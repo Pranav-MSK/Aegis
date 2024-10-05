@@ -1,0 +1,78 @@
+/* Global styling for the activation page */
+body {
+    background-color: #f8f9fa; /* Light grey background */
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Card styling */
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #dddddd;
+    margin: 1.5rem 0;
+}
+
+.license-info {
+    text-align: center;
+}
+
+.license-info h4 {
+    font-size: 1.6rem;
+    color: #2980b9;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.license-info p {
+    font-size: 1.1rem;
+    color: #34495e;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    font-size: 1.1rem;
+    padding: 12px 20px;
+    border-radius: 6px;
+    border: 1px solid #bdc3c7;
+    box-shadow: none;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #2980b9;
+    box-shadow: none;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.text-center {
+    text-align: center;
+}

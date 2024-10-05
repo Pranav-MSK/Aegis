@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ title }} Activation{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/activation.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="shadow-lg p-4 rounded-lg">
+                <h1 class="card-title text-center mb-4">{{ title }} Activation</h1>
+                {% include 'ext/message.html' %}
+
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group mb-4">
+                        <label for="activation_code">Enter Activation Code</label>
+                        <input type="text" class="form-control" id="activation_code" name="activation_code" 
+                               placeholder="Enter your activation code" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <!-- SystemGuard Unique ID -->
+                {% if systemguard_unique_id %}
+                <div class="text-center mb-4">
+                    <h5>SystemGuard Unique ID</h5>
+                    <p class="lead">{{ systemguard_unique_id }}</p>
+                </div>
+                {% endif %}
+
+                <!-- License Information -->
+                <div class="license-info">
+                    <h4>License Information</h4>
+                    <p class="lead">{{ message }}</p>
+
+                    {% if remaining_days %}
+                    <p>Remaining Days: <strong>{{ remaining_days }}</strong></p>
+                    {% endif %}
+
+                    {% if plan_type %}
+                    <p>Plan Type: <strong>{{ plan_type }}</strong></p>
+                    {% endif %}
+
+                    {% if is_trial %}
+                    <p>Trial Version: <strong>{{ is_trial }}</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

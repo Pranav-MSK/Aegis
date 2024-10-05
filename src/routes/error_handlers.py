@@ -2,7 +2,8 @@ import datetime
 from flask import render_template, blueprints, request, redirect, url_for, flash
 from flask_login import current_user
 
-from src.config import app, logger
+from src.config import app, logger, secret_key
+from src.routes.helper.activation_helper import check_license_expiration
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
 
@@ -89,3 +90,18 @@ def check_password_expiry():
         if current_user.check_password("admin"):
             flash("Security Alert: Please change the default password for your security.", "danger")
             return redirect(url_for('change_password'))
+
+
+    # check for the activation status of the application
+    # try:
+    #     with open('license_key.txt', 'r') as f:
+    #         license_key = f.read()
+
+    #         is_not_expired, remaining_days, _, _ = check_license_expiration(license_key, secret_key)
+    #         if not is_not_expired:
+    #             print("License has expired. Please activate the application.", "danger")
+    #             return redirect(url_for('activation'))
+    #         else:
+    #             print(f"License is valid for {remaining_days} days.", "success")
+    # except FileNotFoundError:
+    #     print("License key not found. Please activate the application.", "danger")

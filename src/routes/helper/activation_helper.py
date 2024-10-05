@@ -1,4 +1,6 @@
 import os
+from datetime import datetime, timedelta
+from cryptography.fernet import Fernet
 import subprocess
 import functools
 
@@ -44,3 +46,35 @@ def calculate_unique_system_id(sudo_password):
     checksum = calculate_checksum(unique_id, number_of_sum_check_digits)
     unique_id += f"{checksum}"
     return unique_id
+
+def verify_activation_code(activation_code, hardware_id, secret_key):
+    try:
+        cipher = Fernet(secret_key)
+        decrypted_data = cipher.decrypt(activation_code.encode()).decode()
+        license_key, received_hardware_id = decrypted_data.split(':')
+        
+        if received_hardware_id == hardware_id:
+            return True, license_key
+        return False, None
+    except Exception as e:
+        return False, f"Error verifying activation code: {str(e)}"
+    
+def check_license_expiration(license_key, secret_key):
+    cipher = Fernet(secret_key)
+    decrypted_license_data = cipher.decrypt(license_key.encode()).decode()
+    
+    license_parts = decrypted_license_data.split('|')
+    if len(license_parts) < 3:
+        return False, "Invalid license format."
+
+    plan_type = license_parts[0]
+    expiration_date_str = license_parts[1]
+    is_trial = license_parts[2]
+    expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
+
+    today = datetime.now()
+    if today > expiration_date:
+        return False, "License has expired."
+
+    remaining_days = (expiration_date - today).days
+    return True, remaining_days, plan_type, is_trial
