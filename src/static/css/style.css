@@ -157,12 +157,12 @@ body {
     transition: transform 0.4s, box-shadow 0.4s;
 }
 
-.os-info-card, .user-card {
+.os-info-card, .user-card, .plan-info-card {
     min-height: 120px;
     transition: transform 0.3s cubic-bezier(0.42, 0, 0.58, 1), /* Smooth in and out transitions */
                 box-shadow 0.3s cubic-bezier(0.42, 0, 0.58, 1);
 }
-.os-info-card:hover, .user-card:hover {
+.os-info-card:hover, .user-card:hover, .plan-info-card:hover {
     transform: translateY(-15px) rotate(3deg) scale(1.1); /* Slightly larger scaling and movement */
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); /* Stronger shadow for more depth */
     transition: transform 0.3s cubic-bezier(0.42, 0, 0.58, 1), /* Add a custom ease for smoother effect */

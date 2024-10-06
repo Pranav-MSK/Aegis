@@ -1,43 +1,43 @@
-/* Global styling for the activation page */
+/* Global styling */
 body {
-    background-color: #f8f9fa; /* Light grey background */
-    font-family: 'Open Sans', sans-serif;
+    background-color: #f4f6f9;
+    font-family: 'Roboto', sans-serif;
+    color: #2c3e50;
 }
 
 /* Card styling */
 .card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
 }
 
 .card-title {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #2c3e50;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #34495e;
+    margin-bottom: 1rem;
 }
 
 hr {
     border: 0;
     height: 1px;
-    background-color: #dddddd;
-    margin: 1.5rem 0;
+    background-color: #dcdcdc;
+    margin: 3rem 0;
 }
 
-.license-info {
-    text-align: center;
-}
-
+/* License information */
 .license-info h4 {
     font-size: 1.6rem;
     color: #2980b9;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
 }
 
 .license-info p {
-    font-size: 1.1rem;
-    color: #34495e;
+    font-size: 1.2rem;
+    color: #555;
 }
 
 /* Form styling */
@@ -46,33 +46,49 @@ hr {
 }
 
 .form-control {
-    font-size: 1.1rem;
-    padding: 12px 20px;
-    border-radius: 6px;
-    border: 1px solid #bdc3c7;
+    font-size: 1.2rem;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #ced4da;
     box-shadow: none;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .form-control:focus {
-    border-color: #2980b9;
-    box-shadow: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
 }
 
+/* Button styling */
 .btn-primary {
     background-color: #3498db;
     border: none;
-    padding: 12px 30px;
+    padding: 14px 40px;
     font-size: 1.2rem;
-    border-radius: 8px;
+    font-weight: 600;
+    border-radius: 10px;
     transition: background-color 0.3s, box-shadow 0.3s;
+    width: 100%;
 }
 
 .btn-primary:hover {
     background-color: #2980b9;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.2);
 }
 
+/* Text and alignment */
 .text-center {
     text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 1.8rem;
+    }
+    
+    .btn-primary {
+        font-size: 1.1rem;
+        padding: 12px 20px;
+    }
 }

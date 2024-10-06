@@ -6,14 +6,44 @@
 <script src="{{ url_for('static', filename='js/cardChart.js')}}"></script>
 {% endblock %}
 {% block content %}
+<!-- is_plan_not_expired, remaining_plan_days, plan_type, is_trial = get_plan_details(secret_key) -->
+{% if not is_plan_not_expired %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Attention!</strong> Your plan has expired. Please renew your plan to continue using the service.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+{% if is_trial == true %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Notice:</strong> Your trial plan will expire in {{ remaining_plan_days }} days. Please renew your plan to continue using the service.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+{% if remaining_plan_days|int <= 40 and is_trial == false %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Notice:</strong> Your plan will expire in {{ remaining_plan_days }} days. Please renew your plan to continue using the service.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<script>
+    setTimeout(function() {
+        document.querySelector('.alert').style.display = 'none';
+    }, 5000);
+</script>
+
 {% include 'card_comp/selector/refresh_button.html' %}
 <div class="row">
         {% include 'ext/message.html' %}
         <!-- Container for positioning the select input on the right -->
-        <div class="col-md-6 col-lg-6 mb-4">
+        <div class="col-md-6 col-lg-4 mb-4">
                 {% include 'card_comp/other/username.html' %}
         </div>
-        <div class="col-md-6 col-lg-6 mb-4">
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/plan/plan_info.html' %}
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
                 {% include 'card_comp/other/os_info.html' %}
         </div>
 

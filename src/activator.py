@@ -76,5 +76,54 @@ def check_license_expiration(license_key, secret_key):
     if today > expiration_date:
         return False, "License has expired."
 
-    remaining_days = (expiration_date - today).days
-    return True, remaining_days, plan_type, is_trial
+    remaining_plan_days = (expiration_date - today).days
+    return True, remaining_plan_days, plan_type, is_trial
+
+def get_plan_details(secret_key):
+    is_plan_not_expired = False
+    remaining_plan_days = 0
+    plan_type = "Community Edition"
+    is_trial = False
+    license_key = ""
+    activation_code = ""
+    systemguard_unique_id = ""
+    try:
+        with open('internal_license_key.txt', 'r') as f:
+            license_data = f.read()
+            license_key = license_data.split('\n')[0].split(':')[1]
+            activation_code = license_data.split('\n')[1].split(':')[1]
+            systemguard_unique_id = license_data.split('\n')[2].split(':')[1]
+
+            is_plan_not_expired, remaining_plan_days, plan_type, is_trial = check_license_expiration(license_key, secret_key)
+            if not is_plan_not_expired:
+                print("License has expired. Please activate the application.", "danger")
+                return {
+                        "is_plan_not_expired": is_plan_not_expired,
+                        "remaining_plan_days": remaining_plan_days,
+                        "plan_type": plan_type,
+                        "is_trial": is_trial,
+                        "license_key": license_key,
+                        "activation_code": activation_code,
+                        "systemguard_unique_id": systemguard_unique_id
+
+                    }
+            else:
+                return {
+                        "is_plan_not_expired": is_plan_not_expired,
+                        "remaining_plan_days": remaining_plan_days,
+                        "plan_type": plan_type,
+                        "is_trial": is_trial,
+                        "license_key": license_key,
+                        "activation_code": activation_code,
+                        "systemguard_unique_id": systemguard_unique_id
+                    }
+    except FileNotFoundError:
+        return {
+            "is_plan_not_expired": is_plan_not_expired,
+            "remaining_plan_days": remaining_plan_days,
+            "plan_type": plan_type,
+            "is_trial": is_trial,
+            "license_key": license_key,
+            "activation_code": activation_code,
+            "systemguard_unique_id": systemguard_unique_id
+        }

@@ -3,57 +3,71 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/activation.css') }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="shadow-lg p-4 rounded-lg">
-                <h1 class="card-title text-center mb-4">{{ title }} Activation</h1>
-                {% include 'ext/message.html' %}
-
-                <form method="POST">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="form-group mb-4">
-                        <label for="activation_code">Enter Activation Code</label>
-                        <input type="text" class="form-control" id="activation_code" name="activation_code" 
-                               placeholder="Enter your activation code" required>
+            <div class="card shadow-lg rounded-lg">
+                <div class="card-body p-5">
+                    <h1 class="card-title text-center mb-4">{{ title }} Activation</h1>
+                    {% include 'ext/message.html' %}
+                    
+                    {% if not session.get('sudo_password') %}
+                    <!-- alert to show the user that they need to enter the sudo password -->
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Warning!</strong> You need to enter the sudo password to activate the SystemGuard.
                     </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    {% endif %}
+                    <!-- Activation Form -->
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-group mb-4">
+                            <label for="activation_code" class="form-label">Activation Code</label>
+                            <input type="text" class="form-control form-control-lg" id="activation_code" name="activation_code" 
+                                   placeholder="Enter your activation code" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Activate</button>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <hr class="my-5">
+
+                    <!-- SystemGuard Unique ID -->
+                    {% if systemguard_unique_id %}
+                    <div class="text-center mb-4">
+                        <h5 class="fw-bold">SystemGuard Unique ID</h5>
+                        <p class="lead">{{ systemguard_unique_id }}</p>
                     </div>
-                </form>
-
-                <hr class="my-4">
-
-                <!-- SystemGuard Unique ID -->
-                {% if systemguard_unique_id %}
-                <div class="text-center mb-4">
-                    <h5>SystemGuard Unique ID</h5>
-                    <p class="lead">{{ systemguard_unique_id }}</p>
-                </div>
-                {% endif %}
-
-                <!-- License Information -->
-                <div class="license-info">
-                    <h4>License Information</h4>
-                    <p class="lead">{{ message }}</p>
-
-                    {% if remaining_days %}
-                    <p>Remaining Days: <strong>{{ remaining_days }}</strong></p>
                     {% endif %}
 
-                    {% if plan_type %}
-                    <p>Plan Type: <strong>{{ plan_type }}</strong></p>
-                    {% endif %}
+                    <!-- License Information -->
+                    <div class="license-info text-center mt-4">
+                        <h4 class="fw-bold">License Information</h4>
+                        <p class="text-muted">{{ message }}</p>
 
-                    {% if is_trial %}
-                    <p>Trial Version: <strong>{{ is_trial }}</strong></p>
-                    {% endif %}
+                        {% if remaining_plan_days %}
+                        <p>Remaining Days: <strong>{{ remaining_plan_days }}</strong></p>
+                        {% endif %}
+
+                        {% if plan_type %}
+                        <p>Plan Type: <strong>{{ plan_type }}</strong></p>
+                        {% endif %}
+
+                        {% if is_trial %}
+                        <p>Trial Version: <strong>{{ is_trial }}</strong></p>
+                        {% endif %}
+                        
+                        
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+

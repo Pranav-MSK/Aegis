@@ -4,6 +4,7 @@ import platform
 import datetime
 import subprocess
 import psutil
+import functools
 from jinja2 import Environment, FileSystemLoader
 
 from src.logger import logger
@@ -156,6 +157,7 @@ def get_cpu_frequency():
     max_freq = round(psutil.cpu_freq().max)
     return current_freq, max_freq
 
+@functools.lru_cache(maxsize=1)
 def get_cpu_core_count():
     """
     Get the number of CPU cores.
@@ -244,6 +246,7 @@ def get_disk_used():
     """
     return round(psutil.disk_usage("/").used / CONVERSION_FACTOR_GB, 1)
 
+@functools.lru_cache(maxsize=1)
 def get_disk_total():
     """Returns the total disk space in GB.
     ---
@@ -266,6 +269,7 @@ def get_disk_usage_percent():
     return disk_usage.percent
 
 
+@functools.lru_cache(maxsize=1)
 def get_memory_available():
     """Returns the available memory in GB.
     ---
@@ -337,6 +341,7 @@ def render_template_from_file(template_file_path, **context):
     
     return rendered_html
 
+@functools.lru_cache(maxsize=1)
 def get_os_info():
     kernel_version = platform.release()
     os_name = platform.system()
@@ -375,7 +380,7 @@ def check_battery_status():
     return output
 
 
-# TODO: cache the result to avoid reading the file every time
+@functools.lru_cache(maxsize=1)
 def get_os_release_info():
     """
     Reads /etc/os-release and returns a dictionary with distribution information.
@@ -407,7 +412,8 @@ def get_os_release_info():
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
-    
+
+@functools.lru_cache(maxsize=1)
 def get_linux_processor_name():
     """ Get the processor name from /proc/cpuinfo.
     ---

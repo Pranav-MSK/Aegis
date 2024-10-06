@@ -104,3 +104,4 @@ def load_secret_key():
     except Exception as e:
         # temporary fix
         return "1234567890123456"
+

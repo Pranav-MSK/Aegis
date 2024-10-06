@@ -9,6 +9,7 @@ from flask_caching import Cache
 
 from src.logger import logger
 from src.helper import get_system_node_name, get_ip_address, load_secret_key
+from src.activator import get_plan_details
 # from src.utils import get_ip_address, get_system_node_name
 
 app = Flask(__name__)
@@ -53,6 +54,9 @@ limiter.init_app(app)
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app)
 
+# systemgaurd plan details
+plan_details = get_plan_details(secret_key)
+
 # Define global variables for templates
 app.jinja_env.globals.update(
     title=APP_NAME,
@@ -65,6 +69,14 @@ app.jinja_env.globals.update(
     contact_email=CONTACT_EMAIL,
     system_name=SYSTEM_NAME,
     system_ip_address=SYSTEM_IP_ADDRESS,
+    is_plan_not_expired=plan_details.get('is_plan_not_expired'),
+    remaining_plan_days=plan_details.get('remaining_plan_days'),
+    plan_type=plan_details.get('plan_type'),
+    is_trial=plan_details.get('is_trial'),
+    license_key=plan_details.get('license_key'),
+    activation_code=plan_details.get('activation_code'),
+    systemguard_unique_id=plan_details.get('systemguard_unique_id'),
+
 )
 
 def get_app_info():
@@ -80,4 +92,11 @@ def get_app_info():
         "contact_email": CONTACT_EMAIL,
         "system_name": SYSTEM_NAME,
         "system_ip_address": SYSTEM_IP_ADDRESS,
+        "is_plan_not_expired": plan_details.get('is_plan_not_expired'),
+        "remaining_plan_days": plan_details.get('remaining_plan_days'),
+        "plan_type": plan_details.get('plan_type'),
+        "is_trial": plan_details.get('is_trial'),
+        "license_key": plan_details.get('license_key'),
+        "activation_code": plan_details.get('activation_code'),
+        "systemguard_unique_id": plan_details.get('systemguard_unique_id'),
     }

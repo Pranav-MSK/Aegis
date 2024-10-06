@@ -49,4 +49,5 @@ __all__ = [
     "prometheus_bp",
     "alert_bp",
     "webhooks_bp",
+    "activation_bp",
 ]
