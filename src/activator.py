@@ -43,6 +43,7 @@ def calculate_unique_system_id(sudo_password):
     motherboard_serial = get_motherboard_serial(sudo_password)
     unique_id = f"{os_uuid}:{motherboard_serial}"
     unique_id = ''.join(e for e in unique_id if e.isalnum())
+    unique_id = unique_id[::2]
     checksum = calculate_checksum(unique_id, number_of_sum_check_digits)
     unique_id += f"{checksum}"
     return unique_id

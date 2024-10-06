@@ -172,3 +172,6 @@ test.py
 .initialized
 
 *.conf
+internal_license_key.txt
+*.pdf
+*.txt

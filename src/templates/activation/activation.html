@@ -14,7 +14,6 @@
                 <div class="card-body p-5">
                     <h1 class="card-title text-center mb-4">{{ title }} Activation</h1>
                     {% include 'ext/message.html' %}
-                    
                     {% if not session.get('sudo_password') %}
                     <!-- alert to show the user that they need to enter the sudo password -->
                     <div class="alert alert-warning" role="alert">
@@ -22,18 +21,19 @@
                     </div>
                     {% endif %}
                     <!-- Activation Form -->
-                    <form method="POST">
+                    <form method="POST" class="needs-validation" novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-group mb-4">
-                            <label for="activation_code" class="form-label">Activation Code</label>
                             <input type="text" class="form-control form-control-lg" id="activation_code" name="activation_code" 
                                    placeholder="Enter your activation code" required>
+                            <div class="invalid-feedback">
+                                Please enter your activation code.
+                            </div>
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg">Activate</button>
                         </div>
                     </form>
-
                     <!-- Divider -->
                     <hr class="my-5">
 
@@ -45,24 +45,28 @@
                     </div>
                     {% endif %}
 
+                    <div class="license-info text-center mt-4">
+                        <h4 class="fw-bold">Download License File</h4>
+                        <a href="{{ url_for('download_license') }}" class="btn btn-primary">Download</a>
+                    </div>  
+
                     <!-- License Information -->
                     <div class="license-info text-center mt-4">
                         <h4 class="fw-bold">License Information</h4>
-                        <p class="text-muted">{{ message }}</p>
 
                         {% if remaining_plan_days %}
                         <p>Remaining Days: <strong>{{ remaining_plan_days }}</strong></p>
                         {% endif %}
 
                         {% if plan_type %}
-                        <p>Plan Type: <strong>{{ plan_type }}</strong></p>
+                        <p>Plan Type: <strong>{{ plan_type }}</strong>
+                            {% if is_trial == 'true' %}
+                            <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i>Trial</span>
+                            {% else %}
+                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Full</span>
+                            {% endif %}
+                        </p>
                         {% endif %}
-
-                        {% if is_trial %}
-                        <p>Trial Version: <strong>{{ is_trial }}</strong></p>
-                        {% endif %}
-                        
-                        
                     </div>
                 </div>
             </div>

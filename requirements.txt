@@ -39,3 +39,5 @@ pyyaml==6.0.2               # Reads and writes YAML configuration files
 
 # Asynchronous HTTP client/server framework
 aiohttp==3.10.7             # Async HTTP client for non-blocking requests
+
+fpdf==1.7.2                 # PDF generation library

@@ -10,7 +10,13 @@
         <div class="col-md-8">
             <div class="card shadow-lg border-0 rounded-lg animate-card">
                 <div class="card-body p-5">
-                    <h1 class="card-title display-4 mb-3 text-gradient">{{ title }}</h1>
+                    <h1 class="card-title display-4 mb-3 text-gradient">{{ title }} 
+                        {% if is_trial == 'true' %}
+                        <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i>Trial</span>
+                        {% else %}
+                        <span class="badge bg-success">Full <i class="fas fa-check-circle me-1"></i></span>
+                        {% endif %}
+                    </h1>
                     <h4 class="card-subtitle mb-4 text-muted">
                         <i class="fas fa-code-branch me-2"></i>{{ version }}
                         {% if pre_release %}

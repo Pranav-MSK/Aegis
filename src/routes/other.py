@@ -10,6 +10,7 @@ from src.alert_manager import send_smtp_email
 from src.utils import get_os_release_info, get_os_info
 from src.helper import check_installation_information
 from src.routes.helper.common_helper import admin_required
+from src.activator import calculate_unique_system_id
 
 other_bp = blueprints.Blueprint('other', __name__)
 

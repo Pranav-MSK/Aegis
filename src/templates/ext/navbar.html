@@ -119,6 +119,16 @@
                 </a>
             </li>
             {% endif %}
+            <!-- is_trial -->
+            {% if is_trial == 'true' %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('activation') }}">
+                    <span class="badge bg-warning d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                    Trial Version
+                </a>
+            </li>
+            {% endif %}
         </ul>
     </div>
 </nav>
