@@ -24,6 +24,7 @@ def firewall():
     """
     message = ''
     open_ports = []
+    sudo_password = session.get('sudo_password', '')
 
     if request.method == 'POST':
         if 'port' in request.form and 'protocol' in request.form and 'action' in request.form:
