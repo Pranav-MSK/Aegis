@@ -44,12 +44,13 @@
                         <p class="lead">{{ systemguard_unique_id }}</p>
                     </div>
                     {% endif %}
-
+                    
+                    {% if is_plan_not_expired %}
                     <div class="license-info text-center mt-4">
                         <h4 class="fw-bold">Download License File</h4>
                         <a href="{{ url_for('download_license') }}" class="btn btn-primary">Download</a>
                     </div>  
-
+                    {% endif %}
                     <!-- License Information -->
                     <div class="license-info text-center mt-4">
                         <h4 class="fw-bold">License Information</h4>
@@ -63,7 +64,9 @@
                             {% if is_trial == 'true' %}
                             <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i>Trial</span>
                             {% else %}
-                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Full</span>
+                            {% if is_plan_not_expired %}
+                            <span class="badge bg-success">Full</span>
+                            {% endif %}
                             {% endif %}
                         </p>
                         {% endif %}

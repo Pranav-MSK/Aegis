@@ -10,5 +10,8 @@ pyarmor_distribution() {
     cp -r src/assets dist/src || { echo "Failed to copy assets"; exit 1; }
     cp -r src/templates dist/src || { echo "Failed to copy templates"; exit 1; }
     cp -r src/static dist/src || { echo "Failed to copy static"; exit 1; }
+    cp -r src/scripts dist/src || { echo "Failed to copy scripts"; exit 1; }
     cp .env dist || { echo "Failed to copy .env"; exit 1; }
 }
+
+pyarmor_distribution

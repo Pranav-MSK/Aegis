@@ -7,20 +7,22 @@
 {% endblock %}
 {% block content %}
 <!-- is_plan_not_expired, remaining_plan_days, plan_type, is_trial = get_plan_details(secret_key) -->
-{% if not is_plan_not_expired %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Attention!</strong> Your plan has expired. Please renew your plan to continue using the service.
+
+{% if plan_type == 'Free Edition' or plan_type == 'Community Edition' %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>Notice:</strong> You are using the <strong>{{ plan_type }}</strong> plan. Upgrade to a premium plan to unlock all features.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
-{% if is_trial == true %}
+
+{% if is_trial == true and is_plan_not_expired %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <strong>Notice:</strong> Your trial plan will expire in {{ remaining_plan_days }} days. Please renew your plan to continue using the service.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
 
-{% if remaining_plan_days|int <= 40 and is_trial == false %}
+{% if remaining_plan_days|int <= 10 and is_trial == false and is_plan_not_expired %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <strong>Notice:</strong> Your plan will expire in {{ remaining_plan_days }} days. Please renew your plan to continue using the service.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

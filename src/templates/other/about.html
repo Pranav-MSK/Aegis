@@ -14,7 +14,9 @@
                         {% if is_trial == 'true' %}
                         <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i>Trial</span>
                         {% else %}
+                        {% if is_plan_not_expired %}
                         <span class="badge bg-success">Full <i class="fas fa-check-circle me-1"></i></span>
+                        {% endif %}
                         {% endif %}
                     </h1>
                     <h4 class="card-subtitle mb-4 text-muted">

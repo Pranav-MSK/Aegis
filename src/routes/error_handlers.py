@@ -76,7 +76,7 @@ def check_password_expiry():
     # Perform checks only for authenticated users
     if current_user.is_authenticated:
         remaining_days = days_until_password_expiry(current_user)
-        print("Remaining days:", remaining_days)
+        
         # Redirect if the password has expired
         if remaining_days <= 0:
             flash("Your password has expired. Please change it to continue.", "danger")
@@ -91,18 +91,4 @@ def check_password_expiry():
             flash("Security Alert: Please change the default password for your security.", "danger")
             return redirect(url_for('change_password'))
 
-
-    # # check for the activation status of the application
-    # # try:
-    # #     with open('license_key.txt', 'r') as f:
-    # #         license_key = f.read()
-
-    # #         is_not_expired, remaining_days, _, _ = check_license_expiration(license_key, secret_key)
-    # #         if not is_not_expired:
-    # #             print("License has expired. Please activate the application.", "danger")
-    # #             return redirect(url_for('activation'))
-    # #         else:
-    # #             print(f"License is valid for {remaining_days} days.", "success")
-    # # except FileNotFoundError:
-    # #     print("License key not found. Please activate the application.", "danger")
-
+    # logic to check the plan expiration : TODO

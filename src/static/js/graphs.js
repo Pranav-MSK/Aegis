@@ -93,7 +93,7 @@ function createChart(ctx, labels, datasets, yLabel) {
 
     // add h2 element to the parent node
     const h2 = document.createElement('h2');
-    h2.innerHTML = `<i class="fas fa-microchip"></i> ${yLabel}`;
+    h2.innerHTML = `<i class="fas fa-chart-line"></i> ${yLabel}`;
     //css top and left
     h2.style.position = 'absolute';
     h2.style.top = '25px';

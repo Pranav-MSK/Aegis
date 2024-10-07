@@ -5,6 +5,7 @@ import subprocess
 import functools
 
 number_of_sum_check_digits = 5
+internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
 
 def calculate_checksum(unique_id, num_of_digits=2):
     """Calculate a simple checksum for the given unique ID."""
@@ -61,12 +62,14 @@ def verify_activation_code(activation_code, hardware_id, secret_key):
         return False, f"Error verifying activation code: {str(e)}"
     
 def check_license_expiration(license_key, secret_key):
+    plan_type = "Free Edition"
+    is_trial = False
     cipher = Fernet(secret_key)
     decrypted_license_data = cipher.decrypt(license_key.encode()).decode()
     
     license_parts = decrypted_license_data.split('|')
     if len(license_parts) < 3:
-        return False, "Invalid license format."
+        return False, "Invalid license format.", plan_type, is_trial
 
     plan_type = license_parts[0]
     expiration_date_str = license_parts[1]
@@ -75,7 +78,7 @@ def check_license_expiration(license_key, secret_key):
 
     today = datetime.now()
     if today > expiration_date:
-        return False, "License has expired."
+        return False, "License has expired.", plan_type, is_trial
 
     remaining_plan_days = (expiration_date - today).days
     return True, remaining_plan_days, plan_type, is_trial
@@ -83,17 +86,17 @@ def check_license_expiration(license_key, secret_key):
 def get_plan_details(secret_key):
     is_plan_not_expired = False
     remaining_plan_days = 0
-    plan_type = "Community Edition"
+    plan_type = "Free Edition"
     is_trial = False
     license_key = ""
     activation_code = ""
     systemguard_unique_id = ""
     try:
-        with open('internal_license_key.txt', 'r') as f:
+        with open(internal_license_key_path, 'r') as f:
             license_data = f.read()
-            license_key = license_data.split('\n')[0].split(':')[1]
-            activation_code = license_data.split('\n')[1].split(':')[1]
-            systemguard_unique_id = license_data.split('\n')[2].split(':')[1]
+            license_key = license_data.split('\n')[1].split(':')[1]
+            activation_code = license_data.split('\n')[2].split(':')[1]
+            systemguard_unique_id = license_data.split('\n')[3].split(':')[1]
 
             is_plan_not_expired, remaining_plan_days, plan_type, is_trial = check_license_expiration(license_key, secret_key)
             if not is_plan_not_expired:
