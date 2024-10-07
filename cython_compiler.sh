@@ -54,13 +54,13 @@ compile_c_files() {
 # Function to copy necessary files to output directory
 copy_files() {
     echo "Copying necessary files..."
+    cp requirements.txt "$COMPILED_CODE_DIR" || { echo "Failed to copy app.py"; exit 1; }
     cp app.py "$COMPILED_CODE_DIR" || { echo "Failed to copy app.py"; exit 1; }
+    cp setup.sh "$COMPILED_CODE_DIR" || { echo "Failed to copy .env"; exit 1; }
     cp -r src/assets "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy assets"; exit 1; }
     cp -r src/templates "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy templates"; exit 1; }
     cp -r src/static "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy static"; exit 1; }
     cp -r src/scripts "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy scripts"; exit 1; }
-    cp .env "$COMPILED_CODE_DIR" || { echo "Failed to copy .env"; exit 1; }
-    
 }
 
 cleanup() {

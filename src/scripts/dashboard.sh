@@ -133,7 +133,7 @@ fi
 # Check if the Conda environment exists and create it if not
 if ! conda info --envs | awk '{print $1}' | grep -q "^$CONDA_ENV_NAME$"; then
     log_message "Conda environment '$CONDA_ENV_NAME' not found. Creating it..."
-    conda create -n "$CONDA_ENV_NAME" python=3.10 -y
+    conda create -n "$CONDA_ENV_NAME" python=3.12 -y
 
     log_message "Activating Conda environment '$CONDA_ENV_NAME' and installing requirements."
     conda run -n "$CONDA_ENV_NAME" pip install -r "$REQUIREMENTS_FILE"
