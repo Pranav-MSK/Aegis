@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 def obfuscated_key_retriever():
     # Load the shared object file
     lib = ctypes.CDLL(os.path.join(ROOT_DIR, "key_storage.so"))
@@ -24,8 +25,9 @@ def get_system_username():
     """
     return os.getlogin()
 
+
 def get_system_node_name():
-    """ 
+    """
     Get the system node name.
     ---
     Parameters:
@@ -35,13 +37,17 @@ def get_system_node_name():
     """
     return os.uname().nodename
 
+
 def get_ip_address():
     try:
-        result = subprocess.run(['hostname', '-I'], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["hostname", "-I"], capture_output=True, text=True, check=True
+        )
         ip_address = result.stdout.split()[0]
         return ip_address
     except (IndexError, subprocess.CalledProcessError) as e:
         return None
+
 
 def check_installation_information():
     # Output dictionary to store results
@@ -52,7 +58,7 @@ def check_installation_information():
         "git_repo": None,
         "last_commit_date": None,
         "last_commit_message": None,
-        "update_available": False
+        "update_available": False,
     }
 
     # Check if .git directory exists
@@ -74,7 +80,12 @@ def check_installation_information():
 
     # Get the last commit information
     try:
-        result = subprocess.run(["git", "log", "-1", "--pretty=format:%H|%ad|%s", "--date=short"], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["git", "log", "-1", "--pretty=format:%H|%ad|%s", "--date=short"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         commit_data = result.stdout.split("|")
         output["git_commit"] = commit_data[0]
         output["last_commit_date"] = commit_data[1]
@@ -84,7 +95,9 @@ def check_installation_information():
 
     # Check for updates
     try:
-        result = subprocess.run(["git", "status", "-uno"], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["git", "status", "-uno"], capture_output=True, text=True, check=True
+        )
         if "Your branch is up to date" in result.stdout:
             output["update_available"] = False
         else:
@@ -95,29 +108,12 @@ def check_installation_information():
     return output
 
 
-
 def load_secret_key():
     """Load the secret key for the application."""
     load_dotenv()
     try:
         secret_key = obfuscated_key_retriever()
         if secret_key:
-            print("Obfuscated key retrieved successfully.")
-            print("secret_key: ", secret_key)
             return secret_key
-
-        secret_key = os.getenv('SYSTEMGUARD_KEY')    
-        if secret_key:
-            return secret_key
-        else:
-            try:
-                with open('secret.key', 'rb') as key_file:
-                    secret_key = key_file.read()
-                    return secret_key
-            except FileNotFoundError:
-                raise FileNotFoundError("The secret key file 'secret.key' was not found.")
-            except Exception as e:
-                raise RuntimeError(f"An error occurred while reading the secret key: {e}")
     except Exception as e:
         raise RuntimeError(f"An error occurred while reading the secret key")
-
