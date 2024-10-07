@@ -2,7 +2,7 @@ import os
 from flask import render_template, request, Blueprint, jsonify, session, flash, redirect, url_for, send_file
 
 from src.utils import ROOT_DIR
-from src.config import app, secret_key
+from src.config import app, secret_key, limiter
 from src.activator import (
     calculate_unique_system_id, 
     verify_activation_code, 
@@ -49,12 +49,12 @@ def activation():
                            license_key=license_key)
 
 @app.route('/download-license', methods=['GET'])
+@limiter.limit("1 per minute", error_message="Only 1 download per minute is allowed.")
 def download_license():
     try:
         sudo_password = session.get('sudo_password', '')
-        license_file_path = os.path.join(ROOT_DIR, 'internal_license_key.txt')
         systemguard_unique_id = calculate_unique_system_id(sudo_password)
-        pdf_file_path = generate_license_pdf(license_file_path)
+        pdf_file_path = generate_license_pdf(internal_license_key_path)
         return send_file(pdf_file_path, as_attachment=True, download_name=f"license_{systemguard_unique_id}.pdf")
     except Exception as e:
         flash('Error downloading the license file: {}'.format(str(e)), 'danger')

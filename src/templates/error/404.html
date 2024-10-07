@@ -7,10 +7,16 @@
 {% block content %}
 <div class="not-found-container">
     <div class="content-wrapper">
-        <div class="icon">&#128577;</div> <!-- Unicode for a sad face -->
+        <div class="icon">
+            <img src="{{ url_for('static', filename='images/sad-face.jpeg') }}" alt="Sad Face" style="border-radius: 50%;" />
+        </div>
         <h1>404</h1>
-        <p>Oops! The page you are looking for does not exist.</p>
-        <a href="{{ url_for('dashboard') }}" class="btn">Go Back Home</a>
+        <h2>Oops! The page you are looking for does not exist.</h2>
+        <p>It seems we can’t find the page you’re looking for. It might have been removed, had its name changed, or is temporarily unavailable.</p>
+        <div class="button-container">
+            <a href="{{ url_for('dashboard') }}" class="btn">Go Back Home</a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Contact Support</a>
+        </div>
     </div>
 </div>
 {% endblock %}

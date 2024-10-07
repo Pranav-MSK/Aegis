@@ -139,6 +139,21 @@ def show_os_info():
 def terms():
     return render_template('other/terms.html')
 
+@app.route('/privacy')
+def privacy():
+    return render_template('other/privacy.html')
+
+# @app.route('/faq')
+# def faq():
+#     return render_template('other/faq.html')
+
+# @app.route('/changelog')
+# def changelog():
+#     return render_template('other/changelog.html')
+
+# @app.route('/contact')
+# def contact():
+#     return render_template('other/contact.html')
 
 @app.route('/update_git_version', methods=['POST'])
 @admin_required

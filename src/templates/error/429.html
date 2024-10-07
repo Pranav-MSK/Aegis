@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+{% block title %}Too Many Requests{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/error.css') }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <h1 class="error-title">429</h1>
+    <h2 class="error-subtitle">Too Many Requests</h2>
+    <p class="error-message">Limit exceeded! You have reached the maximum number of requests allowed.</p>
+    <p class="error-message">{{error_message}} </p> 
+    
+    <div class="suggestions">
+        <h3>What can you do?</h3>
+        <ul>
+            <li>Check your request frequency and try again later.</li>
+            <li>Ensure that you're not sending too many requests in a short period.</li>
+            <li>If you believe this is a mistake, please contact support.</li>
+        </ul>
+    </div>
+    
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Home</a>
+</div>
+{% endblock %}

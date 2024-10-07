@@ -30,7 +30,9 @@ def method_not_allowed(e):
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    return "Too many requests, please try again later.", 429
+    return render_template("error/429.html", 
+                           error_message=e.description,
+                           ), 429
 
 @app.errorhandler(500)
 def internal_server_error(e):

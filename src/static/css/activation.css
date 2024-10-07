@@ -1,57 +1,64 @@
-/* Global styling */
+/* Global styles */
 body {
     background-color: #f4f6f9;
     font-family: 'Roboto', sans-serif;
     color: #2c3e50;
+    margin: 0;
+    padding: 0;
 }
 
-/* Card styling */
-.card {
-    background-color: #fff;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    padding: 2rem;
+/* Activation Container */
+.activation-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
 }
 
-.card-title {
-    font-size: 2.2rem;
+.activation-container:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 2.5rem;
     font-weight: 700;
-    color: #34495e;
-    margin-bottom: 1rem;
+    color: #1c7ee0;
 }
 
-hr {
-    border: 0;
-    height: 1px;
-    background-color: #dcdcdc;
-    margin: 3rem 0;
-}
-
-/* License information */
-.license-info h4 {
-    font-size: 1.6rem;
-    color: #2980b9;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-}
-
-.license-info p {
+.subtitle {
     font-size: 1.2rem;
-    color: #555;
+    color: #7f8c8d;
 }
 
-/* Form styling */
+/* Form styles */
+.activation-form {
+    margin: 20px 0;
+}
+
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.label {
+    font-weight: 500;
+    margin-bottom: 5px;
 }
 
 .form-control {
-    font-size: 1.2rem;
-    padding: 14px;
-    border-radius: 10px;
+    padding: 15px;
+    font-size: 1.1rem;
     border: 1px solid #ced4da;
-    box-shadow: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
 }
 
 .form-control:focus {
@@ -59,36 +66,92 @@ hr {
     box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
 }
 
-/* Button styling */
-.btn-primary {
+/* Button styles */
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
     background-color: #3498db;
     border: none;
-    padding: 14px 40px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    border-radius: 10px;
-    transition: background-color 0.3s, box-shadow 0.3s;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
 }
 
-.btn-primary:hover {
+.btn:hover {
     background-color: #2980b9;
     box-shadow: 0 6px 15px rgba(52, 152, 219, 0.2);
 }
 
-/* Text and alignment */
-.text-center {
+/* Divider */
+.divider {
+    height: 1px;
+    background-color: #dcdcdc;
+    margin: 30px 0;
+}
+
+/* Info section styles */
+.info-section {
     text-align: center;
+    margin: 20px 0;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    color: #2980b9;
+    margin-bottom: 10px;
+}
+
+.lead {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+/* Footer styles */
+.footer {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.footer-text {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.footer-link {
+    color: #3498db;
+    margin: 0 10px;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .card-title {
-        font-size: 1.8rem;
+    .title {
+        font-size: 2rem;
     }
-    
-    .btn-primary {
-        font-size: 1.1rem;
-        padding: 12px 20px;
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .form-control {
+        font-size: 1rem;
+    }
+
+    .btn {
+        font-size: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
     }
 }
+    

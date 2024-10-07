@@ -1,0 +1,71 @@
+/* Global styling */
+body {
+    background-color: #f4f6f9;
+    font-family: 'Roboto', sans-serif;
+    color: #2c3e50;
+}
+
+/* Error container styling */
+.error-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Error title */
+.error-title {
+    font-size: 100px;
+    font-weight: 700;
+    color: #e74c3c;
+    margin: 0;
+}
+
+/* Error subtitle */
+.error-subtitle {
+    font-size: 24px;
+    font-weight: 500;
+    color: #34495e;
+}
+
+/* Error message */
+.error-message {
+    font-size: 18px;
+    margin: 20px 0;
+}
+
+/* Suggestions */
+.suggestions {
+    margin: 30px 0;
+    text-align: left;
+}
+
+.suggestions h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.suggestions ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+/* Button styling */
+.btn-primary {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 18px;
+    color: #fff;
+    background-color: #3498db;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}

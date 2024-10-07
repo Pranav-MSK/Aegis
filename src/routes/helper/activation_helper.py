@@ -1,13 +1,14 @@
 import os
 from datetime import datetime
 from fpdf import FPDF
+from src.utils import ROOT_DIR
 
 def generate_license_pdf(license_file_path):
     with open(license_file_path, 'r') as f:
         license_data = f.read()
-        license_key = license_data.split('\n')[0].split(':')[1]
-        activation_code = license_data.split('\n')[1].split(':')[1]
-        systemguard_unique_id = license_data.split('\n')[2].split(':')[1]
+        license_key = license_data.split('\n')[1].split(':')[1]
+        activation_code = license_data.split('\n')[2].split(':')[1]
+        systemguard_unique_id = license_data.split('\n')[3].split(':')[1]
     
     # Create an instance of FPDF
     pdf = FPDF()
