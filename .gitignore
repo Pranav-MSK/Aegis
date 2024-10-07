@@ -175,3 +175,9 @@ test.py
 internal_license_key.txt
 *.pdf
 *.txt
+*.c
+*.so
+*.h
+*.cpp
+*.o
+compiled_code/*
