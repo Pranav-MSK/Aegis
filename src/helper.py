@@ -1,6 +1,17 @@
 import os
+import ctypes
 import subprocess
 from dotenv import load_dotenv
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def obfuscated_key_retriever():
+    # Load the shared object file
+    lib = ctypes.CDLL(os.path.join(ROOT_DIR, "key_storage.so"))
+    lib.get_obfuscated_key.restype = ctypes.c_char_p
+    key = lib.get_obfuscated_key()
+    return key.decode()
+
 
 def get_system_username():
     """
@@ -89,6 +100,12 @@ def load_secret_key():
     """Load the secret key for the application."""
     load_dotenv()
     try:
+        secret_key = obfuscated_key_retriever()
+        if secret_key:
+            print("Obfuscated key retrieved successfully.")
+            print("secret_key: ", secret_key)
+            return secret_key
+
         secret_key = os.getenv('SYSTEMGUARD_KEY')    
         if secret_key:
             return secret_key
@@ -102,6 +119,5 @@ def load_secret_key():
             except Exception as e:
                 raise RuntimeError(f"An error occurred while reading the secret key: {e}")
     except Exception as e:
-        # temporary fix
-        return "1234567890123456"
+        raise RuntimeError(f"An error occurred while reading the secret key")
 
