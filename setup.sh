@@ -43,12 +43,10 @@ USER_NAME=$(get_user_name)
 USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
-DOWNLOAD_DIR="/tmp"
 APP_NAME="SystemGuard"
 INSATLLER_VERSION="v1.0.0"
 APP_NAME_LOWER=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]')
 EXTRACT_DIR="$USER_HOME/.$APP_NAME_LOWER"
-GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
 SOURCE_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-source"
 LOG_DIR="$USER_HOME/logs"
 LOG_FILE="$LOG_DIR/$APP_NAME_LOWER-installer.log"
@@ -63,16 +61,8 @@ FLASK_LOG_FILE="$LOG_DIR/flask.log"
 # Cron job pattern
 CRON_PATTERN=".$APP_NAME_LOWER/${APP_NAME}-.*/src/scripts/dashboard.sh"
 
-# GitHub repository details
-GITHUB_USER="codeperfectplus"
-GITHUB_REPO="$APP_NAME"
-GITHUB_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO"
-ISSUE_TRACKER_URL="$GITHUB_URL/issues"
-
 # Backup settings
 NUM_OF_BACKUP=5
-NUM_OF_RELEASES=5
-NUM_OF_RETRIES=5
 
 # Environment variables
 ENV_FILE="$USER_HOME/.bashrc" # Default environment file
@@ -80,9 +70,6 @@ ENV_FILE="$USER_HOME/.bashrc" # Default environment file
 # authentication
 ADMIN_LOGIN="admin"
 ADMIN_PASSWORD="admin"
-
-# installation script link
-install_script_link="https://raw.githubusercontent.com/codeperfectplus/SystemGuard/main/setup.sh"
 
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
@@ -294,41 +281,12 @@ create_dir() {
 create_dir "$LOG_DIR"
 create_dir "$BACKUP_DIR"
 
-# Function to handle errors
-handle_error() {
-    local exit_code="$1"
-    local message="$2"
-    log "ERROR" "$message"
-    exit "$exit_code"
-}
-
 # Check if running with sudo
 if [ "$EUID" -eq 0 ]; then
     crontab_cmd="crontab -u $USER_NAME"
 else
     crontab_cmd="crontab"
 fi
-
-# Function to create a environment variable in the .bashrc file
-prompt_user() {
-    # Display the prompt with improved formatting
-    message_box "Do you want to enable automatic updates for ${APP_NAME}?\n\nThis will allow ${APP_NAME} to check for updates automatically.\n\n1) Yes (Enable automatic updates)\n2) No (Disable automatic updates)" 0
-    read -p "Enter your choice (1 or 2): " user_choice
-
-    # Convert the user's choice to true/false
-    case "$user_choice" in
-    1)
-        user_choice="true"
-        ;;
-    2)
-        user_choice="false"
-        ;;
-    *)
-        echo "Invalid choice. Please enter 1 or 2."
-        return 1
-        ;;
-    esac
-}
 
 # Function to update the environment variable in the env file
 update_env_variable() {
@@ -354,18 +312,6 @@ set_variable() {
     update_env_variable "$var_name" "$var_value"
 }
 
-# Function to set the auto update variable
-set_auto_update() {
-    var_name=$1
-    prompt_user # Prompt user for input
-
-    # If prompt_user returned an error (invalid choice), exit early
-    if [ $? -ne 0 ]; then
-        return 1
-    fi
-
-    set_variable "$var_name" "$user_choice"
-}
 
 # this function will change the ownership of the directory
 change_ownership() {
@@ -520,36 +466,6 @@ restore() {
     fi
 }
 
-update_executable() {
-    # wget the latest version of the script
-    log "Updating the installer script..."
-    if ! wget -q "$install_script_link" -O "$EXECUTABLE"; then
-        log "ERROR" "Failed to download the latest version of the installer script."
-        exit 1
-    fi
-    
-    # install the script as an executable in /usr/local/bin
-    chmod +x "$EXECUTABLE"
-    log "Installer script updated successfully."
-}
-    
-
-# Function to install the script as an executable
-install_executable() {
-    cd $EXTRACT_DIR/$APP_NAME-*/
-    CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT
-    # Verify that the script exists before attempting to copy
-    if [ -f "$CURRENT_SCRIPT" ]; then
-        log "Installing executable to /usr/local/bin/$APP_NAME_LOWER-installer..."
-        cp "$CURRENT_SCRIPT" "$EXECUTABLE"
-        log "Executable installed successfully."
-    else
-        log "ERROR" "Script file not found. Cannot copy to /usr/local/bin."
-    fi
-}
-
-# remove extract directory, break below functions
-# if the directory is not present
 remove_extract_dir() {
     if [ -d "$EXTRACT_DIR" ]; then
         rm -rf "$EXTRACT_DIR"
@@ -573,50 +489,6 @@ remove_previous_installation() {
     remove_cronjob
 }
 
-# Function to fetch the latest version from GitHub releases
-fetch_latest_version() {
-    log "Fetching the latest version of $APP_NAME from GitHub..."
-
-    # Fetch the latest version from GitHub
-    API_URL="https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases/latest"
-    RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/latest_version.json "$API_URL")
-    HTTP_CODE="${RESPONSE: -3}" # Extract HTTP status code
-
-    # Check for HTTP errors
-    if [ "$HTTP_CODE" -ne 200 ]; then
-        if [ "$HTTP_CODE" -eq 403 ]; then
-            log "ERROR" "GitHub API rate limit exceeded. Try again later or provide a GitHub token."
-        else
-            log "ERROR" "Failed to fetch the latest version. HTTP status code: $HTTP_CODE."
-        fi
-        exit 1
-    fi
-
-    # Parse the version from the JSON response
-    VERSION=$(grep -Po '"tag_name": "\K.*?(?=")' /tmp/latest_version.json)
-
-    # Check if a version was found
-    if [ -z "$VERSION" ]; then
-        log "ERROR" "Unable to extract the version from the GitHub API response."
-        exit 1
-    fi
-
-    log "Latest version found: $VERSION"
-    echo "$VERSION"
-}
-
-# Function to download a release from a given URL
-download_release() {
-    local url=$1
-    local output=$2
-    log "Downloading $APP_NAME from $url..."
-    if ! wget -q "$url" -O "$output"; then
-        log "ERROR" "Failed to download $APP_NAME. Please check the URL and try again."
-        exit 1
-    fi
-    log "Download completed successfully."
-}
-
 # Function to setup the cron job
 setup_cron_job() {
     log "Preparing cron job script..."
@@ -627,150 +499,6 @@ setup_cron_job() {
         log "ERROR" "Failed to add the cron job."
         exit 1
     fi
-}
-
-# Function to install from Git repository
-install_from_git() {
-    set_variable "sg_installation_method" "git"
-    # Backup existing configurations
-    backup_configs
-
-    # Remove any previous installations
-    remove_previous_installation
-    message_box "Select the version of $APP_NAME to install" 0
-    message_box "1. Production (stable) -> Recommended for most users\n2. Development (dev) -> Latest features, may be unstable\n3. Specify a branch -> Enter the branch/tag name when prompted" 0
-    echo "Enter the number of your choice:"
-    read -r VERSION
-
-    # Set Git URL based on user choice
-    case "$VERSION" in
-    1 | "") # Stable is the default option if nothing is entered
-        BRANCH="production"
-        log "Selected Production (stable branch)."
-        ;;
-    2) # Development version
-        BRANCH="dev"
-        log "Selected Development (dev branch)."
-        ;;
-    3) # Specific branch
-        echo "Enter the branch name to install:"
-        read -r BRANCH
-        log "Selected branch: $BRANCH."
-        ;;
-    *) # Invalid input handling
-        BRANCH="production"
-        log "WARNING" "Invalid branch selected. Defaulting to 'production'."
-        ;;
-    esac
-
-    # Construct the full Git URL with branch
-    FULL_GIT_URL="$GITHUB_URL -b $BRANCH"
-
-    set_auto_update "sg_auto_update"
-
-    log "Cloning the $APP_NAME repository from GitHub..."
-    create_dir "$GIT_INSTALL_DIR"
-    if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
-        log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
-        exit 30
-    fi
-
-    log "Repository cloned successfully."
-
-    # Change to the installation directory
-    cd "$GIT_INSTALL_DIR" || {
-        log "ERROR" "Failed to navigate to the installation directory."
-        exit 1
-    }
-
-    log "Setting up $APP_NAME from Git repository..."
-
-    # Install the executable
-    install_executable
-
-    log "$APP_NAME installed successfully from Git!"
-
-    # Set up the cron job if necessary
-    setup_cron_job
-
-    # Change ownership of the installation directory
-    change_ownership "$EXTRACT_DIR"
-
-    log "Installation complete. $APP_NAME is ready to use."
-}
-
-# Function to fetch and display GitHub releases
-fetch_github_releases() {
-    local url="https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases"
-
-    # Check if jq is installed
-    if ! command -v jq &>/dev/null; then
-        echo "Error: jq is not installed. Please install jq to use this function."
-        return 1
-    fi
-
-    # Fetch releases
-    response=$(curl -s "$url")
-
-    # Check if curl command was successful
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to fetch releases from GitHub."
-        return 1
-    fi
-
-    # Check if response contains a valid JSON
-    if ! echo "$response" | jq . >/dev/null 2>&1; then
-        echo "Error: Failed to parse JSON response from GitHub."
-        return 1
-    fi
-    
-    # Prepare the message content
-    local message="Latest releases for ${APP_NAME}:\n\n"
-    message+="$(printf "%-3s %-15s %-20s\n" "Sr.No." "Tag Name" "Published At")\n"
-
-    # Fetch and format release data
-    local release_data
-    release_data=$(echo "$response" | jq -r '.[] | [.tag_name, .published_at] | @tsv' | sort -r -t $'\t' -k2,2 |
-        awk -F'\t' '{ printf "%-3d %-15s %-20s\n", NR, $1, $2 }' | head -n $NUM_OF_RELEASES)
-
-    # Append release data to the message
-    message+="$release_data"
-
-    # Display the message using message_box
-    message_box "$message" 0
-    # Exit with status code 0
-    return 0
-}
-
-# install the latest version of APP from the release
-install_from_release() {
-    fetch_github_releases
-    set_variable "sg_installation_method" "release"
-    echo "Enter the tag name of the release to install (e.g., v1.0.3) or 'latest' for the latest release:"
-    read -r VERSION
-
-    [ "$VERSION" == "latest" ] && fetch_latest_version
-
-    ZIP_URL="$GITHUB_URL/archive/refs/tags/$VERSION.zip"
-    log "Installing $APP_NAME version $VERSION..."
-
-    download_release "$ZIP_URL" "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip"
-
-    backup_configs
-    remove_previous_installation
-
-    log "Setting up installation directory..."
-
-    log "Extracting $APP_NAME package..."
-    unzip -q "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip" -d "$EXTRACT_DIR"
-    rm "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip"
-    log "Extraction completed."
-
-    install_executable
-    setup_cron_job
-
-    change_ownership "$EXTRACT_DIR"
-    log "$APP_NAME version $VERSION installed successfully!"
 }
 
 install_using_setup_file_in_cwd() {
@@ -859,28 +587,8 @@ install() {
     message_box "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')" 0
     check_dependencies
     
-    message_box "Choose the installation method\nNote: Release is recommended for production use." 0
-    message_box "1. Release (More Stable Version)\n2. Git Repository (Pre-Release Version)\n3. Source Code (Current Directory)" 0
-
-    echo "Enter the number of your choice:"
-    read -r INSTALL_METHOD
-
-    case $INSTALL_METHOD in
-    1)
-        install_from_release
-        ;;
-    2)
-        install_from_git
-        ;;
-    3)
-        install_from_source_code
-        ;;
-    *)
-        log "Invalid installation method. Please choose '1' for Git repository or '2' for Release."
-        exit 1
-        ;;
-    esac
-        PROMETHEUS_INSTALL_SCRIPT=$(find "$EXTRACT_DIR" -name start_prometheus.sh) || {
+    install_from_source_code
+    PROMETHEUS_INSTALL_SCRIPT=$(find "$EXTRACT_DIR" -name start_prometheus.sh) || {
         log "ERROR" "Prometheus installation script not found."
         exit 1
     }
@@ -895,29 +603,6 @@ uninstall() {
     log "Uninstalling $APP_NAME..."
     remove_previous_installation
     stop_server
-}
-
-# Load test function to start Locust server
-load_test() {
-    log "Starting Locust server for load testing..."
-    echo "It's for advanced users only. Do you want to continue? (y/n)"
-    read -r CONFIRM
-    if [ "$CONFIRM" != "y" ]; then
-        log "Load test aborted by user."
-        exit 0
-    fi
-
-    # Check if Locust is installed
-    if ! command -v locust &>/dev/null; then
-        log "WARNING" "Locust is not installed. Please install it first."
-        exit 1
-    fi
-
-    # Start Locust server
-    log "Starting Locust server..."
-    LOCUST_FILE=$(find "$EXTRACT_DIR" -name "locustfile.py" | head -n 1)
-    echo "locust file: $LOCUST_FILE"
-    locust -f "$LOCUST_FILE" --host="$HOST_URL"
 }
 
 # Check if APP is installed
@@ -1097,9 +782,6 @@ show_help() {
     echo "  --restore                  Restore $APP_NAME from a backup."
     echo "                             Use this option to recover data or settings from a previous backup."
     echo ""
-    echo "  --load-test                Start Locust load testing for $APP_NAME."
-    echo "                             This will initiate performance testing to simulate multiple users."
-    echo ""
     echo "  --status                   Check the status of $APP_NAME installation."
     echo "                             Displays whether $APP_NAME is installed, running, or if there are any issues."
     echo ""
@@ -1123,9 +805,6 @@ show_help() {
     echo " --install-latest            Update the code to the latest version."
     echo "                             This will pull the latest code from the Git repository."
     echo ""
-    echo " --update-executable         Update the installer to the latest version."
-    echo "                             This will download the latest version of the installer."
-    echo ""
     echo " --install-alert-manager     Install the Alert Manager."
     echo "                             This will install the Alert Manager."
     echo ""
@@ -1139,7 +818,6 @@ for arg in "$@"; do
     --install) ACTION="install" ;;
     --uninstall) ACTION="uninstall" ;;
     --restore) ACTION="restore" ;;
-    --load-test) ACTION="load_test" ;;
     --status) ACTION="check_status" ;;
     --health-check) ACTION="health_check" ;;
     --clean-backups) ACTION="cleanup_backups" ;;
@@ -1164,14 +842,6 @@ for arg in "$@"; do
         open_browser
         exit 0
         ;;
-    --fetch-github-releases)
-        fetch_github_releases
-        exit 0
-        ;;
-    --update-executable)
-        update_executable
-        exit 0
-        ;;
     --install-alert-manager)
         install_alert_manager
         exit 0
@@ -1193,7 +863,6 @@ case $ACTION in
 install) install ;;
 uninstall) uninstall ;;
 restore) restore ;;
-load_test) load_test ;;
 check_status) check_status ;;
 health_check) health_check ;;
 cleanup_backups) cleanup_backups ;;
@@ -1203,7 +872,6 @@ installation-logs) show_installer_logs ;;
 fix) fix ;;
 install_latest) install_latest ;;
 open_browser) open_browser ;;
-fetch_github_releases) fetch_github_releases ;;
 update_executable) update_executable ;;
 *) echo "No action specified. Use --help for usage information." ;;
 esac

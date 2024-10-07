@@ -5,6 +5,9 @@ ROOT_DIR=$(pwd)
 SRC_DIR=$ROOT_DIR/src
 COMPILED_CODE_DIR="$ROOT_DIR/compiled_code"
 COMPILED_CODE_SRC_DIR="$COMPILED_CODE_DIR/src"
+PROMETHEUS_OUTPUT_DIR="$COMPILED_CODE_DIR/prometheus_config"
+
+mkdir -p "$PROMETHEUS_OUTPUT_DIR"
 
 # Function to find all .py files in the src directory
 find_python_files() {
@@ -44,7 +47,7 @@ compile_c_files() {
         base_name=$(basename "$c_file" .c)
         
         # Compile to a .so file in the corresponding output directory
-        gcc -shared -o "$COMPILED_CODE_SRC_DIR/$output_file_dir/$base_name.so" -fPIC $(python3 -m pybind11 --includes) "$c_file" || {
+        gcc -shared -o "$COMPILED_CODE_SRC_DIR/$output_file_dir/$base_name.so" -fPIC $(python -m pybind11 --includes) "$c_file" || {
             echo "Failed to compile $c_file"
             exit 1
         }
@@ -61,6 +64,7 @@ copy_files() {
     cp -r src/templates "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy templates"; exit 1; }
     cp -r src/static "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy static"; exit 1; }
     cp -r src/scripts "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy scripts"; exit 1; }
+    cp prometheus_config/alert_rules.yml "$PROMETHEUS_OUTPUT_DIR/" || { echo "Failed to copy prometheus_config"; exit 1; }
 }
 
 cleanup() {
