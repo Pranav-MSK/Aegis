@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define directories
-SRC_DIR="src"
-COMPILED_CODE_DIR="compiled_code"
-OUTPUT_DIR="$COMPILED_CODE_DIR/src"
-C_OUTPUT_DIR="output/c_source"
+ROOT_DIR=$(pwd)
+SRC_DIR=$ROOT_DIR/src
+COMPILED_CODE_DIR="$ROOT_DIR/compiled_code"
+COMPILED_CODE_SRC_DIR="$COMPILED_CODE_DIR/src"
 
 # Function to find all .py files in the src directory
 find_python_files() {
@@ -19,28 +19,32 @@ find_python_files() {
 generate_c_files() {
     echo "Generating C files from Python files..."
     python_files=$(find_python_files)
-    python3 setup.py build_ext --inplace || {
-        echo "Failed to generate C files"
-        exit 0
-    }
+
+    # Loop through each Python file and generate corresponding C file using cython
+    for py_file in $python_files; do
+        cython "$py_file" -o "${py_file%.py}.c" || {
+            echo "Failed to generate C file for $py_file"
+            exit 1
+        }
+    done
 }
 
 # Function to compile .c files to .so files
 compile_c_files() {
     local dir="$1"
-    echo "Compiling .c files to .so files in $dir..."
+    echo "Compiling .c files to .so files in $COMPILED_CODE_SRC_DIR..."
 
     find "$dir" -name "*.c" | while read -r c_file; do
         # Get the relative path and create output directory
         relative_path="${c_file#$SRC_DIR/}"
         output_file_dir="$(dirname "$relative_path")"
-        mkdir -p "$OUTPUT_DIR/$output_file_dir"
+        mkdir -p "$COMPILED_CODE_SRC_DIR/$output_file_dir"
         
         # Get the base name of the file without extension
         base_name=$(basename "$c_file" .c)
         
         # Compile to a .so file in the corresponding output directory
-        gcc -shared -o "$OUTPUT_DIR/$output_file_dir/$base_name.so" -fPIC $(python3 -m pybind11 --includes) "$c_file" || {
+        gcc -shared -o "$COMPILED_CODE_SRC_DIR/$output_file_dir/$base_name.so" -fPIC $(python3 -m pybind11 --includes) "$c_file" || {
             echo "Failed to compile $c_file"
             exit 1
         }
@@ -50,19 +54,26 @@ compile_c_files() {
 # Function to copy necessary files to output directory
 copy_files() {
     echo "Copying necessary files..."
-    cp app.py $COMPILED_CODE_DIR || { echo "Failed to copy app.py"; exit 1; }
-    cp -r src/assets "$OUTPUT_DIR" || { echo "Failed to copy assets"; exit 1; }
-    cp -r src/templates "$OUTPUT_DIR" || { echo "Failed to copy templates"; exit 1; }
-    cp -r src/static "$OUTPUT_DIR" || { echo "Failed to copy static"; exit 1; }
-    cp -r src/scripts "$OUTPUT_DIR" || { echo "Failed to copy scripts"; exit 1; }
+    cp app.py "$COMPILED_CODE_DIR" || { echo "Failed to copy app.py"; exit 1; }
+    cp -r src/assets "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy assets"; exit 1; }
+    cp -r src/templates "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy templates"; exit 1; }
+    cp -r src/static "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy static"; exit 1; }
+    cp -r src/scripts "$COMPILED_CODE_SRC_DIR" || { echo "Failed to copy scripts"; exit 1; }
     cp .env "$COMPILED_CODE_DIR" || { echo "Failed to copy .env"; exit 1; }
     
 }
 
-# # Main execution flow
-# mkdir -p "$OUTPUT_DIR"
-# # generate_c_files
-# compile_c_files "$SRC_DIR"
+cleanup() {
+    # clean all created *.c files and build directory
+    find "$SRC_DIR" -name "*.c" -delete
+    rm -rf build
+}
+
+# Main execution flow
+mkdir -p "$COMPILED_CODE_SRC_DIR"
+generate_c_files
+compile_c_files "$SRC_DIR"
 copy_files
+# cleanup
 
 echo "Build process completed successfully."
