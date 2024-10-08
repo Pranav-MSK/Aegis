@@ -62,23 +62,24 @@ def verify_activation_code(activation_code, hardware_id, secret_key):
         return False, f"Error verifying activation code: {str(e)}"
     
 def check_license_expiration(license_key, secret_key):
-    plan_type = "Free Edition"
+    base_plan = "Free Edition"
     is_trial = False
     cipher = Fernet(secret_key)
     decrypted_license_data = cipher.decrypt(license_key.encode()).decode()
     
     license_parts = decrypted_license_data.split('|')
     if len(license_parts) < 3:
-        return False, "Invalid license format.", plan_type, is_trial
+        return False, "Invalid license format.", base_plan, is_trial
 
     plan_type = license_parts[0]
     expiration_date_str = license_parts[1]
     is_trial = license_parts[2]
     expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
 
-    today = datetime.now()
-    if today > expiration_date:
-        return False, "License has expired.", plan_type, is_trial
+    today = datetime.now() + timedelta(days=0)
+    expiration_date_str = expiration_date.strftime('%Y-%m-%d')
+    if today >= expiration_date:
+        return False, "License has expired {}. Please renew the license.".format(expiration_date_str), base_plan, is_trial
 
     remaining_plan_days = (expiration_date - today).days
     return True, remaining_plan_days, plan_type, is_trial

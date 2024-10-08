@@ -2,7 +2,7 @@ import datetime
 from flask import render_template, blueprints, request, redirect, url_for, flash
 from flask_login import current_user
 
-from src.config import app, logger, secret_key
+from src.config import app, logger, secret_key, plan_details
 # from src.activator import check_license_expiration
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
@@ -16,7 +16,9 @@ def server_start():
 @app.errorhandler(403)
 def forbidden(e):
     """Handle 403 Forbidden error."""
-    return render_template("error/403.html"), 403
+    return render_template("error/403.html",
+                           error_message=e.description,
+                           ), 403
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -92,5 +94,3 @@ def check_password_expiry():
         if current_user.check_password("admin"):
             flash("Security Alert: Please change the default password for your security.", "danger")
             return redirect(url_for('change_password'))
-
-    # logic to check the plan expiration : TODO
