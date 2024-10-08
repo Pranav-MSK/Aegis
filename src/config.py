@@ -39,9 +39,10 @@ app.config['SECRET_KEY'] = secret_key
 app.config['WTF_CSRF_SECRET_KEY'] = secret_key
 app.config['WTF_CSRF_TIME_LIMIT'] = 3600
 app.config['WTF_CSRF_HEADER_NAME'] = "X-CSRFToken"
-app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent access to cookies via JavaScript
 app.config['SESSION_COOKIE_SAMESITE'] = "Lax"  # Prevent CSRF attacks via cross-site requests
+app.config['SESSION_COOKIE_SECURE'] = False  # Change to True for production with HTTPS
+
 
 # Initialize the database
 db = SQLAlchemy(app)

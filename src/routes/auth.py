@@ -123,7 +123,7 @@ def signup():
         confirm_password = request.form["confirm_password"]
         user_level = request.form.get(
             "user_level", "user"
-        )  # Default to 'user' if not provided
+        )
         receive_email_alerts = (
             "receive_email_alerts" in request.form
         )  # Checkbox is either checked or not
@@ -133,9 +133,11 @@ def signup():
             flash("Passwords do not match")
             return redirect(url_for("signup"))
 
-        existing_user = UserProfile.query.filter_by(username=username).first()
+        existing_user = UserProfile.query.filter(
+            (UserProfile.username == username) | (UserProfile.email == email)
+        ).first()
         if existing_user:
-            flash("Username already exists")
+            flash("Username or email already exists")
             return redirect(url_for("signup"))
 
         hashed_password = generate_password_hash(password)

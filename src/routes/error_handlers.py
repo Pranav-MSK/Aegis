@@ -1,6 +1,7 @@
 import datetime
 from flask import render_template, blueprints, request, redirect, url_for, flash
 from flask_login import current_user
+from flask_wtf.csrf import CSRFError
 
 from src.config import app, secret_key
 from src.logger import logger
@@ -13,6 +14,10 @@ error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
 def server_start():
     """Log server start."""
     logger.info("Server started")
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    return redirect(url_for('login', error="CSRF token is missing or invalid"))
 
 # Error Handlers
 @app.errorhandler(403)

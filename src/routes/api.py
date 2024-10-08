@@ -93,6 +93,7 @@ def graph_data_api():
             '1 day': 24 * 60 * 60,
             '2 days': 2 * 24 * 60 * 60,
             '3 days': 3 * 24 * 60 * 60,
+            '15 days': 15 * 24 * 60 * 60,
             '1 week': 7 * 24 * 60 * 60,
             '1 month': 30 * 24 * 60 * 60,
             '3 months': 90 * 24 * 60 * 60,
@@ -120,6 +121,7 @@ def graph_data_api():
             step = '30m'
         else:
             step = '1h'
+
 
         # Cache key generation
         cache_key = f"{time_filter}_{start_time}_{end_time}_{step}"

@@ -126,10 +126,10 @@ function createChart(ctx, labels, datasets, yLabel) {
             labels: labels,
             datasets: datasets.map(dataset => ({
                 ...dataset,
-                borderWidth: 2,
+                borderWidth: 1,
                 fill: false,
-                tension: 0.3,
-                pointRadius: 5,
+                tension: 0.5, // Increased tension for a smoother curve
+                pointRadius: 0,
                 pointHoverRadius: 7,
                 backgroundColor: dataset.backgroundColor || 'rgba(75, 192, 192, 0.2)',
                 borderColor: dataset.borderColor || 'rgba(75, 192, 192, 1)',
@@ -140,15 +140,6 @@ function createChart(ctx, labels, datasets, yLabel) {
             scales: {
                 x: {
                     type: 'category',
-                    // title: {
-                    //     display: true,
-                    //     text: 'Time',
-                    //     font: {
-                    //         size: 16,
-                    //         weight: 'bold'
-                    //     },
-                    //     padding: { top: 10, left: 0, right: 0, bottom: 0 }
-                    // },
                     ticks: {
                         autoSkip: true,
                         maxTicksLimit: 6,
@@ -157,10 +148,13 @@ function createChart(ctx, labels, datasets, yLabel) {
                         padding: 10,
                         font: {
                             size: 12,
-                            weight: 'bold'
+                            weight: 'bold',
+                            color: '#333' // Improved color for better visibility
                         }
-                        
-                    }
+                    },
+                    grid: {
+                        display: false // Remove grid lines for a cleaner look
+                    },
                 },
                 y: {
                     beginAtZero: minY < 0 ? false : true,
@@ -169,13 +163,51 @@ function createChart(ctx, labels, datasets, yLabel) {
                         text: yLabel,
                         font: {
                             size: 16,
-                            weight: 'bold'
-                        },                        
+                            weight: 'bold',
+                            color: '#333' // Improved color for better visibility
+                        },
                     },
+                    ticks: {
+                        font: {
+                            size: 12,
+                            weight: 'bold',
+                            color: '#333' // Improved color for better visibility
+                        },
+                        padding: 10,
+                    },
+                    grid: {
+                        display: false // Remove y-axis grid lines for a cleaner look
+                    },
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: 'bold',
+                            color: '#333'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Dark tooltip background for contrast
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    padding: 10,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 12
+                    }
                 }
             }
         }
-    });
+    });    
 }
 
 // Helper function to create or retrieve a button
