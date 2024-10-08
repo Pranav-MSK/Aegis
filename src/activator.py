@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 import subprocess
 import functools
+from src.logger import logger
 
 number_of_sum_check_digits = 5
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
@@ -37,12 +38,11 @@ def get_motherboard_serial(sudo_password):
     except Exception as e:
         return f"Unexpected error: {str(e)}"
 
-@functools.lru_cache(maxsize=1)
 def calculate_unique_system_id(sudo_password):
     """Calculate a unique system identifier using various hardware IDs."""
     os_uuid = get_os_installation_uuid()
-    motherboard_serial = get_motherboard_serial(sudo_password)
-    unique_id = f"{os_uuid}:{motherboard_serial}"
+    # motherboard_serial = get_motherboard_serial(sudo_password)
+    unique_id = f"{os_uuid}"
     unique_id = ''.join(e for e in unique_id if e.isalnum())
     unique_id = unique_id[::2]
     checksum = calculate_checksum(unique_id, number_of_sum_check_digits)
@@ -98,6 +98,20 @@ def get_plan_details(secret_key):
             license_key = license_data.split('\n')[1].split(':')[1]
             activation_code = license_data.split('\n')[2].split(':')[1]
             systemguard_unique_id = license_data.split('\n')[3].split(':')[1]
+
+            is_valid, _ = verify_activation_code(activation_code, systemguard_unique_id, secret_key)
+            if not is_valid:
+                print("Activation code verification failed. Please activate the application.", "danger")
+                return {
+                    "is_plan_not_expired": is_plan_not_expired,
+                    "remaining_plan_days": remaining_plan_days,
+                    "plan_type": plan_type,
+                    "is_trial": is_trial,
+                    "license_key": license_key,
+                    "activation_code": activation_code,
+                    "systemguard_unique_id": systemguard_unique_id
+                }
+
 
             is_plan_not_expired, remaining_plan_days, plan_type, is_trial = check_license_expiration(license_key, secret_key)
             if not is_plan_not_expired:

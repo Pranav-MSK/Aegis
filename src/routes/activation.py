@@ -15,19 +15,12 @@ internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', '
 @app.route('/activation', methods=['GET', 'POST'])
 def activation():
     sudo_password = session.get('sudo_password', '')
-    if sudo_password:
-        systemguard_unique_id = calculate_unique_system_id(sudo_password)
-    else:
-        systemguard_unique_id = "Superadmin mode is required to view the unique system ID."
+    systemguard_unique_id = calculate_unique_system_id(sudo_password)
 
     license_key = None
     activation_code = ""
 
     if request.method == 'POST':
-        if not session.get('sudo_password'):
-            flash('Superadmin mode is required to activate the license. Go to your profile and enter the superadmin password.', 'danger')
-            return redirect(url_for('activation'))
-
         activation_code = request.form.get('activation_code')
         is_valid, new_license_key = verify_activation_code(activation_code, systemguard_unique_id, secret_key)
 

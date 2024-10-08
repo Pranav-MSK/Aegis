@@ -12,28 +12,23 @@
         <h1 class="title">{{ title }} Activation</h1>
         <p class="subtitle">Activate your SystemGuard and start protecting your system now!</p>
     </div>
-    
+
     {% include 'ext/message.html' %}
-    
-    {% if not session.get('sudo_password') %}
+
+    <!-- {% if not session.get('sudo_password') %}
     <div class="alert alert-warning">
         <strong>Warning!</strong> You need to enter the sudo password to activate the SystemGuard.
     </div>
-    {% endif %}
+    {% endif %} -->
 
     <form method="POST" class="activation-form needs-validation" novalidate>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        
+
         <div class="form-group">
             <label for="activation_code">Activation Code</label>
-            {% if not session.get('sudo_password') %}
-                <input type="text" class="form-control" id="activation_code" name="activation_code"
-                       placeholder="Enable sudo password to activate" required disabled>
-                <small class="form-text text-muted">To activate, please enable the sudo password in your session.</small>
-            {% else %}
-                <input type="text" class="form-control" id="activation_code" name="activation_code"
-                       placeholder="Enter your activation code" required>
-            {% endif %}
+
+            <input type="text" class="form-control" id="activation_code" name="activation_code"
+                placeholder="Enter your activation code" required>
             <div class="invalid-feedback">
                 Please enter your activation code.
             </div>

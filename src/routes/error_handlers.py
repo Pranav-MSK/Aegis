@@ -2,7 +2,8 @@ import datetime
 from flask import render_template, blueprints, request, redirect, url_for, flash
 from flask_login import current_user
 
-from src.config import app, logger, secret_key, plan_details
+from src.config import app, logger, secret_key
+from src.activator import get_plan_details
 # from src.activator import check_license_expiration
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
@@ -71,10 +72,32 @@ def days_until_password_expiry(user):
     return (user.password_last_changed + datetime.timedelta(days=60) - datetime.datetime.now()).days
 
 
+
+# # Define global variables for templates
+# app.jinja_env.globals.update(
+#     title=APP_NAME,
+#     description=DESCRIPTION,
+#     author=AUTHOR,
+#     year=YEAR,
+#     version=VERSION,
+#     pre_release=PRE_RELEASE,
+#     project_url=PROJECT_URL,
+#     contact_email=CONTACT_EMAIL,
+#     system_name=SYSTEM_NAME,
+#     system_ip_address=SYSTEM_IP_ADDRESS,
+#     is_plan_not_expired=plan_details.get('is_plan_not_expired'),
+#     remaining_plan_days=plan_details.get('remaining_plan_days'),
+#     plan_type=plan_details.get('plan_type'),
+#     is_trial=plan_details.get('is_trial'),
+#     license_key=plan_details.get('license_key'),
+#     activation_code=plan_details.get('activation_code'),
+#     systemguard_unique_id=plan_details.get('systemguard_unique_id'),
+# )
+
 @app.before_request
 def check_password_expiry():
     # Allow access to login, password change, and static files routes without restriction
-    if request.endpoint in ['login', 'change_password', 'static', 'activation']:
+    if request.endpoint in ['login', 'change_password', 'static']:
         return
 
     # Perform checks only for authenticated users
@@ -94,3 +117,15 @@ def check_password_expiry():
         if current_user.check_password("admin"):
             flash("Security Alert: Please change the default password for your security.", "danger")
             return redirect(url_for('change_password'))
+
+    if request.endpoint in ['activation', 'download_license']:
+        plan_details = get_plan_details(secret_key)
+        app.jinja_env.globals.update(
+            is_plan_not_expired=plan_details.get('is_plan_not_expired'),
+            remaining_plan_days=plan_details.get('remaining_plan_days'),
+            plan_type=plan_details.get('plan_type'),
+            is_trial=plan_details.get('is_trial'),
+            license_key=plan_details.get('license_key'),
+            activation_code=plan_details.get('activation_code'),
+            systemguard_unique_id=plan_details.get('systemguard_unique_id'),
+        )

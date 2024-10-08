@@ -209,8 +209,12 @@ fetch_latest_changes() {
     fi
 }
 
+is_flask_running() {
+    pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" >/dev/null
+}
+
 # Check if Flask app is running
-if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" >/dev/null; then
+if ! is_flask_running; then
     conda run -n "$CONDA_ENV_NAME" pip install -r "$REQUIREMENTS_FILE"
     log_message "INFO" "Flask app is not running. Checking repository and starting it..."
     [ "$auto_update" = true ] && fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
