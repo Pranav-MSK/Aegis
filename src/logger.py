@@ -1,35 +1,47 @@
-import logging
-from logging.handlers import RotatingFileHandler
 import os
+import ctypes
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOG_DIR = os.path.join(ROOT_DIR, 'logs')
-# Create a logs directory if it doesn't exist
-os.makedirs(LOG_DIR, exist_ok=True)
+CURR_DIR = os.path.dirname(os.path.realpath(__file__))
+ROOT_DIR = os.path.dirname(CURR_DIR)
 
-# Log Formatter with datetime, log level, and message
-formatter = logging.Formatter(
-    '%(asctime)s - %(levelname)s - %(message)s', 
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+def load_library(filename):
+    print(f"Loading library: {filename}")
+    try:
+        lib = ctypes.CDLL(filename)
+        return lib
+    except OSError as e:
+        print(f"Error loading library: {e}")
+        raise
 
-# File handler for logging to a file
-file_handler = RotatingFileHandler(
-    os.path.join(LOG_DIR, 'app_debug.log'),
-    maxBytes=10 * 1024 * 1024,  # 10 MB per log file
-    backupCount=5  # Keep up to 5 old log files
-)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
+# Load the shared library
+logger_lib = load_library(os.path.join(ROOT_DIR, 'src/toolkit/logger.so'))
 
-# Set up the logger
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # Log everything (DEBUG, INFO, WARNING, etc.)
-logger.addHandler(file_handler)
+# Define the function prototype
+logger_lib.log_message.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
 
-# Optionally, add console output for real-time debugging (optional)
-# console_handler = logging.StreamHandler()
-# console_handler.setLevel(logging.INFO)
-# console_handler.setFormatter(formatter)
-# logger.addHandler(console_handler)
+class Logger:
+    def __init__(self):
+        pass
 
+    def log_message(self, level, message):
+        """General logger function."""
+        logger_lib.log_message(level.encode('utf-8'), message.encode('utf-8'))
+
+    def info(self, message):
+        """Log an info message."""
+        self.log_message("INFO", message)
+
+    def debug(self, message):
+        """Log a debug message."""
+        self.log_message("DEBUG", message)
+
+    def warn(self, message):
+        """Log a warning message."""
+        self.log_message("WARNING", message)
+
+    def error(self, message):
+        """Log an error message."""
+        self.log_message("ERROR", message)
+
+# Create an instance of the Logger
+logger = Logger()

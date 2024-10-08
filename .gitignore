@@ -182,3 +182,5 @@ internal_license_key.txt
 *.o
 compiled_code/*
 !src/key_storage.c
+!src/toolkit/logger.c
+!src/toolkit/logger.h
