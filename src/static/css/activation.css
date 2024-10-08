@@ -11,7 +11,7 @@ body {
 .activation-container {
     max-width: 600px;
     margin: 2rem auto;
-    padding: 20px;
+    padding: 30px;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -25,13 +25,14 @@ body {
 /* Header */
 .header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .title {
     font-size: 2.5rem;
     font-weight: 700;
     color: #1c7ee0;
+    margin-bottom: 10px;
 }
 
 .subtitle {
@@ -46,11 +47,6 @@ body {
 
 .form-group {
     margin-bottom: 20px;
-}
-
-.label {
-    font-weight: 500;
-    margin-bottom: 5px;
 }
 
 .form-control {
@@ -86,17 +82,18 @@ body {
     box-shadow: 0 6px 15px rgba(52, 152, 219, 0.2);
 }
 
-/* Divider */
-.divider {
-    height: 1px;
-    background-color: #dcdcdc;
-    margin: 30px 0;
-}
-
 /* Info section styles */
 .info-section {
     text-align: center;
     margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.info-section.success {
+    border-color: #2ecc71;
 }
 
 .section-title {
@@ -154,4 +151,3 @@ body {
         font-size: 1.2rem;
     }
 }
-    

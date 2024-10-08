@@ -15,29 +15,12 @@
 
     {% include 'ext/message.html' %}
 
-    <!-- {% if not session.get('sudo_password') %}
-    <div class="alert alert-warning">
-        <strong>Warning!</strong> You need to enter the sudo password to activate the SystemGuard.
+    {% if is_plan_not_expired %}
+    <div class="info-section success">
+        <h5 class="section-title">Product Activated</h5>
+        <p class="lead">Your product is already activated. Enjoy uninterrupted service!</p>
     </div>
-    {% endif %} -->
-
-    <form method="POST" class="activation-form needs-validation" novalidate>
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-        <div class="form-group">
-            <label for="activation_code">Activation Code</label>
-
-            <input type="text" class="form-control" id="activation_code" name="activation_code"
-                placeholder="Enter your activation code" required>
-            <div class="invalid-feedback">
-                Please enter your activation code.
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Activate</button>
-    </form>
-
-    <div class="divider"></div>
+    {% endif %}
 
     {% if systemguard_unique_id %}
     <div class="info-section">
@@ -55,7 +38,6 @@
 
     <div class="info-section">
         <h4 class="section-title">License Information</h4>
-
         {% if remaining_plan_days %}
         <p>Remaining Days: <strong>{{ remaining_plan_days }}</strong></p>
         {% endif %}
@@ -72,6 +54,16 @@
         </p>
         {% endif %}
     </div>
+
+    <form method="POST" class="activation-form needs-validation" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="activation_code">Activation Code</label>
+            <input type="text" class="form-control" id="activation_code" name="activation_code" placeholder="Enter your activation code" required>
+            <div class="invalid-feedback">Please enter your activation code.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Activate</button>
+    </form>
 
     <div class="footer">
         <p class="footer-text">&copy; 2024 SystemGuard. All rights reserved.</p>
