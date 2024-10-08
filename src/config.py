@@ -7,7 +7,6 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_caching import Cache
 
-from src.logger import logger
 from src.helper import get_system_node_name, get_ip_address, load_secret_key
 from src.activator import get_plan_details
 # from src.utils import get_ip_address, get_system_node_name

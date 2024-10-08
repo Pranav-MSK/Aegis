@@ -2,8 +2,6 @@ import os
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 import subprocess
-import functools
-from src.logger import logger
 
 number_of_sum_check_digits = 5
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
@@ -101,7 +99,6 @@ def get_plan_details(secret_key):
 
             is_valid, _ = verify_activation_code(activation_code, systemguard_unique_id, secret_key)
             if not is_valid:
-                print("Activation code verification failed. Please activate the application.", "danger")
                 return {
                     "is_plan_not_expired": is_plan_not_expired,
                     "remaining_plan_days": remaining_plan_days,

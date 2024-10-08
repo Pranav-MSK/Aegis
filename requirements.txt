@@ -1,5 +1,6 @@
 # Flask web framework
-Flask==3.0.3
+Flask==3.0.3                # Web framework for Python
+Cython==3.0.11              # C-extensions for Python
 
 # System information and performance monitoring
 psutil==6.0.0               # Retrieves system metrics (CPU, memory, etc.)
