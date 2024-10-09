@@ -84,6 +84,35 @@ document.getElementById('refreshData').addEventListener('click', () => {
 
 // Function to create a chart with multiple datasets
 function createChart(ctx, labels, datasets, yLabel) {
+    // Set canvas height and add padding
+    ctx.canvas.height = "500px";
+    ctx.canvas.style.padding = "20px";
+    ctx.canvas.style.margin = "30px";
+    
+    // Add border and rounded corners
+    ctx.canvas.style.border = "1px solid #ccc";
+    ctx.canvas.style.borderRadius = "10px";
+    
+    // Add box shadow for a subtle 3D effect
+    ctx.canvas.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+    
+    // Set background color to white
+    ctx.canvas.style.backgroundColor = "white";
+    
+    // Add a smooth transition effect for hover state
+    ctx.canvas.style.transition = "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out";
+    
+    // Add hover effect to scale up slightly and enhance shadow
+    ctx.canvas.addEventListener('mouseenter', () => {
+        ctx.canvas.style.transform = "scale(1.02)";
+        ctx.canvas.style.boxShadow = "0 8px 16px rgba(0, 0, 0, 0.2)";
+    });
+    
+    // Revert to original state when mouse leaves
+    ctx.canvas.addEventListener('mouseleave', () => {
+        ctx.canvas.style.transform = "scale(1)";
+        ctx.canvas.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+    });
     if (ctx.chart) {
         ctx.chart.destroy(); // Destroy the existing chart if it exists
     }
@@ -109,7 +138,7 @@ function createChart(ctx, labels, datasets, yLabel) {
         link.href = ctx.chart.toBase64Image();
         link.download = fileName;
         link.click();
-    }, { top: '10px', right: '10px' });
+    }, { top: '10px', right: '30px' });
 
     // Create or update refresh button
     getOrCreateButton(ctx.canvas.parentNode, 'Refresh Data', 'refresh-button', () => {
@@ -127,7 +156,7 @@ function createChart(ctx, labels, datasets, yLabel) {
             datasets: datasets.map(dataset => ({
                 ...dataset,
                 borderWidth: 1,
-                fill: false,
+                fill: true,
                 tension: 0.5, // Increased tension for a smoother curve
                 pointRadius: 0,
                 pointHoverRadius: 7,
@@ -142,7 +171,7 @@ function createChart(ctx, labels, datasets, yLabel) {
                     type: 'category',
                     ticks: {
                         autoSkip: true,
-                        maxTicksLimit: 6,
+                        maxTicksLimit: 10,
                         maxRotation: 0,
                         minRotation: 0,
                         padding: 10,
@@ -181,6 +210,20 @@ function createChart(ctx, labels, datasets, yLabel) {
                 }
             },
             plugins: {
+                // title: {
+                //     display: true,  // Enable the title
+                //     text: yLabel,  // Title text
+                //     font: {
+                //         size: 18,  // Font size for the title
+                //         weight: 'bold'  // Font weight for the title
+                //     },
+                //     color: '#333',  // Color of the title
+                //     padding: {
+                //         top: 10,
+                //         bottom: 30  // Add padding between the title and the chart
+                //     },
+                //     align: 'center'  // Align the title in the center
+                // },
                 legend: {
                     display: true,
                     position: 'top',
@@ -193,17 +236,28 @@ function createChart(ctx, labels, datasets, yLabel) {
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Dark tooltip background for contrast
-                    titleColor: '#fff',
-                    bodyColor: '#fff',
+                    enabled: true,  // Enable tooltips
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',  // Dark background
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 12 },
                     padding: 10,
-                    titleFont: {
-                        size: 14,
-                        weight: 'bold'
-                    },
-                    bodyFont: {
-                        size: 12
+                    mode: 'nearest',
+                    intersect: false,
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += Math.round(context.raw * 100) / 100 + '%';
+                            return label;
+                        }
                     }
+                },
+                legend: {
+                    display: true  // Keep the legend hidden to avoid clutter
                 }
             }
         }
@@ -231,10 +285,21 @@ function createCharts(cpuData, timeData, memoryData, batteryData, networkSentDat
 
     // Function to generate dynamic colors based on index
     function generateColor(index) {
+        if (index === 0) {
+            return {
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)'
+            };
+        }
+
         const hue = (index * 40) % 360;  // Adjust hue for unique colors
+        const saturation = 40;
+        const lightness = 50;
+        const fadeFactor = 0.3; // Adjust this factor to control the fade effect
+
         return {
-            borderColor: `hsl(${hue}, 70%, 50%)`, // Border color
-            backgroundColor: `hsl(${hue}, 70%, 80%)` // Background color
+            borderColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`, // Border color
+            backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, ${fadeFactor})` // Background color with fade
         };
     }
 

@@ -54,47 +54,38 @@
 </div>
 <hr>
 
-<div class="row">
-    <div class="cpu-usage col-md-6">
-        <br><br>
-        <canvas class="graph" id="cpuTimeChart"></canvas>
-    </div>
-
-    <div class="memory-usage col-md-6">
-        <br><br>
-        <canvas class="graph" id="memoryTimeChart"></canvas>
-    </div>
+<div class="cpu-usage">
+    <br><br>
+    <canvas class="graph" id="cpuTimeChart" style="height: 400px;"></canvas>
 </div>
 
-<div class="row">
-    <div class="cpu-temperature col-md-6">
-        <br><br>
-        <canvas class="graph" id="currentTempTimeChart"></canvas>
-    </div>
-
-    <div class="cpu-frequency col-md-6">
-        <br><br>
-        <canvas class="graph" id="cpuFrequencyTimeChart"></canvas>
-    </div>
+<div class="memory-usage">
+    <br><br>
+    <canvas class="graph" id="memoryTimeChart" style="height: 400px;"></canvas>
+</div>
+<div class="cpu-temperature ">
+    <br><br>
+    <canvas class="graph" id="currentTempTimeChart" style="height: 400px;"></canvas>
 </div>
 
-<div class="row">
-    <div class="battery-usage col-md-6">
-        <br><br>
-        <canvas class="graph" id="batteryTimeChart"></canvas>
-    </div>
-
-    <div class="network-usage col-md-6">
-        <br><br>
-        <canvas class="graph" id="networkTimeChart"></canvas>
-    </div>
+<div class="cpu-frequency ">
+    <br><br>
+    <canvas class="graph" id="cpuFrequencyTimeChart" style="height: 400px;"></canvas>
 </div>
 
-<div class="row">
-    <div class="dashboard-memory-usage col-md-6">
-        <br><br>
-        <canvas class="graph" id="dashboardMemoryTimeChart"></canvas>
-    </div>
+<div class="battery-usage ">
+    <br><br>
+    <canvas class="graph" id="batteryTimeChart" style="height: 400px;"></canvas>
+</div>
+
+<div class="network-usage ">
+    <br><br>
+    <canvas class="graph" id="networkTimeChart" style="height: 400px;"></canvas>
+</div>
+
+<div class="dashboard-memory-usage ">
+    <br><br>
+    <canvas class="graph" id="dashboardMemoryTimeChart" style="height: 400px;"></canvas>
 </div>
 
 {% endblock %}

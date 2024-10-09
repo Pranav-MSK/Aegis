@@ -147,7 +147,7 @@ body {
 /* General Card Styles */
 .card {
     min-height: 230px;
-    background: linear-gradient(120deg, #f5f7fa, #c3cfe2);
+    background: linear-gradient(120deg, #e4ecf8, #c3cfe2, #d1d9e7);
     /* background: linear-gradient(135deg, #e0f7fa, #b2ebf2); */
     box-sizing: border-box;
     border: 1px solid #cdddeb;  

@@ -7,6 +7,11 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
     // Retrieve data from localStorage or initialize an empty array
     let dataStorage = JSON.parse(localStorage.getItem(dataStorageKey)) || [];
 
+    // Create a gradient color for the line
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400); // Adjust height as needed
+    gradient.addColorStop(0, 'rgba(154, 62, 35, 1)'); // Start color
+    gradient.addColorStop(1, 'rgba(154, 162, 35, 0.2)'); // End color
+
     const chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -14,23 +19,28 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
             datasets: [{
                 label: label,
                 data: dataStorage,
-                borderColor: borderColor,
+                borderColor: gradient, // Use the gradient for the line color
+                backgroundColor: 'rgba(154, 162, 35, 0.2)',
                 borderWidth: 2,
                 fill: true,
-                opacity: 0.5,
-                tension: 0.6,  // Smooth line
-                pointRadius: 0  // Removes the round tip (data points) on the line
+                tension: 0.2,  // Smooth line
+                pointRadius: 0,  // Use small points for visibility
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',  // Color of the points
+                pointHoverRadius: 0,  // Larger radius on hover
             }]
         },
         options: {
             scales: {
                 x: {
-                    display: false  // Hide the x-axis labels and grid
+                    display: false,  // Hide the x-axis labels and grid
                 },
                 y: {
-                    display: false,  // Hide the y-axis labels and grid
+                    display: false,  // Show the y-axis
                     beginAtZero: true,
-                    max: 100  // Assuming max value is 100 for CPU and memory usage
+                    max: 100,  // Assuming max value is 100 for CPU and memory usage
+                    grid: {
+                        color: 'rgba(200, 200, 200, 0.3)',  // Subtle grid lines
+                    },
                 }
             },
             plugins: {
@@ -49,24 +59,19 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
                         }
                     }
                 },
-                legend: { display: false }  // Show legend on hover for better clarity
+                legend: { display: false }  // Hide legend
             },
             hover: {
                 mode: 'nearest',
                 intersect: false,
                 onHover: (e, elements) => {
-                    if (elements.length) {
-                        e.target.style.cursor = 'pointer';
-                    } else {
-                        e.target.style.cursor = 'default';
-                    }
+                    e.target.style.cursor = elements.length ? 'pointer' : 'default';
                 }
             },
             animation: false,  // Disable animation for smooth updates
-            responsive: true
+            responsive: true,
         }
     });
-
     // Function to update the chart with new data
     function updateChart(newUsage) {
         // Add the new data point

@@ -107,6 +107,7 @@ def graph_data_api():
         end_time = int(current_time.timestamp())
         start_time = end_time - time_range_seconds
 
+        step = '30m'
         # Determine the step based on the time range
         if time_range_seconds <= 60:  # 15 minutes
             step = '2s'
@@ -120,9 +121,6 @@ def graph_data_api():
             step = '10m'
         elif time_range_seconds <= 604800:  # 1 week
             step = '30m'
-        else:
-            step = '1h'
-
 
         # Cache key generation
         cache_key = f"{time_filter}_{start_time}_{end_time}_{step}"
