@@ -47,9 +47,9 @@ def calculate_unique_system_id(sudo_password):
     unique_id += f"{checksum}"
     return unique_id
 
-def verify_activation_code(activation_code, hardware_id, secret_key):
+def verify_activation_code(activation_code, hardware_id, obfuscated_key):
     try:
-        cipher = Fernet(secret_key)
+        cipher = Fernet(obfuscated_key)
         decrypted_data = cipher.decrypt(activation_code.encode()).decode()
         license_key, received_hardware_id = decrypted_data.split(':')
         
@@ -59,10 +59,10 @@ def verify_activation_code(activation_code, hardware_id, secret_key):
     except Exception as e:
         return False, f"Error verifying activation code: {str(e)}"
     
-def check_license_expiration(license_key, secret_key):
+def check_license_expiration(license_key, obfuscated_key):
     base_plan = "Free Edition"
     is_trial = False
-    cipher = Fernet(secret_key)
+    cipher = Fernet(obfuscated_key)
     decrypted_license_data = cipher.decrypt(license_key.encode()).decode()
     
     license_parts = decrypted_license_data.split('|')
@@ -82,7 +82,7 @@ def check_license_expiration(license_key, secret_key):
     remaining_plan_days = (expiration_date - today).days
     return True, remaining_plan_days, plan_type, is_trial
 
-def get_plan_details(secret_key):
+def get_plan_details(obfuscated_key):
     is_plan_not_expired = False
     remaining_plan_days = 0
     plan_type = "Free Edition"
@@ -97,7 +97,7 @@ def get_plan_details(secret_key):
             activation_code = license_data.split('\n')[2].split(':')[1]
             systemguard_unique_id = license_data.split('\n')[3].split(':')[1]
 
-            is_valid, _ = verify_activation_code(activation_code, systemguard_unique_id, secret_key)
+            is_valid, _ = verify_activation_code(activation_code, systemguard_unique_id, obfuscated_key)
             if not is_valid:
                 return {
                     "is_plan_not_expired": is_plan_not_expired,
@@ -110,7 +110,7 @@ def get_plan_details(secret_key):
                 }
 
 
-            is_plan_not_expired, remaining_plan_days, plan_type, is_trial = check_license_expiration(license_key, secret_key)
+            is_plan_not_expired, remaining_plan_days, plan_type, is_trial = check_license_expiration(license_key, obfuscated_key)
             if not is_plan_not_expired:
                 print("License has expired. Please activate the application.", "danger")
                 return {

@@ -77,9 +77,8 @@ cleanup() {
 # Main execution flow
 mkdir -p "$COMPILED_CODE_SOURCE_DIRECTORY"
 generate_c_files
-# compile_c_files "$SOURCE_DIRECTORY"
-# copy_files
-# Uncomment to enable cleanup
+compile_c_files "$SOURCE_DIRECTORY"
+copy_files
 # cleanup
 
 echo "Build process completed successfully."

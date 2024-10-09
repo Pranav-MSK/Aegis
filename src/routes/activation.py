@@ -2,7 +2,7 @@ import os
 from flask import render_template, request, Blueprint, jsonify, session, flash, redirect, url_for, send_file
 
 from src.utils import ROOT_DIR
-from src.config import app, secret_key, limiter
+from src.config import app, obfuscated_key, limiter
 from src.activator import (
     calculate_unique_system_id, 
     verify_activation_code, 
@@ -22,7 +22,7 @@ def activation():
 
     if request.method == 'POST':
         activation_code = request.form.get('activation_code')
-        is_valid, new_license_key = verify_activation_code(activation_code, systemguard_unique_id, secret_key)
+        is_valid, new_license_key = verify_activation_code(activation_code, systemguard_unique_id, obfuscated_key)
 
         if is_valid:
             try:

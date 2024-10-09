@@ -25,8 +25,8 @@ CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()
 
-secret_key = load_secret_key("key_storage.so")
-flask_configuration = load_secret_key("flask_configuration.so")
+obfuscated_key = load_secret_key("obfuscation.so")
+obfuscated_flask_config = load_secret_key("flask_configuration.so")
 
 HOME_DIR = os.path.expanduser("~")
 DB_DIR = os.path.join(HOME_DIR, ".database")
@@ -37,8 +37,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_POOL_SIZE'] = 10
 app.config['SQLALCHEMY_MAX_OVERFLOW'] = 5
-app.config['SECRET_KEY'] = flask_configuration
-app.config['WTF_CSRF_SECRET_KEY'] = flask_configuration
+app.config['SECRET_KEY'] = obfuscated_flask_config
+app.config['WTF_CSRF_SECRET_KEY'] = obfuscated_flask_config
 app.config['WTF_CSRF_TIME_LIMIT'] = 3600
 app.config['WTF_CSRF_HEADER_NAME'] = "X-CSRFToken"
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent access to cookies via JavaScript
@@ -57,7 +57,7 @@ cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app)
 
 # systemgaurd plan details
-plan_details = get_plan_details(secret_key)
+plan_details = get_plan_details(obfuscated_key)
 
 # Define global variables for templates
 app.jinja_env.globals.update(

@@ -104,9 +104,9 @@ def check_installation_information():
 def load_secret_key(key_name):
     """Load the secret key for the application."""
     try:
-        secret_key = retrieve_obfuscated_key(key_name)
-        if secret_key:
-            return secret_key
+        obfuscated_key = retrieve_obfuscated_key(key_name)
+        if obfuscated_key:
+            return obfuscated_key
     except Exception as e:
         raise RuntimeError(f"An error occurred while reading the secret key: {e}")
 

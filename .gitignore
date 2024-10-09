@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 
 # C extensions
-*.so
 
 # Distribution / packaging
 .Python
@@ -175,8 +174,6 @@ test.py
 internal_license_key.txt
 *.pdf
 *.txt
-*.so
-*.h
 *.cpp
 *.o
 compiled_code/*
