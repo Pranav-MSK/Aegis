@@ -19,5 +19,6 @@
 const cpuUsageData = [];
 createLineChart('cpuUsageLineChart', '', cpuUsageData, 'red', () => {
     return parseFloat(document.querySelector('.cpu-usage-value').textContent);
-});
+}, document.querySelector('.cpu-usage-bar')
+);
 </script>

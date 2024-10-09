@@ -64,3 +64,22 @@ def dashboard():
             last_timestamp=last_speedtest_timestamp,
             current_user=current_user,
         )
+
+
+# alternative dashboard page for testing
+@app.route("/alt", methods=["GET"])
+@login_required
+def dashboard_alt():
+    # if user is not authenticated, redirect to login page
+    if not current_user.is_authenticated:
+        return redirect(url_for("login"))
+    system_info = get_system_info()
+
+    # Fetch the last speedtest result
+    
+    return render_template(
+            "index.html",
+            system_info=system_info,
+            current_user=current_user,
+        )
+

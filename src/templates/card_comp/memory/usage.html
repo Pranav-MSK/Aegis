@@ -21,5 +21,6 @@
     const memoryUsageData = [];
     createLineChart('memoryUsageLineChart', '', memoryUsageData, 'red', () => {
         return parseFloat(document.querySelector('.memory-usage-value').textContent);
-    });
+    }, document.querySelector('.memory-usage-bar')
+    );
 </script>

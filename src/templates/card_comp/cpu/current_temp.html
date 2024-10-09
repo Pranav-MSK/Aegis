@@ -19,5 +19,6 @@
     const cpuTempData = [];
     createLineChart('cpuTempLineChart', '', cpuTempData, 'red', () => {
         return parseFloat(document.querySelector('.temp-value').textContent);
-    });
+    }, document.querySelector('.temp-bar'));
+
 </script>

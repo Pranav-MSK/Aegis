@@ -19,5 +19,6 @@
     const diskUsageData = [];
     createLineChart('diskUsageLineChart', '', diskUsageData, 'red', () => {
         return parseFloat(document.querySelector('.disk-usage-value').textContent);
-    });
+    }, document.querySelector('.disk-bar')
+    );
 </script>

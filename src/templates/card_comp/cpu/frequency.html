@@ -22,5 +22,6 @@
     const cpuFrequencyData = [];
     createLineChart('cpuFrequencyLineChart', 'frequency', cpuFrequencyData, 'red', () => {
         return 100 * parseFloat(document.querySelector('.frequency-value').textContent) / {{ system_info['cpu_max_frequency'] }};
-    });
+    }, document.querySelector('.frequency-bar')
+    );
 </script>
