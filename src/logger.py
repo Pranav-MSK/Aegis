@@ -1,17 +1,9 @@
 import os
 import ctypes
+from src.helper import load_library
 
 CURR_DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT_DIR = os.path.dirname(CURR_DIR)
-
-def load_library(filename):
-    print(f"Loading library: {filename}")
-    try:
-        lib = ctypes.CDLL(filename)
-        return lib
-    except OSError as e:
-        print(f"Error loading library: {e}")
-        raise
 
 # Load the shared library
 logger_lib = load_library(os.path.join(ROOT_DIR, 'src/toolkit/logger.so'))

@@ -1,17 +1,24 @@
 import os
 import ctypes
 import subprocess
-from dotenv import load_dotenv
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(CURR_DIR)
 
-def obfuscated_key_retriever():
-    # Load the shared object file
-    lib = ctypes.CDLL(os.path.join(ROOT_DIR, "key_storage.so"))
-    lib.get_obfuscated_key.restype = ctypes.c_char_p
-    key = lib.get_obfuscated_key()
-    return key.decode()
+def load_library(filename):
+    try:
+        lib_path = os.path.join(ROOT_DIR, "src/toolkit")
+        lib = ctypes.CDLL(os.path.join(lib_path, filename))
+        return lib
+    except OSError as e:
+        print(f"Error loading library: {e}")
+        raise
 
+def retrieve_obfuscated_key(key_name):
+    library = load_library(key_name)
+    library.get_obfuscated_key.restype = ctypes.c_char_p
+    obfuscated_key = library.get_obfuscated_key()
+    return obfuscated_key.decode()
 
 def get_system_username():
     """
@@ -94,29 +101,12 @@ def check_installation_information():
 
     return output
 
-
-
-def load_secret_key():
+def load_secret_key(key_name):
     """Load the secret key for the application."""
-    load_dotenv()
     try:
-        secret_key = os.getenv('SYSTEMGUARD_KEY')    
+        secret_key = retrieve_obfuscated_key(key_name)
         if secret_key:
             return secret_key
-        
-        secret_key = obfuscated_key_retriever()
-        if secret_key:
-            return secret_key
-        
-        else:
-            try:
-                with open('secret.key', 'rb') as key_file:
-                    secret_key = key_file.read()
-                    return secret_key
-            except FileNotFoundError:
-                raise FileNotFoundError("The secret key file 'secret.key' was not found.")
-            except Exception as e:
-                raise RuntimeError(f"An error occurred while reading the secret key: {e}")
     except Exception as e:
-        raise RuntimeError(f"An error occurred while reading the secret key")
+        raise RuntimeError(f"An error occurred while reading the secret key: {e}")
 

@@ -24,7 +24,9 @@ PROJECT_URL = f"https://github.com/codeperfectplus/{APP_NAME}"
 CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()
-secret_key = load_secret_key()
+
+secret_key = load_secret_key("key_storage.so")
+flask_configuration = load_secret_key("flask_configuration.so")
 
 HOME_DIR = os.path.expanduser("~")
 DB_DIR = os.path.join(HOME_DIR, ".database")
@@ -35,8 +37,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_POOL_SIZE'] = 10
 app.config['SQLALCHEMY_MAX_OVERFLOW'] = 5
-app.config['SECRET_KEY'] = secret_key
-app.config['WTF_CSRF_SECRET_KEY'] = secret_key
+app.config['SECRET_KEY'] = flask_configuration
+app.config['WTF_CSRF_SECRET_KEY'] = flask_configuration
 app.config['WTF_CSRF_TIME_LIMIT'] = 3600
 app.config['WTF_CSRF_HEADER_NAME'] = "X-CSRFToken"
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent access to cookies via JavaScript
