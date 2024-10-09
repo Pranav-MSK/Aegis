@@ -1,3 +1,4 @@
+# cython: language_level=3
 import random
 import string
 import hashlib

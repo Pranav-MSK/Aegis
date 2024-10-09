@@ -1,3 +1,4 @@
+# cython: language_level=3
 import subprocess
 from flask import render_template, blueprints
 from src.config import app

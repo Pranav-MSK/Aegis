@@ -1,3 +1,4 @@
+# cython: language_level=3
 from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash

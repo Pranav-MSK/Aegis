@@ -1,3 +1,4 @@
+# cython: language_level=3
 import os
 from src.background_task.monitor_website import start_website_monitoring
 from src.background_task.log_system_info import monitor_settings

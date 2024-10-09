@@ -1,3 +1,4 @@
+# cython: language_level=3
 import psutil
 
 from flask import render_template, blueprints

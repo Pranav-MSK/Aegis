@@ -1,3 +1,4 @@
+# cython: language_level=3
 import datetime
 from flask import render_template, blueprints, redirect, url_for
 from flask_login import login_required, current_user

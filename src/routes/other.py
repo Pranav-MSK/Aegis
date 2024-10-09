@@ -1,3 +1,4 @@
+# cython: language_level=3
 import os
 import subprocess
 from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for, session

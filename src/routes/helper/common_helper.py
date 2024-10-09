@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.models import UserProfile, PageToggleSettings
 from src.config import app
 from flask_login import current_user

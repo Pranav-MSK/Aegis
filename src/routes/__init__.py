@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.routes.cpu_info import cpu_info_bp
 from src.routes.disk_info import disk_info_bp
 from src.routes.dashboard import dashboard_bp

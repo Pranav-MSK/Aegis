@@ -1,3 +1,4 @@
+# cython: language_level=3
 import requests
 import json
 from src.logger import logger

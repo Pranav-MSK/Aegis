@@ -1,3 +1,4 @@
+# cython: language_level=3
 import datetime
 from threading import Timer
 from src.config import app, db

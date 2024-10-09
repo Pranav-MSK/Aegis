@@ -1,3 +1,4 @@
+# cython: language_level=3
 import re
 
 from flask import render_template, request

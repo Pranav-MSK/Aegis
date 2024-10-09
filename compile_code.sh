@@ -23,22 +23,42 @@ find_python_files() {
 generate_c_files() {
     echo "Generating C files from Python files..."
     local python_files
-    python_files=$(find_python_files)
+    python_files=($(find_python_files))
+    local total_files=${#python_files[@]}
+    local compiled_files=0
+    counter=0
 
-    for python_file in $python_files; do
-        cython "$python_file" -o "${python_file%.py}.c" || {
+    for python_file in "${python_files[@]}"; do
+        counter=$((counter + 1))
+        echo "Processing $counter out of $total_files files: $python_file"
+    
+        # Add the language level directive if not present
+        if ! grep -q "# cython: language_level=" "$python_file"; then
+            echo "# cython: language_level=3" | cat - "$python_file" > temp && mv temp "$python_file"
+        fi
+        cython "$python_file" -o "${python_file%.py}.c" && compiled_files=$((compiled_files + 1)) || {
             echo "Error: Failed to generate C file for '$python_file'"
             exit 1
         }
     done
+
+    echo "Generated $compiled_files out of $total_files C files."
 }
 
 # Function to compile .c files to .so files
 compile_c_files() {
     local directory="$1"
     echo "Compiling .c files to .so files in '$COMPILED_CODE_SOURCE_DIRECTORY'..."
+    
+    local c_files=()
+    while IFS= read -r -d '' c_file; do
+        c_files+=("$c_file")
+    done < <(find "$directory" -name "*.c" -print0)
 
-    find "$directory" -name "*.c" | while read -r c_file; do
+    local total_files=${#c_files[@]}
+    local compiled_files=0
+
+    for c_file in "${c_files[@]}"; do
         # Get the relative path and create output directory
         relative_path="${c_file#$SOURCE_DIRECTORY/}"
         output_file_directory="$(dirname "$relative_path")"
@@ -48,11 +68,13 @@ compile_c_files() {
         base_name=$(basename "$c_file" .c)
         
         # Compile to a .so file in the corresponding output directory
-        gcc -shared -o "$COMPILED_CODE_SOURCE_DIRECTORY/$output_file_directory/$base_name.so" -fPIC $(python -m pybind11 --includes) "$c_file" || {
+        gcc -shared -o "$COMPILED_CODE_SOURCE_DIRECTORY/$output_file_directory/$base_name.so" -fPIC $(python -m pybind11 --includes) "$c_file" && compiled_files=$((compiled_files + 1)) || {
             echo "Error: Failed to compile '$c_file'"
             exit 1
         }
     done
+
+    echo "Compiled $compiled_files out of $total_files C files."
 }
 
 # Function to copy necessary files to output directory

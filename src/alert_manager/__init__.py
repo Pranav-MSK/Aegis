@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.alert_manager.slack_alert import send_slack_alert
 from src.alert_manager.email_alert import send_smtp_email                                                          
 from src.alert_manager.discord_alert import send_discord_alert

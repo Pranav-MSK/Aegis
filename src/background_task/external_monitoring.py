@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import Flask, Response
 from prometheus_client import Gauge, generate_latest
 import os

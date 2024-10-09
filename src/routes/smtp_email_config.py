@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import render_template, request, flash, redirect, url_for, blueprints
 
 from src.config import app, db

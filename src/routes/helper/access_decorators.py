@@ -1,3 +1,4 @@
+# cython: language_level=3
 from functools import wraps
 from flask import abort
 from src.config import plan_details

@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.config import db, app
 from src.models.user_card_settings import UserCardSettings
 from src.models.dashboard_netowrk import DashboardNetworkSettings

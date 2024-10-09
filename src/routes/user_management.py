@@ -1,3 +1,4 @@
+# cython: language_level=3
 import os
 import datetime
 from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints

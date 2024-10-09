@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import Flask, render_template, request, redirect, url_for, flash, blueprints
 from src.config import db, app
 from src.models import NotificationSettings, GeneralSettings

@@ -1,3 +1,4 @@
+# cython: language_level=3
 import os
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet

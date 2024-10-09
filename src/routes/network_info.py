@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import render_template, blueprints, render_template
 from flask_login import login_required
 from src.config import app
