@@ -44,6 +44,12 @@
             <label for="receive_email_alerts" class="form-check-label"><i class="fas fa-envelope-open"></i> Receive Email Alerts</label>
         </div>
 
+        <!-- # is_active checkbox -->
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if user.is_active %}checked{% endif %}>
+            <label for="is_active" class="form-check-label"><i class="fas fa-user-check"></i> Is Active</label>
+        </div>
+
         <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Update Settings</button>
     </form>
 </div>

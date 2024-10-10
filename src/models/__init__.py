@@ -76,6 +76,7 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                             user_level=user_data["user_level"],
                             receive_email_alerts=user_data["receive_email_alerts"],
                             profession=user_data["profession"],
+                            is_active=user_data["is_active"],
                         )
 
                         db.session.add(user)

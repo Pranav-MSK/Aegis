@@ -15,10 +15,8 @@
 <div class="container mt-4">
     <h1 class="text-center"><span class="bg-danger text-white p-2"><i class="fas fa-shield-alt"></i>
         {{title}}</span><span class="text-white bg-warning p-2">Alert Ticket</span></h1>
-
     <hr>
-    {% include 'ext/message.html' %}
-    
+    {% include 'ext/message.html' %}    
     <!-- Alert Metadata -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
@@ -34,8 +32,11 @@
                 <span class="badge badge-{{alert.severity}}">
                     {{ alert.severity }}
                 </span>
+                {% if current_user.user_level == 'admin' %}
                 <i class="fas fa-edit" onclick="toggleEdit('editSeverity')" style="cursor: pointer;"></i>
+                {% endif %}
             </p>
+            {% if current_user.user_level == 'admin' %}
             <div id="editSeverity" style="display: none;">
                 <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -48,11 +49,14 @@
                     <button type="submit" class="btn btn-primary">Update Severity</button>
                 </form>
             </div>
+            {% endif %}
             
             <!-- Editable Status -->
             <p>
                 <strong>Status:</strong> {{ alert.status }}
+                {% if current_user.user_level == 'admin' %}
                 <i class="fas fa-edit" onclick="toggleEdit('editStatus')" style="cursor: pointer;"></i>
+                {% endif %}
             </p>
             <div id="editStatus" style="display: none;">
                 <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
@@ -67,14 +71,35 @@
                     <button type="submit" class="btn btn-primary">Update Status</button>
                 </form>
             </div>
-            
-            <p><strong>Description:</strong> {{ alert.description }}</p>
+
+            <!-- Editable Description -->
+            <p>
+                <strong>Description:</strong> {{ alert.description }}
+                {% if current_user.user_level == 'admin' %}
+                <i class="fas fa-edit" onclick="toggleEdit('editDescription')" style="cursor: pointer;"></i>
+                {% endif %}
+            </p>
+
+            <div id="editDescription" style="display: none;">
+                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="form_type" value="edit_description">
+                    <div class="form-group">
+                        <label for="description">Edit Description:</label>
+                        <textarea class="form-control" name="description" rows="4">{{ alert.description }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Description</button>
+                </form>
+            </div>
+
+            <!-- <p><strong>Description:</strong> {{ alert.description }}</p> -->
             <p><strong>Created At:</strong> {{ alert.created_at }}</p>
             <p><strong>Last Updated At:</strong> {{ alert.updated_at or 'N/A' }}</p>
         </div>
     </div>
     
     <!-- Assigned User and Supervisor -->
+    {% if current_user.user_level == 'admin' %}
     <div class="card mb-4">
         <div class="card-header bg-success text-white">
             <i class="fas fa-users"></i> Assignment
@@ -116,8 +141,10 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Investigation Notes (Comments) -->
+    {% if current_user.id == alert.assigned_user_id %}
     <div class="card mb-4">
         <div class="card-header bg-warning text-white">
             <i class="fas fa-comment"></i> Investigation Notes
@@ -134,9 +161,10 @@
             </form>
         </div>
     </div>
+    {% endif %}
 
     <!-- Supervisor Report -->
-    {% if alert.assigned_supervisor_id %}
+    {% if alert.assigned_supervisor_id and current_user.id == alert.assigned_supervisor_id %}
     <div class="card mb-4">
         <div class="card-header bg-info text-white">
             <i class="fas fa-file-alt"></i> Supervisor Report

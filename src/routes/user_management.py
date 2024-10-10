@@ -24,7 +24,7 @@ def create_user():
         password = request.form['password']
         profession = request.form['profession']
         user_level = request.form.get('user_level', 'user')
-        receive_email_alerts = request.form.get('receive_email_alerts', 'on') == 'on'
+        receive_email_alerts = request.form.get('receive_email_alerts', 'on') == 'on' 
 
         # Check if user already exists
         if UserProfile.query.filter_by(username=username).first() or UserProfile.query.filter_by(email=email).first():
@@ -37,7 +37,8 @@ def create_user():
             password=generate_password_hash(password),
             profession=profession,
             user_level=user_level,
-            receive_email_alerts=receive_email_alerts
+            receive_email_alerts=receive_email_alerts,
+            is_active=True
         )
 
         # Send email alerts to admins
@@ -66,14 +67,14 @@ def create_user():
         send_smtp_email(email, subject, email_body, is_html=True)
 
         # Add and commit the new user to get the correct user ID
-        db.session.add(new_user)
-        db.session.commit()  # Commit to generate the ID
+        new_user.save()
         
         # Now you can use the new user's ID to create related settings
         db.session.add(UserDashboardSettings(user_id=new_user.id))
         db.session.add(UserCardSettings(user_id=new_user.id))
         db.session.add(PageToggleSettings(user_id=new_user.id))
-        db.session.commit()
+        
+        new_user.save()
 
         flash('User created successfully!', 'success')
         return redirect(url_for('view_users'))
@@ -83,6 +84,7 @@ def create_user():
 @app.route('/users')
 @admin_required
 def view_users():
+
     users = UserProfile.query.all()
     return render_template('users/view_users.html', users=users)
 
@@ -97,6 +99,7 @@ def change_user_settings(username):
         new_user_level = request.form['user_level']
         new_profession = request.form['profession']
         receive_email_alerts = 'receive_email_alerts' in request.form
+        is_active = 'is_active' in request.form
 
         # Update user details
         user.username = new_username
@@ -104,8 +107,9 @@ def change_user_settings(username):
         user.user_level = new_user_level
         user.receive_email_alerts = receive_email_alerts
         user.profession = new_profession
+        user.is_active = is_active
 
-        db.session.commit()
+        user.save()
 
         flash('User settings updated successfully!', 'success')
         return redirect(url_for('view_users', username=user.username))

@@ -6,12 +6,11 @@ from flask import (
     jsonify, 
     Blueprint, 
     render_template, 
-    Response, 
-    stream_with_context, 
     redirect, 
     url_for, 
     flash
 )
+from flask_login import current_user, login_required
 from src.config import app, csrf
 from src.logger import logger
 
@@ -71,8 +70,8 @@ def test_alert():
     return jsonify(response), response.get("status", 500)
 
 @app.route('/alerts/ticket', methods=['GET', 'POST'])
+@login_required
 def alert_history():
-
     admin_users = UserProfile.query.filter_by(user_level="admin").all()
     users = UserProfile.query.filter_by().all()
 
@@ -120,6 +119,7 @@ def alert_history():
 
 
 @app.route('/alerts/ticket/<int:alert_id>', methods=['GET', 'POST'])
+@login_required
 def alert_ticket(alert_id):
     alert = AlertTicket.query.get(alert_id)
     if not alert:
@@ -140,6 +140,8 @@ def alert_ticket(alert_id):
             alert.status = request.form.get('status')
         elif form_type == 'edit_severity':
             alert.severity = request.form.get('severity')
+        elif form_type == 'edit_description':
+            alert.description = request.form.get('description')
 
         alert.save()        
         flash('Changes saved successfully!', 'success')
@@ -147,10 +149,13 @@ def alert_ticket(alert_id):
     
     return render_template('alerts/alert_ticket.html', alert=alert, 
                            users=UserProfile.query.all(), 
-                           admin_users=UserProfile.query.filter_by(user_level='admin').all())
+                           admin_users=UserProfile.query.filter_by(user_level='admin').all(),
+                           current_user=current_user)
+
 
 
 @app.route('/assign_user', methods=['POST'])
+@login_required
 def assign_user():
     alert_id = request.form.get('alert_id')
     user_id = request.form.get('assigned_user_id')
@@ -168,6 +173,7 @@ def assign_user():
 
 
 @app.route('/assign_supervisor', methods=['POST'])
+@login_required
 def assign_supervisor():
     alert_id = request.form.get('alert_id')
     supervisor_id = request.form.get('assigned_supervisor_id')

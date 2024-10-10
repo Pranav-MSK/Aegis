@@ -7,7 +7,8 @@
         "password": "admin",
         "user_level": "admin",
         "profession": "Software Developer",
-        "receive_email_alerts": true
+        "receive_email_alerts": true,
+        "is_active": true
     },
     {   
         "first_name": "Db Admin",
@@ -17,6 +18,7 @@
         "password": "prometheus_password",
         "user_level": "user",
         "profession": "Database Administrator",
-        "receive_email_alerts": false
+        "receive_email_alerts": false,
+        "is_active": true
     }
 ]

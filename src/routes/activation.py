@@ -1,6 +1,7 @@
 # cython: language_level=3
 import os
 from flask import render_template, request, Blueprint, jsonify, session, flash, redirect, url_for, send_file
+from flask_login import login_required
 
 from src.utils import ROOT_DIR
 from src.config import app, obfuscated_key, limiter
@@ -14,6 +15,7 @@ activation_bp = Blueprint('activation', __name__)
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
 
 @app.route('/activation', methods=['GET', 'POST'])
+@login_required
 def activation():
     sudo_password = session.get('sudo_password', '')
     systemguard_unique_id = calculate_unique_system_id(sudo_password)
@@ -43,6 +45,7 @@ def activation():
                            license_key=license_key)
 
 @app.route('/download-license', methods=['GET'])
+@login_required
 @limiter.limit("1 per minute", error_message="Only 1 download per minute is allowed.")
 def download_license():
     try:

@@ -40,6 +40,11 @@ def login():
             (UserProfile.username == username) | (UserProfile.email == username)
         ).first()
         if user and user.check_password(password):
+
+            if not user.is_active:
+                flash("Account is not active, Contact Admin", "danger")
+                return redirect(url_for("login"))
+            
             login_user(user, remember=remember_me)
  
             user.last_login = datetime.datetime.utcnow()
@@ -189,7 +194,7 @@ def signup():
         db.session.add(UserCardSettings(user_id=new_user.id))
         db.session.add(PageToggleSettings(user_id=new_user.id))
         db.session.commit()
-        flash("Account created successfully, please log in.")
+        flash("Account created successfully, Contact Admin to activate your account", "success")
         return redirect(url_for("login"))
 
     return render_template("auths/signup.html")

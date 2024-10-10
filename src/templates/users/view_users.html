@@ -17,17 +17,20 @@
                 <th>User Level</th>
                 <th>Profession</th>
                 <th>Email Alerts</th>
+                <th>Is User Active</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
+            <!-- make the table color green for current user : TODO -->
             <tr>
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.user_level }}</td>
                 <td>{{ user.profession }}</td>
                 <td>{{ 'Yes' if user.receive_email_alerts else 'No' }}</td>
+                <td>{{ 'Yes' if user.is_active else 'No' }}</td>
                 <td class="action-buttons">
                     <a href="{{ url_for('change_user_settings', username=user.username) }}" class="btn btn-edit">Edit</a>
                     <form action="{{ url_for('delete_user', username=user.username) }}" method="post" style="display:inline;">
