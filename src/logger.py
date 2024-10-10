@@ -28,13 +28,17 @@ class Logger:
         """Log a debug message."""
         self.log_message("DEBUG", message)
 
-    def warn(self, message):
+    def warning(self, message):
         """Log a warning message."""
         self.log_message("WARNING", message)
 
     def error(self, message):
         """Log an error message."""
         self.log_message("ERROR", message)
+
+    def exception(self, message):
+        """Log an exception message."""
+        self.log_message("EXCEPTION", message)
 
 # Create an instance of the Logger
 logger = Logger()

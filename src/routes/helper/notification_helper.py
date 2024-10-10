@@ -12,18 +12,9 @@ from src.alert_manager import (
     send_teams_alert,
     send_google_chat_alert,
 )
-from src.models import NotificationSettings, AlertDataModel
+from src.models import NotificationSettings, AlertTicket
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
-
-# AlertDataModel
-#     id = db.Column(db.Integer, primary_key=True)
-#     alert_name = db.Column(db.String(255), nullable=False)
-#     instance = db.Column(db.String(255), nullable=False)
-#     severity = db.Column(db.String(255), nullable=False)
-#     description = db.Column(db.String(255), nullable=False)
-#     summary = db.Column(db.String(255), nullable=False)
-
 
 def send_test_alert(alertmanager_url, alert_name, severity, instance):
     # Generate a unique alert name by appending the current timestamp
@@ -90,9 +81,8 @@ def process_alert(alert):
     start_time = alert.get("startsAt", "No start time provided")
 
     log_alert(severity, alert_name, instance, description, summary)
-    notify_alert(alert_name, instance, severity, description, summary)
+    # notify_alert(alert_name, instance, severity, description, summary)
     save_alert_data(alert_name, instance, severity, description, summary, status, start_time)
-
 
 def save_alert_data(alert_name, instance, severity, description, summary, status, start_time):
     """
@@ -105,17 +95,16 @@ def save_alert_data(alert_name, instance, severity, description, summary, status
         description (str): Detailed alert description.
         summary (str): Brief alert summary.
     """
-    alert_data = AlertDataModel(
+    # also save the alert data to the alert_data table
+    alert_ticket = AlertTicket(
         alert_name=alert_name,
         instance=instance,
         severity=severity,
-        description=description,
         summary=summary,
-        status=status,
-        start_time=start_time,
+        description=description,
     )
-    logger.info(f"Saving alert data: {alert_data}")
-    alert_data.save()
+    alert_ticket.save()
+    logger.info(f"Saving alert ticket: {alert_ticket}")
 
 def log_alert(severity, alert_name, instance, description, summary):
     """

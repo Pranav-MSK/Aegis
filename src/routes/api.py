@@ -7,7 +7,7 @@ from flask import jsonify, blueprints, request
 from flask_login import login_required, current_user
 from flask_compress import Compress
 from src.config import app, db
-from src.models import UserDashboardSettings, AlertDataModel
+from src.models import UserDashboardSettings, AlertTicket
 from src.utils import _get_system_info, get_os_release_info, get_os_info, get_cached_value
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
@@ -340,7 +340,7 @@ def get_retention():
 @app.route('/api/v1/alerts/history', methods=['GET'])
 def alert_history_api():
     try:
-        alert_data = AlertDataModel.query.all()
+        alert_data = AlertTicket.query.all()
         if not alert_data:
             return jsonify({"message": "No alert history found."}), 404
         

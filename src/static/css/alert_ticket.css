@@ -1,0 +1,10 @@
+
+.badge-info {
+    background-color: #17a2b8;
+}
+.badge-warning {
+    background-color: #ffc107;
+}
+.badge-danger, .badge-critical {
+    background-color: #dc3545;
+}

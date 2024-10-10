@@ -16,9 +16,9 @@ def server_start():
     """Log server start."""
     logger.info("Server started")
 
-@app.errorhandler(CSRFError)
-def handle_csrf_error(e):
-    return redirect(url_for('login', error="CSRF token is missing or invalid"))
+# @app.errorhandler(CSRFError)
+# def handle_csrf_error(e):
+#     return redirect(url_for('login', error="CSRF token is missing or invalid"))
 
 # Error Handlers
 @app.errorhandler(403)
