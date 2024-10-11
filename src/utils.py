@@ -522,8 +522,6 @@ def _get_system_info():
         'critical_temp': critical_temp,
         'timestamp': datetime.datetime.now(),
     }
-    # update uptime dictionary
-
     return info
 
 def get_system_info():

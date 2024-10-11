@@ -37,7 +37,7 @@ PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
 # App configuration
 FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
 FLASK_APP_PORT="5050"
-SCRAPE_INTERVAL="10s"
+SCRAPE_INTERVAL="2s"
 SYSTEM_LABEL="systemguard-metrics"
 ENVIRONMENT="production"
 JOB_NAME="localhost"

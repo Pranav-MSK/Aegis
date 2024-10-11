@@ -31,6 +31,7 @@ SYSTEM_LABEL="systemguard-metrics"
 JOB_NAME="localhost"
 PROMETHEUS_USERNAME="prometheus_admin"
 PROMETHEUS_PASSWORD="prometheus_password"
+SCRAPE_INTERVAL="2s"
 
 # Verify that initialization script exists
 if [ ! -f "$INIT_ALERTMANAGER_SCRIPT" ]; then
@@ -88,7 +89,7 @@ rule_files:
 
 scrape_configs:
   - job_name: $JOB_NAME
-    scrape_interval: $SCRAPING_INTERVAL
+    scrape_interval: $SCRAPE_INTERVAL
     static_configs:
       - targets:
           - $SYSTEMGUARD_APP_IP:$SYSTEMGUARD_APP_PORT

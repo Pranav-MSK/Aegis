@@ -1,14 +1,15 @@
 # cython: language_level=3
 import datetime
 from threading import Timer
-from src.config import app, db
-from src.utils import _get_system_info
-from src.logger import logger
-from src.models import GeneralSettings, SystemInformation
 from sqlalchemy.exc import SQLAlchemyError
 from prometheus_client import Counter, Gauge
 
 from src.logger import logger
+from src.config import app, db
+from src.utils import _get_system_info
+from src.logger import logger
+from src.models import GeneralSettings, SystemInformation
+
 # Flag to track if logging is already scheduled
 is_logging_scheduled = False
 fetch_system_info_interval = 10
@@ -79,11 +80,6 @@ def log_system_info_to_db():
             # Update Prometheus metrics
             update_prometheus_metrics(system_info)
 
-            # Store system information in InfluxDB
-            # store_system_info_in_influxdb(system_info)
-
-            # Store system information in the database
-            # store_system_info_in_db(system_info)
             logger.info("System information logged to database.")
 
         except SQLAlchemyError as db_err:
@@ -125,36 +121,6 @@ def store_system_info_in_db(system_info):
         timestamp=datetime.datetime.now(),
     )
     system_log.save()
-
-# def store_system_info_in_influxdb(system_info):
-#     """
-#     Stores the collected system information into the InfluxDB with proper error handling.
-#     """
-#     try:
-#         # Create a data point for system information
-#         point = (
-#             Point("system_info")
-#             .tag("host", get_system_username())
-#             .field("cpu_percent", system_info["cpu_percent"])
-#             .field("memory_percent", system_info["memory_percent"])
-#             .field("battery_percent", system_info["battery_percent"])
-#             .field("network_sent", system_info["network_sent"])
-#             .field("network_received", system_info["network_received"])
-#             .field("dashboard_memory_usage", system_info["dashboard_memory_usage"])
-#             .field("cpu_frequency", system_info["cpu_frequency"])
-#             .field("current_temp", system_info["current_temp"])
-#             .time(int(time.time() * 1_000_000_000))
-#         )
-
-#         # Write the data point to InfluxDB
-#         write_api.write(bucket=bucket, record=point)
-#         logger.info("Successfully wrote system information to InfluxDB")
-
-#     except ValueError as ve:
-#         logger.error(f"Value error while storing system info: {ve}")
-#     except Exception as e:
-#         logger.error(f"An unexpected error occurred: {e}", exc_info=True)
-
 
 
 def monitor_settings():
