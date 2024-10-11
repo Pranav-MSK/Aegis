@@ -7,53 +7,94 @@
 
 {% block content %}
 <div class="content mt-4">
-    <h1 class="text-center"><span class="bg-danger text-white p-2"><i class="fas fa-shield-alt"></i>
-        {{ title }}</span><span class="text-white bg-warning p-2">Alert Ticket</span></h1>
+    <h1 class="text-center">
+        <span class="bg-danger text-white p-2"><i class="fas fa-shield-alt"></i> {{ title }}</span>
+        <span class="text-white bg-warning p-2">Alert Ticket</span>
+    </h1>
     <hr>
 
     {% include 'ext/message.html' %}
 
     <!-- Ticket Summary Table -->
-    <h3 class="text-info text-center">Ticket Summary</h3>
-    <table class="table table-bordered table-light text-center">
-        <thead class="thead-dark">
-            <tr>
-                <th>Status</th>
-                <th>Number of Tickets</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for status, count in [('Unassigned', unassigned_count), ('Open', open_count), ('In Progress', in_progress_count), ('Resolved', resolved_count), ('Closed', closed_count)] %}
-            <tr>
-                <td>{{ status }}</td>
-                <td>{{ count }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col-md-6">
+            <h3 class="text-info text-center">Ticket Summary</h3>
+            <table class="table table-bordered table-light text-center mb-4">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Status</th>
+                        <th>Number of Tickets</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for status, count in [
+                    ('Unassigned', unassigned_count),
+                    ('Open', open_count),
+                    ('In Progress', in_progress_count),
+                    ('Resolved', resolved_count),
+                    ('Closed', closed_count)] %}
+                    <tr>
+                        <td>{{ status }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h3 class="text-info text-center">Ticket Summary</h3>
+            <table class="table table-bordered table-light text-center mb-4">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Severity</th>
+                        <th>Number of Tickets</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for severity, count in [
+                    ('Critical', critical_count),
+                    ('Warning', warning_count),
+                    ('Info', info_count)] %}
+                    <tr>
+                        <td>{{ severity }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <form class="form-inline mb-3" method="get" action="{{ url_for('alert_history') }}">
+    <!-- Search Form -->
+    <form class="form-inline mb-4" method="get" action="{{ url_for('alert_history') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="input-group mb-2">
-            <input class="form-control" type="search" placeholder="Search Alerts (by name, severity, etc.)" aria-label="Search" name="search" value="{{ request.args.get('search', '') }}">
+        <div class="input-group">
+            <input class="form-control" type="search" placeholder="Search Alerts..." aria-label="Search" name="search"
+                value="{{ request.args.get('search', '') }}">
             <div class="input-group-append">
-                <button class="btn btn-outline-success" type="submit">
-                    <i class="fas fa-search"></i> Search
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fas fa-search"></i>
                 </button>
             </div>
         </div>
     </form>
 
-    {% if not (open_alerts.items or in_progress_alerts.items or resolved_alerts.items or closed_alerts.items) %}
-    <div class="alert alert-warning" role="alert">
+    {% if not (unassigned_alerts.items or open_alerts.items or in_progress_alerts.items or resolved_alerts.items or
+    closed_alerts.items) %}
+    <div class="alert alert-warning text-center" role="alert">
         No alerts found.
     </div>
     {% endif %}
 
-    {% for alert_type, alerts, title, color in [('Unassigned', unassigned_alerts, 'Unassigned Alerts', 'danger'), ('Open', open_alerts, 'Open Alerts', 'success'), ('In Progress', in_progress_alerts, 'In Progress Alerts', 'warning'), ('Resolved', resolved_alerts, 'Resolved Alerts', 'secondary'), ('Closed', closed_alerts, 'Closed Alerts', 'dark')] %}
-    {% if alerts.items %}
+    {% for alert_type, alerts, title, color in [
+    ('Unassigned', unassigned_alerts, 'Unassigned Alerts', 'danger'),
+    ('Open', open_alerts, 'Open Alerts', 'success'),
+    ('In Progress', in_progress_alerts, 'In Progress Alerts', 'warning'),
+    ('Resolved', resolved_alerts, 'Resolved Alerts', 'secondary'),
+    ('Closed', closed_alerts, 'Closed Alerts', 'dark')] %}
+
     <h3 class="text-{{ color }}">{{ title }}</h3>
-    <table class="table table-striped table-light">
+    <table class="table table-striped table-light mb-4">
         <thead class="thead-dark">
             <tr>
                 <th>Alert Name</th>
@@ -67,7 +108,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for alert in alerts.items if alert.assigned_user or alert_type == 'Unassigned' %}
+            {% for alert in alerts.items|reverse if alert.assigned_user or alert_type == 'Unassigned' %}
             <tr class="table-{% if alert.severity == 'critical' %}danger{% else %}{{ alert.severity }}{% endif %}">
                 <td>{{ alert.alert_name }}</td>
                 <td>{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
@@ -78,71 +119,58 @@
                 <td>{{ alert.assigned_supervisor.username if alert.assigned_supervisor else 'N/A' }}</td>
                 <td>
                     <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="get">
-                        <button type="submit" class="btn btn-info">Details</button>
+                        <button type="submit" class="btn btn-info btn-sm">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
                     </form>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Pagination -->
     <div class="text-center">
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 {% if alerts.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': 1, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}" aria-label="First">
+                    <a class="page-link"
+                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': 1, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        aria-label="First">
                         <span aria-hidden="true">&laquo;&laquo;</span>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.prev_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" aria-label="First">
-                        <span aria-hidden="true">&laquo;&laquo;</span>
-                    </a>
-                </li>
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" aria-label="Previous">
+                    <a class="page-link"
+                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.prev_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
                 {% endif %}
 
                 {% for page_num in range(1, alerts.pages + 1) %}
-                {% if page_num == alerts.page %}
-                <li class="page-item active">
-                    <a class="page-link" href="#">{{ page_num }}</a>
+                <li class="page-item {% if page_num == alerts.page %}active{% endif %}">
+                    <a class="page-link"
+                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': page_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}">
+                        {{ page_num }}
+                    </a>
                 </li>
-                {% else %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': page_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}">{{ page_num }}</a>
-                </li>
-                {% endif %}
                 {% endfor %}
 
                 {% if alerts.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.next_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}" aria-label="Next">
+                    <a class="page-link"
+                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.next_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.pages, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}" aria-label="Last">
-                        <span aria-hidden="true">&raquo;&raquo;</span>
-                    </a>
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" aria-label="Last">
+                    <a class="page-link"
+                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.pages, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        aria-label="Last">
                         <span aria-hidden="true">&raquo;&raquo;</span>
                     </a>
                 </li>
@@ -151,11 +179,6 @@
         </nav>
         <span>Page {{ alerts.page }} of {{ alerts.pages }}</span>
     </div>
-    {% else %}
-    <div class="alert alert-warning" role="alert">
-        No {{ alert_type|lower }} alerts yet.
-    </div>
-    {% endif %}
     {% endfor %}
 </div>
 {% endblock %}

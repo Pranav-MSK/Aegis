@@ -1,55 +1,53 @@
 /* General body styles */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f7fa; /* Lighter background */
-    color: #495057; /* Darker text color */
-    margin: 0;
-    padding: 0;
+    background-color: #f0f4f8; /* Light background */
+    color: #495057; /* Darker text for contrast */
 }
 
 /* Container for the main content */
 .content {
-    margin: 20px auto; /* Centered with margin */
-    padding: 20px; /* Inner padding */
-    border-radius: 8px; /* Rounded corners */
-    background-color: #ffffff; /* White background */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin: 20px auto;
+    padding: 20px 50px;
+    background-color: #ffffff;
+    border-radius: 8px; /* Add rounded corners */
 }
 
 /* Header styles */
 h1 {
-    font-size: 2.5rem; /* Larger font size */
+    font-size: 2.5rem;
     margin-bottom: 20px;
 }
 
 .bg-danger {
-    background-color: #dc3545 !important;
-    border-radius: 5px; /* Rounded edges */
-    padding: 10px; /* Padding for better spacing */
+    background-color: #dc3545 !important; /* Danger color */
+    border-radius: 5px;
+    padding: 10px;
 }
 
 .bg-warning {
-    background-color: #ffc107 !important;
-    border-radius: 5px; /* Rounded edges */
+    background-color: #ffc107 !important; /* Warning color */
+    border-radius: 5px;
     padding: 10px;
 }
 
 /* Table styles */
 .table {
-    width: 100%; /* Full width */
-    border-collapse: collapse; /* Collapse borders */
-    margin-bottom: 20px; /* Space between tables */
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .table th, .table td {
-    padding: 12px 15px; /* Padding for cells */
-    text-align: center; /* Centered text */
+    padding: 12px 15px;
+    text-align: center;
 }
 
 .table th {
-    background-color: #007bff; /* Header background */
-    color: #ffffff; /* Header text color */
-    font-weight: bold; /* Bold text */
+    background-color: #4e73df; /* Darker header color */
+    color: #ffffff;
+    font-weight: bold;
 }
 
 /* Row hover effect */
@@ -58,18 +56,17 @@ h1 {
 }
 
 .table tbody tr:hover {
-    background-color: #e9ecef; /* Light gray on hover */
+    background-color: #e9ecef; /* Light hover effect */
 }
 
 /* Pagination styles */
 .pagination {
-    justify-content: center; /* Center pagination */
-    margin-top: 20px; /* Margin for spacing */
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .page-link {
-    color: #007bff; /* Link color */
-    margin: 0 5px; /* Margin between links */
+    color: #007bff; /* Primary link color */
 }
 
 .page-link:hover {
@@ -78,31 +75,48 @@ h1 {
 
 /* Button styles */
 .btn {
-    border-radius: 5px; /* Rounded button edges */
+    border-radius: 5px;
 }
 
 .btn-info {
     background-color: #17a2b8; /* Info button color */
-    border: none; /* Remove border */
-    color: white; /* Text color */
+    border: none;
+    color: white;
 }
 
 .btn-info:hover {
-    background-color: #138496; /* Darker shade on hover */
+    background-color: #138496; /* Darker info on hover */
     transition: background-color 0.3s; /* Smooth transition */
 }
 
 /* Message container styles */
 .alert {
-    margin: 20px 0; /* Spacing above and below */
-    border-radius: 5px; /* Rounded edges */
+    margin: 20px 0;
+    border-radius: 5px; /* Rounded corners */
 }
 
 /* Input styles */
 .form-control {
-    border-radius: 5px; /* Rounded edges */
+    border-radius: 5px;
+    box-shadow: none; /* Remove default input shadow */
 }
 
+/* Input group styles */
 .input-group {
-    width: 100%; /* Full width */
+    width: 100%;
+}
+
+/* Card-like design for tables */
+.table {
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden; /* Prevents inner elements from spilling out */
+}
+
+/* Add a subtle transition to buttons */
+.btn {
+    transition: transform 0.2s; /* Smooth transform effect */
+}
+
+.btn:hover {
+    transform: scale(1.05); /* Slightly enlarge button on hover */
 }

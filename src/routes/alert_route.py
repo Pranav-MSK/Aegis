@@ -129,7 +129,7 @@ def alert_history():
             )
         )
 
-    per_page = 2
+    per_page = 10
 
     # Pagination for each alert status
     unassigned_page = request.args.get("unassigned_page", 2, type=int)
@@ -172,6 +172,11 @@ def alert_history():
     ).count()
 
 
+    critical_count = base_query.filter(AlertTicket.severity == "critical").count()
+    warning_count = base_query.filter(AlertTicket.severity == "warning").count()
+    info_count = base_query.filter(AlertTicket.severity == "info").count()
+
+
     return render_template(
         "alerts/alert_history.html",
         users=users,
@@ -187,6 +192,9 @@ def alert_history():
         in_progress_count=in_progress_count,
         resolved_count=resolved_count,
         closed_count=closed_count,
+        critical_count=critical_count,
+        warning_count=warning_count,
+        info_count=info_count,
     )
 
 @app.route("/alerts/ticket/<int:alert_id>", methods=["GET", "POST"])
