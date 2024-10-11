@@ -1,4 +1,85 @@
 
+body {
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+h1 {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.alert-metadata,
+.notes-section,
+.logs-section {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.assignment-section {
+    margin-bottom: 1rem;
+}
+
+.btn-primary {
+    margin-top: 0.5rem;
+}
+
+.list-group-item {
+    border: none;
+}
+
+.list-group {
+    padding: 0;
+}
+
+/* General badge styles */
+.badge {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+/* Specific styles for each status */
+.badge-open {
+    color: #fff;
+    background-color: #007bff;
+}
+
+.badge-in.progress {
+    color: #fff;
+    background-color: #ffc107;
+}
+
+.badge-resolved {
+    color: #fff;
+    background-color: #28a745;
+}
+
+.badge-closed {
+    color: #fff;
+    background-color: #6c757d;
+}
+
+/* specific styles for each priority */
+
 .badge-info {
     background-color: #17a2b8;
 }
@@ -7,4 +88,10 @@
 }
 .badge-danger, .badge-critical {
     background-color: #dc3545;
+}
+
+
+/* Optional: Hover effects for badges */
+.badge:hover {
+    opacity: 0.8;
 }

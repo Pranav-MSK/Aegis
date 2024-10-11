@@ -12,7 +12,7 @@ from src.alert_manager import (
     send_teams_alert,
     send_google_chat_alert,
 )
-from src.models import NotificationSettings, AlertTicket
+from src.models import NotificationSettings, AlertTicket, UserProfile
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 
@@ -95,13 +95,47 @@ def save_alert_data(alert_name, instance, severity, description, summary, status
         description (str): Detailed alert description.
         summary (str): Brief alert summary.
     """
-    # also save the alert data to the alert_data table
+    # Fetch all supervisors with user_level "admin"
+    all_supervisors = UserProfile.query.filter_by(user_level="admin").all()
+    
+    if not all_supervisors:
+        assigned_supervisor_id = None
+        logger.warning("No supervisors available to assign.")
+    else:
+        # Load calculation for each supervisor
+        supervisor_loads = {
+            supervisor.id: AlertTicket.query.filter(
+                AlertTicket.assigned_supervisor_id == supervisor.id,
+                AlertTicket.status.in_(["Open", "In Progress"])
+            ).count()
+            for supervisor in all_supervisors
+        }
+
+        # Find the supervisor(s) with the minimum load
+        min_load = min(supervisor_loads.values())
+        eligible_supervisors = [supervisor_id for supervisor_id, load in supervisor_loads.items() if load == min_load]
+
+        # If there's a tie, use round-robin logic based on the last assigned supervisor
+        last_assigned_supervisor = AlertTicket.query.order_by(AlertTicket.id.desc()).first()
+        last_assigned_supervisor_id = last_assigned_supervisor.assigned_supervisor_id if last_assigned_supervisor else None
+        
+        if last_assigned_supervisor_id in eligible_supervisors:
+            # Continue from the last assigned supervisor
+            last_index = eligible_supervisors.index(last_assigned_supervisor_id)
+            next_index = (last_index + 1) % len(eligible_supervisors)
+            assigned_supervisor_id = eligible_supervisors[next_index]
+        else:
+            # Assign the first eligible supervisor
+            assigned_supervisor_id = eligible_supervisors[0]
+
+    # Create and save the alert ticket
     alert_ticket = AlertTicket(
         alert_name=alert_name,
         instance=instance,
         severity=severity,
         summary=summary,
         description=description,
+        assigned_supervisor_id=assigned_supervisor_id,
     )
     alert_ticket.save()
     logger.info(f"Saving alert ticket: {alert_ticket}")

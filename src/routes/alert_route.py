@@ -1,6 +1,4 @@
 # cython: language_level=3
-import os
-import csv
 from flask import (
     request, 
     jsonify, 
@@ -16,9 +14,31 @@ from src.logger import logger
 
 from src.routes.helper.notification_helper import send_test_alert, process_alert
 from src.utils import get_ip_address
-from src.models import AlertTicket, UserProfile
+from src.models import AlertTicket, UserProfile, InvestigationNote, Report, AlertLog
+from functools import wraps
+from flask import abort
 
 alert_bp = Blueprint("alert", __name__)
+
+
+def user_has_access_to_alert(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        alert_id = kwargs.get('alert_id')
+        alert = AlertTicket.query.get(alert_id)
+        if not alert:
+            flash('Alert not found!', 'error')
+            return redirect(url_for('alert_history'))
+
+        if current_user.user_level != 'admin' and current_user.id not in [alert.assigned_user_id, alert.assigned_supervisor_id]:
+            abort(403, description="You do not have access to this alert ticket.")
+
+        return f(*args, **kwargs)
+    return decorated_function
+
+def user_id_to_username(user_id):
+    user = UserProfile.query.get(user_id)
+    return user.username if user else 'Unknown'
 
 @app.route("/alerts", methods=["POST"])
 @csrf.exempt
@@ -118,73 +138,100 @@ def alert_history():
                            admin_users=admin_users)
 
 
+
 @app.route('/alerts/ticket/<int:alert_id>', methods=['GET', 'POST'])
+@user_has_access_to_alert
 @login_required
 def alert_ticket(alert_id):
+
     alert = AlertTicket.query.get(alert_id)
     if not alert:
         flash('Alert not found!', 'error')
         return redirect(url_for('alert_history'))
-    
+
     if request.method == 'POST':
         form_type = request.form.get('form_type')
-        if form_type == 'assign_user':
-            alert.assigned_user_id = request.form.get('assigned_user_id')
-        elif form_type == 'assign_supervisor':
-            alert.assigned_supervisor_id = request.form.get('assigned_supervisor_id')
-        elif form_type == 'add_comment':
-            alert.investigation_notes = request.form.get('investigation_notes')
-        elif form_type == 'add_report':
-            alert.report = request.form.get('report')
-        elif form_type == 'edit_status':
-            alert.status = request.form.get('status')
-        elif form_type == 'edit_severity':
-            alert.severity = request.form.get('severity')
-        elif form_type == 'edit_description':
-            alert.description = request.form.get('description')
+        log_message = ""
+        
+        # Helper function to log changes
+        def log_and_save(message):
+            nonlocal log_message
+            log_message = message
+            alert_log = AlertLog(alert_ticket_id=alert_id, log=log_message)
+            alert_log.save()
 
-        alert.save()        
+        # Assign user and supervisor logic
+        if form_type in ['assign_user', 'assign_supervisor']:
+            assigned_user_id = request.form.get('assigned_user_id') if form_type == 'assign_user' else request.form.get('assigned_supervisor_id')
+            previous_user_id = alert.assigned_user_id if form_type == 'assign_user' else alert.assigned_supervisor_id
+            
+            if assigned_user_id:
+                if form_type == 'assign_user':
+                    alert.assigned_user_id = assigned_user_id
+                    log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
+                else:
+                    alert.assigned_supervisor_id = assigned_user_id
+                    log_message = f"Supervisor {user_id_to_username(assigned_user_id)} assigned to alert ticket by {(current_user.username)}"
+            else:
+                if form_type == 'assign_user':
+                    alert.assigned_user_id = None
+                    log_message = f"User {user_id_to_username(previous_user_id)} removed from alert ticket by {(current_user.username)}"
+                else:
+                    alert.assigned_supervisor_id = None
+                    log_message = f"Supervisor {user_id_to_username(previous_user_id)} removed from alert ticket by {(current_user.username)}"
+                
+            log_and_save(log_message)
+
+        # Edit status and severity logic
+        elif form_type in ['edit_status', 'edit_severity', 'edit_description']:
+            if form_type == 'edit_status':
+                new_status = request.form.get('status')
+                alert.status = new_status
+                log_message = f"Status changed to '{alert.status}' by {current_user.username}"
+            elif form_type == 'edit_severity':
+                new_severity = request.form.get('severity')
+                alert.severity = new_severity
+                log_message = f"Severity changed to '{alert.severity}' by {current_user.username}"
+            elif form_type == 'edit_description':
+                new_description = request.form.get('description')
+                alert.description = new_description
+                log_message = f"Description updated by {current_user.username}"
+
+            log_and_save(log_message)
+
+        # Add comment (investigation notes)
+        elif form_type == 'add_comment':
+            note_content = request.form.get('investigation_notes')  # Ensure this matches the name in your form
+            if note_content:  # Check if the note is not empty
+                note = InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content)
+                note.save()
+                log_message = f"Comment added by {current_user.username}"  
+                log_and_save(log_message)
+            else:
+                flash('Note cannot be empty!', 'error')
+
+        alert.save()
         flash('Changes saved successfully!', 'success')
         return redirect(url_for('alert_ticket', alert_id=alert.id))
-    
-    return render_template('alerts/alert_ticket.html', alert=alert, 
-                           users=UserProfile.query.all(), 
+
+     # Pagination parameters for alert logs
+    logs_page = request.args.get('logs_page', 1, type=int)
+    logs_per_page = request.args.get('logs_per_page', 10, type=int)
+
+    # Pagination parameters for investigation notes
+    notes_page = request.args.get('notes_page', 1, type=int)
+    notes_per_page = request.args.get('notes_per_page', 10, type=int)
+
+    # Fetch alert logs with pagination
+    alert_logs = AlertLog.query.filter_by(alert_ticket_id=alert_id).order_by(AlertLog.created_at.desc()).paginate(page=logs_page, per_page=logs_per_page, error_out=False)
+
+    # Fetch investigation notes with pagination
+    investigation_notes = InvestigationNote.query.filter_by(alert_ticket_id=alert_id).order_by(InvestigationNote.created_at.desc()).paginate(page=notes_page, per_page=notes_per_page, error_out=False)
+
+    return render_template('alerts/alert_ticket.html', alert=alert,
+                           users=UserProfile.query.all(),
                            admin_users=UserProfile.query.filter_by(user_level='admin').all(),
-                           current_user=current_user)
+                           current_user=current_user,
+                           alert_logs=alert_logs,
+                           investigation_notes=investigation_notes)
 
-
-
-@app.route('/assign_user', methods=['POST'])
-@login_required
-def assign_user():
-    alert_id = request.form.get('alert_id')
-    user_id = request.form.get('assigned_user_id')
-    print("Alert ID: ", alert_id)
-    print("User ID: ", user_id)
-    if alert_id and user_id:
-        alert = AlertTicket.query.get(alert_id)
-        if alert:
-            alert.assigned_user_id = user_id
-            alert.save()
-            flash('User assigned successfully!', 'success')
-            return redirect(url_for('alert_history'))
-    flash('Failed to assign user!', 'error')
-    return redirect(url_for('alert_history'))
-
-
-@app.route('/assign_supervisor', methods=['POST'])
-@login_required
-def assign_supervisor():
-    alert_id = request.form.get('alert_id')
-    supervisor_id = request.form.get('assigned_supervisor_id')
-    print("Alert ID: ", alert_id)
-    print("Supervisor ID: ", supervisor_id)
-    if alert_id and supervisor_id:
-        alert = AlertTicket.query.get(alert_id)
-        if alert:
-            alert.assigned_supervisor_id = supervisor_id
-            alert.save()
-            flash('Supervisor assigned successfully!', 'success')
-            return redirect(url_for('alert_history'))
-    flash('Failed to assign supervisor!', 'error')
-    return redirect(url_for('alert_history'))
