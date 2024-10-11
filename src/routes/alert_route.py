@@ -6,7 +6,7 @@ from src.logger import logger
 
 from src.routes.helper.notification_helper import send_test_alert, process_alert
 from src.utils import get_ip_address
-from src.models import AlertTicket, UserProfile, InvestigationNote, AlertLog
+from src.models import AlertTicket, UserProfile, InvestigationNote, AlertLog, CustomFields
 from functools import wraps
 from flask import abort
 
@@ -132,7 +132,7 @@ def alert_history():
     per_page = 10
 
     # Pagination for each alert status
-    unassigned_page = request.args.get("unassigned_page", 2, type=int)
+    unassigned_page = request.args.get("unassigned_page", 1, type=int)
     open_page = request.args.get("open_page", 1, type=int)
     in_progress_page = request.args.get("in_progress_page", 1, type=int)
     resolved_page = request.args.get("resolved_page", 1, type=int)
@@ -274,6 +274,50 @@ def alert_ticket(alert_id):
                 log_and_save(log_message)
             else:
                 flash("Note cannot be empty!", "error")
+
+        elif form_type in ["add_customfield", "delete_customfield", "edit_customfield"]:
+
+            if form_type == "add_customfield":
+                field_name = request.form.get("field_name")
+                field_value = request.form.get("field_value")
+
+                if field_name and field_value:
+                    alert.customfields.append(CustomFields(field_name=field_name, field_value=field_value))
+                    alert.save()
+                    log_message = f"Custom field '{field_name}' added by {current_user.username}"
+                    log_and_save(log_message)
+
+                    flash("Field added successfully!", "success")
+                    return redirect(url_for("alert_ticket", alert_id=alert.id))
+
+            if form_type == "delete_customfield":
+                customfield_id = request.form.get("customfield_id")
+                customfield = CustomFields.query.get(customfield_id)
+                if customfield:
+                    # find customfiled by id and delete it
+                    customfield = CustomFields.query.get(customfield_id)
+                    customfield.delete()
+                    log_message = f"Custom field '{customfield.field_name}' deleted by {current_user.username}"
+                    log_and_save(log_message)
+
+                    flash("Field deleted successfully!", "success")
+                    return redirect(url_for("alert_ticket", alert_id=alert.id))
+
+            if form_type == "edit_customfield":
+                customfield_id = request.form.get("customfield_id")
+                field_name = request.form.get("field_name")
+                field_value = request.form.get("field_value")
+
+                customfield = CustomFields.query.get(customfield_id)
+                if customfield:
+                    customfield.field_name = field_name
+                    customfield.field_value = field_value
+                    customfield.save()
+                    log_message = f"Custom field '{field_name}' updated by {current_user.username}"
+                    log_and_save(log_message)
+
+                    flash("Field updated successfully!", "success")
+                    return redirect(url_for("alert_ticket", alert_id=alert.id))
 
         alert.save()
         flash("Changes saved successfully!", "success")

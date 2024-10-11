@@ -16,11 +16,19 @@ from src.models import NotificationSettings, AlertTicket, UserProfile
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 
+
 def send_test_alert(alertmanager_url, alert_name, severity, instance):
     # Generate a unique alert name by appending the current timestamp
     unique_alert_name = f"{alert_name}_{int(time.time())}"
 
-    # Define the alert data with the unique alert name
+    # Create a detailed description for the alert
+    description = (
+        f"This is a test alert generated at {time.strftime('%Y-%m-%d %H:%M:%S')}.\n"
+        "This alert is intended for testing purposes only and does not indicate any real issues.\n"
+        "If this alert appears in your monitoring system, please disregard it."
+    )
+    
+    # Define the alert data with the unique alert name and improved annotations
     alert_data = [
         {
             "labels": {
@@ -29,8 +37,9 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
                 "instance": instance,
             },
             "annotations": {
-                "description": f"This is a test alert generated at {time.strftime('%Y-%m-%d %H:%M:%S')}",
-                "summary": "SystemGuards Test Alert Verification. Only for testing purposes. You can ignore this alert.",
+                "description": description,
+                "summary": f"Test Alert: {unique_alert_name}",
+                "runbook": "Please refer to the documentation for troubleshooting steps.",
             },
         }
     ]
@@ -48,20 +57,32 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
         print(f"Response Body: {response.text}")
 
         # Check the response
-        if response.status_code == 202 or response.status_code == 200:
+        if response.status_code in (200, 202):
             return {
                 "message": f"Test alert '{unique_alert_name}' sent successfully!",
                 "status": 200,
             }
         else:
             return {
-                "message": f"Failed to send alert, Response: {response.text}",
+                "message": f"Failed to send alert. Response: {response.text}",
                 "status": response.status_code,
             }
 
+    except requests.exceptions.RequestException as e:
+        return {
+            "message": f"Request error occurred: {str(e)}",
+            "status": 500,
+        }
+    except json.JSONDecodeError:
+        return {
+            "message": "Failed to decode JSON response from Alertmanager.",
+            "status": 500,
+        }
     except Exception as e:
-        return {"message": f"An error occurred: {e}", "status": 500}
-
+        return {
+            "message": f"An unexpected error occurred: {str(e)}",
+            "status": 500,
+        }
 
 def process_alert(alert):
     """
@@ -81,8 +102,8 @@ def process_alert(alert):
     start_time = alert.get("startsAt", "No start time provided")
 
     log_alert(severity, alert_name, instance, description, summary)
-    # notify_alert(alert_name, instance, severity, description, summary)
     save_alert_data(alert_name, instance, severity, description, summary, status, start_time)
+    notify_alert(alert_name, instance, severity, description, summary)
 
 def save_alert_data(alert_name, instance, severity, description, summary, status, start_time):
     """

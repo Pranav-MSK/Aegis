@@ -31,6 +31,7 @@ class AlertTicket(BaseModel):
     investigation_notes = db.relationship('InvestigationNote', backref='alert_ticket', lazy=True)
     reports = db.relationship('Report', backref='alert_ticket', lazy=True)
     alertlogs = db.relationship('AlertLog', backref='alert_ticket', lazy=True)
+    customfields = db.relationship('CustomFields', backref='alert_ticket', lazy=True)
 
 
 class AlertLog(BaseModel):
@@ -67,3 +68,14 @@ class Report(BaseModel):
 
     # Foreign key relation
     user = db.relationship('UserProfile', backref='reports')
+
+
+class CustomFields(BaseModel):
+
+    __tablename__ = 'custom_fields'
+
+    id = db.Column(db.Integer, primary_key=True)
+    alert_ticket_id = db.Column(db.Integer, db.ForeignKey('alert_tickets.id'), nullable=False)
+    field_name = db.Column(db.String(255), nullable=False)
+    field_value = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp of report creation

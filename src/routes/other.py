@@ -113,11 +113,7 @@ def about():
     # fetch sg_installation_method from .bashrc file
     sg_installation_method = fetch_bashrc_variable("sg_installation_method")
     installation_info["sg_installation_method"] = sg_installation_method
-    sudo_password = session.get('sudo_password', '')
-    if sudo_password:
-        systemguard_unique_id = calculate_unique_system_id(sudo_password)
-    else:
-        systemguard_unique_id = "Please enable superadmin mode to view the unique system ID."
+    systemguard_unique_id = calculate_unique_system_id()
     session['systemguard_unique_id'] = systemguard_unique_id
     
     return render_template("other/about.html", 

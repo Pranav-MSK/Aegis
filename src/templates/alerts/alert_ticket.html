@@ -132,6 +132,50 @@
                 <p><strong>Created At:</strong> {{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
                 <p><strong>Last Updated At:</strong> {{ alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if
                     alert.updated_at else 'N/A' }}</p>
+
+
+                <!-- Option to delete custom fields -->
+                {% if current_user.user_level == 'admin' %} 
+                {% for customfield in alert.customfields %}
+                <p><strong>{{ customfield.field_name }}:</strong> {{ customfield.field_value }}
+                    <i class="fas fa-edit" onclick="toggleEdit('editCustomField{{ customfield.id }}')" style="cursor: pointer;"></i>
+                    <i class="fas fa-trash" onclick="document.getElementById('deleteCustomField{{ customfield.id }}').submit();" style="cursor: pointer;"></i>
+                    <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" id="deleteCustomField{{ customfield.id }}" style="display: none;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="form_type" value="delete_customfield">
+                        <input type="hidden" name="customfield_id" value="{{ customfield.id }}">
+                    </form>
+                    <div id="editCustomField{{ customfield.id }}" style="display: none;">
+                        <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="form_type" value="edit_customfield">
+                            <input type="hidden" name="customfield_id" value="{{ customfield.id }}">
+                            <div class="form-group">
+                                <label for="field_name">Field Name:</label>
+                                <input type="text" name="field_name" class="form-control" value="{{ customfield.field_name }}" required>
+                                <label for="field_value">Field Value:</label>
+                                <input type="text" name="field_value" class="form-control" value="{{ customfield.field_value }}" required>
+                                <button type="submit" class="btn btn-primary mt-2">Update Custom Field</button>
+                            </div>
+                        </form>
+                    </div>
+                </p>
+                {% endfor %}
+                <i class="fas fa-plus" onclick="toggleEdit('addCustomField')" style="cursor: pointer;"></i>
+                <div id="addCustomField" style="display: none;">
+                    <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="form_type" value="add_customfield">
+                        <div class="form-group">
+                            <label for="field_name">Field Name:</label>
+                            <input type="text" name="field_name" class="form-control" required>
+                            <label for="field_value">Field Value:</label>
+                            <input type="text" name="field_value" class="form-control" required>
+                            <button type="submit" class="btn btn-primary mt-2">Add Custom Field</button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -26,21 +26,9 @@ def get_os_installation_uuid():
     except Exception as e:
         return f"Error reading OS Installation UUID: {str(e)}"
 
-def get_motherboard_serial(sudo_password):
-    """Retrieve the motherboard serial number using sudo password."""
-    try:
-        command = f"echo {sudo_password} | sudo -S dmidecode -s baseboard-serial-number"
-        output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
-        return output.decode().strip()
-    except subprocess.CalledProcessError as e:
-        return "Error retrieving Motherboard Serial: " + e.output.decode().strip()
-    except Exception as e:
-        return f"Unexpected error: {str(e)}"
-
-def calculate_unique_system_id(sudo_password):
+def calculate_unique_system_id():
     """Calculate a unique system identifier using various hardware IDs."""
     os_uuid = get_os_installation_uuid()
-    # motherboard_serial = get_motherboard_serial(sudo_password)
     unique_id = f"{os_uuid}"
     unique_id = ''.join(e for e in unique_id if e.isalnum())
     unique_id = unique_id[::2]

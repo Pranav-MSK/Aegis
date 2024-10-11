@@ -17,8 +17,7 @@ internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', '
 @app.route('/activation', methods=['GET', 'POST'])
 @login_required
 def activation():
-    sudo_password = session.get('sudo_password', '')
-    systemguard_unique_id = calculate_unique_system_id(sudo_password)
+    systemguard_unique_id = calculate_unique_system_id()
 
     license_key = None
     activation_code = ""
@@ -49,8 +48,7 @@ def activation():
 @limiter.limit("1 per minute", error_message="Only 1 download per minute is allowed.")
 def download_license():
     try:
-        sudo_password = session.get('sudo_password', '')
-        systemguard_unique_id = calculate_unique_system_id(sudo_password)
+        systemguard_unique_id = calculate_unique_system_id()
         pdf_file_path = generate_license_pdf(internal_license_key_path)
         return send_file(pdf_file_path, as_attachment=True, download_name=f"license_{systemguard_unique_id}.pdf")
     except Exception as e:
