@@ -50,7 +50,6 @@
                 </p>
                 <p><strong>Status:</strong>
                     <span class="badge badge-{{ alert.status | lower }}">{{ alert.status }}</span>
-
                     {% if current_user.user_level == 'admin' %}
                     <i class="fas fa-edit" onclick="toggleEdit('editStatus')" style="cursor: pointer;"></i>
                 <div id="editStatus" style="display: none;">
@@ -88,7 +87,9 @@
                 </div>
                 {% endif %}
                 </p>
-                <p><strong>Assigned Investigator:</strong> 
+                <!-- # <summary></summary> -->
+                 <p><strong>Summary:</strong> {{ alert.summary }}</p>
+                <p><strong>Assigned Investigator:</strong>
                     {{ alert.assigned_user.username if alert.assigned_user else 'Unassigned' }}
                     {% if current_user.user_level == 'admin' %}
                     <i class="fas fa-edit" onclick="toggleEdit('editInvestigator')" style="cursor: pointer;"></i>
@@ -100,14 +101,15 @@
                         <select name="assigned_user_id" class="form-control" onchange="this.form.submit()">
                             <option value="">Unassigned</option>
                             {% for user in users %}
-                            <option value="{{ user.id }}" {% if user.id==alert.assigned_user_id %}selected{% endif %}>{{ user.username }}</option>
+                            <option value="{{ user.id }}" {% if user.id==alert.assigned_user_id %}selected{% endif %}>{{
+                                user.username }}</option>
                             {% endfor %}
                         </select>
                     </form>
                 </div>
                 {% endif %}
                 </p>
-                <p><strong>Assigned Supervisor:</strong> 
+                <p><strong>Assigned Supervisor:</strong>
                     {{ alert.assigned_supervisor.username if alert.assigned_supervisor else 'Unassigned' }}
                     {% if current_user.user_level == 'admin' %}
                     <i class="fas fa-edit" onclick="toggleEdit('editSupervisor')" style="cursor: pointer;"></i>
@@ -119,7 +121,8 @@
                         <select name="assigned_supervisor_id" class="form-control" onchange="this.form.submit()">
                             <option value="">Unassigned</option>
                             {% for user in admin_users %}
-                            <option value="{{ user.id }}" {% if user.id==alert.assigned_supervisor_id %}selected{% endif %}>{{ user.username }}</option>
+                            <option value="{{ user.id }}" {% if user.id==alert.assigned_supervisor_id %}selected{% endif
+                                %}>{{ user.username }}</option>
                             {% endfor %}
                         </select>
                     </form>
@@ -127,11 +130,15 @@
                 {% endif %}
                 </p>
                 <p><strong>Created At:</strong> {{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-                <p><strong>Last Updated At:</strong> {{ alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if alert.updated_at else 'N/A' }}</p>
+                <p><strong>Last Updated At:</strong> {{ alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if
+                    alert.updated_at else 'N/A' }}</p>
             </div>
         </div>
     </div>
     <div class="col-md-6">
+        <div class="text-right mb-3">
+            <a href="{{ url_for('alert_history') }}" class="btn btn-secondary">All Tickets</a>
+        </div>
         <!-- Investigation Notes -->
         {% if current_user.id == alert.assigned_user_id %}
         <div class="notes-section">
