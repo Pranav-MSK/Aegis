@@ -12,7 +12,7 @@ from src.models import GeneralSettings, SystemInformation
 
 # Flag to track if logging is already scheduled
 is_logging_scheduled = False
-fetch_system_info_interval = 10
+fetch_system_info_interval = 1
 
 # Initialize Prometheus metrics
 metrics = {

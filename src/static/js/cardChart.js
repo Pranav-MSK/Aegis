@@ -5,7 +5,13 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
     const ctx = document.getElementById(canvasId).getContext('2d');
 
     // Retrieve data from localStorage or initialize an empty array
-    let dataStorage = JSON.parse(localStorage.getItem(dataStorageKey)) || [];
+    let dataStorage;
+    try {
+        dataStorage = JSON.parse(localStorage.getItem(dataStorageKey)) || [];
+    } catch (error) {
+        console.error('Error retrieving data from localStorage:', error);
+        dataStorage = [];
+    }
 
     // Create a gradient color for the line
     const gradient = ctx.createLinearGradient(0, 0, 0, 400); // Adjust height as needed
@@ -25,15 +31,11 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
                 fill: true,
                 tension: 0.2,  // Smooth line
                 pointRadius: 0,  // Use small points for visibility
-                pointBackgroundColor: 'rgba(54, 162, 235, 1)',  // Color of the points
-                pointHoverRadius: 0,  // Larger radius on hover
             }]
         },
         options: {
             scales: {
-                x: {
-                    display: false,  // Hide the x-axis labels and grid
-                },
+                x: { display: false },  // Hide the x-axis labels and grid
                 y: {
                     display: false,  // Show the y-axis
                     beginAtZero: true,
@@ -46,10 +48,8 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
             plugins: {
                 tooltip: {
                     enabled: true,  // Enable tooltips for interactivity
-                    mode: 'nearest',
-                    intersect: false,
                     callbacks: {
-                        label: function(context) {
+                        label: (context) => {
                             let label = context.dataset.label || '';
                             if (label) {
                                 label += ': ';
@@ -72,6 +72,7 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
             responsive: true,
         }
     });
+
     // Function to update the chart with new data
     function updateChart(newUsage) {
         // Add the new data point
@@ -83,7 +84,11 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
         }
 
         // Store the updated data in localStorage under the unique key
-        localStorage.setItem(dataStorageKey, JSON.stringify(dataStorage));
+        try {
+            localStorage.setItem(dataStorageKey, JSON.stringify(dataStorage));
+        } catch (error) {
+            console.error('Error saving data to localStorage:', error);
+        }
 
         // Update the chart
         chart.update();
@@ -92,31 +97,24 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
     // Set interval to fetch and update data every 2 seconds
     setInterval(() => {
         const newUsage = updateFunc();  // Call the update function to get the current usage
-        
+
         if (percentageUsage) {
-            let percentageUsageValue = percentageUsage.style.width;
-            percentageUsageValue = parseFloat(percentageUsageValue.replace('%', ''));
+            const percentageUsageValue = parseFloat(percentageUsage.style.width.replace('%', ''));
             console.log('percentageUsage', percentageUsageValue);
             
             // Find existing span or create a new one
             let span = document.querySelector(`#${canvasId} + span`);
             if (!span) {
-            span = document.createElement('span');
-            const canvas = document.getElementById(canvasId);
-            canvas.parentNode.insertBefore(span, canvas.nextSibling);
+                span = document.createElement('span');
+                const canvas = document.getElementById(canvasId);
+                canvas.parentNode.insertBefore(span, canvas.nextSibling);
             }
 
-            if (percentageUsageValue > 80) {
-            span.innerHTML = 'High Usage';
+            span.innerHTML = percentageUsageValue > 80 ? 'High Usage' : 'Normal Usage';
             span.style.color = 'white';
-            span.className = 'badge bg-danger position-absolute top-0 end-0 m-3 p-2';
-            } else {
-            span.innerHTML = 'Normal Usage';
-            span.style.color = 'white';
-            span.className = 'badge bg-success position-absolute top-0 end-0 m-3 p-2';
-            }
+            span.className = percentageUsageValue > 80 ? 'badge bg-danger position-absolute top-0 end-0 m-3 p-2' : 'badge bg-success position-absolute top-0 end-0 m-3 p-2';
         }
 
         updateChart(newUsage);
-    }, 300);
+    }, 100); // Change interval to 2 seconds
 }
