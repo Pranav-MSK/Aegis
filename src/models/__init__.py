@@ -79,8 +79,7 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                             is_active=user_data["is_active"],
                         )
 
-                        db.session.add(user)
-                        db.session.commit()
+                        user.save()
                         logger.info(f"Added predefined user: {user_data['username']}")
 
             except (FileNotFoundError, json.JSONDecodeError) as e:

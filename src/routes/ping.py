@@ -57,16 +57,14 @@ def add_website():
                                email_address=email_address, 
                                is_ping_active=True, 
                                email_alerts_enabled=email_alerts_enabled)
-    db.session.add(website)
-    db.session.commit()
+    website.save()
     return redirect(url_for('monitor_websites'))
 
 @app.route('/delete_monitored_website/<int:website_id>', methods=['POST'])
 @admin_required
 def remove_website(website_id):
     website = MonitoredWebsite.query.get_or_404(website_id)
-    db.session.delete(website)
-    db.session.commit()
+    website.delete()
     flash('Website removed successfully!', 'danger')
     return redirect(url_for('monitor_websites'))
 
@@ -79,7 +77,7 @@ def edit_website(website_id):
         website.ping_interval = int(request.form['ping_interval'])
         website.email_alerts_enabled = request.form.get('email_alerts_enabled') == 'on'
         website.email_address = request.form['email_address']
-        db.session.commit()
+        website.save()
         flash('Website updated successfully!', 'success')
         return redirect(url_for('monitor_websites'))
     return render_template('ping/edit_website.html', website=website)
@@ -90,7 +88,7 @@ def edit_website(website_id):
 def toggle_ping(website_id):
     website = MonitoredWebsite.query.get_or_404(website_id)
     website.is_ping_active = not website.is_ping_active
-    db.session.commit()
+    website.save()
     return redirect(url_for('monitor_websites'))
 
 @app.route('/toggle_email_alerts/<int:website_id>')
@@ -98,5 +96,5 @@ def toggle_ping(website_id):
 def toggle_email_alerts(website_id):
     website = MonitoredWebsite.query.get_or_404(website_id)
     website.email_alerts_enabled = not website.email_alerts_enabled
-    db.session.commit()
+    website.save()
     return redirect(url_for('monitor_websites'))

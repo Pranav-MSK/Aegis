@@ -209,114 +209,113 @@ def alert_ticket(alert_id):
         log_message = ""
 
         def log_and_save(message):
-            nonlocal log_message
-            log_message = message
-            AlertLog(alert_ticket_id=alert_id, log=log_message).save()
+            AlertLog(alert_ticket_id=alert_id, log=message).save()
 
+        # User Assignment
         if form_type in ["assign_user", "assign_supervisor"]:
-            assigned_user_id = request.form.get(
-                "assigned_user_id"
-                if form_type == "assign_user"
-                else "assigned_supervisor_id"
-            )
-            previous_user_id = (
-                alert.assigned_user_id
-                if form_type == "assign_user"
-                else alert.assigned_supervisor_id
-            )
+            assigned_user_id = request.form.get("assigned_user_id" if form_type == "assign_user" else "assigned_supervisor_id")
+            previous_user_id = alert.assigned_user_id if form_type == "assign_user" else alert.assigned_supervisor_id
 
             if assigned_user_id:
                 if form_type == "assign_user":
                     alert.assigned_user_id = assigned_user_id
                     log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
+                    flash("User assigned successfully!", "success")
                 else:
                     alert.assigned_supervisor_id = assigned_user_id
                     log_message = f"Supervisor {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
+                    flash("Supervisor assigned successfully!", "success")
             else:
                 if form_type == "assign_user":
                     alert.assigned_user_id = None
                     log_message = f"User {user_id_to_username(previous_user_id)} removed from alert ticket by {current_user.username}"
+                    flash("User removed successfully!", "success")
                 else:
                     alert.assigned_supervisor_id = None
                     log_message = f"Supervisor {user_id_to_username(previous_user_id)} removed from alert ticket by {current_user.username}"
+                    flash("Supervisor removed successfully!", "success")
 
             log_and_save(log_message)
+            return redirect(url_for("alert_ticket", alert_id=alert.id))
 
-        elif form_type in ["edit_status", "edit_severity", "edit_description"]:
+        # Edit Status, Severity, Description, Summary
+        elif form_type in ["edit_status", "edit_severity", "edit_description", "edit_summary"]:
+            new_value = request.form.get("status" if form_type == "edit_status" else
+                                           "severity" if form_type == "edit_severity" else
+                                           "description" if form_type == "edit_description" else
+                                           "summary")
             if form_type == "edit_status":
-                new_status = request.form.get("status")
-                alert.status = new_status
-                log_message = (
-                    f"Status changed to '{alert.status}' by {current_user.username}"
-                )
+                alert.status = new_value
+                log_message = f"Status changed to '{alert.status}' by {current_user.username}"
+                flash("Status updated successfully!", "success")
             elif form_type == "edit_severity":
-                new_severity = request.form.get("severity")
-                alert.severity = new_severity
-                log_message = (
-                    f"Severity changed to '{alert.severity}' by {current_user.username}"
-                )
+                alert.severity = new_value
+                log_message = f"Severity changed to '{alert.severity}' by {current_user.username}"
+                flash("Severity updated successfully!", "success")
             elif form_type == "edit_description":
-                new_description = request.form.get("description")
-                alert.description = new_description
+                alert.description = new_value
                 log_message = f"Description updated by {current_user.username}"
+                flash("Description updated successfully!", "success")
+            elif form_type == "edit_summary":
+                alert.summary = new_value
+                log_message = f"Summary updated by {current_user.username}"
+                flash("Summary updated successfully!", "success")
 
             log_and_save(log_message)
+            return redirect(url_for("alert_ticket", alert_id=alert.id))
 
+        # Add Comment
         elif form_type == "add_comment":
             note_content = request.form.get("investigation_notes")
             if note_content:
-                InvestigationNote(
-                    alert_ticket_id=alert.id, user_id=current_user.id, note=note_content
-                ).save()
+                InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
                 log_message = f"Comment added by {current_user.username}"
                 log_and_save(log_message)
+                flash("Your comment has been added successfully!", "success")
+                return redirect(url_for("alert_ticket", alert_id=alert.id))
             else:
                 flash("Note cannot be empty!", "error")
 
+        # Custom Fields
         elif form_type in ["add_customfield", "delete_customfield", "edit_customfield"]:
-
+            customfield_id = request.form.get("customfield_id")
             if form_type == "add_customfield":
                 field_name = request.form.get("field_name")
                 field_value = request.form.get("field_value")
-
                 if field_name and field_value:
                     alert.customfields.append(CustomFields(field_name=field_name, field_value=field_value))
-                    alert.save()
                     log_message = f"Custom field '{field_name}' added by {current_user.username}"
-                    log_and_save(log_message)
-
                     flash("Field added successfully!", "success")
-                    return redirect(url_for("alert_ticket", alert_id=alert.id))
+                else:
+                    flash("Field name and value cannot be empty!", "error")
 
-            if form_type == "delete_customfield":
-                customfield_id = request.form.get("customfield_id")
+            elif form_type == "delete_customfield" and customfield_id:
                 customfield = CustomFields.query.get(customfield_id)
                 if customfield:
-                    # find customfiled by id and delete it
-                    customfield = CustomFields.query.get(customfield_id)
+                    field_name = customfield.field_name
                     customfield.delete()
-                    log_message = f"Custom field '{customfield.field_name}' deleted by {current_user.username}"
-                    log_and_save(log_message)
-
+                    log_message = f"Custom field '{field_name}' deleted by {current_user.username}"
                     flash("Field deleted successfully!", "success")
-                    return redirect(url_for("alert_ticket", alert_id=alert.id))
+                else:
+                    flash("Custom field not found!", "error")
 
-            if form_type == "edit_customfield":
-                customfield_id = request.form.get("customfield_id")
-                field_name = request.form.get("field_name")
-                field_value = request.form.get("field_value")
-
+            elif form_type == "edit_customfield" and customfield_id:
                 customfield = CustomFields.query.get(customfield_id)
                 if customfield:
+                    field_name = request.form.get("field_name")
+                    field_value = request.form.get("field_value")
                     customfield.field_name = field_name
                     customfield.field_value = field_value
-                    customfield.save()
                     log_message = f"Custom field '{field_name}' updated by {current_user.username}"
-                    log_and_save(log_message)
-
                     flash("Field updated successfully!", "success")
-                    return redirect(url_for("alert_ticket", alert_id=alert.id))
+                else:
+                    flash("Custom field not found!", "error")
 
+            log_and_save(log_message)
+            alert.save()
+            return redirect(url_for("alert_ticket", alert_id=alert.id))
+
+        # Save changes
         alert.save()
         flash("Changes saved successfully!", "success")
         return redirect(url_for("alert_ticket", alert_id=alert.id))

@@ -137,8 +137,7 @@ def delete_user(username):
         email_body = render_template_from_file(deletion_email_template, **context)
         send_smtp_email(admin_email_address, subject, email_body, is_html=True)
 
-    db.session.delete(user)
-    db.session.commit()
+    user.delete()
     
     flash(f'User {username} has been deleted successfully!', 'success')
     return redirect(url_for('view_users'))

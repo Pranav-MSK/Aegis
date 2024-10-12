@@ -112,9 +112,8 @@ def delete_user_self():
     """
     This route allows users to delete their own account.
     """
-    user = current_user
-    db.session.delete(user)
-    db.session.commit()
+    user_to_delete = current_user
+    user_to_delete.delete()
 
     flash('Your account has been deleted.', 'success')
     return redirect(url_for('login'))

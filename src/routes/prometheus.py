@@ -96,8 +96,7 @@ def external_monitoring():
 
         # Save into the ExternalMonitoring table
         new_task = ExternalMonitornig(file_path=file_path)
-        db.session.add(new_task)
-        db.session.commit()
+        new_task.save()
 
         return redirect(url_for("external_monitoring"))
 
@@ -110,8 +109,7 @@ def external_monitoring():
 @admin_required
 def delete_file_path(id):
     file_path = ExternalMonitornig.query.get_or_404(id)
-    db.session.delete(file_path)
-    db.session.commit()
+    file_path.delete()
     flash("File path deleted successfully!", "success")
     return redirect(url_for("external_monitoring"))
 

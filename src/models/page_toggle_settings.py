@@ -45,10 +45,9 @@ class PageToggleSettings(BaseModel):
         feature_toggle_settings = cls.get_feature_toggle_settings(user_id)
         if feature_toggle_settings:
             feature_toggle_settings.update(**kwargs)
-            db.session.commit()
         else:
             feature_toggle_settings = cls(user_id=user_id, **kwargs)
-            db.session.add(feature_toggle_settings)
-            db.session.commit()
+        
+        feature_toggle_settings.save()
         return feature_toggle_settings
     

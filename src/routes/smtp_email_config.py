@@ -35,7 +35,7 @@ def smtp_config():
             smtp_config.username = username
             smtp_config.password = new_password        
         
-        db.session.commit()
+        smtp_config.save()
         flash("Email and password updated successfully!", "success")
         return redirect(url_for("smtp_config"))
 

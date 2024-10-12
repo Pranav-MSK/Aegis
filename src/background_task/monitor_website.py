@@ -88,7 +88,8 @@ def ping_website(website):
             updated_website.ping_status = new_status
 
             # Update the website status
-            db.session.commit()
+            updated_website.save()
+            
             logger.info(f"Website {website.name} updated successfully.")
 
             # Determine if an email should be sent

@@ -188,8 +188,7 @@ def signup():
         email_body = render_template_from_file(welcome_template, **context)
         send_smtp_email(email, subject, email_body, is_html=True)
 
-        db.session.add(new_user)
-        db.session.commit()
+        new_user.save()
         db.session.add(UserDashboardSettings(user_id=new_user.id))
         db.session.add(UserCardSettings(user_id=new_user.id))
         db.session.add(PageToggleSettings(user_id=new_user.id))

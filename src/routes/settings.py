@@ -32,7 +32,7 @@ def user_settings():
         user_dashboard_settings.speedtest_cooldown = request.form.get('speedtest_cooldown')
         user_dashboard_settings.number_of_speedtests = request.form.get('number_of_speedtests')
         user_dashboard_settings.refresh_interval = request.form.get('refresh_interval')
-        db.session.commit()
+        user_dashboard_settings.save()
         flash('Speedtest settings updated successfully!', 'success')
         return redirect(url_for('user_settings'))
     return render_template('settings/user_settings.html', user_dashboard_settings=user_dashboard_settings)
@@ -69,7 +69,7 @@ def general_settings():
                 # Send email only if 'enable_alerts' changed
                 send_smtp_email(admin_emails_with_alerts, subject, email_body, is_html=True, bypass_alerts=True)
         # Save the updated settings to the database
-        db.session.commit()
+        general_settings.save()
         flash('General settings updated successfully!', 'success')
         return redirect(url_for('general_settings'))
 
@@ -87,7 +87,7 @@ def feature_toggles():
         page_toggles_settings.is_disk_info_enabled = 'is_disk_info_enabled' in request.form
         page_toggles_settings.is_network_info_enabled = 'is_network_info_enabled' in request.form
         page_toggles_settings.is_process_info_enabled = 'is_process_info_enabled' in request.form
-        db.session.commit()
+        page_toggles_settings.save()
         flash('Feature toggles updated successfully!', 'success')
         return redirect(url_for('feature_toggles'))
     return render_template('settings/page_toggles.html', page_toggles_settings=page_toggles_settings)
@@ -109,7 +109,7 @@ def card_toggles():
         card_settings.is_system_uptime_card_enabled = 'is_system_uptime_card_enabled' in request.form
         card_settings.is_network_statistic_card_enabled = 'is_network_statistic_card_enabled' in request.form
         card_settings.is_speedtest_enabled = 'is_speedtest_enabled' in request.form
-        db.session.commit()
+        card_settings.save()
         flash('Card toggles updated successfully!', 'success')
         return redirect(url_for('card_toggles'))
     return render_template('settings/card_toggles.html', card_settings=card_settings)

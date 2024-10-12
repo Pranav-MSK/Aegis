@@ -41,8 +41,7 @@ def speedtest():
                 upload_speed=current_speedtest_result["upload_speed"],
                 ping=current_speedtest_result["ping"],
             )
-            db.session.add(new_speedtest_record)
-            db.session.commit()
+            new_speedtest_record.save()
 
             receiver_email = current_user.email
             subject = "Speedtest Result"

@@ -236,7 +236,7 @@ def manage_refresh_interval():
             else:
                 settings.refresh_interval = new_interval
 
-            db.session.commit()
+            settings.save()
             return jsonify({'success': 'Refresh interval updated successfully', 'refresh_interval': new_interval}), 200
 
     except Exception as e:
