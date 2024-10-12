@@ -7,30 +7,32 @@ from flask_wtf.csrf import CSRFError
 from src.config import app, obfuscated_key
 from src.logger import logger
 from src.activator import get_plan_details
+from src.background_task.prometheus_metrics import metrics
 # from src.activator import check_license_expiration
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
+
+class CustomError(Exception):
+    """Custom exception for application-specific errors."""
+    pass
 
 @app.cli.command("run")
 def server_start():
     """Log server start."""
     logger.info("Server started")
 
-# @app.errorhandler(CSRFError)
-# def handle_csrf_error(e):
-#     return redirect(url_for('login', error="CSRF token is missing or invalid"))
-
 # Error Handlers
 @app.errorhandler(403)
 def forbidden(e):
-    """Handle 403 Forbidden error."""
+    """Handle 403 Forbidden error.k"""
+    metrics['error_count'].labels(error_type='403').inc()
     return render_template("error/403.html",
                            error_message=e.description,
                            ), 403
-
 @app.errorhandler(404)
 def page_not_found(e):
     """Handle 404 Not Found error."""
+    metrics['error_count'].labels(error_type='404').inc()
     return render_template("error/404.html"), 404
 
 @app.errorhandler(405)
@@ -40,6 +42,7 @@ def method_not_allowed(e):
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
+    metrics['error_count'].labels(error_type='429').inc()
     return render_template("error/429.html", 
                            error_message=e.description,
                            ), 429
@@ -47,33 +50,21 @@ def ratelimit_handler(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     """Handle 500 Internal Server Error."""
+    metrics['error_count'].labels(error_type='500').inc()
     return "Internal server error", 500
 
 @app.errorhandler(502)
 def bad_gateway(e):
     """Handle 502 Bad Gateway error."""
+    metrics['error_count'].labels(error_type='502').inc()
     return "Bad gateway", 502
 
 @app.errorhandler(503)
 def service_unavailable(e):
     """Handle 503 Service Unavailable error."""
+    metrics['error_count'].labels(error_type='503').inc()
     return "Service unavailable", 503
 
-class CustomError(Exception):
-    """Custom exception for application-specific errors."""
-    pass
-
-# Optional: Request hooks
-# @app.before_request
-# def before_request_func():
-#     """Function to run before each request."""
-#     logger.info("This function runs before each request.")
-
-# @app.after_request
-# def after_request_func(response):
-#     """Function to run after each request."""
-#     logger.info("This function runs after each request.")
-#     return response
 
 def days_until_password_expiry(user):
     return (user.password_last_changed + datetime.timedelta(days=60) - datetime.datetime.now()).days

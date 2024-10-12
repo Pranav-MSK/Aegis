@@ -2,31 +2,17 @@
 import datetime
 from threading import Timer
 from sqlalchemy.exc import SQLAlchemyError
-from prometheus_client import Counter, Gauge
 
 from src.logger import logger
 from src.config import app, db
 from src.utils import _get_system_info
 from src.logger import logger
 from src.models import GeneralSettings, SystemInformation
-
 # Flag to track if logging is already scheduled
 is_logging_scheduled = False
 fetch_system_info_interval = 1
 
-# Initialize Prometheus metrics
-metrics = {
-    'cpu_usage_metric': Gauge('cpu_usage_percentage', 'Current CPU usage percentage'),
-    'memory_usage_metric': Gauge('memory_usage_percentage', 'Current memory usage percentage'),
-    'disk_usage_metric': Gauge('disk_usage_percentage', 'Disk usage percentage'),
-    'network_sent_metric': Gauge('network_bytes_sent', 'Total network bytes sent'),
-    'network_recv_metric': Gauge('network_bytes_received', 'Total network bytes received'),
-    'cpu_temp_metric': Gauge('cpu_temperature', 'Current CPU temperature'),
-    'cpu_frequency_metric': Gauge('cpu_frequency', 'Current CPU frequency'),
-    'battery_percentage_metric': Gauge('battery_percentage', 'Current battery percentage'),
-    'dashboard_memory_usage_metric': Gauge('dashboard_memory_usage_percentage', 'Current memory usage percentage'),
-    'request_count': Counter('http_requests_total', 'Total HTTP requests made')
-}
+from src.background_task.prometheus_metrics import metrics
 
 def log_system_info():
     """

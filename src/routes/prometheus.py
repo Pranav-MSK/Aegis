@@ -74,6 +74,18 @@ def metrics():
     )
     return Response(output, mimetype="text/plain")
 
+@app.route("/metrics_")
+def metrics_():
+    output = generate_latest()
+    output = "\n".join(
+        [
+            line
+            for line in output.decode().split("\n")
+            if not line.startswith("#") and line
+        ]
+    )
+    return Response(output, mimetype="text/plain")
+
 
 # POST request to manage file paths
 @app.route("/external_monitoring", methods=["GET", "POST"])
@@ -273,7 +285,8 @@ def change_auth():
     for scrape_config in config["scrape_configs"]:
         if scrape_config["job_name"] == job_name:
             found = True
-            scrape_config["basic_auth"] = {"username": username, "password": password}
+            if username and password:
+                scrape_config["basic_auth"] = {"username": username, "password": password}
             flash("Basic Auth updated successfully!", "success")
             break
 

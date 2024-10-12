@@ -82,8 +82,8 @@
         <form action="{{ url_for('change_auth') }}" method="post" class="add-target" id="change-auth-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
-            <input type="text" name="username" placeholder="Username" class="input-field" required>
-            <input type="password" name="password" placeholder="Password" class="input-field" required>
+            <input type="text" name="username" placeholder="Username" class="input-field" >
+            <input type="password" name="password" placeholder="Password" class="input-field" >
             <br>
             <button type="submit" class="btn-primary btn-lg">
                 <i class="fas fa-edit"></i> Change Auth
