@@ -179,3 +179,4 @@ internal_license_key.txt
 compiled_code/*
 
 migrations/*
+permission_level.csv

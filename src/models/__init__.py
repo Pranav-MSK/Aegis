@@ -13,6 +13,7 @@ from src.models.monitored_website import MonitoredWebsite
 from src.models.prometheus_model import ExternalMonitornig
 from src.models.notification_settings import NotificationSettings
 from src.models.alert_data_models import AlertTicket, InvestigationNote, Report, AlertLog, CustomFields
+from src.models.graph_config import GraphConfigs
 from flask_login import current_user
 from src.logger import logger
 from werkzeug.security import generate_password_hash

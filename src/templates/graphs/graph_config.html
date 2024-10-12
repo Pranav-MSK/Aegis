@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Configuration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Graph Configuration</h1>
+
+        <!-- Form to Add New Graph Configuration -->
+        <form id="graphConfigForm" class="mb-4">
+            <h3>Add New Graph Config</h3>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="metrics_key" class="form-label">Metrics Key</label>
+                <input type="text" class="form-control" id="metrics_key" required>
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label">Type</label>
+                <input type="text" class="form-control" id="type" required>
+            </div>
+            <div class="mb-3">
+                <label for="y_label" class="form-label">Y Label</label>
+                <input type="text" class="form-control" id="y_label" required>
+            </div>
+            <div class="mb-3">
+                <label for="x_label" class="form-label">X Label</label>
+                <input type="text" class="form-control" id="x_label" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="color_scheme" class="form-label">Color Scheme</label>
+                <input type="text" class="form-control" id="color_scheme" required>
+            </div>
+            <div class="mb-3">
+                <label for="data_source" class="form-label">Data Source</label>
+                <input type="text" class="form-control" id="data_source" required>
+            </div>
+            <div class="mb-3">
+                <label for="refresh_interval" class="form-label">Refresh Interval (seconds)</label>
+                <input type="number" class="form-control" id="refresh_interval" required>
+            </div>
+            <div class="mb-3">
+                <label for="display_options" class="form-label">Display Options</label>
+                <input type="text" class="form-control" id="display_options" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Graph Config</button>
+        </form>
+
+        <!-- Table to Display Existing Graph Configurations -->
+        <h3>Existing Graph Configs</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Metrics Key</th>
+                    <th>Type</th>
+                    <th>Y Label</th>
+                    <th>X Label</th>
+                    <th>Description</th>
+                    <th>Color Scheme</th>
+                    <th>Data Source</th>
+                    <th>Refresh Interval</th>
+                    <th>Display Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for config in graph_configs %}
+                <tr>
+                    <td>{{ config.title }}</td>
+                    <td>{{ config.metrics_key }}</td>
+                    <td>{{ config.type }}</td>
+                    <td>{{ config.y_label }}</td>
+                    <td>{{ config.x_label }}</td>
+                    <td>{{ config.description }}</td>
+                    <td>{{ config.color_scheme }}</td>
+                    <td>{{ config.data_source }}</td>
+                    <td>{{ config.refresh_interval }}</td>
+                    <td>{{ config.display_options }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#graphConfigForm').on('submit', function(event) {
+                event.preventDefault();
+
+                // Collect form data
+                const data = {
+                    title: $('#title').val(),
+                    metrics_key: $('#metrics_key').val(),
+                    type: $('#type').val(),
+                    y_label: $('#y_label').val(),
+                    x_label: $('#x_label').val(),
+                    description: $('#description').val(),
+                    color_scheme: $('#color_scheme').val(),
+                    data_source: $('#data_source').val(),
+                    refresh_interval: $('#refresh_interval').val(),
+                    display_options: $('#display_options').val()
+                };
+
+                // Send data to server
+                $.ajax({
+                    type: 'POST',
+                    url: '/graph_config',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        alert(response.message);
+                        location.reload(); // Reload to show new graph config
+                    },
+                    error: function(response) {
+                        alert('Error adding graph config: ' + response.responseJSON.message);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
