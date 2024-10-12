@@ -1,10 +1,8 @@
-/* view_users.css */
-
 .view-users-container {
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
-    background-color: #ffffff;
+    background-color: #f8f9fa; /* Light background for better contrast */
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -15,30 +13,30 @@
     font-size: 24px;
     font-weight: bold;
     color: #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
-.btn-add-user {
-    background-color: #28a745;
+.button-group {
+    margin-bottom: 10px;
+}
+
+.btn-add-user, .btn-download {
+    background-color: #007bff; /* Blue for action buttons */
     color: white;
     padding: 10px 20px;
     text-decoration: none;
     border-radius: 4px;
     font-size: 16px;
-    display: inline-block;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-right: 10px;
 }
 
-.btn-add-user:hover {
-    background-color: #218838;
+.btn-add-user:hover, .btn-download:hover {
+    background-color: #0056b3;
 }
 
 .user-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 10px;
 }
 
 .user-table th, .user-table td {
@@ -48,7 +46,8 @@
 }
 
 .user-table th {
-    background-color: #f4f4f4;
+    background-color: #007bff; /* Header background */
+    color: white;
     font-weight: bold;
 }
 
@@ -57,29 +56,31 @@
 }
 
 .user-table tr:hover {
-    background-color: #f1f1f1;
+    background-color: #e2e6ea; /* Hover effect */
+}
+
+.current-user {
+    background-color: #d4edda; /* Highlight for current user */
 }
 
 .btn-edit {
-    background-color: #007bff;
+    background-color: #28a745; /* Green for edit */
     color: white;
     padding: 8px 12px;
     text-decoration: none;
-    border-radius: 4px;
 }
 
 .btn-edit:hover {
-    background-color: #0056b3;
+    background-color: #218838;
 }
 
 .btn-delete {
-    background-color: #dc3545;
+    background-color: #dc3545; /* Red for delete */
     color: white;
     padding: 8px 12px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
 }
 
 .btn-delete:hover {

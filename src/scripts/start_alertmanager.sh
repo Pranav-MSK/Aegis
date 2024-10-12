@@ -32,6 +32,8 @@ JOB_NAME="localhost"
 PROMETHEUS_USERNAME="prometheus_admin"
 PROMETHEUS_PASSWORD="prometheus_password"
 SCRAPE_INTERVAL="2s"
+username=$(whoami)
+systemname=$(hostname)
 
 # Verify that initialization script exists
 if [ ! -f "$INIT_ALERTMANAGER_SCRIPT" ]; then
@@ -76,6 +78,8 @@ cat > "$PROMETHEUS_CONFIG" <<EOL
 global:
   external_labels:
     system: $SYSTEM_LABEL
+    username: $username
+    systemname: $systemname
 
 alerting:
   alertmanagers:

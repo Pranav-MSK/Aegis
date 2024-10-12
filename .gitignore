@@ -177,3 +177,5 @@ internal_license_key.txt
 *.cpp
 *.o
 compiled_code/*
+
+migrations/*

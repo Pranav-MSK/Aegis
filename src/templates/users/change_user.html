@@ -49,6 +49,12 @@
             <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if user.is_active %}checked{% endif %}>
             <label for="is_active" class="form-check-label"><i class="fas fa-user-check"></i> Is Active</label>
         </div>
+        <!-- assign_tickets checkbox -->
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="assign_tickets" name="assign_tickets" {% if user.assign_tickets %}checked{% endif %}>
+            <label for="assign_tickets" class="form-check-label"><i class="fas fa-ticket-alt"></i> Opt-in for Ticket Assignment</label>
+        </div>
+
 
         <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Update Settings</button>
     </form>

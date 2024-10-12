@@ -43,6 +43,8 @@ ENVIRONMENT="production"
 JOB_NAME="localhost"
 PROMETHEUS_USERNAME="prometheus_admin"
 PROMETHEUS_PASSWORD="prometheus_password"
+username=$(whoami)
+systemname=$(hostname)
 
 # Logging function for information
 log_info() {
@@ -70,6 +72,8 @@ cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 global:
   external_labels:
     system: $SYSTEM_LABEL
+    username: $username
+    systemname: $systemname
 
 rule_files:
   - /etc/prometheus/alert_rules.yml

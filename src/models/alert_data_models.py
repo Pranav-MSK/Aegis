@@ -1,5 +1,6 @@
 # cython: language_level=3
 from datetime import datetime
+from sqlalchemy import CheckConstraint
 
 from src.models.base_model import BaseModel
 from src.config import db
@@ -8,6 +9,12 @@ from src.config import db
 # Alert Ticket model to save the alert ticket data
 class AlertTicket(BaseModel):
     __tablename__ = 'alert_tickets'
+    __table_args__ = (
+        db.Index('ix_alert_name', 'alert_name'),
+        db.Index('ix_created_at', 'created_at'),
+        CheckConstraint("status IN ('Open', 'In Progress', 'Resolved', 'Closed')", name='check_status'),
+        CheckConstraint("severity IN ('Critical', 'Warning', 'Info')", name='check_severity'),
+    )
     
     id = db.Column(db.Integer, primary_key=True)
     alert_name = db.Column(db.String(255), nullable=False)  # Name of the alert triggered
@@ -28,10 +35,10 @@ class AlertTicket(BaseModel):
     assigned_supervisor = db.relationship('UserProfile', foreign_keys=[assigned_supervisor_id], backref='supervised_alert_tickets')
     
     # Relationships to new models
-    investigation_notes = db.relationship('InvestigationNote', backref='alert_ticket', lazy=True)
-    reports = db.relationship('Report', backref='alert_ticket', lazy=True)
-    alertlogs = db.relationship('AlertLog', backref='alert_ticket', lazy=True)
-    customfields = db.relationship('CustomFields', backref='alert_ticket', lazy=True)
+    investigation_notes = db.relationship('InvestigationNote', backref='alert_ticket', lazy=True, cascade="all, delete-orphan")
+    reports = db.relationship('Report', backref='alert_ticket', lazy=True, cascade="all, delete-orphan")
+    alertlogs = db.relationship('AlertLog', backref='alert_ticket', lazy=True, cascade="all, delete-orphan")
+    customfields = db.relationship('CustomFields', backref='alert_ticket', lazy=True, cascade="all, delete-orphan")
 
 
 class AlertLog(BaseModel):

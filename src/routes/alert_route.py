@@ -120,8 +120,6 @@ def alert_history():
                 AlertTicket.description.contains(search_query),
                 AlertTicket.summary.contains(search_query),
                 AlertTicket.status.contains(search_query),
-                AlertTicket.investigation_notes.contains(search_query),
-                AlertTicket.report.contains(search_query),
                 AlertTicket.assigned_user_id.contains(search_query),
                 AlertTicket.assigned_supervisor_id.contains(search_query),
                 AlertTicket.created_at.contains(search_query),

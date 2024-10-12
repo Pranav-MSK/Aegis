@@ -25,6 +25,7 @@ def create_user():
         profession = request.form['profession']
         user_level = request.form.get('user_level', 'user')
         receive_email_alerts = request.form.get('receive_email_alerts', 'on') == 'on' 
+        assign_tickets = request.form.get('assign_tickets', 'on') == 'on'
 
         # Check if user already exists
         if UserProfile.query.filter_by(username=username).first() or UserProfile.query.filter_by(email=email).first():
@@ -38,7 +39,8 @@ def create_user():
             profession=profession,
             user_level=user_level,
             receive_email_alerts=receive_email_alerts,
-            is_active=True
+            is_active=True,
+            assign_tickets=assign_tickets
         )
 
         # Send email alerts to admins
@@ -100,6 +102,7 @@ def change_user_settings(username):
         new_profession = request.form['profession']
         receive_email_alerts = 'receive_email_alerts' in request.form
         is_active = 'is_active' in request.form
+        assign_tickets = 'assign_tickets' in request.form
 
         # Update user details
         user.username = new_username
@@ -108,6 +111,7 @@ def change_user_settings(username):
         user.receive_email_alerts = receive_email_alerts
         user.profession = new_profession
         user.is_active = is_active
+        user.assign_tickets = assign_tickets
 
         user.save()
 

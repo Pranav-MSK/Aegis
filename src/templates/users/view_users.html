@@ -2,35 +2,41 @@
 {% block title %}View Users{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/view_users.css') }}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/table-sort/0.1.1/table-sort.min.js"></script>
 {% endblock %}
 {% block content %}
 <div class="view-users-container mt-4">
     <h2 class="page-title">{{ title }} User Management</h2>
-    <a href="{{ url_for('create_user') }}" class="btn btn-add-user">
-        <i class="fas fa-user-plus"></i> Add New User
-    </a>
-    <table class="user-table">
+    <div class="button-group">
+        <a href="{{ url_for('create_user') }}" class="btn btn-add-user">
+            <i class="fas fa-user-plus"></i> Add New User
+        </a>
+        <button id="download-csv" class="btn btn-download">Download CSV</button>
+    </div>
+    <table class="user-table" id="user-table">
         <thead>
             <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>User Level</th>
-                <th>Profession</th>
-                <th>Email Alerts</th>
-                <th>Is User Active</th>
+                <th class="sortable">Username</th>
+                <th class="sortable">Email</th>
+                <th class="sortable">User Level</th>
+                <th class="sortable">Profession</th>
+                <th class="sortable">Email Alerts</th>
+                <th class="sortable">Is User Active</th>
+                <th class="sortable">Is Assign Tickets</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
-            <!-- make the table color green for current user : TODO -->
-            <tr>
+            <tr class="{% if user.username == current_user.username %}current-user{% endif %}">
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.user_level }}</td>
                 <td>{{ user.profession }}</td>
                 <td>{{ 'Yes' if user.receive_email_alerts else 'No' }}</td>
                 <td>{{ 'Yes' if user.is_active else 'No' }}</td>
+                <td>{{ 'Yes' if user.assign_tickets else 'No' }}</td>
                 <td class="action-buttons">
                     <a href="{{ url_for('change_user_settings', username=user.username) }}" class="btn btn-edit">Edit</a>
                     <form action="{{ url_for('delete_user', username=user.username) }}" method="post" style="display:inline;">
@@ -43,6 +49,35 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    // Sorting functionality
+    $(document).ready(function() {
+        $('#user-table').tablesort();
+    });
+
+    // Download CSV functionality
+    $('#download-csv').click(function() {
+        let csv = [];
+        let rows = document.querySelectorAll('#user-table tr');
+
+        for (let row of rows) {
+            let cols = row.querySelectorAll('td, th');
+            let csvRow = [];
+            for (let col of cols) {
+                csvRow.push(col.innerText);
+            }
+            csv.push(csvRow.join(','));        
+        }
+
+        // Create a link to download the CSV
+        let csvString = csv.join('\n');
+        let link = document.createElement('a');
+        link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString);
+        link.setAttribute('download', 'users.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script>
 {% endblock %}
-
-

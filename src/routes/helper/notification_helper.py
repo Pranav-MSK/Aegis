@@ -3,6 +3,8 @@ import os
 import requests
 import json
 import time
+import fpdf
+from datetime import datetime
 
 from src.logger import logger
 from src.alert_manager import (
@@ -39,7 +41,7 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
             "annotations": {
                 "description": description,
                 "summary": f"Test Alert: {unique_alert_name}",
-                "runbook": "Please refer to the documentation for troubleshooting steps.",
+                "runbook_url": "Please refer to the documentation for troubleshooting steps.",
             },
         }
     ]
@@ -310,3 +312,70 @@ def notify_alert(alert_name, instance, severity, description, summary):
 
     if is_enabled(notification_config, "is_google_chat_alert_enabled"):
         send_google_chat_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+
+
+class PDF(fpdf.FPDF):
+    def header(self):
+        self.set_font("Arial", 'B', 14)
+        self.cell(0, 10, "Alert Ticket Report", 0, 1, 'C')
+        self.ln(5)
+
+    def chapter_title(self, title):
+        self.set_font("Arial", 'B', 12)
+        self.set_fill_color(220, 220, 220)  # Light gray background
+        self.cell(0, 10, title, 0, 1, 'L', 1)
+        self.ln(5)
+
+    def chapter_body(self, body):
+        self.set_font("Arial", '', 12)
+        self.multi_cell(0, 10, body)
+        self.ln()
+
+    def add_table(self, header, data):
+        self.set_font("Arial", 'B', 12)
+        self.set_fill_color(200, 200, 200)  # Gray header
+        for col in header:
+            self.cell(60, 10, col, 1, 0, 'C', 1)
+        self.ln()
+
+        self.set_font("Arial", '', 12)
+        for row in data:
+            for item in row:
+                self.cell(60, 10, item, 1)
+            self.ln()
+
+    def add_icon(self, icon_path, size=(10, 10)):
+        self.image(icon_path, x=None, y=None, w=size[0], h=size[1])
+
+def generate_alert_ticket_pdf(alert, investigation_notes, alert_logs):
+    pdf = PDF(format='letter')
+    pdf.add_page()
+
+    # Add alert ticket details
+    pdf.chapter_title("Alert Information")
+    pdf.chapter_body(f"Alert Name: {alert.alert_name}")
+    pdf.chapter_body(f"Instance: {alert.instance}")
+    pdf.chapter_body(f"Severity: {alert.severity}")
+    pdf.chapter_body(f"Description: {alert.description}")
+    pdf.chapter_body(f"Summary: {alert.summary}")
+    pdf.chapter_body(f"Assigned Investigator: {alert.assigned_user.username if alert.assigned_user else 'Unassigned'}")
+    pdf.chapter_body(f"Assigned Supervisor: {alert.assigned_supervisor.username if alert.assigned_supervisor else 'Unassigned'}")
+    pdf.chapter_body(f"Created At: {alert.created_at.strftime('%Y-%m-%d %H:%M:%S')}")
+    pdf.chapter_body(f"Last Updated At: {alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if alert.updated_at else 'N/A'}")
+
+    # Add Investigation Notes
+    pdf.chapter_title("Investigation Notes")
+    notes_data = [(note.created_at.strftime('%Y-%m-%d %H:%M:%S'), note.user.username, note.note) for note in investigation_notes.items]
+    pdf.add_table(["Date", "User", "Note"], notes_data)
+
+    # Add Alert Logs
+    pdf.chapter_title("Alert Logs")
+    logs_data = [(log.created_at.strftime('%Y-%m-%d %H:%M:%S'), log.log) for log in alert_logs.items]
+    pdf.add_table(["Date", "Log"], logs_data)
+
+    # Save the PDF
+    pdf_file_path = "alert_ticket.pdf"
+    pdf.output(pdf_file_path)
+
+    return pdf_file_path
+

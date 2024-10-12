@@ -47,6 +47,11 @@
             <input type="checkbox" class="form-check-input" id="receive_email_alerts" name="receive_email_alerts" {% if user.receive_email_alerts %}checked{% endif %}>
             <label for="receive_email_alerts" class="form-check-label"><i class="fas fa-envelope-open"></i> Receive Email Alerts</label>
         </div>
+        <!-- assign_tickets checkbox -->
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="assign_tickets" name="assign_tickets" {% if user.assign_tickets %}checked{% endif %}>
+            <label for="assign_tickets" class="form-check-label"><i class="fas fa-ticket-alt"></i> Opt-in for Ticket Assignment</label>
+        </div>
 
         <button type="submit" class="btn-action"><i class="fas fa-save"></i> Save Changes</button>
     </form>

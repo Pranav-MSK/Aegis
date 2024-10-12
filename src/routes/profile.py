@@ -85,6 +85,7 @@ def edit_profile():
         new_email = request.form['email']
         profession = request.form['profession']
         receive_email_alerts = 'receive_email_alerts' in request.form
+        assign_tickets = 'assign_tickets' in request.form
 
         # Update user information
         user.first_name = first_name
@@ -94,8 +95,9 @@ def edit_profile():
         user.profession = profession
         user.receive_email_alerts = receive_email_alerts
         user.last_updated = datetime.utcnow()
+        user.assign_tickets = assign_tickets
 
-        db.session.commit()
+        user.save()
 
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('view_profile'))
