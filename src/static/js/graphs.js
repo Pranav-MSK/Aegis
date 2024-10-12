@@ -251,9 +251,13 @@ function createChart(ctx, labels, datasets, yLabel) {
                             if (label) {
                                 label += ': ';
                             }
-                            label += Math.round(context.raw * 100) / 100 + '%';
+                            label += `Value: ${Math.round(context.raw * 100) / 100}`;
                             return label;
-                        }
+                        },
+                        title: function (context) {
+                            return `Time: ${context[0].label}`;
+                        },
+                        
                     }
                 },
                 legend: {

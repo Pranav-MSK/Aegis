@@ -25,6 +25,7 @@ groups:
         annotations:
           description: Battery percentage is below 20%.
           summary: Instance {{ $labels.instance }} low battery. Current battery percentage is {{ $value }}%. Charge the device.
+          runbook_url: https://example.com/runbook/low-battery
         expr: avg by (instance) (battery_percentage) < 80
         for: 2m
         labels:
@@ -34,6 +35,7 @@ groups:
         annotations:
           description: Dashboard memory usage is above 85% for more than 2 minutes.
           summary: Instance {{ $labels.instance }} high dashboard memory usage. Current memory usage is {{ $value }}%.
+          runbook_url: https://example.com/runbook/high-memory-usage
         expr: avg by (instance) (dashboard_memory_usage_percentage) > 85
         for: 2m
         labels:

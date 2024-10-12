@@ -13,8 +13,8 @@ from flask import abort
 alert_bp = Blueprint("alert", __name__)
 
 
-def paginate_alerts(status, page, per_page=10):
-    return AlertTicket.query.filter_by(status=status).paginate(
+def paginate_alerts(ticket_status, page, per_page=10):
+    return AlertTicket.query.filter_by(ticket_status=ticket_status).paginate(
         page=page, per_page=per_page, error_out=False
     )
 
@@ -119,7 +119,8 @@ def alert_history():
                 AlertTicket.instance.contains(search_query),
                 AlertTicket.description.contains(search_query),
                 AlertTicket.summary.contains(search_query),
-                AlertTicket.status.contains(search_query),
+                AlertTicket.alert_status.contains(search_query),
+                AlertTicket.ticket_status.contains(search_query),
                 AlertTicket.assigned_user_id.contains(search_query),
                 AlertTicket.assigned_supervisor_id.contains(search_query),
                 AlertTicket.created_at.contains(search_query),
@@ -140,33 +141,33 @@ def alert_history():
     unassigned_alerts = base_query.filter(AlertTicket.assigned_user_id.is_(None)).paginate(
         page=unassigned_page, per_page=per_page, error_out=False
     )
-    open_alerts = base_query.filter(AlertTicket.status == "Open",
+    open_alerts = base_query.filter(AlertTicket.ticket_status == "Open",
                                     AlertTicket.assigned_user_id.isnot(None)).paginate(
         page=open_page, per_page=per_page, error_out=False
     )
     in_progress_alerts = base_query.filter(
-        AlertTicket.status == "In Progress", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "In Progress", AlertTicket.assigned_user_id.isnot(None)
     ).paginate(page=in_progress_page, per_page=per_page, error_out=False)
     resolved_alerts = base_query.filter(
-        AlertTicket.status == "Resolved", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "Resolved", AlertTicket.assigned_user_id.isnot(None)
     ).paginate(page=resolved_page, per_page=per_page, error_out=False)
     closed_alerts = base_query.filter(
-        AlertTicket.status == "Closed", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)
     ).paginate(page=closed_page, per_page=per_page, error_out=False)
 
     # Get counts for unassigned, open, in progress, resolved, and closed alerts
     unassigned_count = base_query.filter(AlertTicket.assigned_user_id.is_(None)).count()
     open_count = base_query.filter(
-        AlertTicket.status == "Open", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)
     ).count()
     in_progress_count = base_query.filter(
-        AlertTicket.status == "In Progress", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "In Progress", AlertTicket.assigned_user_id.isnot(None)
     ).count()
     resolved_count = base_query.filter(
-        AlertTicket.status == "Resolved", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "Resolved", AlertTicket.assigned_user_id.isnot(None)
     ).count()
     closed_count = base_query.filter(
-        AlertTicket.status == "Closed", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)
     ).count()
 
 
@@ -240,13 +241,13 @@ def alert_ticket(alert_id):
 
         # Edit Status, Severity, Description, Summary
         elif form_type in ["edit_status", "edit_severity", "edit_description", "edit_summary"]:
-            new_value = request.form.get("status" if form_type == "edit_status" else
+            new_value = request.form.get("ticket_status" if form_type == "edit_status" else
                                            "severity" if form_type == "edit_severity" else
                                            "description" if form_type == "edit_description" else
                                            "summary")
             if form_type == "edit_status":
-                alert.status = new_value
-                log_message = f"Status changed to '{alert.status}' by {current_user.username}"
+                alert.ticket_status = new_value
+                log_message = f"Status changed to '{alert.ticket_status}' by {current_user.username}"
                 flash("Status updated successfully!", "success")
             elif form_type == "edit_severity":
                 alert.severity = new_value

@@ -12,8 +12,8 @@ class AlertTicket(BaseModel):
     __table_args__ = (
         db.Index('ix_alert_name', 'alert_name'),
         db.Index('ix_created_at', 'created_at'),
-        CheckConstraint("status IN ('Open', 'In Progress', 'Resolved', 'Closed')", name='check_status'),
-        CheckConstraint("severity IN ('Critical', 'Warning', 'Info')", name='check_severity'),
+        CheckConstraint("ticket_status IN ('Open', 'In Progress', 'Resolved', 'Closed')", name='check_status'),
+        CheckConstraint("severity IN ('critical', 'warning', 'info')", name='check_severity'),
     )
     
     id = db.Column(db.Integer, primary_key=True)
@@ -22,7 +22,13 @@ class AlertTicket(BaseModel):
     severity = db.Column(db.String(50), nullable=False)  # Severity of the alert (e.g., critical, warning)
     summary = db.Column(db.Text, nullable=False)  # Alert summary description
     description = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.String(50), nullable=False, default='Open')  # Ticket status (Open, In Progress, Resolved, Closed)
+    alert_status = db.Column(db.String(50), nullable=False)  # Alert status (firing, resolved)
+    ticket_status = db.Column(db.String(50), nullable=False, default='Open')  # Ticket status (Open, In Progress, Resolved, Closed)
+
+    system_username = db.Column(db.String(255), nullable=True)  # Username of the system that triggered the alert
+    system_hostname = db.Column(db.String(255), nullable=True)  # Hostname of the system that triggered the alert
+    fingerprint = db.Column(db.String(32), nullable=True)  # Fingerprint of the alert
+    runbook_url = db.Column(db.String(255), nullable=True)  # URL to the runbook for the alert
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp of ticket creation
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)  # Timestamp of last update

@@ -59,6 +59,10 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
             logger.info("Creating tables")
             db.create_all()
 
+            # create NotificationSettings
+            if not NotificationSettings.query.first():
+                NotificationSettings().save()
+
             # Load predefined users from JSON file and add them to the database if not already present
             pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")
             try:

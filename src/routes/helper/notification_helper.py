@@ -94,20 +94,24 @@ def process_alert(alert):
     Args:
         alert (dict): The alert payload containing labels and annotations.
     """
-    
     alert_name = alert["labels"].get("alertname", "Unknown Alert")
+    alert_status = alert.get("status", "firing")
+    system_username = alert["labels"].get("username", "Unknown User")
+    system_hostname = alert["labels"].get("system_hostname", "Unknown System")
     instance = alert["labels"].get("instance", "Unknown Instance")
     severity = alert["labels"].get("severity", "info")
     description = alert["annotations"].get("description", "No description provided")
     summary = alert["annotations"].get("summary", "No summary provided")
-    status = alert.get("status", "firing")
-    start_time = alert.get("startsAt", "No start time provided")
+    fingerprint = alert.get("fingerprint", None)
+    runbook_url = alert["annotations"].get("runbook_url", None)
 
     log_alert(severity, alert_name, instance, description, summary)
-    save_alert_data(alert_name, instance, severity, description, summary, status, start_time)
+    save_alert_data(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)
     notify_alert(alert_name, instance, severity, description, summary)
 
-def save_alert_data(alert_name, instance, severity, description, summary, status, start_time):
+def save_alert_data(alert_name, alert_status, instance, severity, 
+                    description, summary, system_username, system_hostname, 
+                    fingerprint, runbook_url=None):
     """
     Saves the alert data to the database.
 
@@ -120,6 +124,22 @@ def save_alert_data(alert_name, instance, severity, description, summary, status
     """
     # Fetch all supervisors with user_level "admin"
     all_supervisors = UserProfile.query.filter_by(user_level="admin").all()
+
+    # check if fingerprint already exists
+    if fingerprint:
+        existing_alert = AlertTicket.query.filter_by(fingerprint=fingerprint).first()
+        # if alert_status of existing alert is "firing" and new alert_status is "resolved", update the existing alert
+        if existing_alert and existing_alert.alert_status == "firing" and alert_status == "resolved":
+            existing_alert.alert_status = alert_status
+            existing_alert.updated_at = datetime.utcnow()
+            existing_alert.save()
+            logger.info(f"Alert with fingerprint {fingerprint} updated to resolved status.")
+            return 
+        elif existing_alert and existing_alert.alert_status == "resolved" and alert_status == "firing":
+            logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
+            return
+
+        
     
     if not all_supervisors:
         assigned_supervisor_id = None
@@ -129,10 +149,11 @@ def save_alert_data(alert_name, instance, severity, description, summary, status
         supervisor_loads = {
             supervisor.id: AlertTicket.query.filter(
                 AlertTicket.assigned_supervisor_id == supervisor.id,
-                AlertTicket.status.in_(["Open", "In Progress"])
+                AlertTicket.ticket_status.in_(["Open", "In Progress"])
             ).count()
             for supervisor in all_supervisors
         }
+        logger.info(f"Supervisor loads: {supervisor_loads}")
 
         # Find the supervisor(s) with the minimum load
         min_load = min(supervisor_loads.values())
@@ -154,11 +175,16 @@ def save_alert_data(alert_name, instance, severity, description, summary, status
     # Create and save the alert ticket
     alert_ticket = AlertTicket(
         alert_name=alert_name,
+        alert_status=alert_status,
         instance=instance,
         severity=severity,
         summary=summary,
         description=description,
         assigned_supervisor_id=assigned_supervisor_id,
+        system_username=system_username,
+        system_hostname=system_hostname,
+        fingerprint=fingerprint,
+        runbook_url=runbook_url
     )
     alert_ticket.save()
     logger.info(f"Saving alert ticket: {alert_ticket}")

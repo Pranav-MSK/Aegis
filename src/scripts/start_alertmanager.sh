@@ -33,7 +33,7 @@ PROMETHEUS_USERNAME="prometheus_admin"
 PROMETHEUS_PASSWORD="prometheus_password"
 SCRAPE_INTERVAL="2s"
 username=$(whoami)
-systemname=$(hostname)
+system_hostname=$(hostname)
 
 # Verify that initialization script exists
 if [ ! -f "$INIT_ALERTMANAGER_SCRIPT" ]; then
@@ -77,9 +77,9 @@ log_info "Updating prometheus.yml configuration."
 cat > "$PROMETHEUS_CONFIG" <<EOL
 global:
   external_labels:
-    system: $SYSTEM_LABEL
+    source: $SYSTEM_LABEL
     username: $username
-    systemname: $systemname
+    system_hostname: $system_hostname
 
 alerting:
   alertmanagers:

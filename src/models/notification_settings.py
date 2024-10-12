@@ -8,10 +8,10 @@ class NotificationSettings(BaseModel):
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    slack_webhook_url = db.Column(db.String(150), nullable=False)
-    discord_webhook_url = db.Column(db.String(150), nullable=False)
-    teams_webhook_url = db.Column(db.String(150), nullable=False)
-    google_chat_webhook_url = db.Column(db.String(150), nullable=False)
+    slack_webhook_url = db.Column(db.String(150), nullable=True)
+    discord_webhook_url = db.Column(db.String(150), nullable=True)
+    teams_webhook_url = db.Column(db.String(150), nullable=True)
+    google_chat_webhook_url = db.Column(db.String(150), nullable=True)
 
     is_email_alert_enabled = db.Column(db.Boolean, default=False)
     is_slack_alert_enabled = db.Column(db.Boolean, default=False)

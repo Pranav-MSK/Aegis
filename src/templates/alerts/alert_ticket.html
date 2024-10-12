@@ -19,7 +19,6 @@
 {% include 'ext/message.html' %}
 
 <div class="row">
-
     <div class="col-md-6">
         <!-- Alert Metadata -->
         <div class="alert-metadata">
@@ -27,6 +26,25 @@
             <div class="alert-info">
                 <p><strong>Alert Name:</strong> {{ alert.alert_name }}</p>
                 <p><strong>Instance:</strong> {{ alert.instance }}</p>
+                <!-- system_username, system_hostname -->
+                <p><strong>System Username:</strong> {{ alert.system_username }}</p>
+                <p><strong>System Hostname:</strong> {{ alert.system_hostname }}</p>
+                <!-- fingerprint -->
+                <p><strong>Fingerprint:</strong> {{ alert.fingerprint }}</p>
+                <!-- runbook_url -->
+                <p><strong>Runbook URL:</strong>
+                    {% if alert.runbook_url %}
+                    <a href="{{ alert.runbook_url }}" target="_blank">{{ alert.runbook_url }}</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                <p><strong>Alert Status(Prometheus):</strong>
+                    <span
+                        class="badge badge-{% if alert.alert_status == 'firing' %}danger{% elif alert.alert_status == 'resolved' %}info{% else %}warning{% endif %}"
+                        data-toggle="tooltip"
+                        title="The current status of the alert. 'Firing' means the alert is active, 'Resolved' means the alert has been backed off. (Prometheus)">{{
+                        alert.alert_status }}</span>
+                </p>
                 <p><strong>Severity:</strong>
                     <span class="badge badge-{{ alert.severity }}">{{ alert.severity }}</span>
                     {% if current_user.user_level == 'admin' %}
@@ -48,22 +66,26 @@
                 </div>
                 {% endif %}
                 </p>
-                <p><strong>Status:</strong>
-                    <span class="badge badge-{{ alert.status | lower }}">{{ alert.status }}</span>
+
+                <p><strong>Ticket Status:</strong>
+                    <span class="badge badge-{{ alert.ticket_status | lower }}">{{ alert.ticket_status }}</span>
                     {% if current_user.user_level == 'admin' %}
                     <i class="fas fa-edit" onclick="toggleEdit('editStatus')" style="cursor: pointer;"></i>
                 <div id="editStatus" style="display: none;">
                     <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="form_type" value="edit_status">
-                        <select name="status" class="form-control mb-2">
-                            <option value="Open" {% if alert.status=='Open' %}selected{% endif %}>Open</option>
-                            <option value="In Progress" {% if alert.status=='In Progress' %}selected{% endif %}>In
+                        <select name="ticket_status" class="form-control mb-2">
+                            <option value="Open" {% if alert.ticket_status=='Open' %}selected{% endif %}>Open</option>
+                            <option value="In Progress" {% if alert.ticket_status=='In Progress' %}selected{% endif %}>
+                                In
                                 Progress
                             </option>
-                            <option value="Resolved" {% if alert.status=='Resolved' %}selected{% endif %}>Resolved
+                            <option value="Resolved" {% if alert.ticket_status=='Resolved' %}selected{% endif %}>
+                                Resolved
                             </option>
-                            <option value="Closed" {% if alert.status=='Closed' %}selected{% endif %}>Closed</option>
+                            <option value="Closed" {% if alert.ticket_status=='Closed' %}selected{% endif %}>Closed
+                            </option>
                         </select>
                         <button type="submit" class="btn btn-primary">Update Status</button>
                     </form>

@@ -44,7 +44,7 @@ JOB_NAME="localhost"
 PROMETHEUS_USERNAME="prometheus_admin"
 PROMETHEUS_PASSWORD="prometheus_password"
 username=$(whoami)
-systemname=$(hostname)
+system_hostname=$(hostname)
 
 # Logging function for information
 log_info() {
@@ -71,9 +71,9 @@ log_info "Generating prometheus.yml configuration file."
 cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 global:
   external_labels:
-    system: $SYSTEM_LABEL
+    source: $SYSTEM_LABEL
     username: $username
-    systemname: $systemname
+    system_hostname: $system_hostname
 
 rule_files:
   - /etc/prometheus/alert_rules.yml

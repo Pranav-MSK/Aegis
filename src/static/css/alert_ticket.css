@@ -95,3 +95,9 @@ h1 {
 .badge:hover {
     opacity: 0.8;
 }
+
+.severity-bar {
+    width: 10px; /* Adjust width as needed */
+    height: 100%;
+    background-color: transparent; /* Default state */
+}
