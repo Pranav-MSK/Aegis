@@ -13,7 +13,7 @@ from src.models.monitored_website import MonitoredWebsite
 from src.models.prometheus_model import ExternalMonitornig
 from src.models.notification_settings import NotificationSettings
 from src.models.alert_data_models import AlertTicket, InvestigationNote, Report, AlertLog, CustomFields
-from src.models.graph_config import GraphConfigs
+from src.models.graph_config import ChartConfiguration
 from flask_login import current_user
 from src.logger import logger
 from werkzeug.security import generate_password_hash
@@ -65,6 +65,12 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
 
             # Load predefined users from JSON file and add them to the database if not already present
             pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")
+            initial_chart_configurations_json = os.path.join(ROOT_DIR, "src/assets/initial_chart_configurations.json")
+
+            with open(initial_chart_configurations_json, "r") as file:
+                initial_chart_configurations = json.load(file)
+
+
             try:
                 with open(pre_defined_users_json, "r") as file:
                     pre_defined_users = json.load(file)
@@ -98,6 +104,24 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                     db.session.add(UserDashboardSettings(user_id=user.id))
                     db.session.add(UserCardSettings(user_id=user.id))
                     db.session.add(PageToggleSettings(user_id=user.id))
+                    
+                    for config in initial_chart_configurations:
+                        new_chart_config = ChartConfiguration(
+                            user_id=user.id,
+                            metric_name=config['metric_name'],
+                            label=config['label'],
+                            title=config['title'],
+                            xlabel=config['xlabel'],
+                            ylabel=config['ylabel'],
+                            chart_type=config['chart_type'],
+                            tension=config.get('tension', 0.4),
+                            point_radius=config.get('point_radius', 0),
+                            point_hover_radius=config.get('point_hover_radius', 6),
+                            point_border_color=config.get('point_border_color', '#fff'),
+                            point_hover_background_color=config.get('point_hover_background_color', '#fff'),
+                            point_hover_border_color=config.get('point_hover_border_color', 'rgba(75, 192, 192, 1)')
+                        )
+                        new_chart_config.save()
 
                     db.session.commit()  # Commit once per user
                     logger.info(f"Initial settings data added for user ID: {user.id}")

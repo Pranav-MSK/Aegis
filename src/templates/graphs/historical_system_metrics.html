@@ -8,8 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}
-{% block content %}
 
+{% block content %}
 <h2 class="page-title"><i class="fas fa-chart-line"></i>
     <span class="text-danger m-2"> {{ title }} </span> Metrics
 </h2>
@@ -54,41 +54,9 @@
 </div>
 <hr>
 
-<div class="cpu-usage">
-    <br><br>
-    <canvas class="graph" id="cpuTimeChart" style="height: 400px;"></canvas>
-</div>
-
-<div class="memory-usage">
-    <br><br>
-    <canvas class="graph" id="memoryTimeChart" style="height: 400px;"></canvas>
-</div>
-<div class="cpu-temperature ">
-    <br><br>
-    <canvas class="graph" id="currentTempTimeChart" style="height: 400px;"></canvas>
-</div>
-
-<div class="cpu-frequency ">
-    <br><br>
-    <canvas class="graph" id="cpuFrequencyTimeChart" style="height: 400px;"></canvas>
-</div>
-
-<div class="battery-usage ">
-    <br><br>
-    <canvas class="graph" id="batteryTimeChart" style="height: 400px;"></canvas>
-</div>
-
-<div class="network-usage ">
-    <br><br>
-    <canvas class="graph" id="networkTimeChart" style="height: 400px;"></canvas>
-</div>
-
-<div class="dashboard-memory-usage ">
-    <br><br>
-    <canvas class="graph" id="dashboardMemoryTimeChart" style="height: 400px;"></canvas>
-</div>
-
+<div id="chartsContainer"></div>
 {% endblock %}
+
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/graphs.js')}}"></script>
 <script src="{{ url_for('static', filename='js/bootTime.js')}}"></script>

@@ -4,30 +4,32 @@ class ChartManager {
         this.charts = {};
     }
 
-    createChart(ctx, label, data, yLabel) {
+    createChart(ctx, label, data, title, xlabel, yLabel,
+        type, tension, pointRadius, pointHoverRadius, 
+        backgroundColor, borderColor, pointBackgroundColor, 
+        pointBorderColor, pointHoverBackgroundColor, pointHoverBorderColor) {
         this.setupCanvasStyle(ctx.canvas);
-        
 
         const chart = new Chart(ctx, {
-            type: 'line',
+            type: type || 'line',
             data: {
-            labels: data.labels,
-            datasets: data.datasets.map(dataset => ({
-                ...dataset,
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4, // Adjusted tension for a balanced curve
-                pointRadius: 0, // Added point radius for better visibility
-                pointHoverRadius: 6,
-                backgroundColor: dataset.backgroundColor || 'rgba(75, 192, 192, 0.2)',
-                borderColor: dataset.borderColor || 'rgba(75, 192, 192, 1)',
-                pointBackgroundColor: dataset.borderColor || 'rgba(75, 192, 192, 1)', // Match point color with border color
-                pointBorderColor: '#fff', // White border for points
-                pointHoverBackgroundColor: '#fff', // White background on hover
-                pointHoverBorderColor: dataset.borderColor || 'rgba(75, 192, 192, 1)', // Match hover border color with dataset border color
-            })),
+                labels: data.labels,
+                datasets: data.datasets.map(dataset => ({
+                    ...dataset,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: tension || 0.4,
+                    pointRadius: pointRadius || 3,
+                    pointHoverRadius: pointHoverRadius || 5,
+                    backgroundColor: backgroundColor || 'rgba(75, 192, 192, 0.3)',
+                    borderColor: borderColor || 'rgba(75, 192, 192, 1)',
+                    pointBackgroundColor: pointBackgroundColor || 'rgba(75, 192, 192, 1)', // Match point color with border color
+                    pointBorderColor: pointBorderColor || 'rgba(75, 192, 192, 1)',
+                    pointHoverBackgroundColor: pointHoverBackgroundColor || 'rgba(75, 192, 192, 1)',
+                    pointHoverBorderColor: pointHoverBorderColor || 'rgba(75, 192, 192, 1)', // Match hover border color with dataset border color
+                })),
             },
-            options: this.getChartOptions(yLabel),
+            options: this.getChartOptions(title, xlabel, yLabel),
         });
 
         this.charts[label] = chart;
@@ -50,7 +52,7 @@ class ChartManager {
         canvas.style.backgroundColor = "white";
     }
 
-    getChartOptions(yLabel) {
+    getChartOptions(title, xlabel, yLabel) {
         return {
             responsive: true,
             scales: {
@@ -71,6 +73,15 @@ class ChartManager {
                     grid: {
                         display: false // Remove grid lines for a cleaner look
                     },
+                    title: {
+                        display: true,
+                        text: xlabel,
+                        font: {
+                            size: 16,
+                            weight: 'bold',
+                            color: '#333' // Improved color for better visibility
+                        },
+                    }
                 },
                 y: {
                     title: {
@@ -129,7 +140,6 @@ class ChartManager {
                         title: function (context) {
                             return `Time: ${context[0].label}`;
                         },
-                        
                     }
                 },
                 legend: {
@@ -140,41 +150,70 @@ class ChartManager {
     }
 }
 
-
 // Variables to store chart instances
 let chartManager = new ChartManager();
 
-// Configuration for the charts
-const chartConfigurations = [
-    { id: 'cpuTimeChart', label: 'CPU Usage (%)', yLabel: 'CPU Usage (%)' },
-    { id: 'memoryTimeChart', label: 'Memory Usage (%)', yLabel: 'Memory Usage (%)' },
-    { id: 'batteryTimeChart', label: 'Power Usage (%)', yLabel: 'Power Usage (%)' },
-    { id: 'networkTimeChart', label: 'Data Transferred (MB)', yLabel: 'Data Transferred (MB)', combine: true },
-    { id: 'dashboardMemoryTimeChart', label: 'Dashboard Memory Usage', yLabel: 'Memory Usage' },
-    { id: 'cpuFrequencyTimeChart', label: 'CPU Frequency (GHz)', yLabel: 'Frequency (GHz)' },
-    { id: 'currentTempTimeChart', label: 'Current Temperature (°C)', yLabel: 'Temperature (°C)' },
-];
+// Function to fetch chart configurations and render charts
+function fetchChartConfigurations() {
+    fetch('/api/v1/chart-configurations')
+        .then(response => response.json())
+        .then(configurations => {
+            fetchDataAndRenderCharts(configurations);
+        })
+        .catch(error => console.error('Error fetching chart configurations:', error));
+}
 
 // Function to fetch data and render charts
-function fetchDataAndRenderCharts() {
+function fetchDataAndRenderCharts(chartConfigurations) {
     const storedFilterValue = localStorage.getItem('filterValue') || 5;
     document.getElementById('timeFilter').value = storedFilterValue;
 
     fetch(`/api/v1/prometheus/graphs_data?filter=${storedFilterValue}`)
         .then(response => response.json())
         .then(data => {
-            createCharts(data);
+            createCharts(data, chartConfigurations);
         })
         .catch(error => console.error('Error fetching data:', error));
 }
 
+// Function to create charts dynamically
+function createChartContainer(chartConfig) {
+    const container = document.getElementById('chartsContainer');
+    
+    // Create a new div for each chart
+    const chartDiv = document.createElement('div');
+    chartDiv.className = 'chart-container'; // Optional: add styles for better layout
+    
+    // Create a canvas element
+    const canvas = document.createElement('canvas');
+    canvas.className = 'graph';
+    canvas.id = chartConfig.metric_name; // Use the metric name for the canvas ID
+
+    // Append canvas to the div
+    chartDiv.appendChild(canvas);
+    
+    // Append the div to the charts container
+    container.appendChild(chartDiv);
+}
+
 // Function to create charts with the fetched data
-function createCharts(data) {
-    chartConfigurations.forEach(({ id, label, yLabel }) => {
-        const ctx = document.getElementById(id).getContext('2d');
-        const chartData = prepareChartData(data, label);
-        chartManager.destroyChart(label); // Ensure we destroy existing chart before creating a new one
-        chartManager.createChart(ctx, label, chartData, yLabel);
+function createCharts(data, chartConfigurations) {
+    // Clear previous charts
+    const container = document.getElementById('chartsContainer');
+    container.innerHTML = ''; // Clear the charts container
+
+    chartConfigurations.forEach(config => {
+        createChartContainer(config); // Create a container for each chart
+        
+        const ctx = document.getElementById(config.metric_name).getContext('2d');
+        const chartData = prepareChartData(data, config.label);
+        
+        chartManager.destroyChart(config.label); // Ensure we destroy existing chart before creating a new one
+        
+        chartManager.createChart(ctx, config.label, chartData, config.title, config.xlabel, config.ylabel,
+            config.type, config.tension, config.pointRadius, config.pointHoverRadius,
+            config.backgroundColor, config.borderColor, config.pointBackgroundColor,
+            config.pointBorderColor, config.pointHoverBackgroundColor, config.pointHoverBorderColor);
     });
 }
 
@@ -266,13 +305,13 @@ function formatDate(utcTime, timeZone) {
 // Event listeners
 document.getElementById('timeFilter').addEventListener('change', (event) => {
     localStorage.setItem('filterValue', event.target.value);
-    fetchDataAndRenderCharts();
+    fetchChartConfigurations();
 });
 
-document.getElementById('refreshData').addEventListener('click', fetchDataAndRenderCharts);
+document.getElementById('refreshData').addEventListener('click', fetchChartConfigurations);
 
 // Ensure the DOM is fully loaded before running scripts
 document.addEventListener('DOMContentLoaded', () => {
-    fetchDataAndRenderCharts();
+    fetchChartConfigurations();
     getRetentionDays();
 });
