@@ -10,30 +10,29 @@
     {% include 'ext/message.html' %}
     <form id="chartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="text" name="metric_name" placeholder="Metric Name" required>
-        <input type="text" name="label" placeholder="Label" required>
-        <input type="text" name="title" placeholder="Title" required>
-        <input type="text" name="xlabel" placeholder="X-Axis Label" required>
-        <input type="text" name="ylabel" placeholder="Y-Axis Label" required>
+        <input type="hidden" id="configId" name="config_id" value="">
+        <input type="text" name="metric_name" placeholder="Metric Name" required id="metricName">
+        <input type="text" name="label" placeholder="Label" required id="label">
+        <input type="text" name="title" placeholder="Title" required id="title">
+        <input type="text" name="xlabel" placeholder="X-Axis Label" required id="xlabel">
+        <input type="text" name="ylabel" placeholder="Y-Axis Label" required id="ylabel">
 
         <button type="button" id="toggleOptionalFields"><i class="fas fa-cog"></i> Optional Fields</button>
         <div id="optionalFields" class="optional-fields" style="display: none;">
-            <input type="text" name="tension" placeholder="Tension (default: 0.4)">
-            <input type="number" name="point_radius" placeholder="Point Radius (default: 0)">
-            <input type="number" name="point_hover_radius" placeholder="Point Hover Radius (default: 6)">
-            <input type="text" name="point_border_color" placeholder="Point Border Color (default: #fff)">
-            <input type="text" name="point_hover_background_color"
-                placeholder="Point Hover Background Color (default: #fff)">
-            <input type="text" name="point_hover_border_color"
-                placeholder="Point Hover Border Color (default: rgba(75, 192, 192, 1))">
+            <input type="text" name="tension" placeholder="Tension (default: 0.4)" id="tension">
+            <input type="number" name="point_radius" placeholder="Point Radius (default: 0)" id="pointRadius">
+            <input type="number" name="point_hover_radius" placeholder="Point Hover Radius (default: 6)" id="pointHoverRadius">
+            <input type="text" name="point_border_color" placeholder="Point Border Color (default: #fff)" id="pointBorderColor">
+            <input type="text" name="point_hover_background_color" placeholder="Point Hover Background Color (default: #fff)" id="pointHoverBackgroundColor">
+            <input type="text" name="point_hover_border_color" placeholder="Point Hover Border Color (default: rgba(75, 192, 192, 1))" id="pointHoverBorderColor">
         </div>
 
-        <select name="chart_type">
+        <select name="chart_type" id="chartType">
             <option value="line">Line</option>
             <option value="bar">Bar</option>
         </select>
 
-        <button type="submit"><i class="fas fa-plus"></i> Add Configuration</button>
+        <button type="submit"><i class="fas fa-plus"></i> Add/Update Configuration</button>
     </form>
 
     <table class="table">
@@ -58,6 +57,7 @@
                 <td>{{ config.xlabel }}</td>
                 <td>{{ config.ylabel }}</td>
                 <td>
+                    <button class="btn-edit" data-id="{{ config.id }}" data-metric-name="{{ config.metric_name }}" data-label="{{ config.label }}" data-title="{{ config.title }}" data-xlabel="{{ config.xlabel }}" data-ylabel="{{ config.ylabel }}" data-tension="{{ config.tension }}" data-point-radius="{{ config.point_radius }}" data-point-hover-radius="{{ config.point_hover_radius }}" data-point-border-color="{{ config.point_border_color }}" data-point-hover-background-color="{{ config.point_hover_background_color }}" data-point-hover-border-color="{{ config.point_hover_border_color }}"><i class="fas fa-edit"></i> Edit</button>
                     <button class="btn-delete" data-id="{{ config.id }}"><i class="fas fa-trash"></i> Delete</button>
                 </td>
             </tr>
@@ -89,7 +89,22 @@
         });
     });
 
-
+    document.querySelectorAll('.btn-edit').forEach(button => {
+        button.addEventListener('click', function () {
+            document.getElementById('configId').value = this.getAttribute('data-id');
+            document.getElementById('metricName').value = this.getAttribute('data-metric-name');
+            document.getElementById('label').value = this.getAttribute('data-label');
+            document.getElementById('title').value = this.getAttribute('data-title');
+            document.getElementById('xlabel').value = this.getAttribute('data-xlabel');
+            document.getElementById('ylabel').value = this.getAttribute('data-ylabel');
+            document.getElementById('tension').value = this.getAttribute('data-tension');
+            document.getElementById('pointRadius').value = this.getAttribute('data-point-radius');
+            document.getElementById('pointHoverRadius').value = this.getAttribute('data-point-hover-radius');
+            document.getElementById('pointBorderColor').value = this.getAttribute('data-point-border-color');
+            document.getElementById('pointHoverBackgroundColor').value = this.getAttribute('data-point-hover-background-color');
+            document.getElementById('pointHoverBorderColor').value = this.getAttribute('data-point-hover-border-color');
+        });
+    });
 
     document.getElementById('toggleOptionalFields').addEventListener('click', function () {
         const optionalFields = document.getElementById('optionalFields');

@@ -30,28 +30,45 @@ def get_form_value(key, default):
     return value if value else default
 
 @app.route('/chart_configurations', methods=['GET', 'POST'])
+@login_required
 def chart_configurations():
     if request.method == 'POST':
-
-
-        new_config = ChartConfiguration(
-            user_id=current_user.id,
-            metric_name=request.form['metric_name'],
-            label=request.form['label'],
-            title=request.form['title'],
-            xlabel=request.form['xlabel'],
-            ylabel=request.form['ylabel'],
-            chart_type=request.form['chart_type'],
-
-            tension=get_form_value('tension', 0.4),
-            point_radius=get_form_value('point_radius', 0),
-            point_hover_radius=get_form_value('point_hover_radius', 6),
-            point_border_color=get_form_value('point_border_color', '#fff'),
-            point_hover_background_color=get_form_value('point_hover_background_color', '#fff'),
-            point_hover_border_color=get_form_value('point_hover_border_color', 'rgba(75, 192, 192, 1)')
-        )
-        new_config.save()
-        return redirect(url_for('chart_configurations'))
+        config_id = request.form.get('config_id')
+        
+        if config_id:  # Editing an existing configuration
+            config = ChartConfiguration.query.get(config_id)
+            if config and config.user_id == current_user.id:
+                config.metric_name = request.form['metric_name']
+                config.label = request.form['label']
+                config.title = request.form['title']
+                config.xlabel = request.form['xlabel']
+                config.ylabel = request.form['ylabel']
+                config.tension = request.form.get('tension', 0.4)
+                config.point_radius = request.form.get('point_radius', 0)
+                config.point_hover_radius = request.form.get('point_hover_radius', 6)
+                config.point_border_color = request.form.get('point_border_color', '#fff')
+                config.point_hover_background_color = request.form.get('point_hover_background_color', '#fff')
+                config.point_hover_border_color = request.form.get('point_hover_border_color', 'rgba(75, 192, 192, 1)')
+                
+                db.session.commit()
+                return redirect(url_for('chart_configurations'))
+        else:  # Creating a new configuration
+            new_config = ChartConfiguration(
+                user_id=current_user.id,
+                metric_name=request.form['metric_name'],
+                label=request.form['label'],
+                title=request.form['title'],
+                xlabel=request.form['xlabel'],
+                ylabel=request.form['ylabel'],
+                tension=request.form.get('tension', 0.4),
+                point_radius=request.form.get('point_radius', 0),
+                point_hover_radius=request.form.get('point_hover_radius', 6),
+                point_border_color=request.form.get('point_border_color', '#fff'),
+                point_hover_background_color=request.form.get('point_hover_background_color', '#fff'),
+                point_hover_border_color=request.form.get('point_hover_border_color', 'rgba(75, 192, 192, 1)')
+            )
+            new_config.save()
+            return redirect(url_for('chart_configurations'))
 
     configs = ChartConfiguration.query.filter_by(user_id=current_user.id).all()
     return render_template('graphs/chart_configurations.html', configs=configs)
