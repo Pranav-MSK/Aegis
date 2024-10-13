@@ -141,7 +141,6 @@ def start_website_monitoring():
 
         except SQLAlchemyError as db_err:
             logger.error(
-                f"Database error during website monitoring: {db_err}", exc_info=True
-            )
+                f"Database error during website monitoring: {db_err}, {type(db_err)}")
         except Exception as e:
-            logger.error(f"Error during website monitoring: {e}", exc_info=True)
+            logger.error(f"Error during website monitoring: {e} {type(e)}")

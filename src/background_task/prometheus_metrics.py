@@ -1,3 +1,4 @@
+# cython: language_level=3
 from prometheus_client import Gauge, Counter, Summary
 
 metrics = {

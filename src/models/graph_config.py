@@ -1,3 +1,4 @@
+# cython: language_level=3
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import JSON
 
