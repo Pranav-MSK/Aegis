@@ -9,11 +9,7 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
-        "background_color": "rgba(75, 192, 192, 0.2)",
-        "point_background_color": "#fff", 
-        "point_border_color": "#fff",
-        "point_hover_background_color": "#fff",
-        "point_hover_border_color": "rgba(75, 192, 192, 1)"
+        "is_active": true
     },
     {
         "metric_name": "memory_usage_percentage",
@@ -25,11 +21,8 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
-        "background_color": "rgba(75, 192, 192, 0.2)",
-        "point_background_color": "#fff", 
-        "point_border_color": "#fff",
-        "point_hover_background_color": "#fff",
-        "point_hover_border_color": "rgba(75, 192, 192, 1)"
+        "is_active": true
+        
     },
     {
         "metric_name": "battery_percentage",
@@ -41,11 +34,7 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
-        "background_color": "rgba(75, 192, 192, 0.2)",
-        "point_background_color": "#fff", 
-        "point_border_color": "#fff",
-        "point_hover_background_color": "#fff",
-        "point_hover_border_color": "rgba(75, 192, 192, 1)"
+        "is_active": true
     },
     {
         "metric_name": "network_bytes_received",
@@ -57,11 +46,7 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
-        "background_color": "rgba(75, 192, 192, 0.2)",
-        "point_background_color": "#fff", 
-        "point_border_color": "#fff",
-        "point_hover_background_color": "#fff",
-        "point_hover_border_color": "rgba(75, 192, 192, 1)"
+        "is_active": true
     },
     {
         "metric_name": "dashboard_memory_usage_percentage",
@@ -73,11 +58,7 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
-        "background_color": "rgba(75, 192, 192, 0.2)",
-        "point_background_color": "#fff", 
-        "point_border_color": "#fff",
-        "point_hover_background_color": "#fff",
-        "point_hover_border_color": "rgba(75, 192, 192, 1)"
+        "is_active": true
     },
     {
         "metric_name": "cpu_frequency",
@@ -89,11 +70,7 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
-        "background_color": "rgba(75, 192, 192, 0.2)",
-        "point_background_color": "#fff", 
-        "point_border_color": "#fff",
-        "point_hover_background_color": "#fff",
-        "point_hover_border_color": "rgba(75, 192, 192, 1)"
+        "is_active": true
     },
     {
         "metric_name": "cpu_temperature",
@@ -105,10 +82,18 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
-        "background_color": "rgba(75, 192, 192, 0.2)",
-        "point_background_color": "#fff", 
-        "point_border_color": "#fff",
-        "point_hover_background_color": "#fff",
-        "point_hover_border_color": "rgba(75, 192, 192, 1)"
+        "is_active": true
+    },
+    {
+        "metric_name" : "up",
+        "label": "Uptime (s)",
+        "title": "Uptime",
+        "xlabel": "Time",
+        "ylabel": "Uptime (s)",
+        "chart_type": "line",
+        "tension": 0.4,
+        "point_radius": 0,
+        "point_hover_radius": 6,
+        "is_active": true
     }
 ]

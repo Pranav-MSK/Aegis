@@ -5,68 +5,106 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
-<div class="container">
     <h1>Chart Configurations</h1>
     {% include 'ext/message.html' %}
-    <form id="chartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" id="configId" name="config_id" value="">
-        <input type="text" name="metric_name" placeholder="Metric Name" required id="metricName">
-        <input type="text" name="label" placeholder="Label" required id="label">
-        <input type="text" name="title" placeholder="Title" required id="title">
-        <input type="text" name="xlabel" placeholder="X-Axis Label" required id="xlabel">
-        <input type="text" name="ylabel" placeholder="Y-Axis Label" required id="ylabel">
+    
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Metric Name</th>
+                        <th>Label</th>
+                        <th>Title</th>
+                        <th>X-Axis</th>
+                        <th>Y-Axis</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for config in configs %}
+                    <tr>
+                        <td>{{ config.metric_name }}</td>
+                        <td>{{ config.label }}</td>
+                        <td>{{ config.title }}</td>
+                        <td>{{ config.xlabel }}</td>
+                        <td>{{ config.ylabel }}</td>
+                        <td>
+                            <button class="btn-edit" data-id="{{ config.id }}" data-metric-name="{{ config.metric_name }}"
+                                data-label="{{ config.label }}" data-title="{{ config.title }}"
+                                data-xlabel="{{ config.xlabel }}" data-ylabel="{{ config.ylabel }}"
+                                data-tension="{{ config.tension }}" data-point-radius="{{ config.point_radius }}"
+                                data-point-hover-radius="{{ config.point_hover_radius }}"
+                                data-chart-type="{{ config.chart_type }}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn-delete" data-id="{{ config.id }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-        <input type="text" name="tension" placeholder="Tension (default: 0.4)" id="tension">
-        <input type="number" name="point_radius" placeholder="Point Radius (default: 0)" id="pointRadius">
-        <input type="number" name="point_hover_radius" placeholder="Point Hover Radius (default: 6)"
-            id="pointHoverRadius">
+        <div class="col-md-6">
+            <form id="chartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" id="configId" name="config_id" value="">
 
+                <div class="form-group">
+                    <label for="metricName">Metric Name</label>
+                    <input type="text" name="metric_name" required id="metricName" placeholder="Metric Name">
+                </div>
 
-        <select name="chart_type" id="chartType">
-            <option value="line">Line</option>
-            <option value="bar">Bar</option>
-        </select>
+                <div class="form-group">
+                    <label for="label">Label</label>
+                    <input type="text" name="label" required id="label" placeholder="Label">
+                </div>
 
-        <button type="submit"><i class="fas fa-plus"></i> Add/Update Configuration</button>
-    </form>
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" name="title" required id="title" placeholder="Title">
+                </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Metric Name</th>
-                <th>Label</th>
-                <th>Title</th>
-                <th>X-Axis</th>
-                <th>Y-Axis</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for config in configs %}
-            <tr>
-                <td>{{ config.id }}</td>
-                <td>{{ config.metric_name }}</td>
-                <td>{{ config.label }}</td>
-                <td>{{ config.title }}</td>
-                <td>{{ config.xlabel }}</td>
-                <td>{{ config.ylabel }}</td>
-                <td>
-                    <button class="btn-edit" data-id="{{ config.id }}" data-metric-name="{{ config.metric_name }}"
-                        data-label="{{ config.label }}" data-title="{{ config.title }}"
-                        data-xlabel="{{ config.xlabel }}" data-ylabel="{{ config.ylabel }}"
-                        data-tension="{{ config.tension }}" data-point-radius="{{ config.point_radius }}"
-                        data-point-hover-radius="{{ config.point_hover_radius }}"
-                        data-chart-type="{{ config.chart_type }}"><i class="fas fa-edit"></i>
-                        Edit</button>
-                    <button class="btn-delete" data-id="{{ config.id }}"><i class="fas fa-trash"></i> Delete</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+                <div class="form-group">
+                    <label for="xlabel">X-Axis Label</label>
+                    <input type="text" name="xlabel" required id="xlabel" placeholder="X-Axis Label">
+                </div>
+
+                <div class="form-group">
+                    <label for="ylabel">Y-Axis Label</label>
+                    <input type="text" name="ylabel" required id="ylabel" placeholder="Y-Axis Label">
+                </div>
+
+                <div class="form-group optional-fields">
+                    <label for="tension">Tension (default: 0.4)</label>
+                    <input type="text" name="tension" id="tension" placeholder="Tension">
+                </div>
+
+                <div class="form-group optional-fields">
+                    <label for="pointRadius">Point Radius (default: 0)</label>
+                    <input type="number" name="point_radius" id="pointRadius" placeholder="Point Radius">
+                </div>
+
+                <div class="form-group optional-fields">
+                    <label for="pointHoverRadius">Point Hover Radius (default: 6)</label>
+                    <input type="number" name="point_hover_radius" id="pointHoverRadius" placeholder="Point Hover Radius">
+                </div>
+
+                <div class="form-group">
+                    <label for="chartType">Chart Type</label>
+                    <select name="chart_type" id="chartType">
+                        <option value="line">Line</option>
+                        <option value="bar">Bar</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Add/Update Configuration</button>
+            </form>
+        </div>
+    </div>
 
 <script>
     document.querySelectorAll('.btn-delete').forEach(button => {
@@ -105,7 +143,5 @@
             document.getElementById('chartType').value = this.getAttribute('data-chart-type');
         });
     });
-
-
 </script>
 {% endblock %}

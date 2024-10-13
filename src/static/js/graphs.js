@@ -19,7 +19,7 @@ class ChartManager {
                     borderWidth: 2,
                     fill: true,
                     tension: tension || 0.4,
-                    pointRadius: pointRadius || 3,
+                    pointRadius: pointRadius,
                     pointHoverRadius: pointHoverRadius || 5,
                     backgroundColor: backgroundColor,
                     borderColor: borderColor,
@@ -196,6 +196,16 @@ function createChartContainer(chartConfig) {
     container.appendChild(chartDiv);
 }
 
+// point_radius = db.Column(db.Integer, nullable=True, default=0)
+// point_hover_radius = db.Column(db.Integer, nullable=True, default=6)
+// point_border_color = db.Column(db.String(50), nullable=True, default='#fff')
+// point_hover_background_color = db.Column(db.String(50), nullable=True, default='#fff')
+// point_hover_border_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 1)')
+// background_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 0.2)') # Background color for the data
+// point_background_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 1)') # Background color for the data
+// created_at = db.Column(db.DateTime, default=datetime.utcnow)
+// updated_at = db.C
+
 // Function to create charts with the fetched data
 function createCharts(data, chartConfigurations) {
     // Clear previous charts
@@ -211,7 +221,9 @@ function createCharts(data, chartConfigurations) {
         chartManager.destroyChart(config.label); // Ensure we destroy existing chart before creating a new one
 
         chartManager.createChart(ctx, config.label, chartData, config.title, config.xlabel, config.ylabel,
-            config.chart_type, config.tension, config.point_radius, config.point_hover_radius);
+            config.chart_type, config.tension, config.point_radius, config.point_hover_radius
+            );
+            
     });
 }
 

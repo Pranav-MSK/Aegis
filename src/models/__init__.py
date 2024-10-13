@@ -117,9 +117,6 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                             tension=config.get('tension', 0.4),
                             point_radius=config.get('point_radius', 0),
                             point_hover_radius=config.get('point_hover_radius', 6),
-                            point_border_color=config.get('point_border_color', '#fff'),
-                            point_hover_background_color=config.get('point_hover_background_color', '#fff'),
-                            point_hover_border_color=config.get('point_hover_border_color', 'rgba(75, 192, 192, 1)')
                         )
                         new_chart_config.save()
 
