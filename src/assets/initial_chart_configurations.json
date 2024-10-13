@@ -9,6 +9,8 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
+        "background_color": "rgba(75, 192, 192, 0.2)",
+        "point_background_color": "#fff", 
         "point_border_color": "#fff",
         "point_hover_background_color": "#fff",
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
@@ -23,6 +25,8 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
+        "background_color": "rgba(75, 192, 192, 0.2)",
+        "point_background_color": "#fff", 
         "point_border_color": "#fff",
         "point_hover_background_color": "#fff",
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
@@ -37,6 +41,8 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
+        "background_color": "rgba(75, 192, 192, 0.2)",
+        "point_background_color": "#fff", 
         "point_border_color": "#fff",
         "point_hover_background_color": "#fff",
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
@@ -51,6 +57,8 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
+        "background_color": "rgba(75, 192, 192, 0.2)",
+        "point_background_color": "#fff", 
         "point_border_color": "#fff",
         "point_hover_background_color": "#fff",
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
@@ -65,6 +73,8 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
+        "background_color": "rgba(75, 192, 192, 0.2)",
+        "point_background_color": "#fff", 
         "point_border_color": "#fff",
         "point_hover_background_color": "#fff",
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
@@ -79,6 +89,8 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
+        "background_color": "rgba(75, 192, 192, 0.2)",
+        "point_background_color": "#fff", 
         "point_border_color": "#fff",
         "point_hover_background_color": "#fff",
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
@@ -93,6 +105,8 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
+        "background_color": "rgba(75, 192, 192, 0.2)",
+        "point_background_color": "#fff", 
         "point_border_color": "#fff",
         "point_hover_background_color": "#fff",
         "point_hover_border_color": "rgba(75, 192, 192, 1)"

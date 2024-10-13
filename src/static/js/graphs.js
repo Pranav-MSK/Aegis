@@ -5,8 +5,8 @@ class ChartManager {
     }
 
     createChart(ctx, label, data, title, xlabel, yLabel,
-        type, tension, pointRadius, pointHoverRadius, 
-        backgroundColor, borderColor, pointBackgroundColor, 
+        type, tension, pointRadius, pointHoverRadius,
+        backgroundColor, borderColor, pointBackgroundColor,
         pointBorderColor, pointHoverBackgroundColor, pointHoverBorderColor) {
         this.setupCanvasStyle(ctx.canvas);
 
@@ -21,12 +21,12 @@ class ChartManager {
                     tension: tension || 0.4,
                     pointRadius: pointRadius || 3,
                     pointHoverRadius: pointHoverRadius || 5,
-                    backgroundColor: backgroundColor || 'rgba(75, 192, 192, 0.3)',
-                    borderColor: borderColor || 'rgba(75, 192, 192, 1)',
-                    pointBackgroundColor: pointBackgroundColor || 'rgba(75, 192, 192, 1)', // Match point color with border color
-                    pointBorderColor: pointBorderColor || 'rgba(75, 192, 192, 1)',
-                    pointHoverBackgroundColor: pointHoverBackgroundColor || 'rgba(75, 192, 192, 1)',
-                    pointHoverBorderColor: pointHoverBorderColor || 'rgba(75, 192, 192, 1)', // Match hover border color with dataset border color
+                    backgroundColor: backgroundColor,
+                    borderColor: borderColor,
+                    pointBackgroundColor: pointBackgroundColor,
+                    pointBorderColor: pointBorderColor,
+                    pointHoverBackgroundColor: pointHoverBackgroundColor,
+                    pointHoverBorderColor: pointHoverBorderColor,
                 })),
             },
             options: this.getChartOptions(title, xlabel, yLabel),
@@ -179,11 +179,11 @@ function fetchDataAndRenderCharts(chartConfigurations) {
 // Function to create charts dynamically
 function createChartContainer(chartConfig) {
     const container = document.getElementById('chartsContainer');
-    
+
     // Create a new div for each chart
     const chartDiv = document.createElement('div');
     chartDiv.className = 'chart-container'; // Optional: add styles for better layout
-    
+
     // Create a canvas element
     const canvas = document.createElement('canvas');
     canvas.className = 'graph';
@@ -191,7 +191,7 @@ function createChartContainer(chartConfig) {
 
     // Append canvas to the div
     chartDiv.appendChild(canvas);
-    
+
     // Append the div to the charts container
     container.appendChild(chartDiv);
 }
@@ -204,16 +204,14 @@ function createCharts(data, chartConfigurations) {
 
     chartConfigurations.forEach(config => {
         createChartContainer(config); // Create a container for each chart
-        
+
         const ctx = document.getElementById(config.metric_name).getContext('2d');
         const chartData = prepareChartData(data, config.label);
-        
+
         chartManager.destroyChart(config.label); // Ensure we destroy existing chart before creating a new one
-        
+
         chartManager.createChart(ctx, config.label, chartData, config.title, config.xlabel, config.ylabel,
-            config.type, config.tension, config.pointRadius, config.pointHoverRadius,
-            config.backgroundColor, config.borderColor, config.pointBackgroundColor,
-            config.pointBorderColor, config.pointHoverBackgroundColor, config.pointHoverBorderColor);
+            config.chart_type, config.tension, config.point_radius, config.point_hover_radius);
     });
 }
 

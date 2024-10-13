@@ -9,7 +9,7 @@ from src.models import ChartConfiguration
 graphs_bp = blueprints.Blueprint("graphs", __name__)
 
 @app.route('/historical_system_metrics')
-@admin_required
+@login_required
 def historical_system_metrics():
     return render_template('graphs/historical_system_metrics.html')
 
@@ -21,13 +21,13 @@ def historical_alerts_metrics():
 
 
 @app.route('/experimental_system_metrics')
-@admin_required
+@login_required
 def historical_system_metrics_():
     return render_template('graphs/experimental_system_metrics.html')
 
 def get_form_value(key, default):
     value = request.form.get(key, default)
-    return value if value else default
+    return value if value.strip() else default
 
 @app.route('/chart_configurations', methods=['GET', 'POST'])
 @login_required
@@ -43,14 +43,14 @@ def chart_configurations():
                 config.title = request.form['title']
                 config.xlabel = request.form['xlabel']
                 config.ylabel = request.form['ylabel']
-                config.tension = request.form.get('tension', 0.4)
-                config.point_radius = request.form.get('point_radius', 0)
-                config.point_hover_radius = request.form.get('point_hover_radius', 6)
-                config.point_border_color = request.form.get('point_border_color', '#fff')
-                config.point_hover_background_color = request.form.get('point_hover_background_color', '#fff')
-                config.point_hover_border_color = request.form.get('point_hover_border_color', 'rgba(75, 192, 192, 1)')
+                config.chart_type = request.form.get('chart_type', 'line')
+                config.tension = get_form_value('tension', 0.4)
+                config.point_radius = get_form_value('point_radius', 0)
+                config.point_hover_radius = get_form_value('point_hover_radius', 6)
+
+                print("request.form.get('chart_type', 'bar')", request.form.get('chart_type', 'bar'))
                 
-                db.session.commit()
+                config.save()
                 return redirect(url_for('chart_configurations'))
         else:  # Creating a new configuration
             new_config = ChartConfiguration(
@@ -60,13 +60,12 @@ def chart_configurations():
                 title=request.form['title'],
                 xlabel=request.form['xlabel'],
                 ylabel=request.form['ylabel'],
+                chart_type = request.form.get('chart_type', 'bar'),
                 tension=request.form.get('tension', 0.4),
                 point_radius=request.form.get('point_radius', 0),
                 point_hover_radius=request.form.get('point_hover_radius', 6),
-                point_border_color=request.form.get('point_border_color', '#fff'),
-                point_hover_background_color=request.form.get('point_hover_background_color', '#fff'),
-                point_hover_border_color=request.form.get('point_hover_border_color', 'rgba(75, 192, 192, 1)')
             )
+            
             new_config.save()
             return redirect(url_for('chart_configurations'))
 

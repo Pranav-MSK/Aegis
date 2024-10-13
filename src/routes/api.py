@@ -3,7 +3,7 @@ import requests
 import asyncio
 import aiohttp
 from datetime import datetime, timezone
-from flask import jsonify, blueprints, request
+from flask import jsonify, blueprints, request, render_template
 from flask_login import login_required, current_user
 from flask_compress import Compress
 from src.config import app, db
@@ -348,20 +348,6 @@ def alert_history_api():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# @app.route('/api/v1/chart-configurations')
-# def get_chart_configurations():
-#     chart_configurations = [
-#         { 'id': 'cpuTimeChart', 'label': 'CPU Usage (%)',  'title': 'CPU Usage', 'xlabel': 'Time', 'yLabel': 'CPU Usage (%)', 'type': 'line', 'tension': 0.4, 'pointRadius': 0, 'pointHoverRadius': 6 , 'pointBorderColor': '#fff', 'pointHoverBackgroundColor': '#fff', 'pointHoverBorderColor': 'rgba(75, 192, 192, 1)' },
-#         { 'id': 'memoryTimeChart', 'label': 'Memory Usage (%)', 'title': 'Memory Usage', 'xlabel': 'Time', 'yLabel': 'Memory Usage (%)', 'type': 'line', 'tension': 0.4, 'pointRadius': 0, 'pointHoverRadius': 6 , 'pointBorderColor': '#fff', 'pointHoverBackgroundColor': '#fff', 'pointHoverBorderColor': 'rgba(75, 192, 192, 1)' },
-#         { 'id': 'batteryTimeChart', 'label': 'Power Usage (%)', 'title': 'Power Usage', 'xlabel': 'Time', 'yLabel': 'Power Usage (%)', 'type': 'line', 'tension': 0.4, 'pointRadius': 0, 'pointHoverRadius': 6 , 'pointBorderColor': '#fff', 'pointHoverBackgroundColor': '#fff', 'pointHoverBorderColor': 'rgba(75, 192, 192, 1)' },
-#         { 'id': 'networkTimeChart', 'label': 'Data Transferred (MB)', 'title': 'Data Transferred', 'xlabel': 'Time', 'yLabel': 'Data Transferred (MB)', 'type': 'line', 'tension': 0.4, 'pointRadius': 0, 'pointHoverRadius': 6 , 'pointBorderColor': '#fff', 'pointHoverBackgroundColor': '#fff', 'pointHoverBorderColor': 'rgba(75, 192, 192, 1)' },
-#         { 'id': 'dashboardMemoryTimeChart', 'label': 'Dashboard Memory Usage', 'title': 'Dashboard Memory Usage', 'xlabel': 'Time', 'yLabel': 'Memory Usage (%)', 'type': 'line', 'tension': 0.4, 'pointRadius': 0, 'pointHoverRadius': 6 , 'pointBorderColor': '#fff', 'pointHoverBackgroundColor': '#fff', 'pointHoverBorderColor': 'rgba(75, 192, 192, 1)' },
-#         { 'id': 'cpuFrequencyTimeChart', 'label': 'CPU Frequency (GHz)', 'title': 'CPU Frequency', 'xlabel': 'Time', 'yLabel': 'CPU Frequency (GHz)', 'type': 'line', 'tension': 0.4, 'pointRadius': 0, 'pointHoverRadius': 6 , 'pointBorderColor': '#fff', 'pointHoverBackgroundColor': '#fff', 'pointHoverBorderColor': 'rgba(75, 192, 192, 1)' },
-#         { 'id': 'currentTempTimeChart', 'label': 'Current Temperature (°C)', 'title': 'Current Temperature', 'xlabel': 'Time', 'yLabel': 'Temperature (°C)', 'type': 'line', 'tension': 0.4, 'pointRadius': 0, 'pointHoverRadius': 6 , 'pointBorderColor': '#fff', 'pointHoverBackgroundColor': '#fff', 'pointHoverBorderColor': 'rgba(75, 192, 192, 1)' },
-#     ]
-#     return jsonify(chart_configurations)
-
-
 @app.route('/api/v1/chart-configurations')
 def get_chart_configurations():
     
@@ -372,3 +358,9 @@ def get_chart_configurations():
 
     chart_configurations = ChartConfiguration.query.filter_by(user_id=user_id).all()
     return jsonify([config.serialize() for config in chart_configurations])
+
+@app.route('/api/v1/labels', methods=['GET'])
+def labels():
+    response = requests.get("http://localhost:9090/api/v1/label/__name__/values")
+    data = response.json().get("data", [])
+    return render_template('graphs/labels.html', labels=data)

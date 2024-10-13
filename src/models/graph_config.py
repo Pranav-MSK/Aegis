@@ -23,6 +23,8 @@ class ChartConfiguration(BaseModel):
     point_border_color = db.Column(db.String(50), nullable=True, default='#fff')
     point_hover_background_color = db.Column(db.String(50), nullable=True, default='#fff')
     point_hover_border_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 1)')
+    background_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 0.2)') # Background color for the data
+    point_background_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 1)') # Background color for the data
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -45,6 +47,8 @@ class ChartConfiguration(BaseModel):
             'point_border_color': self.point_border_color,
             'point_hover_background_color': self.point_hover_background_color,
             'point_hover_border_color': self.point_hover_border_color,
+            'background_color': self.background_color,
+            'point_background_color': self.point_background_color,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
         }
