@@ -1,0 +1,99 @@
+{% extends 'base/base.html' %}
+{% block title %}Chart Configurations{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chart_configurations.css') }}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Chart Configurations</h1>
+    {% include 'ext/message.html' %}
+    <form id="chartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="metric_name" placeholder="Metric Name" required>
+        <input type="text" name="label" placeholder="Label" required>
+        <input type="text" name="title" placeholder="Title" required>
+        <input type="text" name="xlabel" placeholder="X-Axis Label" required>
+        <input type="text" name="ylabel" placeholder="Y-Axis Label" required>
+
+        <button type="button" id="toggleOptionalFields"><i class="fas fa-cog"></i> Optional Fields</button>
+        <div id="optionalFields" class="optional-fields" style="display: none;">
+            <input type="text" name="tension" placeholder="Tension (default: 0.4)">
+            <input type="number" name="point_radius" placeholder="Point Radius (default: 0)">
+            <input type="number" name="point_hover_radius" placeholder="Point Hover Radius (default: 6)">
+            <input type="text" name="point_border_color" placeholder="Point Border Color (default: #fff)">
+            <input type="text" name="point_hover_background_color"
+                placeholder="Point Hover Background Color (default: #fff)">
+            <input type="text" name="point_hover_border_color"
+                placeholder="Point Hover Border Color (default: rgba(75, 192, 192, 1))">
+        </div>
+
+        <select name="chart_type">
+            <option value="line">Line</option>
+            <option value="bar">Bar</option>
+        </select>
+
+        <button type="submit"><i class="fas fa-plus"></i> Add Configuration</button>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Metric Name</th>
+                <th>Label</th>
+                <th>Title</th>
+                <th>X-Axis</th>
+                <th>Y-Axis</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for config in configs %}
+            <tr>
+                <td>{{ config.id }}</td>
+                <td>{{ config.metric_name }}</td>
+                <td>{{ config.label }}</td>
+                <td>{{ config.title }}</td>
+                <td>{{ config.xlabel }}</td>
+                <td>{{ config.ylabel }}</td>
+                <td>
+                    <button class="btn-delete" data-id="{{ config.id }}"><i class="fas fa-trash"></i> Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.querySelectorAll('.btn-delete').forEach(button => {
+        button.addEventListener('click', function () {
+            const id = this.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this configuration?')) {
+                fetch(`/chart_configurations/${id}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            return response.json().then(err => {
+                                alert('Error deleting configuration: ' + err.message);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while trying to delete the configuration.');
+                    });
+            }
+        });
+    });
+
+
+
+    document.getElementById('toggleOptionalFields').addEventListener('click', function () {
+        const optionalFields = document.getElementById('optionalFields');
+        optionalFields.style.display = optionalFields.style.display === 'none' ? 'block' : 'none';
+    });
+</script>
+{% endblock %}
