@@ -206,7 +206,7 @@ function createCharts(data, chartConfigurations) {
         createChartContainer(config); // Create a container for each chart
 
         const ctx = document.getElementById(config.metric_name).getContext('2d');
-        const chartData = prepareChartData(data, config.label);
+        const chartData = prepareChartData(data, config.metric_name);
 
         chartManager.destroyChart(config.label); // Ensure we destroy existing chart before creating a new one
 
@@ -218,34 +218,7 @@ function createCharts(data, chartConfigurations) {
 // Prepare chart data based on the fetched data
 function prepareChartData(data, label) {
     let datasets;
-
-    switch (label) {
-        case 'CPU Usage (%)':
-            datasets = prepareDatasets(data.cpu);
-            break;
-        case 'Memory Usage (%)':
-            datasets = prepareDatasets(data.memory);
-            break;
-        case 'Power Usage (%)':
-            datasets = prepareDatasets(data.battery);
-            break;
-        case 'Data Transferred (MB)':
-            datasets = prepareDatasets([...data.network_sent, ...data.network_received]);
-            break;
-        case 'Dashboard Memory Usage':
-            datasets = prepareDatasets(data.dashboard_memory_usage);
-            break;
-        case 'CPU Frequency (GHz)':
-            datasets = prepareDatasets(data.cpu_frequency);
-            break;
-        case 'Current Temperature (°C)':
-            datasets = prepareDatasets(data.current_temp);
-            break;
-        default:
-            datasets = [];
-            break;
-    }
-
+    datasets = prepareDatasets(data[label]);
     return {
         labels: data.time.map(t => formatDate(t, Intl.DateTimeFormat().resolvedOptions().timeZone)),
         datasets,

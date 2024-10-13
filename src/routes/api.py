@@ -26,16 +26,7 @@ PROMETHEUS_BASE_URL = "http://localhost:9090"
 QUERY_API_URL = f'{PROMETHEUS_BASE_URL}/api/v1/query_range'
 TARGETS_API_URL = f'{PROMETHEUS_BASE_URL}/api/v1/targets'
 
-PROMETHEUS_METRICS = {
-    'cpu': 'cpu_usage_percentage',  # Adjusting to match the defined gauge
-    'memory': 'memory_usage_percentage',
-    'battery': 'battery_percentage',
-    'network_sent': 'network_bytes_sent',
-    'network_received': 'network_bytes_received',
-    'dashboard_memory_usage': 'dashboard_memory_usage_percentage',
-    'cpu_frequency': 'cpu_frequency',
-    'current_temp': 'cpu_temperature',
-}
+
 
 @app.route("/api/v1/system-info", methods=["GET"])
 @login_required
@@ -73,6 +64,8 @@ def set_cached_data(cache_key, data, timeout=60):
 @login_required
 def graph_data_api():
     try:
+        PROMETHEUS_METRICS = ChartConfiguration.query.with_entities(ChartConfiguration.metric_name).filter_by(user_id=current_user.id).all()
+        PROMETHEUS_METRICS = [metric.metric_name for metric in PROMETHEUS_METRICS]
         # Initialize lists for the data
         time_data = []
         metric_data = {}
@@ -129,10 +122,10 @@ def graph_data_api():
             return jsonify(cached_data), 200
 
         # Fetch all metrics asynchronously
-        results = asyncio.run(fetch_all_metrics(PROMETHEUS_METRICS.values(), start_time, end_time, step))
+        results = asyncio.run(fetch_all_metrics(PROMETHEUS_METRICS, start_time, end_time, step))
 
         # Process the results and populate time_data and metric_data
-        for idx, metric in enumerate(PROMETHEUS_METRICS.keys()):
+        for idx, metric in enumerate(PROMETHEUS_METRICS):
             result = results[idx].get('data', {}).get('result', [])
             if result:
                 metric_data[metric] = []

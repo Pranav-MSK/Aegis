@@ -1,6 +1,6 @@
 [
     {
-        "metric_name": "cpuTimeChart",
+        "metric_name": "cpu_usage_percentage",
         "label": "CPU Usage (%)",
         "title": "CPU Usage",
         "xlabel": "Time",
@@ -16,7 +16,7 @@
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
     },
     {
-        "metric_name": "memoryTimeChart",
+        "metric_name": "memory_usage_percentage",
         "label": "Memory Usage (%)",
         "title": "Memory Usage",
         "xlabel": "Time",
@@ -32,7 +32,7 @@
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
     },
     {
-        "metric_name": "batteryTimeChart",
+        "metric_name": "battery_percentage",
         "label": "Power Usage (%)",
         "title": "Power Usage",
         "xlabel": "Time",
@@ -48,7 +48,7 @@
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
     },
     {
-        "metric_name": "networkTimeChart",
+        "metric_name": "network_bytes_received",
         "label": "Data Transferred (MB)",
         "title": "Data Transferred",
         "xlabel": "Time",
@@ -64,7 +64,7 @@
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
     },
     {
-        "metric_name": "dashboardMemoryTimeChart",
+        "metric_name": "dashboard_memory_usage_percentage",
         "label": "Dashboard Memory Usage",
         "title": "Dashboard Memory Usage",
         "xlabel": "Time",
@@ -80,7 +80,7 @@
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
     },
     {
-        "metric_name": "cpuFrequencyTimeChart",
+        "metric_name": "cpu_frequency",
         "label": "CPU Frequency (GHz)",
         "title": "CPU Frequency",
         "xlabel": "Time",
@@ -96,7 +96,7 @@
         "point_hover_border_color": "rgba(75, 192, 192, 1)"
     },
     {
-        "metric_name": "currentTempTimeChart",
+        "metric_name": "cpu_temperature",
         "label": "Current Temperature (°C)",
         "title": "Current Temperature",
         "xlabel": "Time",
