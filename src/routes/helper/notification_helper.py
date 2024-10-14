@@ -14,7 +14,7 @@ from src.alert_manager import (
     send_teams_alert,
     send_google_chat_alert,
 )
-from src.models import NotificationSettings, AlertTicket, UserProfile
+from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 
@@ -86,6 +86,7 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
             "status": 500,
         }
 
+
 def process_alert(alert):
     """
     Handles an individual alert by extracting necessary details and
@@ -132,6 +133,13 @@ def save_alert_data(alert_name, alert_status, instance, severity,
         if existing_alert and existing_alert.alert_status == "firing" and alert_status == "resolved":
             existing_alert.alert_status = alert_status
             existing_alert.updated_at = datetime.utcnow()
+            # also log 
+            log_message = f"Alert with fingerprint {fingerprint} updated to resolved status."
+            alert_log = AlertLog(
+                alert_ticket_id=existing_alert.id,
+                log=log_message
+            )
+            alert_log.save()
             existing_alert.save()
             logger.info(f"Alert with fingerprint {fingerprint} updated to resolved status.")
             return 
