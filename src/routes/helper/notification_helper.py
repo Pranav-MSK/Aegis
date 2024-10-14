@@ -134,14 +134,14 @@ def save_alert_data(alert_name, alert_status, instance, severity,
             existing_alert.alert_status = alert_status
             existing_alert.updated_at = datetime.utcnow()
             # also log 
-            log_message = f"Alert with fingerprint {fingerprint} updated to resolved status."
+            log_message = f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
             alert_log = AlertLog(
                 alert_ticket_id=existing_alert.id,
                 log=log_message
             )
             alert_log.save()
             existing_alert.save()
-            logger.info(f"Alert with fingerprint {fingerprint} updated to resolved status.")
+            logger.info(f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve).")
             return 
         elif existing_alert and existing_alert.alert_status == "resolved" and alert_status == "firing":
             logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")

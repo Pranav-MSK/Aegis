@@ -315,8 +315,117 @@ def alert_ticket(alert_id):
             log_and_save(log_message)
             alert.save()
             return redirect(url_for("alert_ticket", alert_id=alert.id))
+            
+        # ticket status
+        # <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+        #         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        #         <input type="hidden" name="form_type" value="resolve_ticket">
+        #         <input type="hidden" name="ticket_status" value="Resolved">
+        #         <input type="hidden" name="investigation_notes" value="Marking the ticket as resolved.">
+        #         <button type="submit" class="btn btn-success">Mark as Resolved</button>
+        #     </form>
+        
+        elif form_type in ["close_ticket", "reopen_ticket", "progress_ticket", "resolve_ticket"]:
+            if form_type == "close_ticket":
+                alert.ticket_status = "Closed"
+                alert.assigned_user_id = current_user.id
+                note_content = request.form.get("investigation_notes")
+                if note_content:
+                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    log_message = f"Ticket closed as 'Resolved' by {current_user.username}"
+                    flash("Ticket closed successfully!", "success")
+                else:
+                    flash("Note cannot be empty!", "error")
+            elif form_type == "reopen_ticket":
+                alert.ticket_status = "Open"
+                note_content = request.form.get("investigation_notes")
+                if note_content:
+                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    log_message = f"Ticket reopened for further investigation by {current_user.username}"
+                    flash("Ticket reopened successfully!", "success")
+                else:
+                    flash("Note cannot be empty!", "error")
 
-        # Save changes
+            elif form_type == "progress_ticket":
+                alert.ticket_status = "In Progress"
+                note_content = request.form.get("investigation_notes")
+                if note_content:
+                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    log_message = f"Ticket marked as 'In Progress' by {current_user.username}"
+                    flash("Ticket marked as in progress successfully!", "success")
+                else:
+                    flash("Note cannot be empty!", "error")
+            
+            elif form_type == "resolve_ticket":
+                alert.ticket_status = "Resolved"
+                note_content = request.form.get("investigation_notes")
+                if note_content:
+                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    log_message = f"Ticket marked as 'Resolved' by {current_user.username}"
+                    flash("Ticket marked as resolved successfully!", "success")
+                else:
+                    flash("Note cannot be empty!", "error")
+
+            
+            log_and_save(log_message)
+            alert.save()
+            return redirect(url_for("alert_ticket", alert_id=alert.id))
+        
+        elif form_type in ["warning_ticket", "info_ticket", "critical_ticket"]:
+            if form_type == "critical_ticket":
+                alert.severity = "critical"
+                note_content = request.form.get("investigation_notes")
+                if note_content:
+                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    log_message = f"Ticket marked as 'Critical Severity' by {current_user.username}"
+                    flash("Ticket marked as critical severity successfully!", "success")
+                else:
+                    flash("Note cannot be empty!", "error")
+
+            elif form_type == "warning_ticket":
+                alert.severity = "warning"
+                note_content = request.form.get("investigation_notes")
+                if note_content:
+                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    log_message = f"Ticket marked as 'Warning Severity' by {current_user.username}"
+                    flash("Ticket marked as warning severity successfully!", "success")
+                else:
+                    flash("Note cannot be empty!", "error")
+
+            elif form_type == "info_ticket":
+                alert.severity = "info"
+                note_content = request.form.get("investigation_notes")
+                if note_content:
+                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    log_message = f"Ticket marked as 'Info Severity' by {current_user.username}"
+                    flash("Ticket marked as info severity successfully!", "success")
+                else:
+                    flash("Note cannot be empty!", "error")
+
+            log_and_save(log_message)
+            alert.save()
+            return redirect(url_for("alert_ticket", alert_id=alert.id))
+      
+        elif form_type in ["assign_me", "assign_user"]:
+            if form_type == "assign_me":
+                assigned_user_id = request.form.get("assigned_user_id")
+                if assigned_user_id:
+                    alert.assigned_user_id = assigned_user_id
+                    log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
+                    flash("User assigned successfully!", "success")
+                else:
+                    flash("User not found!", "error")
+            
+            elif form_type == "assign_user":
+                # assign some user based on load balancer and other factors
+                pass
+
+
+            log_and_save(log_message)
+            alert.save()
+            return redirect(url_for("alert_ticket", alert_id=alert.id))
+        
+
         alert.save()
         flash("Changes saved successfully!", "success")
         return redirect(url_for("alert_ticket", alert_id=alert.id))

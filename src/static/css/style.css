@@ -44,6 +44,7 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+    background-color: #e0f7fa; /* Light and soft background color */
 }
 
 .content {
@@ -133,10 +134,7 @@ body {
     }
 }
 
-/* Button Styles */
-.btn-primary {
-    margin-top: 1rem;
-}
+
 
 /* Icon Sizes */
 .fas {
