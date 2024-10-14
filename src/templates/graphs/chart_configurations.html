@@ -8,6 +8,8 @@
 <h1>Chart Configurations</h1>
 {% include 'ext/message.html' %}
 
+<button id="addConfigBtn" class="btn btn-primary">Add New Configuration</button>
+
 <div class="row">
     {% for config in configs %}
     <div class="col-md-4">
@@ -45,7 +47,7 @@
 <!-- Modal for Editing Chart Configuration -->
 <div class="modal" id="editModal">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <span class="close" onclick="document.getElementById('editModal').style.display='none'">&times;</span>
         <h2>Edit Chart Configuration</h2>
         <form id="chartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -71,17 +73,17 @@
                 <input type="text" name="ylabel" required id="ylabel" placeholder="Y-Axis Label">
             </div>
 
-            <div class="form-group ">
+            <div class="form-group">
                 <label for="tension">Tension (default: 0.4)</label>
                 <input type="text" name="tension" id="tension" placeholder="Tension">
             </div>
 
-            <div class="form-group ">
+            <div class="form-group">
                 <label for="pointRadius">Point Radius (default: 0)</label>
                 <input type="number" name="point_radius" id="pointRadius" placeholder="Point Radius">
             </div>
 
-            <div class="form-group ">
+            <div class="form-group">
                 <label for="pointHoverRadius">Point Hover Radius (default: 6)</label>
                 <input type="number" name="point_hover_radius" id="pointHoverRadius" placeholder="Point Hover Radius">
             </div>
@@ -99,7 +101,67 @@
     </div>
 </div>
 
+<!-- Modal for Adding New Chart Configuration -->
+<div class="modal" id="addModal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('addModal').style.display='none'">&times;</span>
+        <h2>Add New Chart Configuration</h2>
+        <form id="newChartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label for="newMetricName">Metric Name</label>
+                <input type="text" name="metric_name" required id="newMetricName" placeholder="Metric Name">
+            </div>
+
+            <div class="form-group">
+                <label for="newTitle">Title</label>
+                <input type="text" name="title" required id="newTitle" placeholder="Title">
+            </div>
+
+            <div class="form-group">
+                <label for="newXlabel">X-Axis Label</label>
+                <input type="text" name="xlabel" required id="newXlabel" placeholder="X-Axis Label">
+            </div>
+
+            <div class="form-group">
+                <label for="newYlabel">Y-Axis Label</label>
+                <input type="text" name="ylabel" required id="newYlabel" placeholder="Y-Axis Label">
+            </div>
+
+            <div class="form-group">
+                <label for="newTension">Tension (default: 0.4)</label>
+                <input type="text" name="tension" id="newTension" placeholder="Tension">
+            </div>
+
+            <div class="form-group">
+                <label for="newPointRadius">Point Radius (default: 0)</label>
+                <input type="number" name="point_radius" id="newPointRadius" placeholder="Point Radius">
+            </div>
+
+            <div class="form-group">
+                <label for="newPointHoverRadius">Point Hover Radius (default: 6)</label>
+                <input type="number" name="point_hover_radius" id="newPointHoverRadius" placeholder="Point Hover Radius">
+            </div>
+
+            <div class="form-group">
+                <label for="newChartType">Chart Type</label>
+                <select name="chart_type" id="newChartType">
+                    <option value="line">Line</option>
+                    <option value="bar">Bar</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Create Configuration</button>
+        </form>
+    </div>
+</div>
+
 <script>
+    document.getElementById('addConfigBtn').addEventListener('click', function () {
+        document.getElementById('addModal').style.display = 'block';
+    });
+
     document.querySelectorAll('.btn-delete').forEach(button => {
         button.addEventListener('click', function () {
             const id = this.getAttribute('data-id');
