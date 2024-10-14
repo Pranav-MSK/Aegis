@@ -286,3 +286,11 @@ button i.fas {
     align-items: center;
     margin-top: 20px;
 }
+
+.chart-heading {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333; /* Improved color for better visibility */
+    margin-left: 50px;
+}

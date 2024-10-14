@@ -109,7 +109,6 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                         new_chart_config = ChartConfiguration(
                             user_id=user.id,
                             metric_name=config['metric_name'],
-                            label=config['label'],
                             title=config['title'],
                             xlabel=config['xlabel'],
                             ylabel=config['ylabel'],

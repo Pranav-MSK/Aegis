@@ -4,47 +4,51 @@ class ChartManager {
         this.charts = {};
     }
 
-    createChart(ctx, label, data, title, xlabel, yLabel,
-        type, tension, pointRadius, pointHoverRadius,
-        backgroundColor, borderColor, pointBackgroundColor,
-        pointBorderColor, pointHoverBackgroundColor, pointHoverBorderColor) {
+    createChart(ctx, data, title, xlabel, yLabel,
+        type, tension, pointRadius, pointHoverRadius) {
         this.setupCanvasStyle(ctx.canvas);
 
         const chart = new Chart(ctx, {
             type: type || 'line',
             data: {
                 labels: data.labels,
-                datasets: data.datasets.map(dataset => ({
-                    ...dataset,
-                    borderWidth: 2,
-                    fill: true,
-                    tension: tension || 0.4,
-                    pointRadius: pointRadius,
-                    pointHoverRadius: pointHoverRadius || 5,
-                    backgroundColor: backgroundColor,
-                    borderColor: borderColor,
-                    pointBackgroundColor: pointBackgroundColor,
-                    pointBorderColor: pointBorderColor,
-                    pointHoverBackgroundColor: pointHoverBackgroundColor,
-                    pointHoverBorderColor: pointHoverBorderColor,
-                })),
+                datasets: data.datasets.map((dataset, index) => {
+                    const { backgroundColor, borderColor, pointBackgroundColor, pointBorderColor,
+                        pointHoverBackgroundColor, pointHoverBorderColor
+
+                    } = generateColor(index);
+                    return {
+                        ...dataset,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: tension,
+                        pointRadius: pointRadius,
+                        pointHoverRadius: pointHoverRadius || 5,
+                        backgroundColor: backgroundColor,
+                        borderColor: borderColor,
+                        pointBackgroundColor: pointBackgroundColor,
+                        pointBorderColor: pointBorderColor,
+                        pointHoverBackgroundColor: pointHoverBackgroundColor,
+                        pointHoverBorderColor: pointHoverBorderColor,
+                    };
+                }),
             },
             options: this.getChartOptions(title, xlabel, yLabel),
         });
 
-        this.charts[label] = chart;
+        this.charts[title] = chart;
         return chart;
     }
 
-    destroyChart(label) {
-        if (this.charts[label]) {
-            this.charts[label].destroy();
-            delete this.charts[label];
+    destroyChart(title) {
+        if (this.charts[title]) {
+            this.charts[title].destroy();
+            delete this.charts[title];
         }
     }
 
     setupCanvasStyle(canvas) {
-        canvas.height = "500px";
+        canvas.height = "400px";
         canvas.style.padding = "20px";
         canvas.style.margin = "30px";
         canvas.style.border = "1px solid #ccc";
@@ -144,6 +148,15 @@ class ChartManager {
                 },
                 legend: {
                     display: true  // Keep the legend hidden to avoid clutter
+                },
+                title: {
+                    display: true,
+                    text: title,
+                    font: {
+                        size: 20,
+                        weight: 'bold',
+                        color: '#333' // Improved color for better visibility
+                    }
                 }
             }
         };
@@ -178,33 +191,30 @@ function fetchDataAndRenderCharts(chartConfigurations) {
 
 // Function to create charts dynamically
 function createChartContainer(chartConfig) {
+
     const container = document.getElementById('chartsContainer');
 
     // Create a new div for each chart
     const chartDiv = document.createElement('div');
     chartDiv.className = 'chart-container'; // Optional: add styles for better layout
 
+    // Create a heading element
+    const heading = document.createElement('h3');
+    heading.textContent = chartConfig.title; // Use the chart title for the heading
+    heading.className = 'chart-heading'; // Optional: add styles for the heading
+
     // Create a canvas element
     const canvas = document.createElement('canvas');
     canvas.className = 'graph';
     canvas.id = chartConfig.metric_name; // Use the metric name for the canvas ID
 
-    // Append canvas to the div
+    // Append heading and canvas to the div
+    chartDiv.appendChild(heading);
     chartDiv.appendChild(canvas);
 
     // Append the div to the charts container
     container.appendChild(chartDiv);
 }
-
-// point_radius = db.Column(db.Integer, nullable=True, default=0)
-// point_hover_radius = db.Column(db.Integer, nullable=True, default=6)
-// point_border_color = db.Column(db.String(50), nullable=True, default='#fff')
-// point_hover_background_color = db.Column(db.String(50), nullable=True, default='#fff')
-// point_hover_border_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 1)')
-// background_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 0.2)') # Background color for the data
-// point_background_color = db.Column(db.String(50), nullable=True, default='rgba(75, 192, 192, 1)') # Background color for the data
-// created_at = db.Column(db.DateTime, default=datetime.utcnow)
-// updated_at = db.C
 
 // Function to create charts with the fetched data
 function createCharts(data, chartConfigurations) {
@@ -213,24 +223,27 @@ function createCharts(data, chartConfigurations) {
     container.innerHTML = ''; // Clear the charts container
 
     chartConfigurations.forEach(config => {
-        createChartContainer(config); // Create a container for each chart
+        // Check if the chart is active
+        if (config.is_active) {
+            createChartContainer(config); // Create a container for each active chart
 
-        const ctx = document.getElementById(config.metric_name).getContext('2d');
-        const chartData = prepareChartData(data, config.metric_name);
+            const ctx = document.getElementById(config.metric_name).getContext('2d');
+            const chartData = prepareChartData(data, config.metric_name);
 
-        chartManager.destroyChart(config.label); // Ensure we destroy existing chart before creating a new one
+            chartManager.destroyChart(config.title); // Ensure we destroy existing chart before creating a new one
 
-        chartManager.createChart(ctx, config.label, chartData, config.title, config.xlabel, config.ylabel,
-            config.chart_type, config.tension, config.point_radius, config.point_hover_radius
+            chartManager.createChart(ctx, chartData, config.title, config.xlabel, config.ylabel,
+                config.chart_type, config.tension, config.point_radius, config.point_hover_radius
             );
-            
+        }
     });
 }
 
+
 // Prepare chart data based on the fetched data
-function prepareChartData(data, label) {
+function prepareChartData(data, metricName) {
     let datasets;
-    datasets = prepareDatasets(data[label]);
+    datasets = prepareDatasets(data[metricName]);
     return {
         labels: data.time.map(t => formatDate(t, Intl.DateTimeFormat().resolvedOptions().timeZone)),
         datasets,
@@ -246,17 +259,24 @@ function prepareDatasets(data) {
             data: item.values || item.data,
             borderColor: borderColor,
             backgroundColor: backgroundColor,
-            tension: 0.4,
         };
     });
 }
 
 // Generate color for datasets
 function generateColor(index) {
-    const hue = (index * 40) % 360;  // Adjust hue for unique colors
+    const baseHue = 100; // Base hue for blue colors
+    const hue = (baseHue + (index * 30)) % 360;  // Adjust hue for unique colors
+    const lightness = 50 + (index * 5) % 50; // Vary lightness for more distinction
+    const saturation = 70 + (index * 5) % 30; // Vary saturation for more distinction
+
     return {
-        borderColor: `hsl(${hue}, 40%, 50%)`,
-        backgroundColor: `hsla(${hue}, 40%, 50%, 0.3)`,
+        borderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
+        backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`, // Transparent background
+        pointBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
+        pointBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
+        pointHoverBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
+        pointHoverBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
     };
 }
 

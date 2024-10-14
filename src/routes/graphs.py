@@ -34,12 +34,12 @@ def get_form_value(key, default):
 def chart_configurations():
     if request.method == 'POST':
         config_id = request.form.get('config_id')
+        is_active = request.form.get('is_active') == 'on'
         
         if config_id:  # Editing an existing configuration
             config = ChartConfiguration.query.get(config_id)
             if config and config.user_id == current_user.id:
                 config.metric_name = request.form['metric_name']
-                config.label = request.form['label']
                 config.title = request.form['title']
                 config.xlabel = request.form['xlabel']
                 config.ylabel = request.form['ylabel']
@@ -47,16 +47,13 @@ def chart_configurations():
                 config.tension = get_form_value('tension', 0.4)
                 config.point_radius = get_form_value('point_radius', 0)
                 config.point_hover_radius = get_form_value('point_hover_radius', 6)
-
-                print("request.form.get('chart_type', 'bar')", request.form.get('chart_type', 'bar'))
-                
+                config.is_active = is_active
                 config.save()
                 return redirect(url_for('chart_configurations'))
         else:  # Creating a new configuration
             new_config = ChartConfiguration(
                 user_id=current_user.id,
                 metric_name=request.form['metric_name'],
-                label=request.form['label'],
                 title=request.form['title'],
                 xlabel=request.form['xlabel'],
                 ylabel=request.form['ylabel'],
@@ -64,6 +61,7 @@ def chart_configurations():
                 tension=request.form.get('tension', 0.4),
                 point_radius=request.form.get('point_radius', 0),
                 point_hover_radius=request.form.get('point_hover_radius', 6),
+                is_active=is_active
             )
             
             new_config.save()
@@ -89,3 +87,17 @@ def delete_chart_configuration(id):
             return jsonify({'message': 'Permission denied'}), 403
     else:
         return jsonify({'message': 'Configuration not found'}), 404
+
+
+@app.route('/chart_configurations/<int:id>/activate', methods=['POST'])
+@login_required
+def activate_chart_configuration(id):
+    config = ChartConfiguration.query.get(id)
+    if config and config.user_id == current_user.id:
+        data = request.get_json()
+        is_active = data.get('is_active')
+        config.is_active = is_active
+        config.save()  # Save the updated status to the database
+        return jsonify({'message': 'Configuration updated successfully'}), 200
+    else:
+        return jsonify({'message': 'Configuration not found or permission denied'}), 404

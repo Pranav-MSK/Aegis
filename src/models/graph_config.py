@@ -12,7 +12,6 @@ class ChartConfiguration(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     metric_name = db.Column(db.String(100), nullable=False)
-    label = db.Column(db.String(200), nullable=False)
     title = db.Column(db.String(200), nullable=False)
     xlabel = db.Column(db.String(100), nullable=False)
     ylabel = db.Column(db.String(100), nullable=False)
@@ -32,7 +31,6 @@ class ChartConfiguration(BaseModel):
             'id': self.id,
             'user_id': self.user_id,
             'metric_name': self.metric_name,
-            'label': self.label,
             'title': self.title,
             'xlabel': self.xlabel,
             'ylabel': self.ylabel,
@@ -40,6 +38,7 @@ class ChartConfiguration(BaseModel):
             'tension': self.tension,
             'point_radius': self.point_radius,
             'point_hover_radius': self.point_hover_radius,
+            'is_active': self.is_active,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
         }
