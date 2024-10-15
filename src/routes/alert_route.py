@@ -194,6 +194,7 @@ def alert_history():
         critical_count=critical_count,
         warning_count=warning_count,
         info_count=info_count,
+        current_user=current_user,
     )
 
 @app.route("/alerts/ticket/<int:alert_id>", methods=["GET", "POST"])

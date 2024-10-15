@@ -16,6 +16,7 @@
     {% include 'ext/message.html' %}
 
     <!-- Ticket Summary Table -->
+    {% if current_user.user_level == 'admin' %}
     <div class="row">
         <div class="col-md-6">
             <h3 class="text-info text-center">Ticket Summary</h3>
@@ -64,6 +65,7 @@
             </table>
         </div>
     </div>
+    {% endif %}
 
     <!-- Search Form -->
     <form class="form-inline mb-4" method="get" action="{{ url_for('alert_history') }}">
@@ -109,6 +111,7 @@
         </thead>
         <tbody>
             {% for alert in alerts.items|reverse if alert.assigned_user or alert_type == 'Unassigned' %}
+            {% if current_user.user_level == 'admin' or alert.assigned_user.id == current_user.id %}
             <tr class="table-{% if alert.severity == 'critical' %}danger{% else %}{{ alert.severity }}{% endif %}">
                 <td>{{ alert.alert_name }}</td>
                 <td>{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
@@ -125,6 +128,7 @@
                     </form>
                 </td>
             </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>

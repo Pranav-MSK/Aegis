@@ -5,6 +5,7 @@ import hashlib
 from datetime import datetime
 from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints
 from flask_login import login_required, current_user
+from src.models import AlertTicket
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from src.config import app, db
@@ -26,7 +27,22 @@ def view_profile():
     """
     user = current_user  # Get the currently logged-in user
     user.profile_picture_url = get_gravatar_url(user.email)
-    return render_template('users/view_profile.html', user=user)
+    user_assigned_tickets = AlertTicket.query.filter_by(assigned_user_id=user.id).all()
+    # show some statistics to the user for the tickets they have been assigned
+    # e.g., number of open tickets, number of resolved tickets, etc.
+    ticket_stats = {}
+    ticket_count = len(user_assigned_tickets)
+    open_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'Open'])
+    in_progress_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'In Progress'])
+    resolved_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'Resolved'])
+    closed_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'Closed'])
+    ticket_stats['total'] = ticket_count
+    ticket_stats['open'] = open_tickets
+    ticket_stats['in_progress'] = in_progress_tickets
+    ticket_stats['resolved'] = resolved_tickets
+    ticket_stats['closed'] = closed_tickets
+
+    return render_template('users/view_profile.html', user=user, ticket_stats=ticket_stats)
 
 def generate_random_password():
     """
