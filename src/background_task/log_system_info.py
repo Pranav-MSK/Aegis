@@ -32,7 +32,7 @@ def log_system_info():
             schedule_next_log(interval=fetch_system_info_interval)
 
         except Exception as e:
-            logger.error(f"Error during system info logging: {e}", exc_info=True)
+            logger.error(f"Error during system info logging: {e}")
             is_logging_scheduled = False
 
 
@@ -44,7 +44,7 @@ def is_logging_enabled():
         general_settings = GeneralSettings.query.first()
         return general_settings.is_logging_system_info if general_settings else False
     except SQLAlchemyError as e:
-        logger.error(f"Error fetching general settings: {e}", exc_info=True)
+        logger.error(f"Error fetching general settings: {e}")
         return False
 
 
@@ -69,10 +69,10 @@ def log_system_info_to_db():
             logger.info("System information logged to database.")
 
         except SQLAlchemyError as db_err:
-            logger.error(f"Database error while logging system info: {db_err}", exc_info=True)
+            logger.error(f"Database error while logging system info: {db_err}")
             db.session.rollback()
         except Exception as e:
-            logger.error(f"Failed to log system information: {e}", exc_info=True)
+            logger.error(f"Failed to log system information: {e}")
 
 
 def update_prometheus_metrics(system_info):
@@ -130,4 +130,4 @@ def monitor_settings():
             Timer(10, monitor_settings).start()
 
         except SQLAlchemyError as db_err:
-            logger.error(f"Error fetching settings: {db_err}", exc_info=True)
+            logger.error(f"Error fetching settings: {db_err}")

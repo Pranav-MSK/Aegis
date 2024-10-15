@@ -97,12 +97,12 @@ def ping_website(website):
 
         except requests.RequestException as req_err:
             updated_website.ping_status = "DOWN"
-            logger.error(f"Failed to ping {website.name}: {req_err}", exc_info=True)
+            logger.error(f"Failed to ping {website.name}: {req_err}")
             db.session.rollback()
 
         except SQLAlchemyError as db_err:
             logger.error(
-                f"Database commit error for {website.name}: {db_err}", exc_info=True
+                f"Database commit error for {website.name}: {db_err}"
             )
             db.session.rollback()
 
