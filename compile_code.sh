@@ -83,7 +83,7 @@ copy_files() {
     cp requirements.txt "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy requirements.txt"; exit 1; }
     cp app.py "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy app.py"; exit 1; }
     cp setup.sh "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy setup.sh"; exit 1; }
-    cp -r src/assets "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy assets"; exit 1; }
+    rsync -av --exclude='.initialized' src/assets "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy assets"; exit 1; }
     cp -r src/templates "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy templates"; exit 1; }
     cp -r src/static "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy static files"; exit 1; }
     cp -r src/scripts "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy scripts"; exit 1; }
@@ -98,9 +98,12 @@ cleanup() {
 
 # Main execution flow
 mkdir -p "$COMPILED_CODE_SOURCE_DIRECTORY"
+copy_files
 generate_c_files
 compile_c_files "$SOURCE_DIRECTORY"
-copy_files
 # cleanup
 
 echo "Build process completed successfully."
+
+# make zip file as systemguru.zip
+zip -r systemguru.zip compiled_code
