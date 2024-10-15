@@ -1,72 +1,100 @@
-{% extends "base/base.html" %}
+{% extends "base/base2.html" %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/view_profile.css') }}">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<div class="profile-container">
+{% include 'ext/message.html' %}
+<div class="container">
     <header class="profile-header">
-        <div class="profile-avatar">
+        <div class="profile-info">
             <img src="{{ user.profile_picture_url }}" alt="Profile Image" class="avatar">
+            <div class="user-details">
+                <h1>{{ user.first_name }} {{ user.last_name }}</h1>
+                <p>{{ user.email }}</p>
+                <p>@{{ user.username }}</p>
+            </div>
         </div>
-        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
-        <p class="profile-email">{{ user.email }}</p>
         <div class="quote" id="quote">Loading quote...</div>
     </header>
 
-    <section class="profile-details">
-        <h3>User Details</h3>
-        <div class="detail-item"><strong>Username:</strong> {{ user.username }}</div>
-        <div class="detail-item"><strong>User Level:</strong> {{ user.user_level }}</div>
-        <div class="detail-item"><strong>Email Alerts:</strong> {{ user.receive_email_alerts }}</div>
-        <div class="detail-item"><strong>Role:</strong> {{ user.profession }}</div>
-        <div class="detail-item"><strong>Last Updated:</strong> {{ user.last_updated.strftime('%Y-%m-%d %H:%M:%S') }}</div>
-        <div class="detail-item"><strong>Last Login:</strong> {% if user.last_login %}{{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}{% else %}N/A{% endif %}</div>
-        <div class="detail-item"><strong>Joined:</strong> {{ user.date_joined.strftime('%Y-%m-%d %H:%M:%S') }}</div>
-    </section>
+    <div class="profile-content">
+        <div class="main-content">
+            <section class="card user-details">
+                <h2>User Details</h2>
+                <div class="detail-item"><strong>User Level:</strong> {{ user.user_level }}</div>
+                <div class="detail-item"><strong>Email Alerts:</strong> {{ user.receive_email_alerts }}</div>
+                <div class="detail-item"><strong>Role:</strong> {{ user.profession }}</div>
+                <div class="detail-item"><strong>Last Updated:</strong> {{ user.last_updated.strftime('%Y-%m-%d
+                    %H:%M:%S') }}</div>
+                <div class="detail-item"><strong>Last Login:</strong> {% if user.last_login %}{{
+                    user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}{% else %}N/A{% endif %}</div>
+                <div class="detail-item"><strong>Joined:</strong> {{ user.date_joined.strftime('%Y-%m-%d %H:%M:%S') }}
+                </div>
+            </section>
 
-    <section class="ticket-stats">
-        <h3>Ticket Statistics</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Status</th>
-                    <th>Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Open</td><td>{{ ticket_stats.open }}</td></tr>
-                <tr><td>In Progress</td><td>{{ ticket_stats.in_progress }}</td></tr>
-                <tr><td>Resolved</td><td>{{ ticket_stats.resolved }}</td></tr>
-                <tr><td>Closed</td><td>{{ ticket_stats.closed }}</td></tr>
-                <tr><td><strong>Total</strong></td><td><strong>{{ ticket_stats.total }}</strong></td></tr>
-            </tbody>
-        </table>
-    </section>
+            <section class="card ticket-stats">
+                <h2>Ticket Statistics</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Open</td>
+                            <td>{{ ticket_stats.open }}</td>
+                        </tr>
+                        <tr>
+                            <td>In Progress</td>
+                            <td>{{ ticket_stats.in_progress }}</td>
+                        </tr>
+                        <tr>
+                            <td>Resolved</td>
+                            <td>{{ ticket_stats.resolved }}</td>
+                        </tr>
+                        <tr>
+                            <td>Closed</td>
+                            <td>{{ ticket_stats.closed }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td><strong>{{ ticket_stats.total }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
 
-    <section class="profile-actions">
-        <h3>Actions</h3>
-        <a href="{{ url_for('edit_profile') }}" class="btn-action">Edit Profile</a>
-        <a href="{{ url_for('change_password') }}" class="btn-action btn-secondary">Change Password</a>
-        <a href="{{ url_for('delete_user_self') }}" class="btn-action btn-danger">Delete Profile</a>
-        <a href="{{ url_for('logout') }}" class="btn-action btn-warning">Logout</a>
+        <div class="sidebar">
+            <section class="card actions">
+                <h2>Actions</h2>
+                <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+                <a href="{{ url_for('change_password') }}" class="btn btn-secondary">Change Password</a>
+                <a href="{{ url_for('delete_user_self') }}" class="btn btn-danger">Delete Profile</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
 
-        {% if current_user.user_level == 'admin' %}
-        <form action="/superadmin" method="POST" class="control-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            {% if session.get('sudo_password') %}
-            <button type="submit" name="clear_session" class="btn-action btn-secondary">Exit SuperAdmin</button>
-            {% else %}
-            <div class="form-group">
-                <label for="sudo_password">Enter Sudo Password</label>
-                <input type="password" class="form-control" id="sudo_password" name="sudo_password" required>
-                <button type="submit" name="action" value="authenticate" class="btn-action btn-primary">Enable Super Admin</button>
-            </div>
-            {% endif %}
-        </form>
-        {% endif %}
-    </section>
+                {% if current_user.user_level == 'admin' %}
+                <form action="/superadmin" method="POST" class="superadmin-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if session.get('sudo_password') %}
+                    <button type="submit" name="clear_session" class="btn btn-secondary">Exit SuperAdmin</button>
+                    {% else %}
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="sudo_password" name="sudo_password"
+                            placeholder="Enter Sudo Password" required>
+                        <button type="submit" name="action" value="authenticate" class="btn btn-info mt-2">Enable Super
+                            Admin</button>
+                    </div>
+                    {% endif %}
+                </form>
+                {% endif %}
+            </section>
+        </div>
+    </div>
 </div>
 
 <script>
