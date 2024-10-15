@@ -1,36 +1,47 @@
 {% extends 'base/base.html' %}
 {% block title %}General Settings{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/general_settings.css') }}">
 {% endblock %}
 {% block content %}
 <div class="settings-container">
     <h1 class="settings-title">General Settings</h1>
 
-    <form method="POST">
+    <form method="POST" class="settings-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {% include 'ext/message.html' %}
         
         <div class="form-group">
-            <label for="timezone">Timezone:</label>
-            <select id="timezone" name="timezone">
+            <label for="timezone" class="form-label">Timezone:</label>
+            <select id="timezone" name="timezone" class="form-select">
                 <option value="Asia/Kolkata" {% if general_settings.timezone == "Asia/Kolkata" %}selected{% endif %}>Asia/Kolkata</option>
                 <option value="America/New_York" {% if general_settings.timezone == "America/New_York" %}selected{% endif %}>America/New_York</option>
                 <option value="Europe/London" {% if general_settings.timezone == "Europe/London" %}selected{% endif %}>Europe/London</option>
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="enable_cache">Enable Caching:</label>
-            <input type="checkbox" id="enable_cache" name="enable_cache" {% if general_settings.enable_cache %}checked{% endif %}>
+        <div class="toggle-group">
+            <label class="toggle">
+                <input type="checkbox" id="enable_cache" name="enable_cache" {% if general_settings.enable_cache %}checked{% endif %}>
+                <span class="slider"></span>
+                <span class="label-text">Enable Caching</span>
+            </label>
         </div>
-        <div class="form-group">
-            <label for="enable_alerts">Enable Alerts:</label>
-            <input type="checkbox" id="enable_alerts" name="enable_alerts" {% if general_settings.enable_alerts %}checked{% endif %}>
+
+        <div class="toggle-group">
+            <label class="toggle">
+                <input type="checkbox" id="enable_alerts" name="enable_alerts" {% if general_settings.enable_alerts %}checked{% endif %}>
+                <span class="slider"></span>
+                <span class="label-text">Enable Alerts</span>
+            </label>
         </div>
-        <div class="form-group">
-            <label for="is_logging_system_info">Metrics Logging:</label>
-            <input type="checkbox" id="is_logging_system_info" name="is_logging_system_info" {% if general_settings.is_logging_system_info %}checked{% endif %}>
+
+        <div class="toggle-group">
+            <label class="toggle">
+                <input type="checkbox" id="is_logging_system_info" name="is_logging_system_info" {% if general_settings.is_logging_system_info %}checked{% endif %}>
+                <span class="slider"></span>
+                <span class="label-text">Metrics Logging</span>
+            </label>
         </div>
 
         <button type="submit" class="btn btn-primary">Save Settings</button>

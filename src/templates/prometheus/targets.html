@@ -8,101 +8,127 @@
 {% block content %}
 <div class="container">
     <h1>SystemGuard/Prometheus Targets</h1>
-    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the scrape interval of the targets here.</p>
-    
+    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the
+        scrape interval of the targets here.</p>
+
     {% include 'ext/message.html' %}
 
-    <!-- Targets Table Section -->
-    <div class="table-wrapper">
-        <table class="modern-table">
-            <thead>
-                <tr>
-                    <th>Group Name <i class="fas fa-info-circle" title="Job Name is the name of the service that is being monitored."></i></th>
-                    <th>Targets <i class="fas fa-info-circle" title="Targets are the IP addresses of the services that are being monitored."></i></th>
-                    <th>Scrape Interval <i class="fas fa-info-circle" title="Scrape Interval is the time interval between each scrape of the target."></i></th>
-                    <th>New Interval <i class="fas fa-info-circle" title="Change the scrape interval of the target."></i></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for info in targets_info %}
-                <tr>
-                    <td>{{ info.job_name }}</td>
-                    <td>
-                        <ul class="target-list">
-                            {% for target in info.targets %}
-                            <li>
-                                {{ target }}
-                                {% if not system_ip_address in target %}
-                                <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                                    <input type="hidden" name="target_to_remove" value="{{ target }}">
-                                    <button type="submit" class="btn-danger btn-sm">
-                                        <i class="fas fa-times"></i> Remove
-                                    </button>
-                                </form>
-                                {% endif %}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </td>
-                    <td>{{ info.scrape_interval }}</td>
-                    <td>
-                        <form action="{{ url_for('change_interval') }}" method="post" class="inline-form">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                            <input type="text" name="new_interval" placeholder="New Interval" required class="input-field">
-                            <input type="submit" value="Change Interval" class="btn-primary btn-sm">
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="card">
+        <h2>Targets</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Group Name <i class="fas fa-info-circle"
+                                title="Job Name is the name of the service that is being monitored."></i></th>
+                        <th>Targets <i class="fas fa-info-circle"
+                                title="Targets are the IP addresses of the services that are being monitored."></i></th>
+                        <th>Scrape Interval <i class="fas fa-info-circle"
+                                title="Scrape Interval is the time interval between each scrape of the target."></i>
+                        </th>
+                        <th>New Interval <i class="fas fa-info-circle"
+                                title="Change the scrape interval of the target."></i></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for info in targets_info %}
+                    <tr>
+                        <td>{{ info.job_name }}</td>
+                        <td>
+                            <ul class="target-list">
+                                {% for target in info.targets %}
+                                <li>
+                                    {{ target }}
+                                    {% if not system_ip_address in target %}
+                                    <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                        <input type="hidden" name="target_to_remove" value="{{ target }}">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i> Remove
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ info.scrape_interval }}</td>
+                        <td>
+                            <form action="{{ url_for('change_interval') }}" method="post" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                <input type="text" name="new_interval" placeholder="New Interval" required
+                                    class="input-field">
+                                <button type="submit" class="btn btn-primary">Change</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Add New Target Section -->
-    <div class="section">
+    <div class="card">
         <h2>Add New Target</h2>
         <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
-            <input type="text" name="new_target" placeholder="New Target" class="input-field" required>
-            <input type="text" name="scrape_interval" placeholder="Scrape Interval" class="input-field" required>
-            <input type="text" name="username" placeholder="Username" class="input-field">
-            <input type="password" name="password" placeholder="Password" class="input-field">
-            <br>
-            <button type="submit" class="btn-primary btn-lg">
+            <div class="form-group">
+                <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="new_target" placeholder="New Target" class="input-field" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="scrape_interval" placeholder="Scrape Interval" class="input-field" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" class="input-field">
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" class="input-field">
+            </div>
+            <button type="submit" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add Target
             </button>
         </form>
+    </div>
 
-        <!-- Change Auth Section -->
+    <div class="card">
         <h2>Change Basic Auth</h2>
-        <form action="{{ url_for('change_auth') }}" method="post" class="add-target" id="change-auth-form">
+        <form action="{{ url_for('change_auth') }}" method="post" id="change-auth-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
-            <input type="text" name="username" placeholder="Username" class="input-field" >
-            <input type="password" name="password" placeholder="Password" class="input-field" >
-            <br>
-            <button type="submit" class="btn-primary btn-lg">
+            <div class="form-group">
+                <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" class="input-field">
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" class="input-field">
+            </div>
+            <button type="submit" class="btn btn-primary">
                 <i class="fas fa-edit"></i> Change Auth
             </button>
         </form>
-        
-        <!-- Update Prometheus Section -->
-        <div class="section">
-            <form action="{{ url_for('restart_prometheus') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="submit" value="Update Prometheus" class="btn-lg btn-primary">
-            </form>
-        </div>
-
-        <p class="text-center text-note">Note: After adding a new target, it may take a few minutes for the target to be scraped by Prometheus.</p>
-        <p class="text-center text-note">Note: If you are adding a target that is not localhost, you need to provide the username and password for the target.</p>
-        <p class="text-center text-note">Note: If you are adding a target that is localhost, you do not need to provide the username and password.</p>
-        <p class="text-center text-note">Note: After making any changes, you need to update Prometheus to apply the changes.</p>
     </div>
+
+    <div class="card">
+        <h2>Update Prometheus</h2>
+        <form action="{{ url_for('restart_prometheus') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-success">Update Prometheus</button>
+        </form>
+    </div>
+
+    <p class="text-note">Note: After adding a new target, it may take a few minutes for the target to be scraped by
+        Prometheus.</p>
+    <p class="text-note">Note: If you are adding a target that is not localhost, you need to provide the username and
+        password for the target.</p>
+    <p class="text-note">Note: If you are adding a target that is localhost, you do not need to provide the username and
+        password.</p>
+    <p class="text-note">Note: After making any changes, you need to update Prometheus to apply the changes.</p>
 </div>
 
 <script>

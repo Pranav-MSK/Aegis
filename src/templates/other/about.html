@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% block title %}About {{title}}{% endblock %}
+{% block title %}About {{ title }}{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -9,17 +9,17 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-lg border-0 rounded-lg animate-card">
-                <div class="card-body p-5">
-                    <h1 class="card-title display-4 mb-3 text-gradient">{{ title }} 
+                <div class="crd-body p-5">
+                    <h1 class="card-title display-4 mb-3 text-center">{{ title }} 
                         {% if is_trial == 'true' %}
-                        <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i>Trial</span>
+                        <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i> Trial</span>
                         {% else %}
                         {% if is_plan_not_expired %}
-                        <span class="badge bg-success">Full <i class="fas fa-check-circle me-1"></i></span>
+                        <span class="badge bg-success text-white">{{plan_type}} <i class="fas fa-check-circle me-1"></i></span>
                         {% endif %}
                         {% endif %}
                     </h1>
-                    <h4 class="card-subtitle mb-4 text-muted">
+                    <h4 class="card-subtitle mb-4 text-center   ">
                         <i class="fas fa-code-branch me-2"></i>{{ version }}
                         {% if pre_release %}
                         <span class="badge bg-warning text-dark">Pre-release</span>
@@ -37,7 +37,6 @@
                         <h5 class="card-title">Year</h5>
                         <p class="card-text mb-0">{{ year }}</p>
                     </div>
-                    <!-- systemguard_unique_id -->
                     <div class="info-section">
                         <h5 class="card-title">SystemGuard Unique ID</h5>
                         <p class="card-text mb-0">{{ systemguard_unique_id }}</p>
@@ -48,7 +47,6 @@
                         <p class="card-text mb-0">Git Repository</p>
                         <h5 class="card-title mt-3">Git Branch</h5>
                         <p class="card-text mb-0">{{ installation_info["git_branch"] }}</p>
-                        <!-- update_available -->
                         {% if installation_info["update_available"] %}
                         <h5 class="card-title mt-3">Update Available</h5>
                         <p class="card-text mb-0">A new version is available. Please update to the latest version.</p>

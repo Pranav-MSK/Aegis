@@ -14,18 +14,10 @@ body {
 }
 
 h1 {
-    background-color: rgba(0, 123, 255, 0.1); /* Light blue background */
-    color: #004d40; /* Dark teal color */
-    padding: 1.5rem 2rem; /* Balanced padding */
-    border-radius: 8px; /* Slightly rounded corners */
-    margin: 2rem 0; /* Consistent margin */
-    position: relative; /* For positioning the background image */
-    overflow: hidden; /* Clip overflow */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slightly larger shadow */
-    font-size: 2rem; /* Larger font size */
-    text-align: center; /* Centered text */
-    text-transform: uppercase; /* Uppercase text */
-    letter-spacing: 1px; /* Spaced out letters */
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--primary-color);
+    font-weight: 700;
 }
 
 h1 span {

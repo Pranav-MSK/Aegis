@@ -1,95 +1,79 @@
-/* Global Styling */
-body {
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Soft gradient background */
-    font-family: 'Roboto', sans-serif; /* Modern font */
-    color: #2c3e50; /* Text color */
+:root {
+    --primary-color: #6200ea;
+    --primary-light: #9d46ff;
+    --background-color: #f5f5f5;
+    --card-background: #ffffff;
+    --text-color: #333333;
+    --light-text-color: #757575;
+    --border-color: #e0e0e0;
+    --gradient-start: #6200ea;
+    --gradient-end: #00e676;
 }
 
-/* Container for Layout */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
 .container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: auto;
 }
 
-/* Card Design */
 .card {
-    background-color: #fff; /* Clean background */
-    color: #2c3e50; /* Dark text */
-    border-radius: 20px; /* Smooth rounded corners */
-    margin-top: 2rem;
-    transition: transform 0.4s ease, box-shadow 0.4s ease; /* Smooth transitions */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Elevated shadow */
+    border-radius: 15px;
+    transition: transform 0.2s;
 }
 
 .card:hover {
-    transform: translateY(-10px); /* Lift effect on hover */
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); /* Deeper shadow */
-}
-
-.animate-card {
-    animation: fadeInUp 1s ease; /* Card animation on load */
-}
-
-.card-title {
-    font-size: 2.8rem; /* Larger title font */
-    font-weight: bold;
-    color: #2980b9; /* Brighter title color */
+    transform: scale(1.02);
 }
 
 .text-gradient {
-    background: linear-gradient(45deg, #3498db, #8e44ad); /* Gradient for title text */
+    background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
     -webkit-background-clip: text;
-    color: transparent;
+    -webkit-text-fill-color: transparent;
 }
 
-/* Info Sections */
 .info-section {
-    margin-top: 1.5rem;
-    text-align: center;
+    margin-bottom: 1.5rem;
 }
 
-hr {
-    border-top: 1px solid #bdc3c7; /* Soft gray separator */
-    margin: 1.5rem 0;
+.card-title {
+    font-weight: 700;
 }
 
-/* Buttons */
-.btn-primary {
-    background-color: #3498db;
+.card-subtitle {
+    font-weight: 500;
+}
+
+.btn {
+    background-color: var(--primary-color);
+    color: white;
     border: none;
-    padding: 12px 25px;
-    font-size: 1.2rem;
-    border-radius: 10px;
-    transition: transform 0.3s, box-shadow 0.3s;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-.btn-primary:hover {
-    transform: translateY(-5px); /* Button lift on hover */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Elevated shadow on hover */
-    background-color: #2c3e50; /* Darker hover background */
-    color: #fff;
+.btn:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
 }
 
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
+.hover-raise {
+    transition: transform 0.2s;
+}
+
+.hover-raise:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 3rem;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* List Styles */
-.list-group-item {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-}
-
-.list-group-item:not(:last-child) {
-    margin-bottom: 5px;
 }

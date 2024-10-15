@@ -4,59 +4,75 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/process.css') }}">
 {% endblock %}
 {% block content %}
-<div class="content">
-    <h1 class="text-center"><span class="text-danger"><i class="fas fa-shield-alt"></i>
-        {{title}} </span>Process Manager</h1>
+<div class="container">
+    <h1><i class="fas fa-shield-alt"></i> {{title}} Process Manager</h1>
+    <div class="content">
+        <!-- Display flash messages -->
+        {% include 'ext/message.html' %}
 
-    <!-- Display flash messages -->
-    {% include 'ext/message.html' %}
+        <div class="form-group" method="post" style="display: flex;">
+            <form method="post" class="form-control" style="flex: 1;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label for="number">Number of Processes:</label>
+                <input type="number" id="number" name="number" min="1" value="{{ number }}">
+                <button type="submit">Show</button>
+            </form>
 
-    <form method="post" class="form-control">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label for="number">Number of Processes:</label>
-        <input type="number" id="number" name="number" min="1" value="{{ number }}">
-        <button type="submit">Show</button>
-    </form>
+            <form method="post" class="form-control" style="flex: 1;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% if session.get('sudo_password') %}
+                <button type="clear" name="clear_session">Deauthenticate</button>
+                {% else %}
+                <input type="text" id="sudo_password" name="sudo_password" placeholder="Enter sudo password">
+                <button type="submit">Authenticate</button>
+                {% endif %}
+            </form>
+        </div>
 
-    <form method="post" class="form-control">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% if session.get('sudo_password') %}
-        <button type="clear" name="clear_session">Deauthenticate</button>
-        {% else %}
-        <input type="text" id="sudo_password" name="sudo_password" placeholder="Enter sudo password">
-        <button type="submit">Authenticate</button>
-        {% endif %}
-        
-    </form>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th><a href="{{ url_for('process', sort='name', order=toggle_order) }}">Process Name</a></th>
-                <th><a href="{{ url_for('process', sort='cpu', order=toggle_order) }}">CPU Usage (%)</a></th>
-                <th><a href="{{ url_for('process', sort='memory', order=toggle_order) }}">Memory Usage (%)</a></th>
-                <th>Process ID</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for process in processes %}
-            <tr>
-                <td>{{ process[0] }}</td>
-                <td>{{ process[1] }}</td>
-                <td>{{ process[2] }}</td>
-                <td>{{ process[3] }}</td>
-                <td>
-                    <form method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="kill_pid" value="{{ process[3] }}">
-                        <input type="hidden" name="process_name" value="{{ process[0] }}">
-                        <button type="submit">Kill</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <a href="{{ url_for('process', sort='name', order=toggle_order) }}" class="sort-link">
+                            Process Name
+                            <i class="fas fa-sort sort-icon"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ url_for('process', sort='cpu', order=toggle_order) }}" class="sort-link">
+                            CPU Usage (%)
+                            <i class="fas fa-sort sort-icon"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ url_for('process', sort='memory', order=toggle_order) }}" class="sort-link">
+                            Memory Usage (%)
+                            <i class="fas fa-sort sort-icon"></i>
+                        </a>
+                    </th>
+                    <th>Process ID</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for process in processes %}
+                <tr>
+                    <td>{{ process[0] }}</td>
+                    <td>{{ process[1] }}</td>
+                    <td>{{ process[2] }}</td>
+                    <td>{{ process[3] }}</td>
+                    <td>
+                        <form method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="kill_pid" value="{{ process[3] }}">
+                            <input type="hidden" name="process_name" value="{{ process[0] }}">
+                            <button type="submit" class="kill-btn">Kill</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

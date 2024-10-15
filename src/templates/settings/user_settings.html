@@ -1,28 +1,29 @@
 {% extends 'base/base.html' %}
 {% block title %}Speedtest Settings{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user_settings.css') }}">
 {% endblock %}
 {% block content %}
 <div class="settings-container">
     <h1 class="settings-title">User Settings</h1>
 
-    <form method="POST">
+    <form method="POST" class="settings-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {% include 'ext/message.html' %}
+        
         <div class="form-group">
-            <label for="speedtest_cooldown">Speedtest Cooldown (minutes):</label>
-            <input type="number" id="speedtest_cooldown" name="speedtest_cooldown" value="{{ user_dashboard_settings.speedtest_cooldown }}" min="1" required>
+            <label for="speedtest_cooldown" class="form-label">Speedtest Cooldown (minutes):</label>
+            <input type="number" id="speedtest_cooldown" name="speedtest_cooldown" value="{{ user_dashboard_settings.speedtest_cooldown }}" min="1" required class="form-input">
         </div>
         
         <div class="form-group">
-            <label for="number_of_speedtests">Number of Speedtests Allowed per Hour:</label>
-            <input type="number" id="number_of_speedtests" name="number_of_speedtests" value="{{ user_dashboard_settings.number_of_speedtests }}" min="1" required>
+            <label for="number_of_speedtests" class="form-label">Number of Speedtests Allowed per Hour:</label>
+            <input type="number" id="number_of_speedtests" name="number_of_speedtests" value="{{ user_dashboard_settings.number_of_speedtests }}" min="1" required class="form-input">
         </div>
 
         <div class="form-group">
-            <label for="refresh_interval">Refresh Interval(sec):</label>
-            <input type="number" id="refresh_interval" name="refresh_interval" value="{{ user_dashboard_settings.refresh_interval }}">
+            <label for="refresh_interval" class="form-label">Refresh Interval (sec):</label>
+            <input type="number" id="refresh_interval" name="refresh_interval" value="{{ user_dashboard_settings.refresh_interval }}" class="form-input">
         </div>
         
         <button type="submit" class="btn btn-primary">Save Settings</button>
