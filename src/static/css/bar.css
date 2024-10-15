@@ -1,0 +1,91 @@
+/* Bar Styles */
+.temp-indicator, .usage-indicator, .memory-usage-bar, .frequency-indicator, .battery-indicator {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* General Bar Styles */
+.temp-bar, .disk-bar, .frequency-bar, .cpu-usage-bar, .memory-usage-bar, .battery-bar {
+    height: 20px;
+    transition: width 0.3s ease;
+}
+
+/* Battery Bar Styles */
+.battery-bar.low {
+    background-color: #dd6c77;
+}
+
+.battery-bar.medium {
+    background-color: #d7b25c;
+}
+
+.battery-bar.high {
+    background-color: #57d474;
+}
+
+/* Temperature Bar Styles */
+.temp-bar.low {
+    background-color: #57d474;
+}
+
+.temp-bar.medium {
+    background-color: #d7b25c;
+}
+
+.temp-bar.high {
+    background-color: #dd6c77;
+}
+
+/* Disk Bar Styles */
+.disk-bar.low {
+    background-color: #57d474;
+}
+
+.disk-bar.medium {
+    background-color: #d7b25c;
+}
+
+.disk-bar.high {
+    background-color: #dd6c77;
+}
+
+/* CPU Usage Bar Styles */
+.cpu-usage-bar.low {
+    background-color: #57d474;
+}
+
+.cpu-usage-bar.medium {
+    background-color: #d7b25c;
+}
+
+.cpu-usage-bar.high {
+    background-color: #dd6c77;
+}
+
+/* Memory Usage Bar Styles */
+.memory-usage-bar.low {
+    background-color: #57d474;    
+}
+
+.memory-usage-bar.medium {
+    background-color: #d7b25c;
+}
+
+.memory-usage-bar.high {
+    background-color: #dd6c77;   
+}
+
+/* Frequency Bar Styles */
+.frequency-bar.low {
+    background: linear-gradient(90deg, #57d474, #41d865);
+}
+
+.frequency-bar.medium {
+    background-color: #d7b25c;
+}
+
+.frequency-bar.high {
+    background-color: #dd6c77;
+}

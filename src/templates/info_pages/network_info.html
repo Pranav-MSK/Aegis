@@ -2,6 +2,7 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bar.css') }}">
 {% endblock %}
 {% block content %}
 {% include 'card_comp/selector/refresh_button.html' %}
@@ -24,4 +25,5 @@
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/refreshCardData.js')}}"></script>
+<script src="{{ url_for('static', filename='js/poweredByFooter.js') }}"></script>
 {% endblock %}

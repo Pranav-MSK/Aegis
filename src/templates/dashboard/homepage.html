@@ -3,6 +3,7 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bar.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/cardChart.js')}}"></script>
 {% endblock %}
@@ -92,5 +93,6 @@
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/bootTime.js')}}"></script>
 <script src="{{ url_for('static', filename='js/refreshCardData.js')}}"></script>
+<script src="{{ url_for('static', filename='js/poweredByFooter.js') }}"></script>
 
 {% endblock %}

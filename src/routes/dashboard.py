@@ -6,12 +6,14 @@ from flask_login import login_required, current_user
 from src.config import app
 from src.models import NetworkSpeedTestResult, UserDashboardSettings
 from src.utils import datetimeformat, get_system_info
+from src.logger import logger
 
 dashboard_bp = blueprints.Blueprint("dashboard", __name__)
 
 @app.route("/", methods=["GET"])
 @login_required
 def dashboard():
+    logger.info("Dashboard accessed")
     # if user is not authenticated, redirect to login page
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
