@@ -51,8 +51,6 @@ function createTargetRow(target) {
     const dashboardCell = createDashboardCell(target);
     row.appendChild(dashboardCell);
 
-    const removeCell = createRemoveCell(target);
-    row.appendChild(removeCell);
 
     return row;
 }

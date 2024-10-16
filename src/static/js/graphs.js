@@ -164,19 +164,21 @@
         }
 
         generateColor(index) {
-            const hue = (100 + (index * 30)) % 360;
-            const lightness = 50 + (index * 5) % 50;
-            const saturation = 70 + (index * 5) % 30;
-
+            const baseHue = 50; // Base hue for blue colors
+            const hue = (baseHue + (index * 30)) % 360;  // Adjust hue for unique colors
+            const lightness = 50 + (index * 5) % 10; // Vary lightness for more distinction
+            const saturation = 70 + (index * 5) % 30; // Vary saturation for more distinction
+        
             return {
-                borderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
-                backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`,
-                pointBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
-                pointBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
-                pointHoverBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
-                pointHoverBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
+                borderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
+                backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.2)`, // Transparent background
+                pointBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
+                pointBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
+                pointHoverBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
+                pointHoverBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
             };
         }
+        
 
         formatDate(utcTime) {
             const date = new Date(utcTime);
