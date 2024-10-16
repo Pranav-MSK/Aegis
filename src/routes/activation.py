@@ -9,6 +9,7 @@ from src.activator import (
     calculate_unique_system_id, 
     verify_activation_code, 
 )
+from src.helper import load_secret_key
 from src.routes.helper.activation_helper import generate_license_pdf
 
 activation_bp = Blueprint('activation', __name__)
@@ -24,6 +25,7 @@ def activation():
 
     if request.method == 'POST':
         activation_code = request.form.get('activation_code')
+        obfuscated_key = load_secret_key("obfuscation.so")
         is_valid, new_license_key = verify_activation_code(activation_code, systemguard_unique_id, obfuscated_key)
 
         if is_valid:
