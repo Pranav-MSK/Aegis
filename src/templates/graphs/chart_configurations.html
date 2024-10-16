@@ -83,19 +83,24 @@
             </div>
 
             <div class="form-group">
-                <label for="tension">Tension (default: 0.4)</label>
-                <input type="text" name="tension" id="tension" placeholder="Tension">
+                <label for="tension">Tension</label>
+                <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4" oninput="this.nextElementSibling.value = this.value">
+                <output>0.4</output>
             </div>
-
+            
             <div class="form-group">
-                <label for="pointRadius">Point Radius (default: 0)</label>
-                <input type="number" name="point_radius" id="pointRadius" placeholder="Point Radius">
+                <label for="pointRadius">Point Radius</label>
+                <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0" oninput="this.nextElementSibling.value = this.value">
+                <output>0</output>
             </div>
-
+            
             <div class="form-group">
-                <label for="pointHoverRadius">Point Hover Radius (default: 6)</label>
-                <input type="number" name="point_hover_radius" id="pointHoverRadius" placeholder="Point Hover Radius">
-            </div>
+                <label for="pointHoverRadius">Point Hover Radius</label>
+                <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6" oninput="this.nextElementSibling.value = this.value">
+                <output>6</output>
+            </div>            
+
+            <input type="hidden" name="formtype" value="edit">
 
             <div class="form-group">
                 <label for="chartType">Chart Type</label>
@@ -139,20 +144,23 @@
             </div>
 
             <div class="form-group">
-                <label for="newTension">Tension (default: 0.4)</label>
-                <input type="text" name="tension" id="newTension" placeholder="Tension">
+                <label for="tension">Tension</label>
+                <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4" oninput="this.nextElementSibling.value = this.value">
+                <output>0.4</output>
             </div>
-
+            
             <div class="form-group">
-                <label for="newPointRadius">Point Radius (default: 0)</label>
-                <input type="number" name="point_radius" id="newPointRadius" placeholder="Point Radius">
+                <label for="pointRadius">Point Radius</label>
+                <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0" oninput="this.nextElementSibling.value = this.value">
+                <output>0</output>
             </div>
-
+            
             <div class="form-group">
-                <label for="newPointHoverRadius">Point Hover Radius (default: 6)</label>
-                <input type="number" name="point_hover_radius" id="newPointHoverRadius"
-                    placeholder="Point Hover Radius">
+                <label for="pointHoverRadius">Point Hover Radius</label>
+                <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6" oninput="this.nextElementSibling.value = this.value">
+                <output>6</output>
             </div>
+            
 
             <div class="form-group">
                 <label for="newChartType">Chart Type</label>
@@ -161,6 +169,8 @@
                     <option value="bar">Bar</option>
                 </select>
             </div>
+
+            <input type="hidden" name="formtype" value="add">
 
             <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Create Configuration</button>
         </form>
@@ -205,11 +215,18 @@
             document.getElementById('tension').value = this.getAttribute('data-tension');
             document.getElementById('pointRadius').value = this.getAttribute('data-point-radius');
             document.getElementById('pointHoverRadius').value = this.getAttribute('data-point-hover-radius');
+
+            // Update outputs to reflect current values
+            document.querySelector('#tension + output').value = document.getElementById('tension').value;
+            document.querySelector('#pointRadius + output').value = document.getElementById('pointRadius').value;
+            document.querySelector('#pointHoverRadius + output').value = document.getElementById('pointHoverRadius').value;
+
             document.getElementById('chartType').value = this.getAttribute('data-chart-type');
 
             document.getElementById('editModal').style.display = 'block';
         });
     });
+
 
     document.querySelector('.close').onclick = function () {
         document.getElementById('editModal').style.display = 'none';
