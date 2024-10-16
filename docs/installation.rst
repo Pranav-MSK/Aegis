@@ -19,21 +19,21 @@ For **Debian/Ubuntu** systems:
    .. code:: bash
 
       sudo apt-get update
-      sudo apt-get install git curl wget unzip iptables jq nmap
+      sudo apt-get install unzip iptables nmap
 
 For **Fedora** systems:
 
    .. code:: bash
 
       sudo dnf update -y
-      sudo dnf install -y git curl wget unzip iptables jq nmap
+      sudo dnf install -y unzip iptables nmap
 
 For **CentOS/RHEL** systems:
 
    .. code:: bash
 
       sudo yum update -y
-      sudo yum install -y git curl wget unzip iptables jq nmap
+      sudo yum install -y unzip iptables nmap
 
 **Anaconda3/Miniconda3**
 ^^^^^^^^^^^^^^^^^^^^^^^^

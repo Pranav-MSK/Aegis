@@ -1,49 +1,16 @@
 # cython: language_level=3
-from flask import request, jsonify, Blueprint, render_template, redirect, url_for, flash
+from flask import request, jsonify, Blueprint, render_template, redirect, url_for, flash, abort
 from flask_login import current_user, login_required
+
 from src.config import app, csrf, db
 from src.logger import logger
-
 from src.routes.helper.notification_helper import send_test_alert, process_alert
 from src.utils import get_ip_address
 from src.models import AlertTicket, UserProfile, InvestigationNote, AlertLog, CustomFields
-from functools import wraps
-from flask import abort
+from src.routes.helper.access_decorators import systemguard_enterprise, community_edition
+from src.routes.helper.alert_helper import user_has_access_to_alert, user_id_to_username
 
 alert_bp = Blueprint("alert", __name__)
-
-
-def paginate_alerts(ticket_status, page, per_page=10):
-    return AlertTicket.query.filter_by(ticket_status=ticket_status).paginate(
-        page=page, per_page=per_page, error_out=False
-    )
-
-
-def user_has_access_to_alert(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        alert_id = kwargs.get("alert_id")
-        alert = AlertTicket.query.get(alert_id)
-
-        if not alert:
-            flash("Alert not found!", "error")
-            return redirect(url_for("alert_history"))
-
-        if current_user.user_level != "admin" and current_user.id not in {
-            alert.assigned_user_id,
-            alert.assigned_supervisor_id,
-        }:
-            abort(403, description="You do not have access to this alert ticket.")
-
-        return f(*args, **kwargs)
-
-    return decorated_function
-
-
-def user_id_to_username(user_id):
-    user = UserProfile.query.get(user_id)
-    return user.username if user else "Unknown"
-
 
 @app.route("/alerts", methods=["POST"])
 @csrf.exempt
@@ -80,6 +47,7 @@ def receive_alerts():
 
 
 @app.route("/alerts/test", methods=["GET"])
+@community_edition()
 def test_alert():
     alertmanager_ip = get_ip_address()
     alertmanager_port = "9093"
@@ -92,6 +60,7 @@ def test_alert():
 
 
 @app.route("/alerts/ticket", methods=["GET", "POST"])
+@systemguard_enterprise()
 @login_required
 def alert_history():
     admin_users = UserProfile.query.filter_by(user_level="admin").all()
@@ -198,6 +167,7 @@ def alert_history():
     )
 
 @app.route("/alerts/ticket/<int:alert_id>", methods=["GET", "POST"])
+@systemguard_enterprise()
 @user_has_access_to_alert
 @login_required
 def alert_ticket(alert_id):
@@ -316,16 +286,7 @@ def alert_ticket(alert_id):
             log_and_save(log_message)
             alert.save()
             return redirect(url_for("alert_ticket", alert_id=alert.id))
-            
-        # ticket status
-        # <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-        #         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        #         <input type="hidden" name="form_type" value="resolve_ticket">
-        #         <input type="hidden" name="ticket_status" value="Resolved">
-        #         <input type="hidden" name="investigation_notes" value="Marking the ticket as resolved.">
-        #         <button type="submit" class="btn btn-success">Mark as Resolved</button>
-        #     </form>
-        
+ 
         elif form_type in ["close_ticket", "reopen_ticket", "progress_ticket", "resolve_ticket"]:
             if form_type == "close_ticket":
                 alert.ticket_status = "Closed"

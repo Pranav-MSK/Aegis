@@ -101,6 +101,7 @@
                     },
                 },
                 y: {
+                    beginAtZero: true,
                     title: {
                         display: true,
                         text: config.ylabel,
