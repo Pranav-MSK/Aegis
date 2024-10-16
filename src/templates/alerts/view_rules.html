@@ -1,0 +1,126 @@
+{% extends 'base/base.html' %}
+{% block title %}Manage Alert Rules{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/view_rules.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.3/cdn.min.js" defer></script>
+{% endblock %}
+{% block content %}
+<div class="container" x-data="{ editingRule: null }">
+    <h1 class="title">Manage Alert Rules</h1>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div class="messages">
+            {% for category, message in messages %}
+                <div class="message {{ category }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="rules-container">
+        {% for group in rules.groups %}
+            <div class="group">
+                <h2 class="group-name">{{ group.name }}</h2>
+                {% for rule in group.rules %}
+                <div class="rule" :class="{ 'editing': editingRule === '{{ group.name }}-{{ loop.index0 }}' }">
+                    <div class="rule-header" @click="editingRule = editingRule === '{{ group.name }}-{{ loop.index0 }}' ? null : '{{ group.name }}-{{ loop.index0 }}'">
+                        <span class="rule-name">{{ rule.alert }}</span>
+                        <span class="rule-severity {{ rule.labels.severity }}">{{ rule.labels.severity }}</span>
+                    </div>
+                    <div class="rule-details" x-show="editingRule === '{{ group.name }}-{{ loop.index0 }}'" x-cloak>
+                        <form method="POST" action="{{ url_for('view_rules') }}" class="edit-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="index" value="{{ loop.index0 }}">
+                            <input type="hidden" name="group_name" value="{{ group.name }}">
+                            <div class="form-group">
+                                <label for="expr">Expression:</label>
+                                <input type="text" id="expr" name="expr" value="{{ rule.expr }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="for">For:</label>
+                                <input type="text" id="for" name="for" value="{{ rule.for }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="severity">Severity:</label>
+                                <select id="severity" name="severity" required>
+                                    <option value="info" {% if rule.labels.severity == 'info' %}selected{% endif %}>Info</option>
+                                    <option value="warning" {% if rule.labels.severity == 'warning' %}selected{% endif %}>Warning</option>
+                                    <option value="critical" {% if rule.labels.severity == 'critical' %}selected{% endif %}>Critical</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <input type="text" id="description" name="description" value="{{ rule.annotations.description }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="summary">Summary:</label>
+                                <input type="text" id="summary" name="summary" value="{{ rule.annotations.summary }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="runbook_url">Runbook URL:</label>
+                                <input type="text" id="runbook_url" name="runbook_url" value="{{ rule.annotations.runbook_url }}" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Update Rule</button>
+                                <button type="button" class="btn btn-secondary" @click="editingRule = null">Cancel</button>
+                            </div>
+                        </form>
+                        <form method="POST" action="{{ url_for('view_rules') }}" class="delete-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="index" value="{{ loop.index0 }}">
+                            <input type="hidden" name="group_name" value="{{ group.name }}">
+                            <button type="submit" class="btn btn-danger">Delete Rule</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="add-rule-container">
+        <h2 class="subtitle">Add New Rule</h2>
+        <form method="POST" action="{{ url_for('view_rules') }}" class="add-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="group_name" value="SystemGuard's alert rules">
+            <div class="form-group">
+                <label for="alert_name">Alert Name:</label>
+                <input type="text" id="alert_name" name="alert_name" required>
+            </div>
+            <div class="form-group">
+                <label for="new_expr">Expression:</label>
+                <input type="text" id="new_expr" name="expr" required>
+            </div>
+            <div class="form-group">
+                <label for="new_for">For:</label>
+                <input type="text" id="new_for" name="for" required>
+            </div>
+            <div class="form-group">
+                <label for="new_severity">Severity:</label>
+                <select id="new_severity" name="severity" required>
+                    <option value="info">Info</option>
+                    <option value="warning">Warning</option>
+                    <option value="critical">Critical</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="new_description">Description:</label>
+                <input type="text" id="new_description" name="description" required>
+            </div>
+            <div class="form-group">
+                <label for="new_summary">Summary:</label>
+                <input type="text" id="new_summary" name="summary" required>
+            </div>
+            <div class="form-group">
+                <label for="new_runbook_url">Runbook URL:</label>
+                <input type="text" id="new_runbook_url" name="runbook_url" required>
+            </div>
+            <button type="submit" class="btn btn-success">Add Rule</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

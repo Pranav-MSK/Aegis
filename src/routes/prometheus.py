@@ -30,6 +30,7 @@ from src.routes.helper.prometheus_helper import (
     prometheus_yml_path,
     update_prometheus_container,
     update_prometheus_config,
+    save_updated_alert_manager_config
 )
 
 # Define the Prometheus Blueprint
@@ -37,6 +38,8 @@ prometheus_bp = Blueprint("prometheus", __name__)
 
 PROMETHEUS_BASE_URL = "http://localhost:9090"
 ALERTMANAGER_BASE_URL = "http://localhost:9093"
+PROMETHEUS_RELOAD_URL = "http://localhost:9090/api/v1/admin/tsdb/reload"  # Adjust as necessary
+RULES_FILE_PATH = "prometheus_config/alert_rules.yml"
 
 # Cache user queries with LRU cache (memory-based, not ideal for distributed apps)
 @lru_cache(maxsize=128)
@@ -130,13 +133,9 @@ def delete_file_path(id):
 @admin_required
 def configure_targets():
     update_prometheus_config()
+    save_updated_alert_manager_config()
     targets_info = show_targets()
     return render_template("prometheus/targets.html", targets_info=targets_info)
-
-
-@app.route("/new_alert_rule")
-def new_alert_rule():
-    return render_template("alerts/new_alert_rule.html")
 
 
 @app.route("/targets/restart_prometheus")
@@ -209,7 +208,6 @@ def add_target():
     # Save the updated config
     save_yaml(config, prometheus_yml_path)
     flash("Target added successfully!", "success")
-    # update_prometheus_container()
     return redirect(url_for("configure_targets"))
 
 
@@ -327,19 +325,90 @@ def show_alerts():
         return f"Error fetching alerts: {str(e)}", 500
 
 
-@app.route("/view_rules")
+@app.route("/view_rules", methods=["GET", "POST"])
 def view_rules():
-    url = f"{PROMETHEUS_BASE_URL}/api/v1/rules"
-    response = requests.get(url)
+    # Load existing rules from the YAML file
+    with open(RULES_FILE_PATH, 'r') as file:
+        rules = yaml.safe_load(file)
 
-    if response.status_code == 200:
-        rules_data = response.json()
-        return render_template(
-            "other/view_rules.html", rules=rules_data["data"]["groups"]
-        )
-    else:
-        return jsonify({"error": "Unable to fetch rules"}), 500
+    if request.method == "POST":
+        action = request.form.get("action")
+        group_name = request.form.get("group_name")
 
+        if action == "add":
+            new_rule = {
+                "alert": request.form.get("alert_name"),
+                "expr": request.form.get("expr"),
+                "for": request.form.get("for"),
+                "labels": {
+                    "severity": request.form.get("severity"),
+                },
+                "annotations": {
+                    "description": request.form.get("description"),
+                    "summary": request.form.get("summary"),
+                    "runbook_url": request.form.get("runbook_url"),
+                },
+            }
+            # Adding new rule logic
+            for group in rules['groups']:
+                if group['name'] == group_name:
+                    group['rules'].append(new_rule)
+                    break
+
+            # Write the updated rules back to the file
+            with open(RULES_FILE_PATH, 'w') as file:
+                yaml.dump(rules, file)
+
+            # Reload Prometheus configuration
+            requests.post(PROMETHEUS_RELOAD_URL)
+
+            flash("Rule added successfully!", "success")
+            return redirect(url_for("view_rules"))
+
+        elif action == "edit":
+            index = int(request.form.get("index"))
+
+            # Find the group and edit the specified rule
+            for group in rules['groups']:
+                if group['name'] == group_name and index < len(group['rules']):
+                    group['rules'][index]["expr"] = request.form.get("expr")
+                    group['rules'][index]["for"] = request.form.get("for")
+                    group['rules'][index]["labels"]["severity"] = request.form.get("severity")
+                    group['rules'][index]["annotations"]["description"] = request.form.get("description")
+                    group['rules'][index]["annotations"]["summary"] = request.form.get("summary")
+                    group['rules'][index]["annotations"]["runbook_url"] = request.form.get("runbook_url")
+                    break
+
+            # Write the updated rules back to the file
+            with open(RULES_FILE_PATH, 'w') as file:
+                yaml.dump(rules, file)
+
+            # Reload Prometheus configuration
+            requests.post(PROMETHEUS_RELOAD_URL)
+
+            flash("Rule updated successfully!", "success")
+            return redirect(url_for("view_rules"))
+
+        elif action == "delete":
+            index = int(request.form.get("index"))
+
+            # Find the group and delete the specified rule
+            for group in rules['groups']:
+                if group['name'] == group_name and index < len(group['rules']):
+                    group['rules'].pop(index)
+                    break
+
+            # Write the updated rules back to the file
+            with open(RULES_FILE_PATH, 'w') as file:
+                yaml.dump(rules, file)
+
+            # Reload Prometheus configuration
+            requests.post(PROMETHEUS_RELOAD_URL)
+
+            flash("Rule deleted successfully!", "success")
+            return redirect(url_for("view_rules"))
+
+    return render_template("alerts/view_rules.html", rules=rules)
 
 @app.route("/alertmanager/status")
 def alertmanager_status():

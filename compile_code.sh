@@ -106,4 +106,4 @@ compile_c_files "$SOURCE_DIRECTORY"
 echo "Build process completed successfully."
 
 # make zip file as systemguru.zip
-zip -r systemguru.zip compiled_code
+zip -r systemguard.zip compiled_code

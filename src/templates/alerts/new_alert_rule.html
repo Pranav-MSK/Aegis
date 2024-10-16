@@ -6,7 +6,9 @@
 {% block content %}
 <h1>Submit Alert Rule</h1>
 
-<form id="alertRuleForm">
+{% include 'ext/message.html' %}
+
+<form id="alertRuleForm" action="{{ url_for('new_alert_rule') }}" method="POST">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label for="name">Rule Name:</label>
     <input type="text" id="name" placeholder="Rule Name. Eg: HighCPUUsage" required>
@@ -32,61 +34,4 @@
     <button type="submit">Submit Alert Rule</button>
 </form>
 
-<div id="response"></div>
-
-<script>
-document.getElementById('alertRuleForm').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Prevent the default form submission
-
-    // Gather input values
-    const name = document.getElementById('name').value;
-    const alert = document.getElementById('alert').value;
-    const expr = document.getElementById('expr').value;
-    const forField = document.getElementById('for').value;
-    const severity = document.getElementById('severity').value;
-    const description = document.getElementById('description').value;
-    const summary = document.getElementById('summary').value;
-
-    // Prepare the data for the POST request
-    const alertRule = {
-        name: name,
-        rules: [
-            {
-                alert: alert,
-                expr: expr,
-                for: forField,
-                labels: {
-                    severity: severity
-                },
-                annotations: {
-                    description: description,
-                    summary: summary
-                }
-            }
-        ]
-    };
-
-    try {
-        const response = await fetch('http://localhost:5001/api/v1/alert_rules', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(alertRule)
-        });
-
-        const result = await response.json();
-        const responseDiv = document.getElementById('response');
-
-        if (response.ok) {
-            responseDiv.innerHTML = `<p style="color: green;">Alert rule added successfully!</p>`;
-        } else {
-            responseDiv.innerHTML = `<p style="color: red;">Failed to add alert rule: ${result.message}</p>`;
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('response').innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
-    }
-});
-</script>
 {% endblock %}

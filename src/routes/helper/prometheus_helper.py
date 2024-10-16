@@ -6,6 +6,7 @@ from collections import OrderedDict
 from src.utils import ROOT_DIR
 
 prometheus_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/prometheus.yml')
+alert_manager_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/alertmanager.yml')
 update_prometheus_path = os.path.join(ROOT_DIR, 'src/scripts/update_prometheus.sh')
 alert_rules_path = os.path.join(ROOT_DIR, 'prometheus_config/alert_rules.yml')
 
@@ -78,6 +79,16 @@ def update_prometheus_config():
         print(f"Error loading YAML config: {e}")
         return False
     
+    if 'alerting' in config:
+        for alertmanager in config['alerting'].get('alertmanagers', []):
+            if 'static_configs' in alertmanager:
+                for static_config in alertmanager['static_configs']:
+                    if 'targets' in static_config:
+                        for index, target in enumerate(static_config['targets']):
+                            if ':' in target:
+                                static_config['targets'][index] = f'{ipv4_address}:9093'
+                            
+    
     for job in config.get('scrape_configs', []):
         if job['job_name'] == 'localhost':
             # Update the target for 'localhost' job
@@ -111,6 +122,55 @@ def update_prometheus_config():
     
     print("No 'localhost' job found in Prometheus config.")
     return False
+
+def save_updated_alert_manager_config():
+
+    try:
+        alert_manager_config = load_yaml(alert_manager_yml_path)
+    except Exception as e:
+        print(f"Error loading alertmanager YAML config: {e}")
+        return False
+
+    # Get the IP address of the machine
+    try:
+        ipv4_address = subprocess.run(
+            ['hostname', '-I'], capture_output=True, text=True, check=True
+        ).stdout.split()[0]
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting IP address: {e}")
+        return False
+
+    # Update the URL in the alertmanager.yml file
+    try:
+        alert_manager_config['receivers'][0]['webhook_configs'][0]['url'] = f'http://{ipv4_address}:5050/alerts'
+    except KeyError as e:
+        print(f"Error updating URL in alertmanager config: {e}")
+        return False
+    
+    # for index, j in enumerate(config['scrape_configs']):
+    #         if j['job_name'] == 'localhost':
+    #             config['scrape_configs'][index] = updated_job
+    #         else:
+    #             config['scrape_configs'][index] = OrderedDict(j)
+
+    for index, receiver in enumerate(alert_manager_config['receivers']):
+        if receiver['name'] == 'webhook':
+            alert_manager_config['receivers'][index] = receiver
+        else:
+            alert_manager_config['receivers'][index] = OrderedDict(receiver)
+            
+
+    # Save the updated alertmanager.yml file
+    try:
+        save_yaml(alert_manager_config, alert_manager_yml_path)
+        print("Alertmanager config updated successfully.")
+        return True
+    except Exception as e:
+        print(f"Error saving alertmanager YAML config: {e}")
+        return False
+
+
+    
 
 def show_targets():
     """Show all targets for each job."""

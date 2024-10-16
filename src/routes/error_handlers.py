@@ -90,9 +90,9 @@ def check_password_expiry():
             flash(f"Your password will expire in {remaining_days} days. Please change it soon.", "warning")
 
         # Check if the user is still using the default password (e.g., 'admin')
-        # if current_user.check_password("admin"):
-        #     flash("Security Alert: Please change the default password for your security.", "danger")
-        #     return redirect(url_for('change_password'))
+        if current_user.check_password("admin"):
+            flash("Security Alert: Please change the default password for your security.", "danger")
+            return redirect(url_for('change_password'))
 
     if request.endpoint in ['activation', 'download_license', '/']:
         plan_details = get_plan_details(obfuscated_key)

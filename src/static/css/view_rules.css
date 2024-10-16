@@ -1,96 +1,209 @@
-.rules-container {
-    width: 90%;
-    margin: 0 auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* view_rules.css */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --background-color: #f5f5f5;
+    --text-color: #333;
+    --border-color: #ddd;
 }
 
-.group-section {
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.title {
+    color: var(--primary-color);
+    text-align: center;
     margin-bottom: 30px;
 }
 
-.rule-list {
-    list-style: none;
-    padding-left: 0;
+.subtitle {
+    color: var(--secondary-color);
+    margin-top: 40px;
 }
 
-.rule-item {
-    background-color: #e9ecef;
-    padding: 15px;
-    border-radius: 6px;
+.messages {
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 4px;
     margin-bottom: 10px;
-    transition: all 0.3s ease;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.rules-container {
+    display: grid;
+    gap: 20px;
+}
+
+.group {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.group-name {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    margin: 0;
+}
+
+.rule {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.rule:last-child {
+    border-bottom: none;
 }
 
 .rule-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.rule-header:hover {
+    background-color: #f0f0f0;
 }
 
 .rule-name {
     font-weight: bold;
-    font-size: 1.2rem;
-    color: #333;
 }
 
-.rule-state {
-    font-size: 0.9rem;
+.rule-severity {
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
-.rule-state.firing {
-    background-color: #dc3545;
-    color: #fff;
+.rule-severity.info {
+    background-color: #3498db;
+    color: white;
 }
 
-.rule-state.inactive {
-    background-color: #28a745;
-    color: #fff;
+.rule-severity.warning {
+    background-color: #f39c12;
+    color: white;
 }
 
-.rule-state.pending {
-    background-color: #ffc107;
-    color: #333;
-}
-
-.rule-details-container {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+.rule-severity.critical {
+    background-color: #e74c3c;
+    color: white;
 }
 
 .rule-details {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 10px;
+    padding: 20px;
+    background-color: #f9f9f9;
 }
 
-.toggle-details-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 0.9rem;
+.form-group {
+    margin-bottom: 15px;
 }
 
-.toggle-details-btn:hover {
-    background-color: #0056b3;
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
-.alert-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-.alert-item {
-    background-color: #f1f3f5;
-    padding: 10px;
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    margin-bottom: 8px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-success {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.add-rule-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 40px;
+}
+
+.add-form {
+    display: grid;
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
 }

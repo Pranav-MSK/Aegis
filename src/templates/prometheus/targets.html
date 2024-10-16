@@ -39,7 +39,7 @@
                                 {% for target in info.targets %}
                                 <li>
                                     {{ target }}
-                                    {% if not system_ip_address in target %}
+                                    {% if not system_ip_address ~ ':5050' in target %}
                                     <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <input type="hidden" name="job_name" value="{{ info.job_name }}">

@@ -1,64 +1,60 @@
 groups:
-  - name: SystemGuard's alert rules
-    rules:
-      - alert: High CPU Usage Alert
-        annotations:
-          description: CPU usage is above 85% for more than 2 minutes.
-          summary: Instance {{ $labels.instance }} high CPU usage.
-          runbook_url: https://example.com/runbook/high-cpu-usage
-        expr: avg by (instance) (cpu_usage_percentage{mode!="idle"}) > 85
-        for: 2m
-        labels:
-          severity: warning
-      
-      - alert: High Memory Usage Alert
-        annotations:
-          description: Memory usage is above 85% for more than 2 minutes.
-          summary: Instance {{ $labels.instance }} high memory usage. Current memory usage is {{ $value }}%.
-          runbook_url: https://example.com/runbook/high-memory-usage
-        expr: avg by (instance) (memory_usage_percentage) > 85
-        for: 2m
-        labels:
-          severity: warning
-
-      - alert: Low Power Alert
-        annotations:
-          description: Battery percentage is below 20%.
-          summary: Instance {{ $labels.instance }} low battery. Current battery percentage is {{ $value }}%. Charge the device.
-          runbook_url: https://example.com/runbook/low-battery
-        expr: avg by (instance) (battery_percentage) < 80
-        for: 2m
-        labels:
-          severity: warning
-
-      - alert: Memory Usage Alert By SystemGuard
-        annotations:
-          description: Dashboard memory usage is above 85% for more than 2 minutes.
-          summary: Instance {{ $labels.instance }} high dashboard memory usage. Current memory usage is {{ $value }}%.
-          runbook_url: https://example.com/runbook/high-memory-usage
-        expr: avg by (instance) (dashboard_memory_usage_percentage) > 85
-        for: 2m
-        labels:
-          severity: warning
-
-      - alert: High CPU Temperature Alert
-        annotations:
-          description: CPU temperature is above 90°C for more than 2 minutes.
-          summary: Instance {{ $labels.instance }} high CPU temperature. Current CPU temperature is {{ $value }}%.
-          runbook_url: https://example.com/runbook/high-cpu-temperature
-        expr: avg by (instance) (cpu_temperature) > 90
-        for: 2m
-        labels:
-          severity: warning
-
-      - alert: InstanceDown
-        expr: up == 0
-        for: 5m
-        labels:
-          severity: critical
-        annotations:
-          summary: "Instance Down"
-          description: "Instance {{ $labels.instance }} is down for more than 5 minutes."
-
-      
-
+- name: SystemGuard's alert rules
+  rules:
+  - alert: High Memory Usage Alert
+    annotations:
+      description: Memory usage is above 85% for more than 2 minutes.
+      runbook_url: https://example.com/runbook/high-memory-usage
+      summary: Instance {{ $labels.instance }} high memory usage. Current memory usage
+        is {{ $value }}%.
+    expr: avg by (instance) (memory_usage_percentage) > 90
+    for: 5m
+    labels:
+      severity: info
+  - alert: Low Power Alert
+    annotations:
+      description: Battery percentage is below 20%.
+      runbook_url: https://example.com/runbook/low-battery
+      summary: Instance {{ $labels.instance }} low battery. Current battery percentage
+        is {{ $value }}%. Charge the device.
+    expr: avg by (instance) (battery_percentage) < 80
+    for: 10m
+    labels:
+      severity: warning
+  - alert: Memory Usage Alert By SystemGuard
+    annotations:
+      description: Dashboard memory usage is above 85% for more than 2 minutes.
+      runbook_url: https://example.com/runbook/high-memory-usage
+      summary: Instance {{ $labels.instance }} high dashboard memory usage. Current
+        memory usage is {{ $value }}%.
+    expr: avg by (instance) (dashboard_memory_usage_percentage) > 85
+    for: 2m
+    labels:
+      severity: warning
+  - alert: High CPU Temperature Alert
+    annotations:
+      description: "CPU temperature is above 90\xB0C for more than 2 minutes."
+      runbook_url: https://example.com/runbook/high-cpu-temperature
+      summary: Instance {{ $labels.instance }} high CPU temperature. Current CPU temperature
+        is {{ $value }}%.
+    expr: avg by (instance) (cpu_temperature) > 90
+    for: 2m
+    labels:
+      severity: warning
+  - alert: InstanceDown
+    annotations:
+      description: Instance {{ $labels.instance }} is down for more than 5 minutes.
+      summary: Instance Down
+    expr: up == 0
+    for: 5m
+    labels:
+      severity: critical
+  - alert: new rules
+    annotations:
+      description: sam
+      runbook_url: http://google.com
+      summary: sa
+    expr: avg by (instance) (cpu_temperature) > 90
+    for: 5m
+    labels:
+      severity: warning
