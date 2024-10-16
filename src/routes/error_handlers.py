@@ -4,7 +4,7 @@ from flask import render_template, blueprints, request, redirect, url_for, flash
 from flask_login import current_user
 from flask_wtf.csrf import CSRFError
 
-from src.config import app, obfuscated_key
+from src.config import app
 from src.logger import logger
 from src.activator import get_plan_details
 from src.background_task.prometheus_metrics import metrics
@@ -95,7 +95,7 @@ def check_password_expiry():
             return redirect(url_for('change_password'))
 
     if request.endpoint in ['activation', 'download_license', '/']:
-        plan_details = get_plan_details(obfuscated_key)
+        plan_details = get_plan_details()
         app.jinja_env.globals.update(
             is_plan_not_expired=plan_details.get('is_plan_not_expired'),
             remaining_plan_days=plan_details.get('remaining_plan_days'),

@@ -8,8 +8,6 @@
 <script src="{{ url_for('static', filename='js/cardChart.js')}}"></script>
 {% endblock %}
 {% block content %}
-<!-- is_plan_not_expired, remaining_plan_days, plan_type, is_trial = get_plan_details(obfuscated_key) -->
-
 {% if plan_type == 'Free Edition' or plan_type == 'Community Edition' %}
 <div class="alert alert-info alert-dismissible fade show" role="alert">
         <strong>Notice:</strong> You are using the <strong>{{ plan_type }}</strong> plan. Upgrade to a premium plan to unlock all features.

@@ -26,7 +26,7 @@ CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()
 
-obfuscated_key = load_secret_key("obfuscation.so")
+
 obfuscated_flask_config = load_secret_key("flask_configuration.so")
 
 HOME_DIR = os.path.expanduser("~")
@@ -57,7 +57,7 @@ cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app)
 
 # systemgaurd plan details
-plan_details = get_plan_details(obfuscated_key)
+plan_details = get_plan_details()
 
 # Define global variables for templates
 app.jinja_env.globals.update(

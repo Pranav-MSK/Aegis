@@ -2,7 +2,8 @@
 import os
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
-import subprocess
+
+from src.helper import load_secret_key
 
 number_of_sum_check_digits = 5
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
@@ -71,7 +72,8 @@ def check_license_expiration(license_key, obfuscated_key):
     remaining_plan_days = (expiration_date - today).days
     return True, remaining_plan_days, plan_type, is_trial
 
-def get_plan_details(obfuscated_key):
+def get_plan_details():
+    obfuscated_key = load_secret_key("obfuscation.so")
     is_plan_not_expired = False
     remaining_plan_days = 0
     plan_type = "Free Edition"

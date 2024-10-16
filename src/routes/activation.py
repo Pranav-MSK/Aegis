@@ -4,7 +4,7 @@ from flask import render_template, request, Blueprint, jsonify, session, flash, 
 from flask_login import login_required
 
 from src.utils import ROOT_DIR
-from src.config import app, obfuscated_key, limiter
+from src.config import app, limiter
 from src.activator import (
     calculate_unique_system_id, 
     verify_activation_code, 
