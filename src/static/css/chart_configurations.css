@@ -1,27 +1,23 @@
 :root {
-    --primary-color: #6200ea;
-    --primary-light: #9d46ff;
-    --primary-dark: #0a00b6;
-    --secondary-color: #00e676;
-    --background-color: #f5f5f5;
-    --card-background: #ffffff;
-    --text-color: #333333;
-    --light-text-color: #757575;
-    --border-color: #e0e0e0;
-    --toggle-bg: #bdbdbd;
-    --toggle-bg-checked: #00e676;
-}
-
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 20px;
+    --primary-color: #6200ea; /* Main color */
+    --primary-light: #9d46ff; /* Lighter shade */
+    --primary-dark: #0a00b6; /* Darker shade */
+    --secondary-color: #00e676; /* Green for success */
+    --background-color: #f5f5f5; /* Light background */
+    --card-background: #ffffff; /* White for cards */
+    --text-color: #333333; /* Main text color */
+    --light-text-color: #757575; /* Light text color */
+    --border-color: #e0e0e0; /* Light border color */
+    --toggle-bg: #bdbdbd; /* Default toggle background */
+    --toggle-bg-checked: #00e676; /* Checked toggle background */
+    --hover-effect: rgba(0, 0, 0, 0.1); /* Hover shadow effect */
+    --button-hover: #0056b3; /* Button hover color */
+    --button-danger-hover: #c82333; /* Danger button hover color */
 }
 
 h1 {
     text-align: center;
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 20px;
 }
 
@@ -37,16 +33,21 @@ h1 {
 
 .card {
     margin-bottom: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px var(--hover-effect);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px var(--hover-effect);
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
     padding: 10px;
     border-top-left-radius: 8px;
@@ -62,20 +63,20 @@ h1 {
 }
 
 .btn-edit, .btn-delete {
-    padding: 5px 10px;
-    margin-right: 5px;
+    padding: 8px 12px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .btn-edit {
-    background-color: #28a745;
+    background-color: var(--secondary-color);
     color: white;
 }
 
 .btn-edit:hover {
-    background-color: #218838;
+    background-color: var(--button-hover);
 }
 
 .btn-delete {
@@ -84,7 +85,7 @@ h1 {
 }
 
 .btn-delete:hover {
-    background-color: #c82333;
+    background-color: var(--button-danger-hover);
 }
 
 .modal {
@@ -96,7 +97,7 @@ h1 {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.6);
     padding-top: 60px;
 }
 
@@ -107,6 +108,7 @@ h1 {
     border: 1px solid #888;
     width: 80%;
     border-radius: 8px;
+    box-shadow: 0 2px 10px var(--hover-effect);
 }
 
 .close {
@@ -118,7 +120,7 @@ h1 {
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: var(--primary-color);
     text-decoration: none;
     cursor: pointer;
 }
@@ -131,8 +133,14 @@ input, select {
     width: 100%;
     padding: 10px;
     margin: 5px 0;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px rgba(98, 0, 234, 0.5);
 }
 
 .toggle-form {
@@ -154,7 +162,7 @@ input, select {
 }
 
 .toggle-group:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px var(--hover-effect);
 }
 
 .toggle {
@@ -165,18 +173,6 @@ input, select {
 
 .toggle input {
     display: none;
-}
-
-
-.toggle-group {
-    background-color: #f9f9f9;
-    padding: 1rem;
-    border-radius: 8px;
-    transition: box-shadow 0.3s ease;
-}
-
-.toggle-group:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .slider {
@@ -199,7 +195,6 @@ input, select {
     border-radius: 50%;
     transition: transform 0.3s;
 }
-
 
 input:checked + .slider {
     background-color: var(--toggle-bg-checked);
@@ -251,3 +246,4 @@ output {
     margin-left: 10px;
     font-weight: bold;
 }
+

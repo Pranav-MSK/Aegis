@@ -1,0 +1,51 @@
+/* Table styles */
+.table {
+    width: 100%;
+    border-collapse: collapse; /* Remove space between table cells */
+    margin-top: 1rem; /* Space between section and table */
+    background-color: #f9f9f9; /* Light background for table */
+    border: 1px solid #ddd; /* Border around the table */
+}
+
+.table th,
+.table td {
+    padding: 1rem; /* More padding for better spacing */
+    text-align: left; /* Left align text */
+    border-bottom: 1px solid #ddd; /* Subtle bottom border for rows */
+}
+
+.table th {
+    background-color: #004d40; /* Darker header background */
+    color: #ffffff; /* White text for header */
+    font-weight: bold; /* Bold text for headers */
+}
+
+.table tbody tr:hover {
+    background-color: #b2ebf2; /* Light hover effect for rows */
+}
+
+.table td {
+    background-color: #ffffff; /* White background for cells */
+}
+
+
+.table-bordered {
+    border: 1px solid #ddd; /* Border around the table */
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #ddd; /* Border for table cells */
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e0f7fa; /* Hover effect for rows */
+}
+
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto; /* Horizontal scroll for small screens */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+}
+

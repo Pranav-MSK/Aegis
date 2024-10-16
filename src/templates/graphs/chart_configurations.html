@@ -2,6 +2,7 @@
 {% block title %}Chart Configurations{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/chart_configurations.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
@@ -176,83 +177,7 @@
         </form>
     </div>
 </div>
-
-
-<script>
-    document.getElementById('addConfigBtn').addEventListener('click', function () {
-        document.getElementById('addModal').style.display = 'block';
-    });
-
-    document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', function () {
-            const id = this.getAttribute('data-id');
-            if (confirm('Are you sure you want to delete this configuration?')) {
-                fetch(`/chart_configurations/${id}`, { method: 'DELETE' })
-                    .then(response => {
-                        if (response.ok) {
-                            location.reload();
-                        } else {
-                            return response.json().then(err => {
-                                alert('Error deleting configuration: ' + err.message);
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while trying to delete the configuration.');
-                    });
-            }
-        });
-    });
-
-    document.querySelectorAll('.btn-edit').forEach(button => {
-        button.addEventListener('click', function () {
-            document.getElementById('configId').value = this.getAttribute('data-id');
-            document.getElementById('metricName').value = this.getAttribute('data-metric-name');
-            document.getElementById('title').value = this.getAttribute('data-title');
-            document.getElementById('xlabel').value = this.getAttribute('data-xlabel');
-            document.getElementById('ylabel').value = this.getAttribute('data-ylabel');
-            document.getElementById('tension').value = this.getAttribute('data-tension');
-            document.getElementById('pointRadius').value = this.getAttribute('data-point-radius');
-            document.getElementById('pointHoverRadius').value = this.getAttribute('data-point-hover-radius');
-
-            // Update outputs to reflect current values
-            document.querySelector('#tension + output').value = document.getElementById('tension').value;
-            document.querySelector('#pointRadius + output').value = document.getElementById('pointRadius').value;
-            document.querySelector('#pointHoverRadius + output').value = document.getElementById('pointHoverRadius').value;
-
-            document.getElementById('chartType').value = this.getAttribute('data-chart-type');
-
-            document.getElementById('editModal').style.display = 'block';
-        });
-    });
-
-
-    document.querySelector('.close').onclick = function () {
-        document.getElementById('editModal').style.display = 'none';
-    };
-
-    document.querySelectorAll('.is-active').forEach(checkbox => {
-        checkbox.addEventListener('change', function () {
-            const id = this.getAttribute('data-id');
-            const isActive = this.checked;
-
-            fetch(`/chart_configurations/${id}/activate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ is_active: isActive })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Configuration updated successfully');
-                    } else {
-                        alert('Error updating configuration');
-                    }
-                });
-        });
-    });
-</script>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/chartConfig.js') }}" defer></script>
 {% endblock %}

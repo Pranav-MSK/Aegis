@@ -13,7 +13,6 @@ dashboard_bp = blueprints.Blueprint("dashboard", __name__)
 @app.route("/", methods=["GET"])
 @login_required
 def dashboard():
-    logger.info("Dashboard accessed")
     # if user is not authenticated, redirect to login page
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
