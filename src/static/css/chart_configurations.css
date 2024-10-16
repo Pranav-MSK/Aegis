@@ -1,3 +1,17 @@
+:root {
+    --primary-color: #6200ea;
+    --primary-light: #9d46ff;
+    --primary-dark: #0a00b6;
+    --secondary-color: #00e676;
+    --background-color: #f5f5f5;
+    --card-background: #ffffff;
+    --text-color: #333333;
+    --light-text-color: #757575;
+    --border-color: #e0e0e0;
+    --toggle-bg: #bdbdbd;
+    --toggle-bg-checked: #00e676;
+}
+
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f8f9fa;
@@ -119,4 +133,78 @@ input, select {
     margin: 5px 0;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.toggle-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.toggle-group {
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease;
+}
+
+.toggle-group:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle input {
+    display: none;
+}
+
+
+.toggle-group {
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease;
+}
+
+.toggle-group:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slider {
+    position: relative;
+    width: 60px;
+    height: 34px;
+    background-color: var(--toggle-bg);
+    border-radius: 34px;
+    transition: background-color 0.3s;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+
+input:checked + .slider {
+    background-color: var(--toggle-bg-checked);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
 }

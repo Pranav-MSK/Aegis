@@ -29,16 +29,19 @@
             <td>{{ config.xlabel }}</td>
             <td>{{ config.ylabel }}</td>
             <td>
-                <input type="checkbox" class="is-active" data-id="{{ config.id }}" {{ 'checked' if config.is_active else '' }}>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" class="is-active" data-id="{{ config.id }}" {{ 'checked' if
+                            config.is_active else '' }}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </td>
             <td>
-                <button class="btn-edit" data-id="{{ config.id }}"
-                    data-metric-name="{{ config.metric_name }}"
-                    data-title="{{ config.title }}"
-                    data-xlabel="{{ config.xlabel }}" data-ylabel="{{ config.ylabel }}"
+                <button class="btn-edit" data-id="{{ config.id }}" data-metric-name="{{ config.metric_name }}"
+                    data-title="{{ config.title }}" data-xlabel="{{ config.xlabel }}" data-ylabel="{{ config.ylabel }}"
                     data-tension="{{ config.tension }}" data-point-radius="{{ config.point_radius }}"
-                    data-point-hover-radius="{{ config.point_hover_radius }}"
-                    data-chart-type="{{ config.chart_type }}">
+                    data-point-hover-radius="{{ config.point_hover_radius }}" data-chart-type="{{ config.chart_type }}">
                     <i class="fas fa-edit"></i> Edit
                 </button>
                 <button class="btn-delete" data-id="{{ config.id }}">
@@ -147,7 +150,8 @@
 
             <div class="form-group">
                 <label for="newPointHoverRadius">Point Hover Radius (default: 6)</label>
-                <input type="number" name="point_hover_radius" id="newPointHoverRadius" placeholder="Point Hover Radius">
+                <input type="number" name="point_hover_radius" id="newPointHoverRadius"
+                    placeholder="Point Hover Radius">
             </div>
 
             <div class="form-group">
@@ -207,7 +211,7 @@
         });
     });
 
-    document.querySelector('.close').onclick = function() {
+    document.querySelector('.close').onclick = function () {
         document.getElementById('editModal').style.display = 'none';
     };
 
@@ -224,13 +228,13 @@
                 },
                 body: JSON.stringify({ is_active: isActive })
             })
-            .then(response => {
-                if (response.ok) {
-                    alert('Configuration updated successfully');
-                } else {
-                    alert('Error updating configuration');
-                }
-            });
+                .then(response => {
+                    if (response.ok) {
+                        alert('Configuration updated successfully');
+                    } else {
+                        alert('Error updating configuration');
+                    }
+                });
         });
     });
 </script>
