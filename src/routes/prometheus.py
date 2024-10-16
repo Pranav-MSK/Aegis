@@ -39,7 +39,7 @@ prometheus_bp = Blueprint("prometheus", __name__)
 PROMETHEUS_BASE_URL = "http://localhost:9090"
 ALERTMANAGER_BASE_URL = "http://localhost:9093"
 PROMETHEUS_RELOAD_URL = "http://localhost:9090/api/v1/admin/tsdb/reload"  # Adjust as necessary
-RULES_FILE_PATH = "prometheus_config/alert_rules.yml"
+RULES_FILE_PATH = os.path.join(ROOT_DIR, "prometheus_config/alert_rules.yml")
 
 # Cache user queries with LRU cache (memory-based, not ideal for distributed apps)
 @lru_cache(maxsize=128)

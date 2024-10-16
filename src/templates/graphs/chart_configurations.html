@@ -10,39 +10,45 @@
 
 <button id="addConfigBtn" class="btn btn-primary">Add New Configuration</button>
 
-<div class="row">
-    {% for config in configs %}
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5>{{ config.title }}</h5>
-                <div>
-                    <input type="checkbox" class="is-active" data-id="{{ config.id }}" {{ 'checked' if config.is_active else '' }}>
-                </div>
-            </div>
-            <div class="card-body">
-                <p><strong>Metric Name:</strong> {{ config.metric_name }}</p>
-                <p><strong>Title:</strong> {{ config.title }}</p>
-                <p><strong>Y-Axis:</strong> {{ config.ylabel }}</p>
-                <div class="actions">
-                    <button class="btn-edit" data-id="{{ config.id }}"
-                        data-metric-name="{{ config.metric_name }}"
-                        data-title="{{ config.title }}"
-                        data-xlabel="{{ config.xlabel }}" data-ylabel="{{ config.ylabel }}"
-                        data-tension="{{ config.tension }}" data-point-radius="{{ config.point_radius }}"
-                        data-point-hover-radius="{{ config.point_hover_radius }}"
-                        data-chart-type="{{ config.chart_type }}">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button class="btn-delete" data-id="{{ config.id }}">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
+<table class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th>Metric Name</th>
+            <th>Title</th>
+            <th>X-Axis</th>
+            <th>Y-Axis</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for config in configs %}
+        <tr>
+            <td>{{ config.metric_name }}</td>
+            <td>{{ config.title }}</td>
+            <td>{{ config.xlabel }}</td>
+            <td>{{ config.ylabel }}</td>
+            <td>
+                <input type="checkbox" class="is-active" data-id="{{ config.id }}" {{ 'checked' if config.is_active else '' }}>
+            </td>
+            <td>
+                <button class="btn-edit" data-id="{{ config.id }}"
+                    data-metric-name="{{ config.metric_name }}"
+                    data-title="{{ config.title }}"
+                    data-xlabel="{{ config.xlabel }}" data-ylabel="{{ config.ylabel }}"
+                    data-tension="{{ config.tension }}" data-point-radius="{{ config.point_radius }}"
+                    data-point-hover-radius="{{ config.point_hover_radius }}"
+                    data-chart-type="{{ config.chart_type }}">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-delete" data-id="{{ config.id }}">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <!-- Modal for Editing Chart Configuration -->
 <div class="modal" id="editModal">
@@ -156,6 +162,7 @@
         </form>
     </div>
 </div>
+
 
 <script>
     document.getElementById('addConfigBtn').addEventListener('click', function () {
