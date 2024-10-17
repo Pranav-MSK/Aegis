@@ -16,7 +16,7 @@ body {
     max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
@@ -30,22 +30,9 @@ body {
 /* Page Title */
 .page-title {
     font-size: 2.5rem;
-    color: #333;
+    color: #4caf50; /* Use primary color */
     margin-bottom: 30px;
     text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.page-title i {
-    color: #4caf50;
-    margin-right: 10px;
-    transition: transform 0.3s;
-}
-
-.page-title:hover i {
-    transform: rotate(10deg);
 }
 
 /* Buttons */
@@ -54,10 +41,11 @@ button {
     border: none;
     border-radius: 6px;
     background-color: #4caf50;
-    color: #fff;
+    color: #ffffff;
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
+    margin-bottom: 10px;
 }
 
 button:hover {
@@ -69,17 +57,13 @@ button:active {
     transform: scale(0.98);
 }
 
-button i {
-    margin-right: 8px;
-}
-
 /* Select Dropdown */
 select {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 1rem;
-    background-color: #fff;
+    background-color: #ffffff;
     color: #333;
     transition: border-color 0.3s, background-color 0.3s;
 }
@@ -98,11 +82,6 @@ h2 {
     margin-bottom: 20px;
     display: flex;
     align-items: center;
-}
-
-h2 i {
-    margin-right: 10px;
-    color: #4caf50;
 }
 
 /* Chart Canvas */
@@ -184,12 +163,12 @@ canvas {
 }
 
 /* Improved Color Scheme */
-body {
+:root {
     --primary-color: #4caf50;
     --secondary-color: #333;
     --background-color: #f0f2f5;
     --text-color: #444;
-    --light-bg: #fff;
+    --light-bg: #ffffff;
     --shadow-color: rgba(0, 0, 0, 0.1);
     --hover-color: #45a049;
     --card-background: #f5f5f5;
@@ -201,8 +180,7 @@ body {
     color: var(--text-color);
 }
 
-.page-title i,
-h2 i {
+.page-title {
     color: var(--primary-color);
 }
 
@@ -223,74 +201,41 @@ canvas {
     background-color: var(--card-background);
 }
 
-/* Hover Animations */
-button:hover {
-    background-color: var(--hover-color);
-    transform: scale(1.05);
+/* Metric Card Styling */
+.metric-card {
+    background: white; /* Card background */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: transform 0.3s;
 }
 
-/* General Button Styles */
-button {
-    padding: 10px 20px;             /* Adjust padding for a comfortable size */
-    border: 2px solid transparent;  /* Add border for better contrast */
-    border-radius: 5px;             /* Slightly rounded corners for modern look */
-    background-color: #4caf50;      /* Primary button background color (green) */
-    color: white;                   /* Button text color */
-    font-size: 1rem;                /* Base font size */
-    cursor: pointer;                /* Show pointer on hover */
-    display: inline-flex;           /* Align button content horizontally */
-    align-items: center;            /* Center icon and text vertically */
-    justify-content: center;        /* Center content */
-    transition: background-color 0.3s, transform 0.3s;  /* Smooth transition on hover */
-    margin-bottom: 10px;           /* Add space between buttons */
+.metric-card:hover {
+    transform: translateY(-5px);
 }
 
-/* Hover and Active States */
-button:hover {
-    background-color: #45a049;      /* Darken background on hover */
-    transform: scale(1.05);         /* Slight zoom effect on hover */
+/* Card header styling */
+.card-header {
+    background-color: #007bff; /* Header color */
+    color: white;
+    padding: 15px;
+    text-align: center;
 }
 
-button:active {
-    transform: scale(0.98);         /* Slight shrink effect on click */
+/* Card content styling */
+.card-content {
+    padding: 15px;
 }
 
-/* Icon Spacing */
-button i {
-    margin-right: 8px;              /* Space between icon and text */
-}
-
-/* Style for Icon in Button */
-button i.fas {
-    font-size: 1.2rem;              /* Adjust icon size */
-    vertical-align: middle;         /* Center the icon vertically */
-}
-
-/* Custom Styles for Specific Buttons (Optional) */
-#refreshData, #refreshCpuTime, #refreshMemoryTime, #refreshBatteryTime, 
-#refreshNetworkTime, #refreshDashboardMemoryTime, #refreshCpuFrequencyTime,
-#refreshCurrentTempTime {
-    background-color: #3498db;      /* Optional: Blue background for specific buttons */
-}
-
-#refreshData:hover, #refreshCpuTime:hover, #refreshMemoryTime:hover, #refreshBatteryTime:hover, 
-#refreshNetworkTime:hover, #refreshDashboardMemoryTime:hover, 
-#refreshCpuFrequencyTime:hover, #refreshCurrentTempTime:hover {
-    background-color: #2980b9;      /* Darker blue on hover for specific buttons */
-}
-
-
+/* Canvas styling */
 .graph {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
+    width: 100% !important; /* Full width */
+    height: 200px; /* Set height for charts */
 }
 
+/* Chart Heading */
 .chart-heading {
     font-size: 1.5em;
     font-weight: bold;
     margin-bottom: 10px;
     color: #333; /* Improved color for better visibility */
-    margin-left: 50px;
 }

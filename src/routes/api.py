@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from flask import jsonify, blueprints, request, render_template
 from flask_login import login_required, current_user
 from flask_compress import Compress
-from src.config import app, db
+from src.config import app, db, csrf
 from src.models import UserDashboardSettings, AlertTicket, ChartConfiguration, UserProfile
 from src.utils import _get_system_info, get_os_release_info, get_os_info, get_cached_value
 from src.routes.helper.common_helper import admin_required
@@ -26,9 +26,8 @@ PROMETHEUS_BASE_URL = "http://localhost:9090"
 QUERY_API_URL = f'{PROMETHEUS_BASE_URL}/api/v1/query_range'
 TARGETS_API_URL = f'{PROMETHEUS_BASE_URL}/api/v1/targets'
 
-
-
 @app.route("/api/v1/system-info", methods=["GET"])
+@csrf.exempt
 @login_required
 def system_api():
     try:

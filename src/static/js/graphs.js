@@ -200,24 +200,43 @@
         constructor(chartManager) {
             this.chartManager = chartManager;
             this.container = document.getElementById('chartsContainer');
-        }
+        }                
 
         createChartContainer(config) {
             const chartDiv = document.createElement('div');
             chartDiv.className = 'chart-container';
-
+        
+            const metricCard = document.createElement('div');
+            metricCard.className = 'metric-card';
+        
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'card-header';
+        
+            // Set the card header to display the metric name
             const heading = document.createElement('h3');
-            heading.textContent = config.title;
-            heading.className = 'chart-heading';
-
+            heading.textContent = config.title; // Change from config.title to config.metric_name
+            cardHeader.appendChild(heading);
+        
+            const cardContent = document.createElement('div');
+            cardContent.className = 'card-content';
+        
+            // Create the canvas element for the chart
             const canvas = document.createElement('canvas');
             canvas.className = 'graph';
-            canvas.id = config.metric_name;
-
-            chartDiv.appendChild(heading);
-            chartDiv.appendChild(canvas);
+            canvas.id = config.metric_name; // Ensure canvas ID is unique
+        
+            // Append the canvas to the card content
+            cardContent.appendChild(canvas);
+            
+            // Append header and content to the card
+            metricCard.appendChild(cardHeader);
+            metricCard.appendChild(cardContent);
+        
+            // Finally, append the card to the chart container
+            chartDiv.appendChild(metricCard);
             this.container.appendChild(chartDiv);
         }
+        
 
         clearCharts() {
             this.container.innerHTML = '';
@@ -233,11 +252,14 @@
                         const ctx = document.getElementById(config.metric_name).getContext('2d');
                         this.chartManager.destroyChart(config.title);
                         this.chartManager.createChart(ctx, data, config);
+
+                        // Add space between graphs
+                        const chartContainer = document.getElementById(config.metric_name).closest('.chart-container');
+                        chartContainer.style.marginBottom = '20px';
                     } else {
                         console.warn(`No data for chart: ${config.title}`);
                     }
-                }
-            });
+                }    });
         }
     }
 

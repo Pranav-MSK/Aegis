@@ -1,0 +1,289 @@
+{% extends "base/base.html" %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/alternative_homepage.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-main">
+            <h1>{{ title }} <span class="refresh-indicator"></span></h1>
+            <div class="server-info">
+                <p>Server: <span class="server-name">{{ system_info.nodename }}</span></p>
+                <p>IP: <span class="server-ip">{{ system_info.ipv4_connections }}</span></p>
+            </div>
+        </div>
+        <div class="header-status">
+            <div class="status-item">
+                <span class="status-label">Last Updated:</span>
+                <span class="status-value current-server-time">{{ system_info.current_server_time }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid Section -->
+    <div class="metrics-grid">
+        <!-- CPU Section -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>CPU Status</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="metric-primary">
+                    <div class="metric-value">
+                        <span class="large-number cpu-percent">{{ system_info.cpu_percent }}</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="metric-label">Utilization</div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Cores:</span>
+                        <span class="detail-value">{{ system_info.cpu_core }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Frequency:</span>
+                        <span class="detail-value cpu-frequency">{{ system_info.cpu_frequency }} GHz</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Max Frequency:</span>
+                        <span class="detail-value">{{ system_info.cpu_max_frequency }} GHz</span>
+                    </div>
+                    <!-- <div class="detail-item">
+                        <span class="detail-label">Processor:</span>
+                        <span class="detail-value">{{ system_info.processor_name }}</span>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Storage Section -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Storage Status</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="metric-primary">
+                    <div class="metric-value">
+                        <span class="large-number disk-percent">{{ system_info.disk_percent }}</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="metric-label">Disk Usage</div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Total:</span>
+                        <span class="detail-value">{{ system_info.disk_total }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Used:</span>
+                        <span class="detail-value disk-used">{{ system_info.disk_used }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Free:</span>
+                        <span class="detail-value disk-free">{{ system_info.disk_free }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memory Section -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Memory Status</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="metric-primary">
+                    <div class="metric-value">
+                        <span class="large-number memory-percent">{{ system_info.memory_percent }}</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="metric-label">Memory Usage</div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Used:</span>
+                        <span class="detail-value memory-used">{{ system_info.memory_used }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Available:</span>
+                        <span class="detail-value">{{ system_info.memory_available }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Swap:</span>
+                        <span class="detail-value">{{ system_info.swap_memory }}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temperature Section -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Temperature</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="metric-primary">
+                    <div class="metric-value">
+                        <span class="large-number current-temp">{{ system_info.current_temp }}</span>
+                        <span class="unit">°C</span>
+                    </div>
+                    <div class="metric-label">Current Temperature</div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">High:</span>
+                        <span class="detail-value">{{ system_info.high_temp }}°C</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Critical:</span>
+                        <span class="detail-value">{{ system_info.critical_temp }}°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Battery Status -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Battery Status</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="metric-primary">
+                    <div class="metric-value">
+                        <span class="large-number battery-percent">{{ system_info.battery_percent }}</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="metric-label">Battery Level</div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value battery-status">{{ system_info.battery_status }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="details-grid">
+        <!-- System Information -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>System Information</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-desktop info-icon"></i>OS:</span>
+                        <span class="info-value"> {{ system_info.os_info.os_full_name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-user info-icon"></i>Username:</span>
+                        <span class="info-value">{{ system_info.system_username }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-clock info-icon"></i>Boot Time:</span>
+                        <span class="info-value">{{ system_info.boot_time }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-tasks info-icon"></i>Process Count:</span>
+                        <span class="info-value">{{ system_info.process_count }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Kernel Version:</span>
+                        <span class="info-value">{{ system_info.os_info.kernel_version }}</span>
+                    </div>
+         
+                </div>
+            </div>
+        </div>
+        <!-- Top 5 Processes dummy data -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Top 5 Processes</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="process-grid">
+                    {% for process in system_info.top_processes %}
+                    <div class="process-item">
+                        <span class="process-name">{{ process[0] }}</span>
+                        <span class="process-cpu">CPU: {{ process[1] }}%</span>
+                        <span class="process-memory">Memory: {{ process[2] }}%</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="process-footer">
+                    <a href="#">View All Processes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Details Section -->
+    <div class="details-grid">
+
+        <!-- Network Section -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Network Status</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="network-stats">
+                    <div class="stat-item">
+                        <span class="stat-icon download"></span>
+                        <div class="stat-details">
+                            <span class="stat-value network-received">{{ system_info.network_received }}</span>
+                            <span class="stat-label">MB Downloaded</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon upload"></span>
+                        <div class="stat-details">
+                            <span class="stat-value network-sent">{{ system_info.network_sent }}</span>
+                            <span class="stat-label">MB Uploaded</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>System Metrics History</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <canvas id="system-metrics"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/alternativeHomepage.js')}}"></script>
+{% endblock %}

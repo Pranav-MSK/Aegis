@@ -110,11 +110,7 @@
   }
   
   /* Enhanced Value Display */
-  .temp-value,
-  .usage-value,
-  .memory-usage-percentage,
-  .frequency-value,
-  .high-temp-value {
+ .card-text {
     font-size: 2.75rem;
     font-weight: 800;
     background: linear-gradient(135deg, var(--color-primary), var(--color-accent));

@@ -7,6 +7,7 @@ import subprocess
 import psutil
 import functools
 from jinja2 import Environment, FileSystemLoader
+from collections import defaultdict
 
 from src.logger import logger
 from src.models import GeneralSettings
@@ -179,7 +180,8 @@ def cpu_usage_percent():
     Returns:
         float: Current CPU usage percentage
     """
-    return psutil.cpu_percent(interval=1)
+    cpu_percent = psutil.cpu_percent(interval=1, percpu=False)
+    return round(cpu_percent, 2)
 
 def get_cpu_temp():
     """
@@ -210,21 +212,49 @@ def get_cpu_temp():
         logger.warning(f"Error getting CPU temperature: {e}")
         return (0, 0, 0)
 
-
-def get_top_processes(number=5):
+def get_top_processes(number=5, combined=False):
     """Get the top processes by memory usage.
+    
     ---
     Parameters:
         number (int): Number of top processes to return.
+        combined (bool): Whether to combine metrics of processes with the same name.
+    
     ---
     Returns:
         list: List of top processes with name, CPU percent, memory percent, and PID.
     """
-    processes = [
-        (p.info['name'], p.info['cpu_percent'], round(p.info['memory_percent'], 2), p.info['pid'])
-        for p in sorted(psutil.process_iter(['name', 'cpu_percent', 'memory_percent', 'pid']),
-                        key=lambda p: p.info['memory_percent'], reverse=True)[:number]
-    ]
+    if combined:
+        # Use a defaultdict to aggregate processes by name
+        combined_processes = defaultdict(lambda: {'cpu_percent': 0, 'memory_percent': 0, 'pid': None})
+
+        for p in psutil.process_iter(['name', 'cpu_percent', 'memory_percent', 'pid']):
+            try:
+                name = p.info['name'].title()
+                combined_processes[name]['cpu_percent'] = max(combined_processes[name]['cpu_percent'], p.info['cpu_percent'])
+                combined_processes[name]['memory_percent'] = max(combined_processes[name]['memory_percent'], p.info['memory_percent'])
+                # Store one PID (you can modify this logic if needed)
+                combined_processes[name]['pid'] = p.info['pid']
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+
+        # Convert the combined processes to a list and sort by memory percent
+        processes = sorted(
+            [(name, info['cpu_percent'], round(info['memory_percent'], 2), info['pid'])
+             for name, info in combined_processes.items()],
+            key=lambda x: x[2],  # Sort by memory percent
+            reverse=True
+        )[:number]
+    else:
+        processes = [
+            (p.info['name'].title(), p.info['cpu_percent'], round(p.info['memory_percent'], 2), p.info['pid'])
+            for p in sorted(
+                psutil.process_iter(['name', 'cpu_percent', 'memory_percent', 'pid']),
+                key=lambda p: p.info['memory_percent'],
+                reverse=True
+            )[:number]
+        ]
+
     return processes
 
 def get_disk_free():
@@ -502,6 +532,7 @@ def _get_system_info():
     # ifconfig | grep -E 'RX packets|TX packets' -A 1
 
     # Prepare system information dictionary
+    top_processes = get_top_processes(6, combined=True)
     info = {
         'cpu_percent': cpu_usage_percent(),
         'memory_percent': round(memory_info.percent, 2),
@@ -521,7 +552,12 @@ def _get_system_info():
         'high_temp': high_temp,
         'critical_temp': critical_temp,
         'timestamp': datetime.datetime.now(),
+        "disk_used": get_disk_used(),
+        "disk_free": get_disk_free(),
     }
+    info.update({
+        'top_processes': top_processes
+    })
     return info
 
 def get_system_info():
@@ -547,7 +583,7 @@ def get_system_info():
         "system_username": system_username,
         'nodename': nodename,
         'cpu_core': get_cpu_core_count(),
-        'processort_name': get_linux_processor_name(),
+        'processor_name': get_linux_processor_name(),
         'boot_time': boot_time.strftime("%Y-%m-%d %H:%M:%S"),
         'process_count': len(psutil.pids()),
         'swap_memory': psutil.swap_memory().percent,

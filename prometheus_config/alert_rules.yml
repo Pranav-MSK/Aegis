@@ -49,12 +49,3 @@ groups:
     for: 5m
     labels:
       severity: critical
-  - alert: new rules
-    annotations:
-      description: sam
-      runbook_url: http://google.com
-      summary: sa
-    expr: avg by (instance) (cpu_temperature) > 90
-    for: 5m
-    labels:
-      severity: warning
