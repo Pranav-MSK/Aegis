@@ -34,42 +34,64 @@ def process():
     sort_by = request.args.get("sort", "cpu")
     order = request.args.get("order", "asc")
     toggle_order = "desc" if order == "asc" else "asc"
-
     sudo_password = session.get("sudo_password", "")
 
     if request.method == "POST":
         if "kill_pid" in request.form:
             pid_to_kill = request.form.get("kill_pid")
             process_name = request.form.get("process_name")
-
             if pid_to_kill and process_name:
                 try:
+                    # First, try to kill the process normally
                     result = subprocess.run(
-                        ['sudo', '-S', 'kill', '-9', str(pid_to_kill)],
+                        ['sudo', '-S', 'kill', str(pid_to_kill)],
                         input=sudo_password + '\n',
-                        stderr=subprocess.PIPE,
-                        stdout=subprocess.PIPE,
+                        capture_output=True,
                         text=True,
+                        timeout=5
                     )
-
+                    
+                    if result.returncode != 0:
+                        # If normal kill fails, try SIGKILL
+                        result = subprocess.run(
+                            ['sudo', '-S', 'kill', '-9', str(pid_to_kill)],
+                            input=sudo_password + '\n',
+                            capture_output=True,
+                            text=True,
+                            timeout=5
+                        )
+                    
                     if result.returncode == 0:
                         flash(f"Process '{process_name}' (PID {pid_to_kill}) killed successfully.", "success")
                         logger.info(f"Killed process '{process_name}' (PID {pid_to_kill}) successfully by user '{current_user.username}' (IP: {request.remote_addr})")
                     else:
-                        flash(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {result.stderr.strip()}", "danger")
-                        logger.error(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {result.stderr.strip()}")
+                        # If both methods fail, check if the process still exists
+                        check_process = subprocess.run(
+                            ['ps', '-p', str(pid_to_kill)],
+                            capture_output=True,
+                            text=True
+                        )
+                        
+                        if check_process.returncode != 0:
+                            # Process doesn't exist, assume it was killed
+                            flash(f"Process '{process_name}' (PID {pid_to_kill}) no longer exists. It may have been terminated.", "success")
+                            logger.info(f"Process '{process_name}' (PID {pid_to_kill}) no longer exists. Assumed terminated.")
+                        else:
+                            # Process still exists, report failure
+                            flash(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {result.stderr.strip()}", "danger")
+                            logger.error(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {result.stderr.strip()}")
+                
+                except subprocess.TimeoutExpired:
+                    flash(f"Timeout while attempting to kill process '{process_name}' (PID {pid_to_kill}).", "danger")
+                    logger.error(f"Timeout while attempting to kill process '{process_name}' (PID {pid_to_kill}).")
                 except Exception as e:
                     flash(f"Error executing command: {str(e)}", "danger")
                     logger.error(f"Error executing command to kill process '{process_name}' (PID {pid_to_kill}): {str(e)}")
             else:
                 flash("Invalid process ID or name.", "danger")
                 logger.error("Invalid process ID or name.")
-            return redirect(url_for("process"))
-
-        # Handle the number of processes to display
-        if "number" in request.form:
-            number_of_processes = int(request.form.get("number", 50))
-            session["number_of_processes"] = number_of_processes
+        
+        return redirect(url_for("process"))
 
     top_processes = get_top_processes(number_of_processes)
 

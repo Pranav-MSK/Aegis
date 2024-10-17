@@ -54,6 +54,7 @@
                 </table>
             </section>
 
+            {% if plan_type == 'SystemGuard Enterprise' %}
             <section class="card ticket-stats">
                 <h2>Ticket Statistics</h2>
                 <table>
@@ -87,6 +88,13 @@
                     </tbody>
                 </table>
             </section>
+            {% else %}
+            <section class="card ticket-stats">
+                <h2>SystemGuard Enterprise</h2>
+                <p>Upgrade to SystemGuard Enterprise to get access to advanced features and ticket statistics.</p>
+                <a href="{{ url_for('plan') }}" class="btn btn-primary">Upgrade Plan</a>
+            </section>
+            {% endif %}
         </div>
 
         <div class="sidebar">

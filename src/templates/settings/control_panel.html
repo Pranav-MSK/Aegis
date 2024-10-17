@@ -4,305 +4,209 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/control_panel.css') }}">
 {% endblock %}
 {% block content %}
-<div class="settings-container container-fluid p-4">
-    <h1 class="settings-title text-center my-4"><span class="text-danger">{{ title }}</span> Control Panel
-        <i class="fas fa-cogs"></i>
-    </h1>
-    {% include 'ext/message.html' %}
 
-    <!-- Tab Navigation -->
-    <ul class="nav nav-tabs justify-content-center mb-4" id="controlPanelTabs" role="tablist">
-        {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
-        <li class="nav-item">
-            <a class="nav-link" id="user-management-tab" data-bs-toggle="tab" href="#user-management" role="tab"
-                aria-controls="user-management" aria-selected="false">
-                <i class="fas fa-users"></i> Users
-            </a>
-        </li>
-        <!-- systemguard central -->
-        <li class="nav-item">
-            <a class="nav-link" id="systemguard-central-tab" data-bs-toggle="tab" href="#systemguard-central" role="tab"
-                aria-controls="systemguard-central" aria-selected="false">
-                <i class="fa-brands fa-centercode"></i> SystemGuard Central
-            </a>
+    <div class="settings-container container-fluid p-4">
+        <h1 class="settings-title text-center my-4">
+            <span class="text-primary">{{ title }}</span> Control Panel
+            <i class="fas fa-cogs"></i>
+        </h1>
+        {% include 'ext/message.html' %}
 
-        </li>
-        <!-- Alert tab -->
-        <li class="nav-item">
-            <a class="nav-link" id="alert-tab" data-bs-toggle="tab" href="#alert" role="tab" aria-controls="alert"
-                aria-selected="false">
-                <i class="fas fa-solid fa-bell"></i> Alerts & Notifications
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="utilities-tab" data-bs-toggle="tab" href="#utilities" role="tab"
-                aria-controls="utilities" aria-selected="false">
-                <i class="fas fa-tools"></i> Utilities
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="network-tab" data-bs-toggle="tab" href="#network-tools" role="tab"
-                aria-controls="network-tools" aria-selected="false">
-                <i class="fas fa-globe"></i> Security Tools
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings" role="tab"
-                aria-controls="settings" aria-selected="false">
-                <i class="fas fa-cogs"></i> General
-            </a>
-        </li>
-        {% endif %}
-        <li class="nav-item">
-            <a class="nav-link" id="system-info-tab" data-bs-toggle="tab" href="#system-info" role="tab"
-                aria-controls="system-info" aria-selected="false">
-                <i class="fas fa-info-circle"></i> System Info
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab"
-                aria-controls="profile" aria-selected="true">
-                <i class="fas fa-user"></i> Profile
-            </a>
-        </li>
-    </ul>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
+                    <button class="nav-link" id="v-pills-users-tab" data-bs-toggle="pill" data-bs-target="#v-pills-users" type="button" role="tab" aria-controls="v-pills-users" aria-selected="false">
+                        <i class="fas fa-users"></i> Users
+                    </button>
+                    <button class="nav-link" id="v-pills-systemguard-tab" data-bs-toggle="pill" data-bs-target="#v-pills-systemguard" type="button" role="tab" aria-controls="v-pills-systemguard" aria-selected="false">
+                        <i class="fa-brands fa-centercode"></i> SystemGuard Central
+                    </button>
+                    <button class="nav-link" id="v-pills-alerts-tab" data-bs-toggle="pill" data-bs-target="#v-pills-alerts" type="button" role="tab" aria-controls="v-pills-alerts" aria-selected="false">
+                        <i class="fas fa-bell"></i> Alerts & Notifications
+                    </button>
+                    <button class="nav-link" id="v-pills-utilities-tab" data-bs-toggle="pill" data-bs-target="#v-pills-utilities" type="button" role="tab" aria-controls="v-pills-utilities" aria-selected="false">
+                        <i class="fas fa-tools"></i> Utilities
+                    </button>
+                    <button class="nav-link" id="v-pills-security-tab" data-bs-toggle="pill" data-bs-target="#v-pills-security" type="button" role="tab" aria-controls="v-pills-security" aria-selected="false">
+                        <i class="fas fa-shield-alt"></i> Security Tools
+                    </button>
+                    <button class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false">
+                        <i class="fas fa-cogs"></i> General
+                    </button>
+                    {% endif %}
+                    <button class="nav-link" id="v-pills-system-tab" data-bs-toggle="pill" data-bs-target="#v-pills-system" type="button" role="tab" aria-controls="v-pills-system" aria-selected="false">
+                        <i class="fas fa-info-circle"></i> System Info
+                    </button>
+                    <button class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="true">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                    <!-- User Management Section -->
+                    <div class="tab-pane fade" id="v-pills-users" role="tabpanel" aria-labelledby="v-pills-users-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-users"></i> User Management</h5>
+                                <a href="{{ url_for('view_users') }}" class="btn btn-primary">
+                                    <i class="fas fa-users"></i> Manage Users
+                                </a>
+                                <a href="{{ url_for('create_user') }}" class="btn btn-success">
+                                    <i class="fas fa-user-plus"></i> Create New User
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- Tab Content -->
-    <div class="tab-content mt-4" id="controlPanelTabContent">
-        <!-- User Management Section -->
-        <div class="tab-pane fade" id="user-management" role="tabpanel" aria-labelledby="user-management-tab">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-8 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg">
-                        <div class="card-body text-center">
-                            <!-- Title -->
-                            <h5 class="card-title mb-4 d-flex justify-content-center align-items-center">
-                                <i class="fas fa-users me-2"></i> User Management
-                            </h5>
+                    <!-- SystemGuard Central Section -->
+                    <div class="tab-pane fade" id="v-pills-systemguard" role="tabpanel" aria-labelledby="v-pills-systemguard-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fa-brands fa-centercode"></i> SystemGuard Central</h5>
+                                <a href="{{ url_for('configure_targets') }}" class="btn btn-primary">
+                                    <i class="fas fa-cogs"></i> Configure Targets
+                                </a>
+                                <a href="{{ url_for('chart_configurations') }}" class="btn btn-primary">
+                                    <i class="fas fa-chart-line"></i> Chart Configurations
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
-                            <!-- User Management Button -->
-                            <a href="{{ url_for('view_users') }}"
-                                class="btn btn-primary btn-lg btn-block mb-3 d-flex justify-content-center align-items-center">
-                                <i class="fas fa-users me-2"></i> Manage Users
-                            </a>
+                    <!-- Alerts Section -->
+                    <div class="tab-pane fade" id="v-pills-alerts" role="tabpanel" aria-labelledby="v-pills-alerts-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-bell"></i> Alerts & Notifications</h5>
+                                <a href="{{ url_for('active_alerts') }}" class="btn btn-primary">
+                                    <i class="fas fa-bell"></i> Active Alerts
+                                </a>
+                                <a href="{{ url_for('view_rules') }}" class="btn btn-primary">
+                                    <i class="fas fa-list"></i> View Rules
+                                </a>
+                                <a href="{{ url_for('alertmanager_status') }}" class="btn btn-primary">
+                                    <i class="fas fa-tachometer-alt"></i> Alertmanager Status
+                                </a>
+                                <a href="{{ url_for('alert_history') }}" class="btn btn-primary">
+                                    <i class="fas fa-history"></i> Alert Ticket Tracker
+                                </a>
+                                <a href="{{ url_for('smtp_config') }}" class="btn btn-secondary">
+                                    <i class="fas fa-envelope"></i> SMTP Configuration
+                                </a>
+                                <a href="{{ url_for('update_webhooks') }}" class="btn btn-secondary">
+                                    <i class="fas fa-plug"></i> Notification Webhooks
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
-                            <!-- Create User Button -->
-                            <a href="{{ url_for('create_user') }}"
-                                class="btn btn-success btn-lg btn-block d-flex justify-content-center align-items-center">
-                                <i class="fas fa-user-plus me-2"></i> Create New User
-                            </a>
+                    <!-- Utilities Section -->
+                    <div class="tab-pane fade" id="v-pills-utilities" role="tabpanel" aria-labelledby="v-pills-utilities-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-tools"></i> Utilities</h5>
+                                <a href="{{ url_for('terminal') }}" class="btn btn-primary">
+                                    <i class="fas fa-terminal"></i> Terminal
+                                </a>
+                                <a href="{{ url_for('utility_control') }}" class="btn btn-primary">
+                                    <i class="fas fa-power-off"></i> Shutdown/Reboot
+                                </a>
+                                <a href="{{ url_for('send_email_page') }}" class="btn btn-primary">
+                                    <i class="fas fa-envelope"></i> Send Email
+                                </a>
+                                <a href="{{ url_for('speedtest') }}" class="btn btn-primary">
+                                    <i class="fas fa-tachometer-alt"></i> Speedtest
+                                </a>
+                                <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary">
+                                    <i class="fas fa-globe"></i> Ping Website
+                                </a>
+                                <a href="{{ url_for('external_monitoring') }}" class="btn btn-primary">
+                                    <i class="fas fa-cloud"></i> External API Monitoring
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Tools Section -->
+                    <div class="tab-pane fade" id="v-pills-security" role="tabpanel" aria-labelledby="v-pills-security-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-shield-alt"></i> Security Tools</h5>
+                                <a href="{{ url_for('firewall') }}" class="btn btn-primary">
+                                    <i class="fas fa-fire"></i> Firewall
+                                </a>
+                                <a href="{{ url_for('security_analysis') }}" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Security Analysis
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Section -->
+                    <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-cogs"></i> General Settings</h5>
+                                <a href="{{ url_for('general_settings') }}" class="btn btn-primary">
+                                    <i class="fas fa-sliders-h"></i> General Settings
+                                </a>
+                                <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary">
+                                    <i class="fas fa-toggle-on"></i> Page Toggles
+                                </a>
+                                <a href="{{ url_for('card_toggles') }}" class="btn btn-primary">
+                                    <i class="fas fa-th-large"></i> Card Toggles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Info Section -->
+                    <div class="tab-pane fade" id="v-pills-system" role="tabpanel" aria-labelledby="v-pills-system-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-info-circle"></i> System Info</h5>
+                                <a href="{{ url_for('show_os_info') }}" class="btn btn-primary">
+                                    <i class="fas fa-desktop"></i> Show OS Info
+                                </a>
+                                <a href="{{ url_for('about') }}" class="btn btn-primary">
+                                    <i class="fas fa-info-circle"></i> About {{ title }}
+                                </a>
+                                {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
+                                <a href="{{ url_for('activation') }}" class="btn btn-primary">
+                                    <i class="fas fa-key"></i> SystemGuard Activation
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Section -->
+                    <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-user"></i> Profile</h5>
+                                <a href="{{ url_for('view_profile') }}" class="btn btn-primary">
+                                    <i class="fas fa-user-circle"></i> My Profile
+                                </a>
+                                <a href="{{ url_for('change_password') }}" class="btn btn-primary">
+                                    <i class="fas fa-key"></i> Change Password
+                                </a>
+                                <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+                                    <i class="fas fa-user-edit"></i> Edit Profile
+                                </a>
+                                <a href="{{ url_for('user_settings') }}" class="btn btn-primary">
+                                    <i class="fas fa-user-cog"></i> User Settings
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- SystemGuard Central Section -->
-        <div class="tab-pane fade" id="systemguard-central" role="tabpanel" aria-labelledby="systemguard-central-tab">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <!-- central dashboard for systemguard use dashboard icon -->
-                            <h5 class="card-title"><i class="fa-brands fa-centercode"></i> SystemGuard Central</h5>
-                            <a href="{{ url_for('configure_targets') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-cogs"></i> Configure Targets for SystemGuard
-                            </a>
-                            <!-- chart_configurations -->
-                            <a href="{{ url_for('chart_configurations') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-cogs"></i> Chart Configurations
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Alert Section -->
-        <div class="tab-pane fade" id="alert" role="tabpanel" aria-labelledby="alert-tab">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-solid fa-bell"></i> Alerts</h5>
-                            <a href="{{ url_for('active_alerts') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-solid fa-bell"></i> Active Alerts
-                            </a>
-                            <!-- view rules -->
-                            <a href="{{ url_for('view_rules') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-solid fa-bell"></i> View Rules
-                            </a>
-                            <!-- alertmanager_status -->
-                            <a href="{{ url_for('alertmanager_status') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-solid fa-bell"></i> Alertmanager Status
-                            </a>
-                            <!-- alert_history -->
-                            <a href="{{ url_for('alert_history') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-solid fa-bell"></i> Alert Ticket Tracker
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-solid fa-bell"></i> Notification Configuration</h5>
-                            <a href="{{ url_for('smtp_config') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-key"></i> SMTP Configuration
-                            </a>
-                            <!-- webhooks -->
-                            <a href="{{ url_for('update_webhooks') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-solid fa-bell"></i> Notification Webhooks
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Section -->
-        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-cogs"></i> Settings</h5>
-                            <a href="{{ url_for('general_settings') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-cogs"></i> General Settings
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-toggle-on"></i> Feature Toggles</h5>
-                            <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-toggle-on"></i> Page Toggles
-                            </a>
-                            <a href="{{ url_for('card_toggles') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-toggle-on"></i> Card Toggles
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Utilities Section -->
-        <div class="tab-pane fade" id="utilities" role="tabpanel" aria-labelledby="utilities-tab">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-tools"></i> Utilities</h5>
-                            <a href="{{ url_for('terminal') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-terminal"></i> Terminal
-                            </a>
-                            <a href="{{ url_for('utility_control') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-tools"></i> Shutdown/Reboot
-                            </a>
-                            <a href="{{ url_for('send_email_page') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-envelope"></i> Send Email
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-tools"></i> More Utilities</h5>
-                            <a href="{{ url_for('speedtest') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-tachometer-alt"></i> Speedtest
-                            </a>
-                            <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-globe"></i> Ping Website
-                            </a>
-                            <a href="{{ url_for('external_monitoring') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-globe"></i> External API Monitoring
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Network Tools Section -->
-        <div class="tab-pane fade" id="network-tools" role="tabpanel" aria-labelledby="network-tab">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-globe"></i> Network Tools</h5>
-                            <a href="{{ url_for('firewall') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-shield-alt"></i> Firewall
-                            </a>
-                            <a href="{{ url_for('security_analysis') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-shield-alt"></i> Security Analysis
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Feature Toggles Section -->
-        <div class="tab-pane fade" id="feature-toggles" role="tabpanel" aria-labelledby="toggles-tab">
-            <div class="row justify-content-center">
-
-            </div>
-        </div>
-
-        <!-- System Info Section -->
-        <div class="tab-pane fade" id="system-info" role="tabpanel" aria-labelledby="system-info-tab">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-info-circle"></i> System Info</h5>
-                            <a href="{{ url_for('show_os_info') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-info-circle"></i> Show OS Info
-                            </a>
-                            <a href="{{ url_for('about') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-info-circle"></i> About {{ title }}
-                            </a>
-                            {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
-                            <a href="{{ url_for('activation') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-info-circle"></i> SystemGuard Activation
-                            </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Profile Section -->
-        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-user"></i> Profile</h5>
-                            <a href="{{ url_for('view_profile') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-user-cog"></i> My Profile
-                            </a>
-                            <a href="{{ url_for('change_password') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-key"></i> Change Password
-                            </a>
-                            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-user-edit"></i> Edit Profile
-                            </a>
-                            <a href="{{ url_for('user_settings') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-user-cog"></i> User Settings
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
     </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock %}

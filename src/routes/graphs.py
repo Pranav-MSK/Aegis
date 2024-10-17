@@ -47,7 +47,6 @@ def chart_configurations():
                 config.tension = get_form_value('tension', 0.4)
                 config.point_radius = get_form_value('point_radius', 0)
                 config.point_hover_radius = get_form_value('point_hover_radius', 6)
-                config.is_active = is_active
                 config.save()
                 return redirect(url_for('chart_configurations'))
         else:  # Creating a new configuration
@@ -61,7 +60,6 @@ def chart_configurations():
                 tension=request.form.get('tension', 0.4),
                 point_radius=request.form.get('point_radius', 0),
                 point_hover_radius=request.form.get('point_hover_radius', 6),
-                is_active=is_active
             )
             
             new_config.save()

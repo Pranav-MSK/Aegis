@@ -141,7 +141,7 @@ def privacy():
     return render_template('other/privacy.html')
 
 
-# @app.route('/plan')
-# def plan():
-#     return render_template('other/plan.html')
+@app.route('/plan')
+def plan():
+    return render_template('other/plan.html')
 
