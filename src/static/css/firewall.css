@@ -117,3 +117,14 @@ p {
     flex: none; /* Prevent the button from resizing */
     width: auto; /* Allow button to fit its content */
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+.transition-bg {
+    transition: background-color 0.3s ease;
+}

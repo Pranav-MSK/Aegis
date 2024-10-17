@@ -267,10 +267,6 @@
                                 <i class="fas fa-info-circle"></i> About {{ title }}
                             </a>
                             {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
-                            <a href="#" class="btn btn-primary btn-lg hover-raise" id="updateButton">
-                                <i class="fas fa-download"></i> Update Now
-                            </a>
-                            <!-- activation -->
                             <a href="{{ url_for('activation') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-info-circle"></i> SystemGuard Activation
                             </a>
@@ -309,31 +305,4 @@
 
     </div>
 </div>
-<script>
-    document.getElementById('updateButton').addEventListener('click', function (event) {
-        event.preventDefault(); // Prevent the default link behavior
-
-        fetch('{{ url_for("update_git_version") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('Update successful: ' + data.message);
-                } else if (data.status === 'info') {
-                    alert('Update info: ' + data.message);
-                } else {
-                    alert('Update failed: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while updating.');
-            });
-    });
-</script>
-
 {% endblock %}

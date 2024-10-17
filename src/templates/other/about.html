@@ -3,84 +3,81 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 {% endblock %}
 {% block content %}
+<div class="hero-section mb-5">
+    <div class="container text-center">
+        <h1 class="display-4 mb-3">{{ title }}
+            {% if is_trial == 'true' %}
+            <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i> Trial</span>
+            {% else %}
+            {% if is_plan_not_expired %}
+            <span class="badge bg-success text-white">{{plan_type}} <i class="fas fa-check-circle me-1"></i></span>
+            {% endif %}
+            {% endif %}
+        </h1>
+        <h4 class="mb-4">
+            <i class="fas fa-code-branch me-2"></i>{{ version }}
+            {% if pre_release %}
+            <span class="badge bg-warning text-dark">Pre-release</span>
+            {% else %}
+            <span class="badge bg-success">Stable</span>
+            {% endif %}
+        </h4>
+        <p class="lead">{{ description }}</p>
+    
+    </div>
+</div>
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-lg border-0 rounded-lg animate-card">
-                <div class="crd-body p-5">
-                    <h1 class="card-title display-4 mb-3 text-center">{{ title }} 
-                        {% if is_trial == 'true' %}
-                        <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i> Trial</span>
-                        {% else %}
-                        {% if is_plan_not_expired %}
-                        <span class="badge bg-success text-white">{{plan_type}} <i class="fas fa-check-circle me-1"></i></span>
-                        {% endif %}
-                        {% endif %}
-                    </h1>
-                    <h4 class="card-subtitle mb-4 text-center   ">
-                        <i class="fas fa-code-branch me-2"></i>{{ version }}
-                        {% if pre_release %}
-                        <span class="badge bg-warning text-dark">Pre-release</span>
-                        {% else %}
-                        <span class="badge bg-success">Stable</span>
-                        {% endif %}
-                    </h4>
-                    <p class="card-text lead text-center">{{ description }}</p>
-                    <hr>
-                    <div class="info-section">
-                        <h5 class="card-title">Author</h5>
-                        <p class="card-text mb-0">{{ author }}</p>
-                    </div>
-                    <div class="info-section">
-                        <h5 class="card-title">Year</h5>
-                        <p class="card-text mb-0">{{ year }}</p>
-                    </div>
-                    <div class="info-section">
-                        <h5 class="card-title">SystemGuard Unique ID</h5>
-                        <p class="card-text mb-0">{{ systemguard_unique_id }}</p>
-                    </div>
-                    <div class="info-section">
-                        <h5 class="card-title">Installation Method</h5>
-                        {% if installation_info["sg_installation_method"] == "git" %}
-                        <p class="card-text mb-0">Git Repository</p>
-                        <h5 class="card-title mt-3">Git Branch</h5>
-                        <p class="card-text mb-0">{{ installation_info["git_branch"] }}</p>
-                        {% if installation_info["update_available"] %}
-                        <h5 class="card-title mt-3">Update Available</h5>
-                        <p class="card-text mb-0">A new version is available. Please update to the latest version.</p>
-                        <a href="#" class="btn btn-primary btn-lg hover-raise" id="updateButton">
-                            <i class="fas fa-download"></i> Update Now
-                        </a>
-                        {% else %}
-                        <h5 class="card-title mt-3">Update Status</h5>
-                        <p class="card-text mb-0">You are up-to-date with the latest version.</p>
-                        {% endif %}
-                        {% elif installation_info["sg_installation_method"] == "release" %}
-                        <p class="card-text">Installed via Release</p>
-                        {% elif installation_info["sg_installation_method"] == "source" %}
-                        <p class="card-text">Installed via Source Code</p>
-                        {% endif %}
-                    </div>
-                    <hr>
-                    <h5 class="card-title">GitHub Repository</h5>
-                    <a href="{{ project_url }}" target="_blank" class="btn btn-primary btn-lg hover-raise">
-                        <i class="fab fa-github"></i> View on GitHub
-                    </a>
-                    <hr>
-                    <h5 class="card-title">Contact</h5>
-                    <p class="card-text">
-                        For more information, please visit the <a href="{{ project_url }}" target="_blank">GitHub
-                            repository</a> or contact us at <a href="mailto:{{ contact_email }}">{{ contact_email
-                            }}</a>.
+            <div class="card shadow-lg rounded-lg animate-card mb-5">
+                <div class="card-body p-5">
+                    <h2 class="card-title mb-4">About SystemGuard</h2>
+                    <p class="card-text">SystemGuard is a cutting-edge monitoring solution designed to provide real-time insights into your system's performance. With its intuitive interface and powerful features, SystemGuard empowers you to:
                     </p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Monitor CPU, memory, and disk usage</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Track network performance</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Set up custom alerts for critical events</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Generate detailed performance reports</li>
+                    </ul>
+                    <p>Whether you're managing a single server or a complex infrastructure, SystemGuard provides the tools you need to ensure optimal performance and uptime.</p>
+                </div>
+            </div>
+
+            <div class="row mb-5">
+                <div class="col-md-4 text-center mb-3">
+                    <i class="fas fa-user-circle feature-icon mb-3"></i>
+                    <h5>Author</h5>
+                    <p class="mb-0">{{ author }}</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <i class="fas fa-calendar-alt feature-icon mb-3"></i>
+                    <h5>Year</h5>
+                    <p class="mb-0">{{ year }}</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <i class="fas fa-fingerprint feature-icon mb-3"></i>
+                    <h5>Unique ID</h5>
+                    <p class="mb-0">{{ systemguard_unique_id }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow-lg rounded-lg animate-card">
+                <div class="card-body p-5">
+                    <h2 class="card-title mb-4">Get in Touch</h2>
+                    <p class="card-text">We're always looking to improve SystemGuard and would love to hear from you! Whether you have questions, feature requests, or just want to share your experience, don't hesitate to reach out.</p>
+                    <div class="d-flex justify-content-center mt-4">
+                        <a href="mailto:{{ contact_email }}" class="btn btn-primary btn-lg me-3 hover-raise">
+                            <i class="fas fa-envelope me-2"></i>Email Us
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-{% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/update.js') }}"></script>
 {% endblock %}
