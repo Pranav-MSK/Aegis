@@ -55,21 +55,21 @@ document.querySelectorAll('.is-active').forEach(checkbox => {
     checkbox.addEventListener('change', function () {
         const id = this.getAttribute('data-id');
         const isActive = this.checked;
-
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+    
         fetch(`/chart_configurations/${id}/activate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': '{{ csrf_token() }}'
+                'X-CSRF-Token': csrfToken
             },
             body: JSON.stringify({ is_active: isActive })
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert('Configuration updated successfully');
-                } else {
-                    alert('Error updating configuration');
-                }
-            });
+        }).then(response => {
+            if (response.ok) {
+                alert('Configuration updated successfully');
+            } else {
+                alert('Error updating configuration');
+            }
+        });
     });
 });

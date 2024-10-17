@@ -65,7 +65,7 @@ body {
 .quote {
     font-style: italic;
     color: var(--light-text-color);
-    max-width: 300px;
+    max-width: 600px;
     text-align: right;
 }
 
@@ -130,6 +130,12 @@ body {
     transition: all 0.3s ease;
     cursor: pointer;
     border: none;
+    width: 400px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.5rem;
 }
 
 .btn-primary {
@@ -151,6 +157,7 @@ body {
     opacity: 0.9;
     transform: translateY(-2px);
 }
+
 
 @media (max-width: 768px) {
     .profile-header {
