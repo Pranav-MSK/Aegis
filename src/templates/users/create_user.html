@@ -1,60 +1,81 @@
 {% extends 'base/base.html' %}
 {% block title %}Add New User{% endblock %}
+
 {% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/create_user.css') }}">
 {% endblock %}
+
 {% block content %}
-<div class="add-user-container mt-5">
-    <h2 class="page-title bg-primary text-white p-3 rounded">Create New User</h2>
-    <form action="{{ url_for('create_user') }}" method="post" class="user-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="page-container">
+  <div class="form-card">
+    <h1 class="page-title">Create New User</h1>
+    
+    <form action="{{ url_for('create_user') }}" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      
+      <div class="form-grid">
         <div class="form-group">
-            <label for="username"><i class="fas fa-user"></i> Username:</label>
-            <input type="text" id="username" name="username" required class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="email"><i class="fas fa-envelope"></i> Email:</label>
-            <input type="email" id="email" name="email" required class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="password"><i class="fas fa-key"></i> Password:</label>
-            <input type="password" id="password" name="password" required class="form-control">
+          <label for="username">
+            <i class="fas fa-user"></i>Username
+          </label>
+          <input type="text" id="username" name="username" required class="form-control">
         </div>
 
         <div class="form-group">
-            <label for="user_level"><i class="fas fa-user-shield"></i> User Level:</label>
-            <select id="user_level" name="user_level" class="form-control">
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-            </select>
+          <label for="email">
+            <i class="fas fa-envelope"></i>Email
+          </label>
+          <input type="email" id="email" name="email" required class="form-control">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">
+          <i class="fas fa-key"></i>Password
+        </label>
+        <input type="password" id="password" name="password" required class="form-control">
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="user_level">
+            <i class="fas fa-user-shield"></i>User Level
+          </label>
+          <select id="user_level" name="user_level" class="form-control">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
 
         <div class="form-group">
-            <label for="profession"><i class="fas fa-briefcase"></i> Profession</label>
-            <select id="profession" name="profession" class="form-control">
-                <option value="Software Developer">Software Developer</option>
-                <option value="Network Engineer" >Network Engineer</option>
-                <option value="System Administrator" >System Administrator</option>
-                <option value="Database Administrator" >Database Administrator</option>
-                <option value="Security Analyst">Security Analyst</option>
-            </select>
+          <label for="profession">
+            <i class="fas fa-briefcase"></i>Profession
+          </label>
+          <select id="profession" name="profession" class="form-control">
+            <option value="Software Developer">Software Developer</option>
+            <option value="Network Engineer">Network Engineer</option>
+            <option value="System Administrator">System Administrator</option>
+            <option value="Database Administrator">Database Administrator</option>
+            <option value="Security Analyst">Security Analyst</option>
+          </select>
         </div>
+      </div>
 
-        <div class="form-group d-flex align-items-center">
-            <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" class="form-check-input" checked>
-            <label for="receive_email_alerts" class="ml-2">Receive Email Alerts</label>
-        </div>
-        <!-- assign_tickets checkbox -->
-        <div class="form-group d-flex align-items-center">
-            <input type="checkbox" id="assign_tickets" name="assign_tickets" class="form-check-input">
-            <label for="assign_tickets" class="ml-2">Opt-in for Ticket Assignment</label>
-        </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" checked>
+        <label for="receive_email_alerts">Receive Email Alerts</label>
+      </div>
 
-        <button type="submit" class="btn btn-primary btn-block mt-4">
-            <i class="fas fa-user-plus mr-2"></i> Add User
-        </button>
+      <div class="checkbox-group">
+        <input type="checkbox" id="assign_tickets" name="assign_tickets">
+        <label for="assign_tickets">Opt-in for Ticket Assignment</label>
+      </div>
+
+      <button type="submit" class="submit-button">
+        <i class="fas fa-user-plus"></i> Create User
+      </button>
     </form>
+  </div>
 </div>
 {% endblock %}

@@ -11,7 +11,7 @@
         "is_active": true
     },
     {   
-        "first_name": "Db Admin",
+        "first_name": "Db",
         "last_name": "Admin",
         "username": "prometheus_admin",
         "email": "prometheus_admin@mail.com",

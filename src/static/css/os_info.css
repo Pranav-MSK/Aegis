@@ -1,62 +1,103 @@
-/* General container styles */
-.container {
-    background-color: #f8f9fa;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #34495e;
+    --accent-color: #3498db;
+    --background-color: #f8f9fa;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Title styling */
-h1 {
-    font-size: 2.25rem;
-    font-weight: 700;
-    color: #495057;
+body {
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.os-info-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.page-title {
+    color: var(--primary-color);
+    font-weight: 600;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
 }
 
-/* Table styles */
-.table {
-    background-color: #ffffff;
+.info-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
+    transition: transform 0.2s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+.info-row {
+    transition: background-color 0.2s ease;
+}
+
+.info-row:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.info-label {
+    padding: 1rem;
+    font-weight: 500;
+    color: var(--secondary-color);
+    width: 40%;
+}
+
+.info-value {
+    padding: 1rem;
+    background-color: rgba(52, 152, 219, 0.05);
     border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    border: none;
+    color: var(--primary-color);
 }
 
-/* Header of the table */
-.table thead th {
-    background-color: #6c757d;
-    color: #fff;
-    text-transform: uppercase;
-    font-size: 0.875rem;
-    letter-spacing: 0.05em;
-    border-bottom: none;
-    padding: 15px;
-    text-align: left;
+.info-icon {
+    margin-right: 0.75rem;
+    color: var(--accent-color);
+    width: 20px;
+    text-align: center;
 }
 
-/* Table body cells */
-.table tbody td {
-    padding: 15px;
-    vertical-align: middle;
-    font-size: 0.875rem;
-    border-color: #dee2e6;
-}
+@media (max-width: 768px) {
+    .os-info-container {
+        padding: 1rem;
+        margin: 1rem;
+    }
 
-/* Table icons */
-.table tbody td i {
-    margin-right: 8px;
-    color: #007bff; /* Icon color */
-}
+    .info-table {
+        display: block;
+    }
 
-/* Hover effect for table rows */
-.table-hover tbody tr:hover {
-    background-color: #f1f1f1;
-}
+    .info-row {
+        display: block;
+        margin-bottom: 1.5rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+    }
 
-/* Alternating row colors for table */
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f9f9f9;
+    .info-label, .info-value {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    .info-label {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
 }

@@ -2,82 +2,145 @@
 {% block title %}View Users{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/view_users.css') }}">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/table-sort/0.1.1/table-sort.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 {% endblock %}
+
 {% block content %}
-<div class="view-users-container mt-4">
-    <h2 class="page-title">{{ title }} User Management</h2>
-    <div class="button-group">
-        <a href="{{ url_for('create_user') }}" class="btn btn-add-user">
-            <i class="fas fa-user-plus"></i> Add New User
-        </a>
-        <button id="download-csv" class="btn btn-download">Download CSV</button>
+<div class="dashboard-container">
+    <div class="page-header">
+        <div class="header-content">
+            <h2 class="page-title animate__animated animate__fadeIn">
+                <i class="fas fa-users-cog"></i>
+                {{ title }} User Management
+            </h2>
+            <p class="page-subtitle">Manage system users and their permissions</p>
+        </div>
+        <div class="action-buttons animate__animated animate__fadeInRight">
+            <a href="{{ url_for('create_user') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                <span>Add New User</span>
+            </a>
+            <button id="download-csv" class="btn btn-secondary">
+                <i class="fas fa-download"></i>
+                <span>Export CSV</span>
+            </button>
+        </div>
     </div>
-    <table class="user-table" id="user-table">
-        <thead>
-            <tr>
-                <th class="sortable">Username</th>
-                <th class="sortable">Email</th>
-                <th class="sortable">User Level</th>
-                <th class="sortable">Profession</th>
-                <th class="sortable">Email Alerts</th>
-                <th class="sortable">Is User Active</th>
-                <th class="sortable">Is Assign Tickets</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr class="{% if user.username == current_user.username %}current-user{% endif %}">
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.user_level }}</td>
-                <td>{{ user.profession }}</td>
-                <td>{{ 'Yes' if user.receive_email_alerts else 'No' }}</td>
-                <td>{{ 'Yes' if user.is_active else 'No' }}</td>
-                <td>{{ 'Yes' if user.assign_tickets else 'No' }}</td>
-                <td class="action-buttons">
-                    <a href="{{ url_for('change_user_settings', username=user.username) }}" class="btn btn-edit">Edit</a>
-                    <form action="{{ url_for('delete_user', username=user.username) }}" method="post" style="display:inline;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    <div class="table-container animate__animated animate__fadeInUp">
+        <div class="table-wrapper">
+            <table class="user-table" id="user-table">
+                <thead>
+                    <tr>
+                        <th class="sortable"><i class="fas fa-sort"></i> Username</th>
+                        <th class="sortable"><i class="fas fa-sort"></i> Full Name</th>
+                        <th class="sortable"><i class="fas fa-sort"></i> Email</th>
+                        <th class="sortable"><i class="fas fa-sort"></i> User Level</th>
+                        <th class="sortable"><i class="fas fa-sort"></i> Profession</th>
+                        <th class="sortable"><i class="fas fa-sort"></i> Email Alerts</th>
+                        <th class="sortable"><i class="fas fa-sort"></i> Status</th>
+                        <th class="sortable"><i class="fas fa-sort"></i> Ticket Assignment</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="{% if user.username == current_user.username %}current-user{% endif %}">
+                        <td>
+                            <div class="user-info">
+                                <i class="fas fa-user-circle"></i>
+                                {{ user.username }}
+                            </div>
+                        </td>
+                        <td>{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge badge-{{ user.user_level.lower() }}">
+                                {{ user.user_level }}
+                            </span>
+                        </td>
+                        <td>{{ user.profession }}</td>
+                        <td>
+                            <span class="status-indicator {% if user.receive_email_alerts %}active{% endif %}">
+                                {{ 'Yes' if user.receive_email_alerts else 'No' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-indicator {% if user.is_active %}active{% endif %}">
+                                {{ 'Active' if user.is_active else 'Inactive' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-indicator {% if user.assign_tickets %}active{% endif %}">
+                                {{ 'Yes' if user.assign_tickets else 'No' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-cell">
+                                <a href="{{ url_for('change_user_settings', username=user.username) }}" 
+                                   class="btn btn-icon btn-edit" 
+                                   title="Edit User">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url_for('delete_user', username=user.username) }}" 
+                                      method="post" 
+                                      class="delete-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" 
+                                            class="btn btn-icon btn-delete" 
+                                            title="Delete User"
+                                            onclick="return confirm('Are you sure you want to delete this user?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
-    // Sorting functionality
-    $(document).ready(function() {
-        $('#user-table').tablesort();
-    });
-
-    // Download CSV functionality
+$(document).ready(function() {
+    // Initialize table sorting
+    $('#user-table').tablesort();
+    
+    // Add hover animation to rows
+    $('.user-table tbody tr').hover(
+        function() { $(this).addClass('row-hover'); },
+        function() { $(this).removeClass('row-hover'); }
+    );
+    
+    // CSV Download functionality
     $('#download-csv').click(function() {
         let csv = [];
         let rows = document.querySelectorAll('#user-table tr');
-
+        
         for (let row of rows) {
             let cols = row.querySelectorAll('td, th');
             let csvRow = [];
+            
             for (let col of cols) {
-                csvRow.push(col.innerText);
+                // Clean the text content
+                let text = col.innerText.replace(/,/g, ';').replace(/\n/g, ' ');
+                csvRow.push(`"${text}"`);
             }
-            csv.push(csvRow.join(','));        
+            
+            csv.push(csvRow.join(','));
         }
-
-        // Create a link to download the CSV
+        
         let csvString = csv.join('\n');
         let link = document.createElement('a');
         link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString);
-        link.setAttribute('download', 'users.csv');
+        link.setAttribute('download', `users_export_${new Date().toISOString().slice(0,10)}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     });
+});
 </script>
 {% endblock %}
