@@ -3,12 +3,19 @@ import os
 import yaml
 import subprocess
 from collections import OrderedDict
+import requests
+
 from src.utils import ROOT_DIR
 
 prometheus_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/prometheus.yml')
 alert_manager_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/alertmanager.yml')
 update_prometheus_path = os.path.join(ROOT_DIR, 'src/scripts/update_prometheus.sh')
 alert_rules_path = os.path.join(ROOT_DIR, 'prometheus_config/alert_rules.yml')
+
+PROMETHEUS_BASE_URL = "http://localhost:9090"
+ALERTMANAGER_BASE_URL = "http://localhost:9093"
+PROMETHEUS_RELOAD_URL = "http://localhost:9090/api/v1/admin/tsdb/reload"  # Adjust as necessary
+
 
 def is_valid_file(file_path: str) -> bool:
     """Checks if a file is valid and has key-value pairs separated by a colon."""
@@ -123,6 +130,15 @@ def update_prometheus_config():
     print("No 'localhost' job found in Prometheus config.")
     return False
 
+def total_targets():
+    """Return the total number of targets."""
+    config = load_yaml(prometheus_yml_path)
+    total_targets = 0
+    for scrape_config in config.get('scrape_configs', []):
+        targets = scrape_config.get('static_configs', [{}])[0].get('targets', [])
+        total_targets += len(targets)
+    return total_targets
+
 def save_updated_alert_manager_config():
 
     try:
@@ -199,3 +215,10 @@ def update_prometheus_container():
             print(result.stderr)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while updating Prometheus container: {e}")
+
+
+def fetch_active_alerts():
+    response = requests.get(f"{PROMETHEUS_BASE_URL}/api/v1/alerts")
+    alerts_data = response.json()
+    alerts = alerts_data["data"]["alerts"]  # Extract the alerts
+    return alerts

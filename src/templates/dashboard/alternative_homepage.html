@@ -58,9 +58,8 @@
                         <span class="detail-value">{{ system_info.cpu_max_frequency }} GHz</span>
                     </div>
                     <!-- <div class="detail-item">
-                        <span class="detail-label">Processor:</span>
-                        <span class="detail-value">{{ system_info.processor_name }}</span>
-                    </div> -->
+                        <span class="detail-value">{{ system_info.processor_name }} GHz</span>
+                    </div>   -->
                 </div>
             </div>
         </div>
@@ -180,6 +179,7 @@
 
 
     <div class="details-grid">
+
         <!-- System Information -->
         <div class="metric-card">
             <div class="card-header">
@@ -190,7 +190,11 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label"><i class="fas fa-desktop info-icon"></i>OS:</span>
-                        <span class="info-value"> {{ system_info.os_info.os_full_name }}</span>
+                        <span class="info-value">{{ system_info.os_info.os_full_name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-microchip info-icon"></i>Processor Name:</span>
+                        <span class="info-value">{{ system_info.processor_name }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label"><i class="fas fa-user info-icon"></i>Username:</span>
@@ -208,14 +212,14 @@
                         <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Kernel Version:</span>
                         <span class="info-value">{{ system_info.os_info.kernel_version }}</span>
                     </div>
-         
                 </div>
             </div>
         </div>
+
         <!-- Top 5 Processes dummy data -->
         <div class="metric-card">
             <div class="card-header">
-                <h3>Top 5 Processes</h3>
+                <h3>Top 10 Processes</h3>
                 <span class="refresh-indicator"></span>
             </div>
             <div class="card-content">
@@ -229,12 +233,42 @@
                     {% endfor %}
                 </div>
                 <div class="process-footer">
-                    <a href="#">View All Processes</a>
+                    <a href="url_for('process')" class="view-all">View All Processes</a>
                 </div>
             </div>
         </div>
+
+        <!-- Product Information -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Product Information</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-tag info-icon"></i>Product Name:</span>
+                        <span class="info-value">{{ plan_type }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Product Version:</span>
+                        <span class="info-value">{{ version }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-id-badge info-icon"></i>SystemGuard Unique ID:</span>
+                        <span class="info-value">{{ systemguard_unique_id }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-calendar-alt info-icon"></i>Remaining Days:</span>
+                        <span class="info-value">{{ remaining_plan_days }} days</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
-    
+
     <!-- System Details Section -->
     <div class="details-grid">
 
@@ -249,22 +283,77 @@
                     <div class="stat-item">
                         <span class="stat-icon download"></span>
                         <div class="stat-details">
-                            <span class="stat-value network-received">{{ system_info.network_received }}</span>
-                            <span class="stat-label">MB Downloaded</span>
+                            <div class="stat-value">
+                                <span class="network-received">{{ system_info.network_received }}</span>
+                                <!-- <span class="speed-indicator speed-up">2.1 MB/s</span> -->
+                            </div>
+                            <span class="stat-label">Downloaded</span>
                         </div>
                     </div>
                     <div class="stat-item">
                         <span class="stat-icon upload"></span>
                         <div class="stat-details">
-                            <span class="stat-value network-sent">{{ system_info.network_sent }}</span>
-                            <span class="stat-label">MB Uploaded</span>
+                            <div class="stat-value">
+                                <span class="network-sent">{{ system_info.network_sent }}</span>
+                                <!-- <span class="speed-indicator speed-down">1.8 MB/s</span> -->
+                            </div>
+                            <span class="stat-label">Uploaded</span>
                         </div>
+                    </div>
+              
+                </div>
+            </div>
+        </div>
+
+        <!-- other information -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Other Information</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-users info-icon"></i>Total Users:</span>
+                        <span class="info-value">{{ system_info.total_users }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Total Tickets:</span>
+                        <span class="info-value">{{ system_info.total_tickets }}</span>
+                    </div>
+                    <!-- total_targets -->
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-bullseye info-icon"></i>Total Targets:</span>
+                        <span class="info-value">{{ system_info.total_targets }}</span>
                     </div>
                 </div>
             </div>
         </div>
-        
+    </div>
 
+
+    <div class="details-grid">
+        <div class="metric-card">
+            {% if system_info.top_alert_tickets %}
+            <div class="card-header">
+                <h3>Top Alert Tickets</h3>
+                <!-- # link to all tickets -->
+                <a href="{{ url_for('alert_history') }}" class="btn btn-primary view-all">View All Tickets</a>
+            </div>
+            <div class="card-content">
+                <div class="alert-grid">
+                    {% for alert in system_info.top_alert_tickets %}
+                    <div class="alert-item severity-{{ alert.severity }}">
+                        <span class="alert-name">{{ alert.alert_name }}</span>
+                        <span class="alert-instance">Instance: {{ alert.instance }}</span>
+                        <span class="alert-severity">{{ alert.severity | capitalize }}</span>
+                        <span class="alert-created-at">{{ alert.created_at }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Charts Section -->

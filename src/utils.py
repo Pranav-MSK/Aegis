@@ -299,6 +299,24 @@ def get_disk_usage_percent():
     disk_usage = psutil.disk_usage("/")
     return disk_usage.percent
 
+# disk read and write spped
+def get_disk_io():
+    """ Get the disk I/O statistics.
+    ---
+    Parameters:
+        None
+    ---
+    Returns:
+        tuple: Disk read and write speed in MB/s.
+    """
+    disk_io_start = psutil.disk_io_counters()
+    time.sleep(1)  # Sleep for 1 second to measure the speed
+    disk_io_end = psutil.disk_io_counters()
+
+    disk_read_speed = round((disk_io_end.read_bytes - disk_io_start.read_bytes) / CONVERSION_FACTOR_MB, 1)  # In MB/s
+    disk_write_speed = round((disk_io_end.write_bytes - disk_io_start.write_bytes) / CONVERSION_FACTOR_MB, 1)  # In MB/s
+
+    return disk_read_speed, disk_write_speed
 
 @functools.lru_cache(maxsize=1)
 def get_memory_available():
@@ -521,6 +539,7 @@ def _get_system_info():
     """
     
     disk_total = get_disk_total()
+    disk_read, disk_write = get_disk_io()
     memory_available = get_memory_available()
     battery_data = check_battery_status()
     memory_info = psutil.virtual_memory()
@@ -532,7 +551,7 @@ def _get_system_info():
     # ifconfig | grep -E 'RX packets|TX packets' -A 1
 
     # Prepare system information dictionary
-    top_processes = get_top_processes(6, combined=True)
+    top_processes = get_top_processes(10, combined=True)
     info = {
         'cpu_percent': cpu_usage_percent(),
         'memory_percent': round(memory_info.percent, 2),
@@ -554,6 +573,8 @@ def _get_system_info():
         'timestamp': datetime.datetime.now(),
         "disk_used": get_disk_used(),
         "disk_free": get_disk_free(),
+        "disk_read": disk_read,
+        "disk_write": disk_write,
     }
     info.update({
         'top_processes': top_processes

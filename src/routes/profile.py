@@ -28,8 +28,6 @@ def view_profile():
     user = current_user  # Get the currently logged-in user
     user.profile_picture_url = get_gravatar_url(user.email)
     user_assigned_tickets = AlertTicket.query.filter_by(assigned_user_id=user.id).all()
-    # show some statistics to the user for the tickets they have been assigned
-    # e.g., number of open tickets, number of resolved tickets, etc.
     ticket_stats = {}
     ticket_count = len(user_assigned_tickets)
     open_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'Open'])

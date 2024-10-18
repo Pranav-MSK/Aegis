@@ -30,7 +30,8 @@ from src.routes.helper.prometheus_helper import (
     prometheus_yml_path,
     update_prometheus_container,
     update_prometheus_config,
-    save_updated_alert_manager_config
+    save_updated_alert_manager_config,
+    fetch_active_alerts
 )
 
 # Define the Prometheus Blueprint
@@ -303,9 +304,7 @@ def change_auth():
 @app.route("/active_alerts")
 def active_alerts():
     try:
-        response = requests.get(f"{PROMETHEUS_BASE_URL}/api/v1/alerts")
-        alerts_data = response.json()
-        alerts = alerts_data["data"]["alerts"]  # Extract the alerts
+        alerts = fetch_active_alerts()
     except Exception as e:
         alerts = []
         print(f"Error fetching alerts: {e}")
@@ -417,7 +416,6 @@ def alertmanager_status():
 
     if response.status_code == 200:
         alertmanager_data = response.json()
-        print(alertmanager_data["data"]["activeAlertmanagers"])
         active_alertmanagers = alertmanager_data["data"]["activeAlertmanagers"]
         return render_template(
             "alerts/alertmanager_status.html", alertmanagers=active_alertmanagers

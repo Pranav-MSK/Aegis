@@ -4,9 +4,10 @@ from flask import render_template, blueprints, redirect, url_for
 from flask_login import login_required, current_user
 
 from src.config import app
-from src.models import NetworkSpeedTestResult, UserDashboardSettings
+from src.models import NetworkSpeedTestResult, UserDashboardSettings, UserProfile, AlertTicket
 from src.utils import datetimeformat, get_system_info, get_top_processes
 from src.logger import logger
+from src.routes.helper.prometheus_helper import total_targets
 
 dashboard_bp = blueprints.Blueprint("dashboard", __name__)
 
@@ -16,6 +17,19 @@ dashboard_bp = blueprints.Blueprint("dashboard", __name__)
 @login_required
 def dashboard():
     system_info = get_system_info()
+
+    total_users = UserProfile.query.count()
+    total_tickets = AlertTicket.query.count()
+
+    system_info["total_users"] = total_users
+    system_info["total_tickets"] = total_tickets
+    system_info["total_targets"] = total_targets()
+
+    # top 5 Alert Tickets
+    top_alert_tickets = AlertTicket.query.order_by(AlertTicket.created_at.desc()).limit(8).all()
+    system_info["top_alert_tickets"] = top_alert_tickets
+    
+
     return render_template(
             "dashboard/alternative_homepage.html",
             system_info=system_info,
