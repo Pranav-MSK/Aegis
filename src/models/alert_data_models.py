@@ -46,6 +46,30 @@ class AlertTicket(BaseModel):
     alertlogs = db.relationship('AlertLog', backref='alert_ticket', lazy=True, cascade="all, delete-orphan")
     customfields = db.relationship('CustomFields', backref='alert_ticket', lazy=True, cascade="all, delete-orphan")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'alert_name': self.alert_name,
+            'instance': self.instance,
+            'severity': self.severity,
+            'summary': self.summary,
+            'description': self.description,
+            'alert_status': self.alert_status,
+            'ticket_status': self.ticket_status,
+            'system_username': self.system_username,
+            'system_hostname': self.system_hostname,
+            'fingerprint': self.fingerprint,
+            'runbook_url': self.runbook_url,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'assigned_user_id': self.assigned_user_id,
+            'assigned_supervisor_id': self.assigned_supervisor_id,
+            'investigation_notes': [note.to_dict() for note in self.investigation_notes],
+            'reports': [report.to_dict() for report in self.reports],
+            'alertlogs': [log.to_dict() for log in self.alertlogs],
+            'customfields': [field.to_dict() for field in self.customfields]
+        }
+
 
 class AlertLog(BaseModel):
     __tablename__ = 'alert_logs'
@@ -54,6 +78,14 @@ class AlertLog(BaseModel):
     alert_ticket_id = db.Column(db.Integer, db.ForeignKey('alert_tickets.id'), nullable=False)
     log = db.Column(db.Text, nullable=False)  # Log message content
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp of log creation
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'alert_ticket_id': self.alert_ticket_id,
+            'log': self.log,
+            'created_at': self.created_at
+        }
 
 # Investigation Note model to save individual investigation notes
 class InvestigationNote(BaseModel):
@@ -67,6 +99,15 @@ class InvestigationNote(BaseModel):
 
     # Foreign key relation
     user = db.relationship('UserProfile', backref='investigation_notes')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'alert_ticket_id': self.alert_ticket_id,
+            'user_id': self.user_id,
+            'note': self.note,
+            'created_at': self.created_at
+        }
 
 
 # Report model to save individual reports
@@ -82,6 +123,15 @@ class Report(BaseModel):
     # Foreign key relation
     user = db.relationship('UserProfile', backref='reports')
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'alert_ticket_id': self.alert_ticket_id,
+            'user_id': self.user_id,
+            'report': self.report,
+            'created_at': self.created_at
+        }
+
 
 class CustomFields(BaseModel):
 
@@ -92,3 +142,12 @@ class CustomFields(BaseModel):
     field_name = db.Column(db.String(255), nullable=False)
     field_value = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp of report creation
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'alert_ticket_id': self.alert_ticket_id,
+            'field_name': self.field_name,
+            'field_value': self.field_value,
+            'created_at': self.created_at
+        }

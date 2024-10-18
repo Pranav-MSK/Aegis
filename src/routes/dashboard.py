@@ -1,95 +1,103 @@
 # cython: language_level=3
-import datetime
-from flask import render_template, blueprints, redirect, url_for
+from flask import render_template, Blueprint
 from flask_login import login_required, current_user
+from sqlalchemy import func, case
 
-from src.config import app
-from src.models import NetworkSpeedTestResult, UserDashboardSettings, UserProfile, AlertTicket
-from src.utils import datetimeformat, get_system_info, get_top_processes
-from src.logger import logger
-from src.routes.helper.prometheus_helper import total_targets
+from src.config import app, csrf
+from src.models import UserProfile, AlertTicket, ChartConfiguration
+from src.utils import get_system_info
+from src.routes.helper.prometheus_helper import total_targets, total_rules
 
-dashboard_bp = blueprints.Blueprint("dashboard", __name__)
+dashboard_bp = Blueprint("dashboard", __name__)
 
-
-# alternative dashboard page for testing
 @app.route("/", methods=["GET"])
 @login_required
 def dashboard():
     system_info = get_system_info()
 
-    total_users = UserProfile.query.count()
-    total_tickets = AlertTicket.query.count()
+    # User statistics in a single query
+    user_stats = UserProfile.query.with_entities(
+        func.count().label('total_users'),
+        func.sum(case((UserProfile.is_active == True, 1), else_=0)).label('active_users'),
+        func.sum(case((UserProfile.user_level == 'admin', 1), else_=0)).label('admin_users'),
+        func.sum(case((UserProfile.user_level == 'user', 1), else_=0)).label('regular_users'),
+    ).first()
+    system_info.update(user_stats._asdict())
 
-    system_info["total_users"] = total_users
-    system_info["total_tickets"] = total_tickets
+    # Ticket statistics in a single query
+    ticket_stats = AlertTicket.query.with_entities(
+        func.count().label('total_tickets'),
+        func.sum(case((AlertTicket.ticket_status == 'Open', 1), else_=0)).label('open_tickets'),
+        func.sum(case((AlertTicket.ticket_status == 'In Progress', 1), else_=0)).label('in_progress_tickets'),
+        func.sum(case((AlertTicket.ticket_status == 'Resolved', 1), else_=0)).label('resolved_tickets'),
+        func.sum(case((AlertTicket.ticket_status == 'Closed', 1), else_=0)).label('closed_tickets'),
+        func.sum(case((AlertTicket.severity == 'critical', 1), else_=0)).label('critical_tickets'),
+        func.sum(case((AlertTicket.severity == 'warning', 1), else_=0)).label('warning_tickets'),
+        func.sum(case((AlertTicket.severity == 'info', 1), else_=0)).label('info_tickets')
+    ).first()
+    system_info.update(ticket_stats._asdict())
+
+    # Prometheus metrics
     system_info["total_targets"] = total_targets()
+    system_info["total_rules"] = total_rules()
 
-    # top 5 Alert Tickets
+       # number of chart 
+    chart_stats = ChartConfiguration.query.with_entities(
+        func.count().label('total_charts'),
+        func.sum(case((ChartConfiguration.is_active == True, 1), else_=0)).label('active_charts')
+    ).filter(ChartConfiguration.user_id == current_user.id).first()
+    system_info.update(chart_stats._asdict())
+
+    # Top 5 Alert Tickets
     top_alert_tickets = AlertTicket.query.order_by(AlertTicket.created_at.desc()).limit(8).all()
     system_info["top_alert_tickets"] = top_alert_tickets
-    
 
     return render_template(
-            "dashboard/alternative_homepage.html",
-            system_info=system_info,
-            current_user=current_user,
-        )
+        "dashboard/alternative_homepage.html",
+        system_info=system_info,
+        current_user=current_user,
+    )
 
 
-# @app.route("/", methods=["GET"])
-# @login_required
-# def dashboard():
-#     # if user is not authenticated, redirect to login page
-#     if not current_user.is_authenticated:
-#         return redirect(url_for("login"))
-#     user_id = current_user.id if current_user.is_authenticated else 0
-#     user_dashboard_settings = UserDashboardSettings.query.filter_by(user_id=user_id).first()
-#     system_info = get_system_info()
+from flask import jsonify
 
-#     # Fetch the last speedtest result
-#     speedtest_cooldown_time = datetime.datetime.now() - datetime.timedelta(minutes=user_dashboard_settings.speedtest_cooldown)
-#     recent_speedtest_results = NetworkSpeedTestResult.query.filter(
-#         NetworkSpeedTestResult.timestamp > speedtest_cooldown_time
-#     ).all()
-#     last_speedtest_timestamp = (
-#         datetimeformat(recent_speedtest_results[-1].timestamp) if recent_speedtest_results else None
-#     )
+@app.route("/api/dashboard/stats", methods=["GET"])
+@login_required
+@csrf.exempt
+def api_dashboard_stats():
+    # User statistics in a single query
+    user_stats = UserProfile.query.with_entities(
+        func.count().label('total_users'),
+        func.sum(case((UserProfile.is_active == True, 1), else_=0)).label('active_users'),
+        func.sum(case((UserProfile.user_level == 'admin', 1), else_=0)).label('admin_users'),
+        func.sum(case((UserProfile.user_level == 'user', 1), else_=0)).label('regular_users'),
+    ).first()
 
-#     if recent_speedtest_results:
-#         latest_result = recent_speedtest_results[-1]
-        
-        
-#         next_test_time = latest_result.timestamp + datetime.timedelta(
-#             minutes=user_dashboard_settings.speedtest_cooldown
-#         )
-#         remaining_time_for_next_test = round(
-#             (next_test_time - datetime.datetime.now()).total_seconds() / 60
-#         )
-#         speedtest_result = {
-#             "download_speed": latest_result.download_speed,
-#             "upload_speed": latest_result.upload_speed,
-#             "ping": latest_result.ping,
-#             "source": "Database",
-#             "show_prompt": False,
-#             "remaining_time_for_next_test": remaining_time_for_next_test,
-#         }
-#     else:
-#         # No recent results, prompt to perform a test
-#         speedtest_result = {
-#             "download_speed": None,
-#             "upload_speed": None,
-#             "ping": None,
-#             "source": None,
-#             "show_prompt": True,
-#             "remaining_time_for_next_test": None,
-#         }
-    
-#     return render_template(
-#             "dashboard/homepage.html",
-#             system_info=system_info,
-#             speedtest_result=speedtest_result,
-#             last_timestamp=last_speedtest_timestamp,
-#             current_user=current_user,
-#         )
+    # Ticket statistics in a single query
+    ticket_stats = AlertTicket.query.with_entities(
+        func.count().label('total_tickets'),
+        func.sum(case((AlertTicket.ticket_status == 'Open', 1), else_=0)).label('open_tickets'),
+        func.sum(case((AlertTicket.ticket_status == 'In Progress', 1), else_=0)).label('in_progress_tickets'),
+        func.sum(case((AlertTicket.ticket_status == 'Resolved', 1), else_=0)).label('resolved_tickets'),
+        func.sum(case((AlertTicket.ticket_status == 'Closed', 1), else_=0)).label('closed_tickets'),
+        func.sum(case((AlertTicket.severity == 'critical', 1), else_=0)).label('critical_tickets'),
+        func.sum(case((AlertTicket.severity == 'warning', 1), else_=0)).label('warning_tickets'),
+        func.sum(case((AlertTicket.severity == 'info', 1), else_=0)).label('info_tickets')
+    ).first()
 
+    chart_stats = ChartConfiguration.query.with_entities(
+        func.count().label('total_charts'),
+        func.sum(case((ChartConfiguration.is_active == True, 1), else_=0)).label('active_charts')
+    ).filter(ChartConfiguration.user_id == current_user.id).first()
+
+    # Prepare the response data
+    response_data = {
+        "user_stats": user_stats._asdict(),
+        "ticket_stats": ticket_stats._asdict(),
+        "total_targets": total_targets(),
+        "total_rules": total_rules(),
+        "chart_stats": chart_stats._asdict(),
+        "top_alert_tickets": [ticket.to_dict() for ticket in AlertTicket.query.order_by(AlertTicket.created_at.desc()).limit(5).all()]
+    }
+
+    return jsonify(response_data)

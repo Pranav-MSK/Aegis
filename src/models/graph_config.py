@@ -43,3 +43,20 @@ class ChartConfiguration(BaseModel):
             'updated_at': self.updated_at,
         }
     
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'metric_name': self.metric_name,
+            'title': self.title,
+            'xlabel': self.xlabel,
+            'ylabel': self.ylabel,
+            'chart_type': self.chart_type,
+            'tension': self.tension,
+            'point_radius': self.point_radius,
+            'point_hover_radius': self.point_hover_radius,
+            'is_active': self.is_active,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }

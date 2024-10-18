@@ -130,15 +130,6 @@ def update_prometheus_config():
     print("No 'localhost' job found in Prometheus config.")
     return False
 
-def total_targets():
-    """Return the total number of targets."""
-    config = load_yaml(prometheus_yml_path)
-    total_targets = 0
-    for scrape_config in config.get('scrape_configs', []):
-        targets = scrape_config.get('static_configs', [{}])[0].get('targets', [])
-        total_targets += len(targets)
-    return total_targets
-
 def save_updated_alert_manager_config():
 
     try:
@@ -185,9 +176,6 @@ def save_updated_alert_manager_config():
         print(f"Error saving alertmanager YAML config: {e}")
         return False
 
-
-    
-
 def show_targets():
     """Show all targets for each job."""
     config = load_yaml(prometheus_yml_path)
@@ -222,3 +210,21 @@ def fetch_active_alerts():
     alerts_data = response.json()
     alerts = alerts_data["data"]["alerts"]  # Extract the alerts
     return alerts
+
+def total_rules():
+    """Return the total number of rules."""
+    config = load_yaml(alert_rules_path)
+    total_rules = 0
+    for rule in config.get('groups', []):
+        rules = rule.get('rules', [])
+        total_rules += len(rules)
+    return total_rules
+
+def total_targets():
+    """Return the total number of targets."""
+    config = load_yaml(prometheus_yml_path)
+    total_targets = 0
+    for scrape_config in config.get('scrape_configs', []):
+        targets = scrape_config.get('static_configs', [{}])[0].get('targets', [])
+        total_targets += len(targets)
+    return total_targets

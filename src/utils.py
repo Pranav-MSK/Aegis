@@ -183,6 +183,19 @@ def cpu_usage_percent():
     cpu_percent = psutil.cpu_percent(interval=1, percpu=False)
     return round(cpu_percent, 2)
 
+def cpu_usage_per_core():
+    """
+    Get the current CPU usage percentage per core.
+    ---
+    Parameters:
+    ---
+    Returns:
+        list: Current CPU usage percentage per core.
+    """
+    cpu_percent_per_core = psutil.cpu_percent(interval=1, percpu=True)
+    return [round(usage, 2) for usage in cpu_percent_per_core]
+
+
 def get_cpu_temp():
     """
     Get the current CPU temperature, high temperature, and critical temperature.
@@ -299,24 +312,31 @@ def get_disk_usage_percent():
     disk_usage = psutil.disk_usage("/")
     return disk_usage.percent
 
-# disk read and write spped
 def get_disk_io():
-    """ Get the disk I/O statistics.
-    ---
-    Parameters:
-        None
-    ---
+    """Get the disk I/O statistics.
+    
     Returns:
         tuple: Disk read and write speed in MB/s.
     """
-    disk_io_start = psutil.disk_io_counters()
-    time.sleep(1)  # Sleep for 1 second to measure the speed
-    disk_io_end = psutil.disk_io_counters()
+    try:
+        # Get initial disk I/O stats
+        disk_io_start = psutil.disk_io_counters()
+        time.sleep(1)  # Sleep for 1 second to measure the speed
+        # Get final disk I/O stats
+        disk_io_end = psutil.disk_io_counters()
 
-    disk_read_speed = round((disk_io_end.read_bytes - disk_io_start.read_bytes) / CONVERSION_FACTOR_MB, 1)  # In MB/s
-    disk_write_speed = round((disk_io_end.write_bytes - disk_io_start.write_bytes) / CONVERSION_FACTOR_MB, 1)  # In MB/s
+        # Calculate read and write speeds in MB/s
+        disk_read_speed = round((disk_io_end.read_bytes - disk_io_start.read_bytes) / CONVERSION_FACTOR_MB, 1)
+        disk_write_speed = round((disk_io_end.write_bytes - disk_io_start.write_bytes) / CONVERSION_FACTOR_MB, 1)
 
-    return disk_read_speed, disk_write_speed
+        "MB/s"
+        disk_read_speed = f"{disk_read_speed} MB/s"
+        disk_write_speed = f"{disk_write_speed} MB/s"
+        return disk_read_speed, disk_write_speed
+    
+    except Exception as e:
+        print(f"Error measuring disk I/O: {e}")
+        return None, None  # Return None if there's an error
 
 @functools.lru_cache(maxsize=1)
 def get_memory_available():
@@ -547,11 +567,14 @@ def _get_system_info():
     network_sent, network_received = get_network_io()
     cpu_freq, max_freq = get_cpu_frequency()
     current_temp, high_temp, critical_temp = get_cpu_temp()
-   
+    # cpu_usage_per_core
+    cpu_usage_core = cpu_usage_per_core()
+    print(cpu_usage_core)
+
     # ifconfig | grep -E 'RX packets|TX packets' -A 1
 
     # Prepare system information dictionary
-    top_processes = get_top_processes(10, combined=True)
+    top_processes = get_top_processes(8, combined=True)
     info = {
         'cpu_percent': cpu_usage_percent(),
         'memory_percent': round(memory_info.percent, 2),
@@ -575,6 +598,7 @@ def _get_system_info():
         "disk_free": get_disk_free(),
         "disk_read": disk_read,
         "disk_write": disk_write,
+        "cpu_usage_core": cpu_usage_core
     }
     info.update({
         'top_processes': top_processes
