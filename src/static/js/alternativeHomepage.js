@@ -123,6 +123,8 @@ function updateMetricsDisplay(data) {
     document.querySelector('.battery-percent').textContent = data.battery_percent;
     document.querySelector('.battery-status').textContent = data.battery_status;
     document.querySelector('.current-server-time').textContent = data.timestamp;
+    document.querySelector('.disk-read').textContent = data.disk_read;
+    document.querySelector('.disk-write').textContent = data.disk_write;
 }
 
 // Function to update process grid
