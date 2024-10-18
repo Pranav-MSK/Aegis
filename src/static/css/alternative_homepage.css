@@ -36,6 +36,15 @@
     --gray-800: #1f2937;
     --gray-900: #111827;
 
+    --primary-color: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary-color: #3b82f6;
+    --background-dark: #1a1a1a;
+    --text-light: #f3f4f6;
+    --text-dark: #1f2937;
+    --border-color: #374151;
+    --hover-bg: #2d3748;
+
     /* Semantic Colors */
     --background: var(--gray-100);
     --card-bg: #ffffff;
@@ -134,30 +143,22 @@ body {
 
 .header-main {
     display: flex;
-    /* Flexbox for header main section */
     justify-content: space-between;
-    /* Space between items */
     align-items: center;
-    /* Center items vertically */
 }
 
 .header-main h1 {
     font-size: 2rem;
-    /* Larger font for the title */
     margin-bottom: 0;
-    /* Remove bottom margin */
 }
 
 .server-info {
     font-size: 1rem;
-    /* Standard font size for server info */
     margin-left: 20px;
-    /* Space to the left */
 }
 
 .server-info p {
     margin: 5px 0;
-    /* Vertical spacing between lines */
 }
 
 /* Header Status Styling */
@@ -991,8 +992,6 @@ temp-alert-badge {
     --mouse-y: 0;
 }
 
-
-
 .view-all {
     padding: 0.75rem 1.5rem;
     background: linear-gradient(135deg, #c7cff1, #ebebeb);
@@ -1113,3 +1112,8 @@ temp-alert-badge {
     }
 }
 
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}

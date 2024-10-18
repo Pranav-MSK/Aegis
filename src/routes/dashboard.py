@@ -19,6 +19,7 @@ def dashboard():
     user_stats = UserProfile.query.with_entities(
         func.count().label('total_users'),
         func.sum(case((UserProfile.is_active == True, 1), else_=0)).label('active_users'),
+        func.sum(case((UserProfile.is_active == False, 1), else_=0)).label('inactive_users'),
         func.sum(case((UserProfile.user_level == 'admin', 1), else_=0)).label('admin_users'),
         func.sum(case((UserProfile.user_level == 'user', 1), else_=0)).label('regular_users'),
     ).first()
@@ -70,6 +71,7 @@ def api_dashboard_stats():
     user_stats = UserProfile.query.with_entities(
         func.count().label('total_users'),
         func.sum(case((UserProfile.is_active == True, 1), else_=0)).label('active_users'),
+        func.sum(case((UserProfile.is_active == False, 1), else_=0)).label('inactive_users'),
         func.sum(case((UserProfile.user_level == 'admin', 1), else_=0)).label('admin_users'),
         func.sum(case((UserProfile.user_level == 'user', 1), else_=0)).label('regular_users'),
     ).first()

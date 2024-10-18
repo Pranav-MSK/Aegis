@@ -581,8 +581,6 @@ def _get_system_info():
     current_temp, high_temp, critical_temp = get_cpu_temp()
     # cpu_usage_per_core
     cpu_usage_core = cpu_usage_per_core()
-    print(cpu_usage_core)
-
     # ifconfig | grep -E 'RX packets|TX packets' -A 1
 
     # Prepare system information dictionary

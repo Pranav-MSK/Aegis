@@ -3,21 +3,13 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/alternative_homepage.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
-<!-- 
-
-$('.critical-tickets').text(data.ticket_stats.critical_tickets);
-$('.warning-tickets').text(data.ticket_stats.warning_tickets);
-$('.info-tickets').text(data.ticket_stats.info_tickets);
-
-// Example: Update top alert tickets
-data.top_alert_tickets.forEach(ticket => {
-    $('.top-alert-tickets').append('<li>' + ticket.title + '</li>');
-}); -->
-
+{% block title %}{{ title }} | {{ system_info.nodename }} {% endblock %}
 {% block content %}
 <div class="content">
+
+
     <!-- Header Section -->
-    <div class="header-section">
+    <!-- <div class="header-section">
         <div class="header-main">
             <h1>{{ title }} <span class="refresh-indicator"></span></h1>
             <div class="server-info">
@@ -31,7 +23,7 @@ data.top_alert_tickets.forEach(ticket => {
                 <span class="status-value current-server-time">{{ system_info.current_server_time }}</span>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Main Grid Section -->
     <div class="metrics-grid">
@@ -254,7 +246,8 @@ data.top_alert_tickets.forEach(ticket => {
                         <span class="info-value">{{ version }}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label"><i class="fas fa-id-badge info-icon"></i>SystemGuard Unique ID:</span>
+                        <span class="info-label"><i class="fas fa-id-badge info-icon"></i>SystemGuard Unique
+                            ID:</span>
                         <span class="info-value">{{ systemguard_unique_id }}</span>
                     </div>
                     <div class="info-item">
@@ -351,8 +344,12 @@ data.top_alert_tickets.forEach(ticket => {
                         <span class="info-label"><i class="fas fa-user info-icon"></i>Active Users:</span>
                         <span class="info-value active-users">{{ system_info.active_users }}</span>
                     </div>
-                    <!-- active_alertmanagers -->
-                     {% if system_info.active_alertmanagers %}
+                    <!-- func.sum(case((UserProfile.is_active == False, 1), else_=0)).label('inactive_users'), -->
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-user-slash info-icon"></i>Inactive Users:</span>
+                        <span class="info-value inactive-users">{{ system_info.inactive_users }}</span>
+                    </div>
+                    {% if system_info.active_alertmanagers %}
                     <div class="info-item">
                         <span class="info-label"><i class="fas fa-user info-icon"></i>Active Alert Managers:</span>
                         {% for alertmanager in system_info.active_alertmanagers %}
@@ -381,7 +378,8 @@ data.top_alert_tickets.forEach(ticket => {
                     <div class="row">
                         <div class="col">
                             <div class="info-item">
-                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Open Tickets:</span>
+                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Open
+                                    Tickets:</span>
                                 <span class="info-value open-tickets">{{ system_info.open_tickets }}</span>
                             </div>
                         </div>
@@ -452,12 +450,14 @@ data.top_alert_tickets.forEach(ticket => {
                 <div class="info-grid">
                     <div class="info-item">
                         <!-- total_rules -->
-                        <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Total Alerts Rules:</span>
+                        <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Total Alerts
+                            Rules:</span>
                         <span class="info-value">{{ system_info.total_rules }}</span>
                     </div>
 
                     <div class="info-item">
-                        <span class="info-label"><i class="fas fa-bullseye info-icon"></i>Total Srapping Targets:</span>
+                        <span class="info-label"><i class="fas fa-bullseye info-icon"></i>Total Srapping
+                            Targets:</span>
                         <span class="info-value">{{ system_info.total_targets }}</span>
                     </div>
 
@@ -542,10 +542,6 @@ data.top_alert_tickets.forEach(ticket => {
             </div>
         </div>
     </div>
-
-
-
-
 </div>
 {% endblock %}
 
