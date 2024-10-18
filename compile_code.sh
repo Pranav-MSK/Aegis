@@ -86,7 +86,7 @@ copy_files() {
     rsync -av --exclude='.initialized' src/assets "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy assets"; exit 1; }
     cp -r src/templates "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy templates"; exit 1; }
     cp -r src/static "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy static files"; exit 1; }
-    cp -r src/scripts "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy scripts"; exit 1; }
+    rsync -av --exclude='*.py' --exclude='*.c' src/scripts "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy scripts"; exit 1; }
     cp prometheus_config/alert_rules.yml "$PROMETHEUS_OUTPUT_DIRECTORY/" || { echo "Error: Failed to copy Prometheus config"; exit 1; }
 }
 

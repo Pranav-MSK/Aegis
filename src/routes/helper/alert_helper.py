@@ -1,3 +1,4 @@
+# cython: language_level=3
 from functools import wraps
 from flask import flash, redirect, url_for, abort
 from flask_login import current_user
