@@ -351,6 +351,15 @@ data.top_alert_tickets.forEach(ticket => {
                         <span class="info-label"><i class="fas fa-user info-icon"></i>Active Users:</span>
                         <span class="info-value active-users">{{ system_info.active_users }}</span>
                     </div>
+                    <!-- active_alertmanagers -->
+                     {% if system_info.active_alertmanagers %}
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-user info-icon"></i>Active Alert Managers:</span>
+                        {% for alertmanager in system_info.active_alertmanagers %}
+                        <span class="info-value active-alertmanagers">{{ alertmanager["url"] }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
                 </div>
             </div>

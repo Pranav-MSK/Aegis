@@ -312,11 +312,21 @@ def get_disk_usage_percent():
     disk_usage = psutil.disk_usage("/")
     return disk_usage.percent
 
+
+def format_speed(speed):
+    """Format the speed in appropriate units."""
+    if speed < 1024:
+        return f"{speed:.2f} Bytes/s"
+    elif speed < 1024 ** 2:
+        return f"{speed / 1024:.2f} KB/s"
+    else:
+        return f"{speed / (1024 ** 2):.2f} MB/s"
+
 def get_disk_io():
     """Get the disk I/O statistics.
     
     Returns:
-        tuple: Disk read and write speed in MB/s.
+        tuple: Disk read and write speed with units.
     """
     try:
         # Get initial disk I/O stats
@@ -325,18 +335,20 @@ def get_disk_io():
         # Get final disk I/O stats
         disk_io_end = psutil.disk_io_counters()
 
-        # Calculate read and write speeds in MB/s
-        disk_read_speed = round((disk_io_end.read_bytes - disk_io_start.read_bytes) / CONVERSION_FACTOR_MB, 1)
-        disk_write_speed = round((disk_io_end.write_bytes - disk_io_start.write_bytes) / CONVERSION_FACTOR_MB, 1)
+        # Calculate read and write speeds in Bytes/s
+        disk_read_speed = (disk_io_end.read_bytes - disk_io_start.read_bytes) / 1  # Already in Bytes
+        disk_write_speed = (disk_io_end.write_bytes - disk_io_start.write_bytes) / 1  # Already in Bytes
 
-        "MB/s"
-        disk_read_speed = f"{disk_read_speed} MB/s"
-        disk_write_speed = f"{disk_write_speed} MB/s"
-        return disk_read_speed, disk_write_speed
+        # Format the speeds
+        formatted_read_speed = format_speed(disk_read_speed)
+        formatted_write_speed = format_speed(disk_write_speed)
+
+        return formatted_read_speed, formatted_write_speed
     
     except Exception as e:
         print(f"Error measuring disk I/O: {e}")
         return None, None  # Return None if there's an error
+
 
 @functools.lru_cache(maxsize=1)
 def get_memory_available():

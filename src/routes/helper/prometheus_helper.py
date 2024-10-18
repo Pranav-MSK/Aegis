@@ -228,3 +228,14 @@ def total_targets():
         targets = scrape_config.get('static_configs', [{}])[0].get('targets', [])
         total_targets += len(targets)
     return total_targets
+
+def get_active_alert_manager():
+    url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        alertmanager_data = response.json()
+        active_alertmanagers = alertmanager_data["data"]["activeAlertmanagers"]
+        return active_alertmanagers
+    else:
+        return None

@@ -129,10 +129,10 @@ const CONFIG = {
           this.fetchData(CONFIG.API_ENDPOINTS.SYSTEM_INFO),
           this.fetchData(CONFIG.API_ENDPOINTS.DASHBOARD_STATS)
         ]);
-  
+
         this.updateCharts(systemInfo);
         this.updateMetricsDisplay(systemInfo);
-        this.updateProcessGrid(systemInfo.topProcesses);
+        this.updateProcessGrid(systemInfo.top_processes);
         this.updateDashboardStats(dashboardStats);
       } catch (error) {
         this.handleError('Failed to update dashboard', error);

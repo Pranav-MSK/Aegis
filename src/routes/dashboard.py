@@ -6,7 +6,7 @@ from sqlalchemy import func, case
 from src.config import app, csrf
 from src.models import UserProfile, AlertTicket, ChartConfiguration
 from src.utils import get_system_info
-from src.routes.helper.prometheus_helper import total_targets, total_rules
+from src.routes.helper.prometheus_helper import total_targets, total_rules, get_active_alert_manager
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -40,6 +40,7 @@ def dashboard():
     # Prometheus metrics
     system_info["total_targets"] = total_targets()
     system_info["total_rules"] = total_rules()
+    system_info["active_alertmanagers"] = get_active_alert_manager()
 
        # number of chart 
     chart_stats = ChartConfiguration.query.with_entities(
@@ -97,6 +98,7 @@ def api_dashboard_stats():
         "total_targets": total_targets(),
         "total_rules": total_rules(),
         "chart_stats": chart_stats._asdict(),
+        "active_alertmanagers": get_active_alert_manager(),
         "top_alert_tickets": [ticket.to_dict() for ticket in AlertTicket.query.order_by(AlertTicket.created_at.desc()).limit(5).all()]
     }
 

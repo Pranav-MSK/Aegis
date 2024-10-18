@@ -31,7 +31,8 @@ from src.routes.helper.prometheus_helper import (
     update_prometheus_container,
     update_prometheus_config,
     save_updated_alert_manager_config,
-    fetch_active_alerts
+    fetch_active_alerts,
+    get_active_alert_manager
 )
 
 # Define the Prometheus Blueprint
@@ -411,14 +412,10 @@ def view_rules():
 
 @app.route("/alertmanager/status")
 def alertmanager_status():
-    url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        alertmanager_data = response.json()
-        active_alertmanagers = alertmanager_data["data"]["activeAlertmanagers"]
+    active_alertmanagers = get_active_alert_manager()
+    if active_alertmanagers:
         return render_template(
             "alerts/alertmanager_status.html", alertmanagers=active_alertmanagers
         )
-    else:
-        return jsonify({"error": "Unable to fetch Alertmanager status"}), 500
+
+    return jsonify({"error": "Unable to fetch Alertmanager status"}), 500
