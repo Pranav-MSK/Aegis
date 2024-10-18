@@ -53,7 +53,7 @@ def login():
             if remember_me:
                 login_manager.remember_cookie_duration = datetime.timedelta(days=7)
             else:
-                login_manager.remember_cookie_duration = datetime.timedelta(0)
+                login_manager.remember_cookie_duration = datetime.timedelta(days=1)
 
             receiver_email = current_user.email
             admin_emails_with_alerts = get_email_addresses(
