@@ -5,7 +5,7 @@ from cryptography.fernet import Fernet
 
 from src.helper import load_secret_key
 
-number_of_sum_check_digits = 5
+number_of_sum_check_digits = 2
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
 
 def calculate_checksum(unique_id, num_of_digits=2):
