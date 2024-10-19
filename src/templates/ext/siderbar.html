@@ -1,0 +1,31 @@
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>System Features</h2>
+    </div>
+
+    {% set navigation_items = [
+    ('dashboard', 'Dashboard', 'fas fa-tachometer-alt'),
+    ('historical_system_metrics', 'System Metrics', 'fas fa-chart-line'),
+    ('dashboard_network', 'Active Target', 'fas fa-network-wired'),
+    ('process', 'System Process', 'fas fa-tasks'),
+    ('security_analysis', 'Security Analysis', 'fas fa-shield-alt'),
+    ('alert_history', 'Alert Tracker', 'fas fa-bell'),
+    ('settings', 'Control Panel', 'fas fa-cogs'),
+    ('view_users', 'User Management', 'fas fa-users')
+    ] %}
+
+    {% for route, title, icon in navigation_items %}
+    {% if not (request.endpoint == route) %}
+    <div class="feature-list">
+        <div class="feature-element {% if request.endpoint == route %}active{% endif %}" data-section="{{ route }}">
+            <i class="{{ icon }}"></i>
+            <a href="{{ url_for(route) }}" class="feature-link" style="text-decoration: none;">{{ title }}</a>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<!-- Overlay -->
+<div class="sidebar-overlay"></div>

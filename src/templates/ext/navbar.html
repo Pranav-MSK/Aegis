@@ -1,5 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light" x-data="{ isOpen: false }">
     <div class="container-fluid">
+        
         <div class="navbar-brand d-flex align-items-center">
             <i class="fas fa-bars sidebar-toggle"></i>
             <a href="{{ url_for('dashboard') }}" class="site-title">{{ title }}</a>
@@ -9,41 +10,8 @@
         </button>
         <div class="collapse navbar-collapse" :class="{ 'show': isOpen }">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                
-                {% if page_toggles_settings.is_dashboard_network_enabled %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'dashboard_network' %}active{% endif %}"
-                        href="{{ url_for('dashboard_network') }}">
-                        <i class="fa-solid fa-network-wired"></i> Dashboard Network
-                    </a>
-                </li>
-                {% endif %}
-
-                {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'graphs' %}active{% endif %}"
-                        href="{{ url_for('historical_system_metrics') }}">
-                        <i class="fas fa-chart-line"></i> Graphs
-                    </a>
-                </li>
-                {% endif %}
-                {% if page_toggles_settings.is_process_info_enabled and current_user.user_level == 'admin' %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'process' %}active{% endif %}"
-                        href="{{ url_for('process') }}">
-                        <i class="fas fa-tasks"></i> Process
-                    </a>
-                </li>
-                {% endif %}
-                {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}"
-                        href="{{ url_for('settings') }}">
-                        <i class="fas fa-cog"></i> Settings
-                    </a>
-                </li>
-                {% endif %}
             </ul>
+
             <ul class="navbar-nav">
                 {% if current_user.is_authenticated %}
                 <li class="nav-item">

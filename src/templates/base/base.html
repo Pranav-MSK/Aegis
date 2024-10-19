@@ -17,6 +17,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
 
@@ -25,53 +26,7 @@
 
 <body>
     {% include 'ext/navbar.html' %}
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <br><br><br><br>
-        <div class="sidebar-header">
-            <h2>System Features</h2>
-        </div>
-        <div class="feature-list">
-            <div class="feature-item" data-section="metrics">
-                <i class="fas fa-tachometer-alt"></i>
-                <a href="{{ url_for('dashboard') }}" class="feature-link" style="text-decoration: none;">Dashboard</a>
-            </div>
-        </div>
-        <div class="feature-list">
-            <div class="feature-item" data-section="metrics">
-                <i class="fas fa-chart-line"></i>
-                <a href="{{ url_for('historical_system_metrics') }}" class="feature-link" style="text-decoration: none;">System Metrics</a>
-            </div>
-        </div>
-        <div class="feature-list">
-            <div class="feature-item" data-section="security">
-                <i class="fas fa-shield-alt"></i>
-                <a href="{{ url_for('security_analysis') }}" class="feature-link" style="text-decoration: none;">Security Analysis</a>
-            </div>
-        </div>
-        <div class="feature-list">
-            <div class="feature-item" data-section="alerts">
-                <i class="fas fa-bell"></i>
-                <a href="{{ url_for('alert_history') }}" class="feature-link" style="text-decoration: none;">Alert Tracker</a>
-            </div>
-        </div>
-        <div class="feature-list">
-            <div class="feature-item" data-section="settings">
-                <i class="fas fa-cogs"></i>
-                <a href="{{ url_for('settings') }}" class="feature-link" style="text-decoration: none;">Control Panel</a>
-            </div>
-        </div>
-        <div class="feature-list">
-            <div class="feature-item" data-section="users">
-                <i class="fas fa-users"></i>
-                <a href="{{ url_for('view_users') }}" class="feature-link" style="text-decoration: none;">User Management</a>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Overlay -->
-    <div class="sidebar-overlay"></div>
+    {% include 'ext/siderbar.html' %}
 
     <main class="content">
         {% block content %}{% endblock %}

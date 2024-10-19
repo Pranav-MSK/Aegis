@@ -21,7 +21,11 @@ graphs_bp = blueprints.Blueprint("graphs", __name__)
 @app.route("/historical_system_metrics")
 @login_required
 def historical_system_metrics():
-    return render_template("graphs/historical_system_metrics.html")
+    total_chart = ChartConfiguration.query.filter_by(user_id=current_user.id).count()
+    active_chart = ChartConfiguration.query.filter_by(
+        user_id=current_user.id, is_active=True
+    ).count()
+    return render_template("graphs/historical_system_metrics.html", total_chart=total_chart, active_chart=active_chart)
 
 
 @app.route("/historical_alerts_metrics")

@@ -1,39 +1,129 @@
 {% extends 'base/base.html' %}
 {% block title %}{{title}} - Historical System Metrics{% endblock %}
+
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/graphs.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/alternative_homepage.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 {% endblock %}
 
 {% block content %}
-<h2 class="page-title"><i class="fas fa-chart-line"></i>
-    <span class="text-danger m-2"> {{ title }} </span> Metrics
-</h2>
-<hr>
+<div class="dashboard-container">
+    <header class="page-header">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-chart-line"></i>
+                <span>{{ title }} Metrics</span>
+            </h1>
+        </div>
+        <div class="actions-bar">
+            <button id="refreshData" class="btn btn-primary" title="Refresh Data">
+                <i class="fas fa-sync-alt"></i>
+                Refresh Graphs
+            </button>
+            <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button id="fullscreenToggle" class="theme-toggle" title="Toggle Fullscreen">
+                <i class="fas fa-expand"></i>
+            </button>
+            <!-- <button id="exportData" class="btn btn-primary" title="Export Data">
+                <i class="fas fa-download"></i>
+                Export
+            </button> -->
+            <a href="{{ url_for('chart_configurations') }}" class="btn btn-primary">
+                <i class="fas fa-cog"></i>
+                Chart Configurations
+            </a>
+        </div>
+    </header>
 
-<!-- Server Time Section -->
-<div class="">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-clock"></i> Current Server Time & Time Zone</h2>
-        <button id="refreshData" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Graphs</button>
-        <!-- chart_configurations button -->
-        <a href="{{ url_for('chart_configurations') }}" class="btn btn-primary"><i class="fas fa-cog"></i> Chart
-            Configurations</a>
+    <section class="info-section">
+        <div class="info-grid">
+            <div class="info-card">
+                <h3><i class="fas fa-clock"></i> Current Server Time</h3>
+                <p id="currentTime">Loading...</p>
+            </div>
+            <div class="info-card">
+                <h3><i class="fas fa-globe"></i> Time Zone</h3>
+                <p id="timeZoneName">Loading...</p>
+            </div>
+            <div class="info-card">
+                <h3><i class="fas fa-history"></i> Data Retention</h3>
+                <p id="dataretation">Loading...</p>
+            </div>
+            <div class="info-card">
+                <h3><i class="fas fa-chart-bar"></i> Active Charts</h3>
+                <p id="activeCharts">{{ active_chart }} / {{ total_chart }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="filter-section">
+        <div class="filter-content">
+            <div class="filter-group">
+                <label for="timeFilter" class="filter-label">Time Range:</label>
+                <select id="timeFilter" class="time-select">
+                    <option value="1 minute">Last 1 Minute</option>
+                    <option value="5 minutes">Last 5 Minutes</option>
+                    <option value="15 minutes">Last 15 Minutes</option>
+                    <option value="30 minutes">Last 30 Minutes</option>
+                    <option value="1 hour">Last 1 Hour</option>
+                    <option value="3 hours">Last 3 Hours</option>
+                    <option value="6 hours">Last 6 Hours</option>
+                    <option value="12 hours">Last 12 Hours</option>
+                    <option value="1 day">Last 1 Day</option>
+                    <option value="2 days">Last 2 Days</option>
+                    <option value="3 days">Last 3 Days</option>
+                    <option value="1 week">Last 1 Week</option>
+                    <option value="15 days">Last 15 Days</option>
+                    <option value="all">All Time</option>
+                </select>
+            </div>
+            <!-- <div class="filter-group">
+                <label for="refreshInterval" class="filter-label">Auto Refresh:</label>
+                <select id="refreshInterval" class="time-select">
+                    <option value="0">Manual</option>
+                    <option value="30">30 seconds</option>
+                    <option value="60">1 minute</option>
+                    <option value="300">5 minutes</option>
+                    <option value="600">10 minutes</option>
+                </select>
+            </div> -->
+        </div>
+    </section>
+
+    <div id="chartsContainer" class="charts-grid">
+        <!-- Charts will be dynamically inserted here -->
     </div>
-    <p id="currentTime">Current Time: </p>
-    <p id="timeZoneName">Time Zone: </p>
-    <p id="dataretation">Data Retention:</p>
 </div>
-<hr>
 
-<!-- Time Filter Section -->
-{% include 'card_comp/selector/time_filter_selector.html' %}
-<div id="chartsContainer"></div>
+<!-- Export Modal -->
+<div id="exportModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Export Data</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="export-options">
+                <button class="btn btn-primary" data-format="png">
+                    <i class="fas fa-image"></i> Export as PNG
+                </button>
+                <button class="btn btn-primary" data-format="csv">
+                    <i class="fas fa-file-csv"></i> Export as CSV
+                </button>
+                <button class="btn btn-primary" data-format="json">
+                    <i class="fas fa-file-code"></i> Export as JSON
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}

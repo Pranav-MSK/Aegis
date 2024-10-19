@@ -1,378 +1,686 @@
-    // ChartManager class to manage charts
-    class ChartManager {
-        constructor() {
-            this.charts = new Map();
+class ChartManager {
+    constructor() {
+        this.charts = new Map();
+        this.isDarkMode = localStorage.getItem('darkMode') === 'true';
+        this.applyTheme();
+    }
+
+    createChart(ctx, data, config) {
+        this.setupCanvasStyle(ctx.canvas);
+
+        const chart = new Chart(ctx, {
+            type: config.type || 'line',
+            data: this.prepareChartData(data, config),
+            options: this.getChartOptions(config),
+        });
+
+        this.charts.set(config.title, chart);
+        return chart;
+    }
+
+    destroyChart(title) {
+        const chart = this.charts.get(title);
+        if (chart) {
+            chart.destroy();
+            this.charts.delete(title);
         }
+    }
 
-        createChart(ctx, data, config) {
-            this.setupCanvasStyle(ctx.canvas);
+    setupCanvasStyle(canvas) {
+        Object.assign(canvas.style, {
+            height: "400px",
+            padding: "20px",
+            margin: "30px",
+            border: "1px solid #ccc",
+            borderRadius: "10px",
+            backgroundColor: this.isDarkMode ? "#2d2d2d" : "white",
+        });
+    }
 
-            const chart = new Chart(ctx, {
-                type: config.type || 'line',
-                data: this.prepareChartData(data, config),
-                options: this.getChartOptions(config),
-            });
+    prepareChartData(data, config) {
+        const labels = data.time.map(t => this.formatDate(t));
+        const datasets = this.prepareDatasets(data[config.metric_name], config);
 
-            this.charts.set(config.title, chart);
-            return chart;
-        }
+        return datasets.length ? { labels, datasets } : null;
+    }
 
-        destroyChart(title) {
-            const chart = this.charts.get(title);
-            if (chart) {
-                chart.destroy();
-                this.charts.delete(title);
+    prepareDatasets(data, config) {
+        return data.map((item, index) => {
+            const colors = this.generateColor(index);
+            const values = item.values || item.data;
+
+            if (!values || !values.length) {
+                return null;
             }
-        }
-
-        setupCanvasStyle(canvas) {
-            Object.assign(canvas.style, {
-                height: "400px",
-                padding: "20px",
-                margin: "30px",
-                border: "1px solid #ccc",
-                borderRadius: "10px",
-                backgroundColor: "white",
-            });
-        }
-
-        prepareChartData(data, config) {
-            const labels = data.time.map(t => this.formatDate(t));
-            const datasets = this.prepareDatasets(data[config.metric_name], config);
-
-            // Only return data if datasets are not empty
-            return datasets.length ? { labels, datasets } : null;
-        }
-
-        prepareDatasets(data, config) {
-            return data.map((item, index) => {
-                const colors = this.generateColor(index);
-                const values = item.values || item.data;
-
-                // Skip datasets without data
-                if (!values || !values.length) {
-                    return null;
-                }
-
-                return {
-                    label: item.metric ? item.metric.instance : `Dataset ${index + 1}`,
-                    data: values,
-                    borderWidth: 2,
-                    fill: true,
-                    tension: config.tension,
-                    pointRadius: config.point_radius,
-                    pointHoverRadius: config.point_hover_radius || 5,
-                    ...colors,
-                };
-            }).filter(Boolean); // Remove null values
-        }
-
-        getChartOptions(config) {
-            return {
-                responsive: true,
-                scales: this.getScalesOptions(config),
-                plugins: this.getPluginsOptions(config),
-            };
-        }
-
-        getScalesOptions(config) {
-            const fontOptions = {
-                size: 12,
-                weight: 'bold',
-                color: '#333',
-            };
 
             return {
-                x: {
-                    type: 'category',
-                    ticks: {
-                        autoSkip: true,
-                        maxTicksLimit: 10,
-                        maxRotation: 0,
-                        minRotation: 0,
-                        padding: 10,
-                        font: fontOptions,
-                    },
-                    grid: { display: false },
-                    title: {
-                        display: true,
-                        text: config.xlabel,
-                        font: { ...fontOptions, size: 16 },
-                    },
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: config.ylabel,
-                        font: { ...fontOptions, size: 16 },
-                    },
-                    ticks: {
-                        font: fontOptions,
-                        padding: 10,
-                    },
-                    grid: { display: false },
-                },
+                label: item.metric ? item.metric.instance : `Dataset ${index + 1}`,
+                data: values,
+                borderWidth: 2,
+                fill: true,
+                tension: config.tension,
+                pointRadius: config.point_radius,
+                pointHoverRadius: config.point_hover_radius || 5,
+                ...colors,
             };
-        }
+        }).filter(Boolean);
+    }
 
-        getPluginsOptions(config) {
-            return {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        font: {
-                            size: 14,
-                            weight: 'bold',
-                            color: '#333',
-                        },
-                    },
+    getChartOptions(config) {
+        return {
+            responsive: true,
+            scales: this.getScalesOptions(config),
+            plugins: this.getPluginsOptions(config),
+        };
+    }
+
+    getScalesOptions(config) {
+        const textColor = this.isDarkMode ? '#fff' : '#333';
+        const fontOptions = {
+            size: 12,
+            weight: 'bold',
+            color: textColor,
+        };
+
+        return {
+            x: {
+                type: 'category',
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10,
+                    maxRotation: 0,
+                    minRotation: 0,
+                    padding: 10,
+                    font: fontOptions,
+                    color: textColor,
                 },
-                tooltip: this.getTooltipOptions(),
+                grid: {
+                    display: false,
+                    color: this.isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                },
                 title: {
                     display: true,
-                    text: config.title,
+                    text: config.xlabel,
+                    font: { ...fontOptions, size: 16 },
+                    color: textColor,
+                },
+            },
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: config.ylabel,
+                    font: { ...fontOptions, size: 16 },
+                    color: textColor,
+                },
+                ticks: {
+                    font: fontOptions,
+                    padding: 10,
+                    color: textColor,
+                },
+                grid: {
+                    display: false,
+                    color: this.isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                },
+            },
+        };
+    }
+
+    getPluginsOptions(config) {
+        const textColor = this.isDarkMode ? '#fff' : '#333';
+        return {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
                     font: {
-                        size: 20,
+                        size: 14,
                         weight: 'bold',
-                        color: '#333',
+                        color: textColor,
                     },
                 },
-            };
-        }
-
-        getTooltipOptions() {
-            return {
-                enabled: true,
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                titleColor: '#ffffff',
-                bodyColor: '#ffffff',
-                titleFont: { size: 14, weight: 'bold' },
-                bodyFont: { size: 12 },
-                padding: 10,
-                mode: 'nearest',
-                intersect: false,
-                callbacks: {
-                    label: (context) => {
-                        const label = context.dataset.label || '';
-                        const value = Math.round(context.raw * 100) / 100;
-                        return `${label}: Value: ${value}`;
-                    },
-                    title: (context) => `Time: ${context[0].label}`,
+            },
+            tooltip: this.getTooltipOptions(),
+            title: {
+                display: true,
+                text: config.title,
+                font: {
+                    size: 20,
+                    weight: 'bold',
+                    color: textColor,
                 },
+            },
+        };
+    }
+
+    getTooltipOptions() {
+        return {
+            enabled: true,
+            backgroundColor: this.isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.7)',
+            titleColor: this.isDarkMode ? '#000' : '#fff',
+            bodyColor: this.isDarkMode ? '#000' : '#fff',
+            titleFont: { size: 14, weight: 'bold' },
+            bodyFont: { size: 12 },
+            padding: 10,
+            mode: 'nearest',
+            intersect: false,
+            callbacks: {
+                label: (context) => {
+                    const label = context.dataset.label || '';
+                    const value = Math.round(context.raw * 100) / 100;
+                    return `${label}: ${value}`;
+                },
+                title: (context) => `Time: ${context[0].label}`,
+            },
+        };
+    }
+
+    generateColor(index) {
+        const baseHue = 50;
+        const hue = (baseHue + (index * 30)) % 360;
+        const lightness = this.isDarkMode ? 70 : 50;
+        const saturation = 70 + (index * 5) % 30;
+
+        return {
+            borderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
+            backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.2)`,
+            pointBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
+            pointBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
+            pointHoverBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
+            pointHoverBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`,
+        };
+    }
+
+    formatDate(utcTime) {
+        const date = new Date(utcTime);
+        const options = {
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        };
+        return date.toLocaleString('en-US', options).replace(/, (\d{2}:\d{2})/, ' $1');
+    }
+
+    toggleTheme() {
+        this.isDarkMode = !this.isDarkMode;
+        localStorage.setItem('darkMode', this.isDarkMode);
+        this.applyTheme();
+        this.updateChartsTheme();
+    }
+
+    applyTheme() {
+        document.body.classList.toggle('dark-mode', this.isDarkMode);
+        const themeIcon = document.querySelector('#themeToggle i');
+        if (themeIcon) {
+            themeIcon.className = this.isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    }
+
+    updateChartsTheme() {
+        this.charts.forEach(chart => {
+            chart.options.scales = this.getScalesOptions(chart.options.plugins.title);
+            chart.options.plugins = this.getPluginsOptions(chart.options.plugins.title);
+            chart.update();
+        });
+    }
+
+    async exportCharts(format) {
+        const zip = new JSZip();
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+        try {
+            switch (format) {
+                case 'png':
+                    await this.exportAsPNG(zip);
+                    break;
+                case 'csv':
+                    this.exportAsCSV(zip);
+                    break;
+                case 'json':
+                    this.exportAsJSON(zip);
+                    break;
+            }
+
+            const content = await zip.generateAsync({ type: "blob" });
+            this.downloadFile(content, `charts-export-${timestamp}-${format}.zip`);
+        } catch (error) {
+            console.error('Export failed:', error);
+            alert('Export failed. Please try again.');
+        }
+    }
+
+    async exportAsPNG(zip) {
+        const promises = Array.from(this.charts.entries()).map(async ([title, chart]) => {
+            const canvas = chart.canvas;
+            const blob = await new Promise(resolve => canvas.toBlob(resolve));
+            zip.file(`${title}.png`, blob);
+        });
+        await Promise.all(promises);
+    }
+
+    exportAsCSV(zip) {
+        this.charts.forEach((chart, title) => {
+            const labels = chart.data.labels;
+            const datasets = chart.data.datasets;
+
+            let csv = 'Time,' + datasets.map(ds => ds.label).join(',') + '\n';
+            labels.forEach((label, i) => {
+                csv += label + ',' + datasets.map(ds => ds.data[i]).join(',') + '\n';
+            });
+
+            zip.file(`${title}.csv`, csv);
+        });
+    }
+
+    exportAsJSON(zip) {
+        this.charts.forEach((chart, title) => {
+            const data = {
+                title,
+                labels: chart.data.labels,
+                datasets: chart.data.datasets.map(ds => ({
+                    label: ds.label,
+                    data: ds.data
+                }))
             };
+            zip.file(`${title}.json`, JSON.stringify(data, null, 2));
+        });
+    }
+
+    downloadFile(content, fileName) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+    }
+}
+
+class ChartUI {
+    constructor(chartManager) {
+        this.chartManager = chartManager;
+        this.container = document.getElementById('chartsContainer');
+        this.initializeUIControls();
+    }
+
+    initializeUIControls() {
+        // Theme toggle
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            this.chartManager.toggleTheme();
+        });
+
+        // Fullscreen toggle
+        document.getElementById('fullscreenToggle')?.addEventListener('click', () => {
+            this.toggleFullscreen();
+        });
+
+        // Export button and modal
+        document.getElementById('exportData')?.addEventListener('click', () => {
+            this.showExportModal();
+        });
+
+        document.querySelector('.close-modal')?.addEventListener('click', () => {
+            this.hideExportModal();
+        });
+
+        // Export format buttons
+        document.querySelectorAll('.export-options button').forEach(button => {
+            button.addEventListener('click', () => {
+                const format = button.dataset.format;
+                this.chartManager.exportCharts(format);
+                this.hideExportModal();
+            });
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('exportModal');
+            if (event.target === modal) {
+                this.hideExportModal();
+            }
+        });
+
+        // Handle fullscreen change
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.querySelector('#fullscreenToggle i');
+            if (icon) {
+                icon.className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
+            }
+        });
+    }
+
+    toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error('Failed to enter fullscreen:', err);
+            });
+        } else {
+            document.exitFullscreen().catch(err => {
+                console.error('Failed to exit fullscreen:', err);
+            });
+        }
+    }
+
+    showExportModal() {
+        const modal = document.getElementById('exportModal');
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    }
+
+    hideExportModal() {
+        const modal = document.getElementById('exportModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    createChartContainer(config) {
+        const chartDiv = document.createElement('div');
+        chartDiv.className = 'chart-container';
+
+        const metricCard = document.createElement('div');
+        metricCard.className = 'metric-card';
+
+        const cardHeader = document.createElement('div');
+        cardHeader.className = 'card-header';
+
+        const heading = document.createElement('h3');
+        heading.textContent = config.title;
+        cardHeader.appendChild(heading);
+
+        const cardContent = document.createElement('div');
+        cardContent.className = 'card-content';
+
+        const canvas = document.createElement('canvas');
+        canvas.className = 'graph';
+        canvas.id = config.metric_name;
+
+        cardContent.appendChild(canvas);
+        metricCard.appendChild(cardHeader);
+        metricCard.appendChild(cardContent);
+        chartDiv.appendChild(metricCard);
+        this.container.appendChild(chartDiv);
+    }
+
+    clearCharts() {
+        this.container.innerHTML = '';
+    }
+
+    renderCharts(data, configurations) {
+        this.clearCharts();
+        configurations.forEach(config => {
+            if (config.is_active) {
+                const chartData = this.chartManager.prepareChartData(data, config);
+                if (chartData) {
+                    this.createChartContainer(config);
+                    const ctx = document.getElementById(config.metric_name).getContext('2d');
+                    this.chartManager.destroyChart(config.title);
+                    this.chartManager.createChart(ctx, data, config);
+                } else {
+                    console.warn(`No data for chart: ${config.title}`);
+                }
+            }
+        });
+    }
+}
+
+class DataFetcher {
+    static async fetchWithRetry(url, options = {}, retries = 3) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            if (retries > 0) {
+                console.log(`Retrying fetch to ${url}. Attempts left: ${retries - 1}`);
+                return this.fetchWithRetry(url, options, retries - 1);
+            } else {
+                console.error(`Failed to fetch ${url}: ${error.message}`);
+                throw error;
+            }
+        }
+    }
+
+    static async fetchChartConfigurations() {
+        try {
+            return await this.fetchWithRetry('/api/v1/chart-configurations');
+        } catch (error) {
+            console.error('Error fetching chart configurations:', error);
+            throw error;
+        }
+    }
+
+    static async fetchChartData(filterValue) {
+        try {
+            return await this.fetchWithRetry(`/api/v1/prometheus/graphs_data?filter=${filterValue}`);
+        } catch (error) {
+            console.error('Error fetching chart data:', error);
+            throw error;
+        }
+    }
+
+    static async fetchRetentionDays() {
+        try {
+            const data = await this.fetchWithRetry('/api/v1/get-retention');
+            return data.retention_time;
+        } catch (error) {
+            console.error('Error fetching retention days:', error);
+            throw error;
+        }
+    }
+}
+
+class App {
+    constructor() {
+        this.chartManager = new ChartManager();
+        this.chartUI = new ChartUI(this.chartManager);
+        this.filterValue = localStorage.getItem('filterValue') || 5;
+        this.autoRefreshInterval = null;
+        this.initEventListeners();
+        this.initAutoRefresh();
+        this.initTimeZoneInfo();
+    }
+
+    async init() {
+        try {
+            await this.updateRetentionDays();
+            await this.fetchDataAndRenderCharts();
+            this.updateCurrentTime();
+            // Start the current time update interval
+            setInterval(() => this.updateCurrentTime(), 1000);
+        } catch (error) {
+            console.error('Error initializing app:', error);
+            this.showErrorMessage('Failed to initialize the application. Please try refreshing the page.');
+        }
+    }
+
+    initEventListeners() {
+        // Time filter change
+        const timeFilter = document.getElementById('timeFilter');
+        if (timeFilter) {
+            timeFilter.value = localStorage.getItem('filterValue') || '5 minutes';
+            timeFilter.addEventListener('change', this.handleFilterChange.bind(this));
         }
 
-        generateColor(index) {
-            const baseHue = 50; // Base hue for blue colors
-            const hue = (baseHue + (index * 30)) % 360;  // Adjust hue for unique colors
-            const lightness = 50 + (index * 5) % 10; // Vary lightness for more distinction
-            const saturation = 70 + (index * 5) % 30; // Vary saturation for more distinction
-        
-            return {
-                borderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
-                backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.2)`, // Transparent background
-                pointBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
-                pointBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
-                pointHoverBackgroundColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
-                pointHoverBorderColor: `hsl(${hue}, ${saturation}%, ${lightness - 20}%)`, // Adjusted for better contrast
-            };
-        }
-        
+        // Refresh button
+        document.getElementById('refreshData')?.addEventListener('click', () => {
+            this.fetchDataAndRenderCharts();
+        });
 
-        formatDate(utcTime) {
-            const date = new Date(utcTime);
+        // Initialize keyboard shortcuts
+        this.initKeyboardShortcuts();
+    }
+
+    initKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + R to refresh
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                e.preventDefault();
+                this.fetchDataAndRenderCharts();
+            }
+            // Ctrl/Cmd + E to export
+            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                e.preventDefault();
+                this.chartUI.showExportModal();
+            }
+            // Ctrl/Cmd + F to toggle fullscreen
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                this.chartUI.toggleFullscreen();
+            }
+            // Ctrl/Cmd + D to toggle dark mode
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                e.preventDefault();
+                this.chartManager.toggleTheme();
+            }
+        });
+    }
+
+    initAutoRefresh() {
+        const refreshInterval = document.getElementById('refreshInterval');
+        if (refreshInterval) {
+            refreshInterval.value = localStorage.getItem('autoRefreshInterval') || '0';
+
+            refreshInterval.addEventListener('change', (event) => {
+                const seconds = parseInt(event.target.value);
+                localStorage.setItem('autoRefreshInterval', seconds.toString());
+
+                // Clear existing interval
+                if (this.autoRefreshInterval) {
+                    clearInterval(this.autoRefreshInterval);
+                    this.autoRefreshInterval = null;
+                }
+
+                // Set new interval if seconds > 0
+                if (seconds > 0) {
+                    this.autoRefreshInterval = setInterval(() => {
+                        this.fetchDataAndRenderCharts();
+                    }, seconds * 1000);
+                }
+            });
+
+            // Initialize auto-refresh if saved value exists
+            const savedInterval = parseInt(localStorage.getItem('autoRefreshInterval') || '0');
+            if (savedInterval > 0) {
+                this.autoRefreshInterval = setInterval(() => {
+                    this.fetchDataAndRenderCharts();
+                }, savedInterval * 1000);
+            }
+        }
+    }
+
+    initTimeZoneInfo() {
+        const timeZoneElement = document.getElementById('timeZoneName');
+        if (timeZoneElement) {
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            timeZoneElement.textContent = timeZone;
+        }
+    }
+
+    updateCurrentTime() {
+        const currentTimeElement = document.getElementById('currentTime');
+        if (currentTimeElement) {
+            const now = new Date();
             const options = {
-                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
                 hour: '2-digit',
                 minute: '2-digit',
+                second: '2-digit',
                 hour12: false,
+                timeZoneName: 'short'
             };
-            return date.toLocaleString('en-US', options).replace(/, (\d{2}:\d{2})/, ' $1');
+            currentTimeElement.textContent = now.toLocaleString('en-US', options);
         }
     }
 
-    class ChartUI {
-        constructor(chartManager) {
-            this.chartManager = chartManager;
-            this.container = document.getElementById('chartsContainer');
-        }                
+    async handleFilterChange(event) {
+        this.filterValue = event.target.value;
+        localStorage.setItem('filterValue', this.filterValue);
+        await this.fetchDataAndRenderCharts();
+    }
 
-        createChartContainer(config) {
-            const chartDiv = document.createElement('div');
-            chartDiv.className = 'chart-container';
-        
-            const metricCard = document.createElement('div');
-            metricCard.className = 'metric-card';
-        
-            const cardHeader = document.createElement('div');
-            cardHeader.className = 'card-header';
-        
-            // Set the card header to display the metric name
-            const heading = document.createElement('h3');
-            heading.textContent = config.title; // Change from config.title to config.metric_name
-            cardHeader.appendChild(heading);
-        
-            const cardContent = document.createElement('div');
-            cardContent.className = 'card-content';
-        
-            // Create the canvas element for the chart
-            const canvas = document.createElement('canvas');
-            canvas.className = 'graph';
-            canvas.id = config.metric_name; // Ensure canvas ID is unique
-        
-            // Append the canvas to the card content
-            cardContent.appendChild(canvas);
-            
-            // Append header and content to the card
-            metricCard.appendChild(cardHeader);
-            metricCard.appendChild(cardContent);
-        
-            // Finally, append the card to the chart container
-            chartDiv.appendChild(metricCard);
-            this.container.appendChild(chartDiv);
-        }
-        
+    async fetchDataAndRenderCharts() {
+        try {
+            const loadingIndicator = this.showLoadingIndicator();
 
-        clearCharts() {
-            this.container.innerHTML = '';
-        }
+            const [configurations, data] = await Promise.all([
+                DataFetcher.fetchChartConfigurations(),
+                DataFetcher.fetchChartData(this.filterValue)
+            ]);
 
-        renderCharts(data, configurations) {
-            this.clearCharts();
-            configurations.forEach(config => {
-                if (config.is_active) {
-                    const chartData = this.chartManager.prepareChartData(data, config);
-                    if (chartData) {
-                        this.createChartContainer(config);
-                        const ctx = document.getElementById(config.metric_name).getContext('2d');
-                        this.chartManager.destroyChart(config.title);
-                        this.chartManager.createChart(ctx, data, config);
+            // Update active charts counter
+            const activeCharts = document.getElementById('activeCharts');
+            if (activeCharts) {
+                const active = configurations.filter(config => config.is_active).length;
+                const total = configurations.length;
+                activeCharts.textContent = `${active} / ${total}`;
+            }
 
-                        // Add space between graphs
-                        const chartContainer = document.getElementById(config.metric_name).closest('.chart-container');
-                        chartContainer.style.marginBottom = '20px';
-                    } else {
-                        console.warn(`No data for chart: ${config.title}`);
-                    }
-                }    });
+            this.chartUI.renderCharts(data, configurations);
+            this.hideLoadingIndicator(loadingIndicator);
+        } catch (error) {
+            console.error('Error fetching data and rendering charts:', error);
+            this.showErrorMessage('Failed to fetch data. Please try again later.');
+            this.hideLoadingIndicator(loadingIndicator);
         }
     }
 
-    class DataFetcher {
-        static async fetchWithRetry(url, options = {}, retries = 3) {
-            try {
-                const response = await fetch(url, options);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return await response.json();
-            } catch (error) {
-                if (retries > 0) {
-                    console.log(`Retrying fetch to ${url}. Attempts left: ${retries - 1}`);
-                    return this.fetchWithRetry(url, options, retries - 1);
-                } else {
-                    console.error(`Failed to fetch ${url}: ${error.message}`);
-                    throw error;
-                }
+    async updateRetentionDays() {
+        try {
+            const retentionDays = await DataFetcher.fetchRetentionDays();
+            const retentionElement = document.getElementById('dataretation');
+            if (retentionElement) {
+                retentionElement.textContent = `${retentionDays} days`;
             }
-        }
-
-        static async fetchChartConfigurations() {
-            try {
-                return await this.fetchWithRetry('/api/v1/chart-configurations');
-            } catch (error) {
-                console.error('Error fetching chart configurations:', error);
-                throw error;
-            }
-        }
-
-        static async fetchChartData(filterValue) {
-            try {
-                return await this.fetchWithRetry(`/api/v1/prometheus/graphs_data?filter=${filterValue}`);
-            } catch (error) {
-                console.error('Error fetching chart data:', error);
-                throw error;
-            }
-        }
-
-        static async fetchRetentionDays() {
-            try {
-                const data = await this.fetchWithRetry('/api/v1/get-retention');
-                return data.retention_time;
-            } catch (error) {
-                console.error('Error fetching retention days:', error);
-                throw error;
-            }
+        } catch (error) {
+            console.error('Error updating retention days:', error);
+            this.showErrorMessage('Failed to fetch retention days.');
         }
     }
 
-    class App {
-        constructor() {
-            this.chartManager = new ChartManager();
-            this.chartUI = new ChartUI(this.chartManager);
-            this.filterValue = localStorage.getItem('filterValue') || 5;
-            this.initEventListeners();
-        }
+    showLoadingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'loading-indicator';
+        indicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        document.body.appendChild(indicator);
+        return indicator;
+    }
 
-        async init() {
-            try {
-                await this.updateRetentionDays();
-                await this.fetchDataAndRenderCharts();
-            } catch (error) {
-                console.error('Error initializing app:', error);
-                this.showErrorMessage('Failed to initialize the application. Please try refreshing the page.');
-            }
-        }
-
-        initEventListeners() {
-            document.getElementById('timeFilter').addEventListener('change', this.handleFilterChange.bind(this));
-            document.getElementById('refreshData').addEventListener('click', this.fetchDataAndRenderCharts.bind(this));
-        }
-
-        async handleFilterChange(event) {
-            this.filterValue = event.target.value;
-            localStorage.setItem('filterValue', this.filterValue);
-            await this.fetchDataAndRenderCharts();
-        }
-
-        async fetchDataAndRenderCharts() {
-            try {
-                const [configurations, data] = await Promise.all([
-                    DataFetcher.fetchChartConfigurations(),
-                    DataFetcher.fetchChartData(this.filterValue)
-                ]);
-                this.chartUI.renderCharts(data, configurations);
-            } catch (error) {
-                console.error('Error fetching data and rendering charts:', error);
-                this.showErrorMessage('Failed to fetch data. Please try again later.');
-            }
-        }
-
-        async updateRetentionDays() {
-            try {
-                const retentionDays = await DataFetcher.fetchRetentionDays();
-                document.getElementById('dataretation').textContent = `Data Retention Days: ${retentionDays}`;
-            } catch (error) {
-                console.error('Error updating retention days:', error);
-                this.showErrorMessage('Failed to fetch retention days. Please check your connection.');
-            }
-        }
-
-        showErrorMessage(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.textContent = message;
-            document.body.insertBefore(errorDiv, document.body.firstChild);
-            setTimeout(() => errorDiv.remove(), 5000);
+    hideLoadingIndicator(indicator) {
+        if (indicator && indicator.parentNode) {
+            indicator.parentNode.removeChild(indicator);
         }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const app = new App();
-        app.init();
+    showErrorMessage(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+        document.body.appendChild(errorDiv);
+
+        // Remove the error message after 5 seconds
+        setTimeout(() => {
+            if (errorDiv.parentNode) {
+                errorDiv.parentNode.removeChild(errorDiv);
+            }
+        }, 5000);
+    }
+}
+
+// Initialize the application when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new App();
+    app.init().catch(error => {
+        console.error('Failed to initialize the application:', error);
     });
+});
