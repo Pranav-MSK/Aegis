@@ -15,12 +15,12 @@ import yaml
 import requests
 from collections import OrderedDict
 from werkzeug.security import check_password_hash
-
 from functools import lru_cache
-from flask import g  # 'g' is a request-specific object
-from src.config import app, db
+
+from src.config import app, get_app_info
 from src.models import ExternalMonitornig, UserProfile
 from src.utils import ROOT_DIR
+from src.logger import logger
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
     load_yaml,
@@ -31,10 +31,10 @@ from src.routes.helper.prometheus_helper import (
     update_prometheus_container,
     update_prometheus_config,
     save_updated_alert_manager_config,
-    fetch_active_alerts,
-    get_active_alert_manager,
+    retrieve_active_alerts,
+    retrieve_active_alertmanagers,
     count_of_targets,
-    calculate_total_rules
+    calculate_total_rules,
 )
 
 # Define the Prometheus Blueprint
@@ -42,8 +42,11 @@ prometheus_bp = Blueprint("prometheus", __name__)
 
 PROMETHEUS_BASE_URL = "http://localhost:9090"
 ALERTMANAGER_BASE_URL = "http://localhost:9093"
-PROMETHEUS_RELOAD_URL = "http://localhost:9090/api/v1/admin/tsdb/reload"  # Adjust as necessary
+PROMETHEUS_RELOAD_URL = (
+    "http://localhost:9090/api/v1/admin/tsdb/reload"  # Adjust as necessary
+)
 RULES_FILE_PATH = os.path.join(ROOT_DIR, "prometheus_config/alert_rules.yml")
+
 
 # Cache user queries with LRU cache (memory-based, not ideal for distributed apps)
 @lru_cache(maxsize=128)
@@ -80,6 +83,7 @@ def metrics():
         ]
     )
     return Response(output, mimetype="text/plain")
+
 
 @app.route("/metrics_")
 def metrics_():
@@ -139,10 +143,20 @@ def configure_targets():
     update_prometheus_config()
     save_updated_alert_manager_config()
     targets_info = show_targets()
-
+    total_targets = count_of_targets()
 
     if request.form.get("_method") == "POST":
-    
+        max_scrap_target = get_app_info().get("max_scrap_target")
+        if total_targets >= max_scrap_target:
+            flash(
+                f"Cannot add more targets. You have reached the maximum limit of {max_scrap_target} targets.",
+                "danger",
+            )
+            logger.error(
+                f"Cannot add more targets. You have reached the maximum limit of {max_scrap_target} targets."
+            )
+            return redirect(url_for("configure_targets"))
+
         job_name = request.form.get("job_name")
         new_target = request.form.get("new_target")
         username = request.form.get("username")
@@ -155,7 +169,8 @@ def configure_targets():
         # Validate target format
         if ":" not in new_target:
             flash(
-                "Invalid target format. It should be in the format <ip>:<port>.", "danger"
+                "Invalid target format. It should be in the format <ip>:<port>.",
+                "danger",
             )
             return redirect(url_for("configure_targets"))
 
@@ -203,9 +218,9 @@ def configure_targets():
         # Save the updated config
         save_yaml(config, prometheus_yml_path)
         flash("Target added successfully!", "success")
-        
+
         return redirect(url_for("configure_targets"))
-    
+
     if request.form.get("_method") == "DELETE":
         job_name = request.form.get("job_name")
         target_to_remove = request.form.get("target_to_remove")
@@ -227,7 +242,8 @@ def configure_targets():
                         )
                 else:
                     flash(
-                        f"Target {target_to_remove} not found in job {job_name}.", "warning"
+                        f"Target {target_to_remove} not found in job {job_name}.",
+                        "warning",
                     )
                 break
 
@@ -258,7 +274,7 @@ def configure_targets():
 
             save_yaml(config, prometheus_yml_path)
             return redirect(url_for("configure_targets"))
-        
+
         elif request.form.get("action") == "update_auth":
             job_name = request.form.get("job_name")
             username = request.form.get("username")
@@ -270,7 +286,10 @@ def configure_targets():
                 if scrape_config["job_name"] == job_name:
                     found = True
                     if username and password:
-                        scrape_config["basic_auth"] = {"username": username, "password": password}
+                        scrape_config["basic_auth"] = {
+                            "username": username,
+                            "password": password,
+                        }
                     flash("Basic Auth updated successfully!", "success")
                     break
 
@@ -283,9 +302,13 @@ def configure_targets():
             save_yaml(config, prometheus_yml_path)
             # update_prometheus_container()
             return redirect(url_for("configure_targets"))
-                    
-    
-    return render_template("prometheus/targets.html", targets_info=targets_info, total_targets=count_of_targets())
+
+    return render_template(
+        "prometheus/targets.html",
+        targets_info=targets_info,
+        total_targets=total_targets
+    )
+
 
 @app.route("/targets/restart_prometheus")
 @admin_required
@@ -299,7 +322,7 @@ def restart_prometheus():
 @app.route("/active_alerts")
 def active_alerts():
     try:
-        alerts = fetch_active_alerts()
+        alerts = retrieve_active_alerts()
     except Exception as e:
         alerts = []
         print(f"Error fetching alerts: {e}")
@@ -322,7 +345,7 @@ def show_alerts():
 @app.route("/view_rules", methods=["GET", "POST"])
 def view_rules():
     # Load existing rules from the YAML file
-    with open(RULES_FILE_PATH, 'r') as file:
+    with open(RULES_FILE_PATH, "r") as file:
         rules = yaml.safe_load(file)
 
     total_rules = calculate_total_rules()
@@ -332,6 +355,17 @@ def view_rules():
         group_name = request.form.get("group_name")
 
         if action == "add":
+            max_alert_rules = get_app_info().get("max_alert_rules")
+            if total_rules >= max_alert_rules:
+                flash(
+                    f"Cannot add more rules. You have reached the maximum limit of {max_alert_rules} rules.",
+                    "danger",
+                )
+                logger.error(
+                    f"Cannot add more rules. You have reached the maximum limit of {max_alert_rules} rules."
+                )
+                return redirect(url_for("view_rules"))
+
             new_rule = {
                 "alert": request.form.get("alert_name"),
                 "expr": request.form.get("expr"),
@@ -346,13 +380,13 @@ def view_rules():
                 },
             }
             # Adding new rule logic
-            for group in rules['groups']:
-                if group['name'] == group_name:
-                    group['rules'].append(new_rule)
+            for group in rules["groups"]:
+                if group["name"] == group_name:
+                    group["rules"].append(new_rule)
                     break
 
             # Write the updated rules back to the file
-            with open(RULES_FILE_PATH, 'w') as file:
+            with open(RULES_FILE_PATH, "w") as file:
                 yaml.dump(rules, file)
 
             # Reload Prometheus configuration
@@ -365,18 +399,26 @@ def view_rules():
             index = int(request.form.get("index"))
 
             # Find the group and edit the specified rule
-            for group in rules['groups']:
-                if group['name'] == group_name and index < len(group['rules']):
-                    group['rules'][index]["expr"] = request.form.get("expr")
-                    group['rules'][index]["for"] = request.form.get("for")
-                    group['rules'][index]["labels"]["severity"] = request.form.get("severity")
-                    group['rules'][index]["annotations"]["description"] = request.form.get("description")
-                    group['rules'][index]["annotations"]["summary"] = request.form.get("summary")
-                    group['rules'][index]["annotations"]["runbook_url"] = request.form.get("runbook_url")
+            for group in rules["groups"]:
+                if group["name"] == group_name and index < len(group["rules"]):
+                    group["rules"][index]["expr"] = request.form.get("expr")
+                    group["rules"][index]["for"] = request.form.get("for")
+                    group["rules"][index]["labels"]["severity"] = request.form.get(
+                        "severity"
+                    )
+                    group["rules"][index]["annotations"]["description"] = (
+                        request.form.get("description")
+                    )
+                    group["rules"][index]["annotations"]["summary"] = request.form.get(
+                        "summary"
+                    )
+                    group["rules"][index]["annotations"]["runbook_url"] = (
+                        request.form.get("runbook_url")
+                    )
                     break
 
             # Write the updated rules back to the file
-            with open(RULES_FILE_PATH, 'w') as file:
+            with open(RULES_FILE_PATH, "w") as file:
                 yaml.dump(rules, file)
 
             # Reload Prometheus configuration
@@ -389,13 +431,13 @@ def view_rules():
             index = int(request.form.get("index"))
 
             # Find the group and delete the specified rule
-            for group in rules['groups']:
-                if group['name'] == group_name and index < len(group['rules']):
-                    group['rules'].pop(index)
+            for group in rules["groups"]:
+                if group["name"] == group_name and index < len(group["rules"]):
+                    group["rules"].pop(index)
                     break
 
             # Write the updated rules back to the file
-            with open(RULES_FILE_PATH, 'w') as file:
+            with open(RULES_FILE_PATH, "w") as file:
                 yaml.dump(rules, file)
 
             # Reload Prometheus configuration
@@ -404,11 +446,14 @@ def view_rules():
             flash("Rule deleted successfully!", "success")
             return redirect(url_for("view_rules"))
 
-    return render_template("alerts/view_rules.html", rules=rules, total_rules=total_rules)
+    return render_template(
+        "alerts/view_rules.html", rules=rules, total_rules=total_rules
+    )
+
 
 @app.route("/alertmanager/status")
 def alertmanager_status():
-    active_alertmanagers = get_active_alert_manager()
+    active_alertmanagers = retrieve_active_alertmanagers()
     if active_alertmanagers:
         return render_template(
             "alerts/alertmanager_status.html", alertmanagers=active_alertmanagers

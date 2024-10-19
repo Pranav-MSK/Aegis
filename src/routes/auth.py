@@ -3,7 +3,7 @@ import os
 import datetime
 from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import LoginManager, login_user, logout_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
 from src.alert_manager import send_smtp_email
 from src.config import app, db, limiter
@@ -16,6 +16,7 @@ from src.models import (
 from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper.common_helper import get_email_addresses
 from src.config import get_app_info
+from src.logger import logger
 
 auth_bp = blueprints.Blueprint("auth", __name__)
 
@@ -28,7 +29,7 @@ def load_user(user_id):
     return UserProfile.query.get(int(user_id))
 
 @app.route("/login", methods=["GET", "POST"])
-@limiter.limit("5 per minute")
+@limiter.limit("10 per minute")
 def login():
     if request.method == "POST":
         username = request.form["username"]
@@ -109,7 +110,22 @@ def logout():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+    total_users = UserProfile.fetch_total_count()
+    max_users_allowed = get_app_info().get("max_users_allowed")
+
+    if total_users >= max_users_allowed:
+        flash(
+            f"Cannot create more users. You have reached the maximum limit of {max_users_allowed} users.",
+            "danger",
+        )
+        logger.error(
+            f"Cannot create more users. You have reached the maximum limit of {max_users_allowed} users."
+        )
+
+        return redirect(url_for("login"))
+
     if request.method == "POST":
+
         first_name = request.form["first_name"]
         last_name = request.form["last_name"]
         username = request.form["username"]
@@ -185,5 +201,4 @@ def signup():
         flash("Account created successfully, Contact Admin to activate your account", "success")
         return redirect(url_for("login"))
 
-    total_users = UserProfile.fetch_total_count()
     return render_template("auths/signup.html", total_users=total_users)

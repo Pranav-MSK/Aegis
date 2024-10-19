@@ -5,12 +5,13 @@ from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import current_user
 from werkzeug.security import generate_password_hash
 
-from src.config import app, db
+from src.config import app, db, get_app_info
 from src.models import UserProfile, UserDashboardSettings, UserCardSettings, PageToggleSettings
 from src.utils import render_template_from_file, ROOT_DIR
 from src.alert_manager import send_smtp_email
 from src.routes.helper.common_helper import get_email_addresses
 from src.config import get_app_info
+from src.logger import logger
 from src.routes.helper.common_helper import admin_required
 
 user_management_bp = blueprints.Blueprint('user_management', __name__)
@@ -18,7 +19,18 @@ user_management_bp = blueprints.Blueprint('user_management', __name__)
 @app.route('/create_user', methods=['GET', 'POST'])
 @admin_required
 def create_user():
+    total_users = UserProfile.fetch_total_count()
     if request.method == 'POST':
+        max_users_allowed = get_app_info().get("max_users_allowed")
+
+        if total_users >= max_users_allowed:
+            flash(
+                f"Cannot create more users. You have reached the maximum limit of {max_users_allowed} users.",
+                "danger",
+            )
+            logger.error(
+                f"Cannot create more users. You have reached the maximum limit of {max_users_allowed} users."
+            )
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
@@ -80,8 +92,7 @@ def create_user():
 
         flash('User created successfully!', 'success')
         return redirect(url_for('view_users'))
-
-    total_users = UserProfile.fetch_total_count()
+    
     return render_template('users/create_user.html', total_users=total_users)
 
 @app.route('/users')

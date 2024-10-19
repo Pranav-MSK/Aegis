@@ -70,6 +70,29 @@ class AlertTicket(BaseModel):
             'customfields': [field.to_dict() for field in self.customfields]
         }
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'alert_name': self.alert_name,
+            'instance': self.instance,
+            'severity': self.severity,
+            'summary': self.summary,
+            'description': self.description,
+            'alert_status': self.alert_status,
+            'ticket_status': self.ticket_status,
+            'system_username': self.system_username,
+            'system_hostname': self.system_hostname,
+            'fingerprint': self.fingerprint,
+            'runbook_url': self.runbook_url,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'assigned_user_id': self.assigned_user_id,
+            'assigned_supervisor_id': self.assigned_supervisor_id,
+            'investigation_notes': [note.to_dict() for note in self.investigation_notes],
+            'reports': [report.to_dict() for report in self.reports],
+            'alertlogs': [log.to_dict() for log in self.alertlogs],
+            'customfields': [field.to_dict() for field in self.customfields]
+        }
 
 class AlertLog(BaseModel):
     __tablename__ = 'alert_logs'

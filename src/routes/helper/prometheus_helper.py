@@ -27,7 +27,6 @@ def is_valid_file(file_path: str) -> bool:
                 return False
     return True
 
-
 class OrderedDumper(yaml.SafeDumper):
     """Custom YAML dumper that preserves order of keys."""
     pass
@@ -153,13 +152,7 @@ def save_updated_alert_manager_config():
     except KeyError as e:
         print(f"Error updating URL in alertmanager config: {e}")
         return False
-    
-    # for index, j in enumerate(config['scrape_configs']):
-    #         if j['job_name'] == 'localhost':
-    #             config['scrape_configs'][index] = updated_job
-    #         else:
-    #             config['scrape_configs'][index] = OrderedDict(j)
-
+   
     for index, receiver in enumerate(alert_manager_config['receivers']):
         if receiver['name'] == 'webhook':
             alert_manager_config['receivers'][index] = receiver
@@ -204,13 +197,6 @@ def update_prometheus_container():
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while updating Prometheus container: {e}")
 
-
-def fetch_active_alerts():
-    response = requests.get(f"{PROMETHEUS_BASE_URL}/api/v1/alerts")
-    alerts_data = response.json()
-    alerts = alerts_data["data"]["alerts"]  # Extract the alerts
-    return alerts
-
 def calculate_total_rules():
     """Return the total number of rules."""
     config = load_yaml(alert_rules_path)
@@ -229,7 +215,7 @@ def count_of_targets():
         total_targets += len(targets)
     return total_targets
 
-def get_active_alert_manager():
+def retrieve_active_alertmanagers():
     try:
         url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"
         response = requests.get(url)
@@ -242,3 +228,9 @@ def get_active_alert_manager():
         return [
             {"url": "No active Alertmanager found", "cluster": "Unknown", "cluster_version": "Unknown"}
         ]
+
+def retrieve_active_alerts():
+    response = requests.get(f"{PROMETHEUS_BASE_URL}/api/v1/alerts")
+    alerts_data = response.json()
+    alerts = alerts_data["data"]["alerts"]  # Extract the alerts
+    return alerts
