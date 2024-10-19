@@ -81,7 +81,8 @@ def create_user():
         flash('User created successfully!', 'success')
         return redirect(url_for('view_users'))
 
-    return render_template('users/create_user.html')
+    total_users = UserProfile.fetch_total_count()
+    return render_template('users/create_user.html', total_users=total_users)
 
 @app.route('/users')
 @admin_required

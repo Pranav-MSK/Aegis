@@ -34,7 +34,6 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         remember_me = request.form.get("remember_me") == "on"  # TODO: Implement remember me
-        
 
         user = UserProfile.query.filter(
             (UserProfile.username == username) | (UserProfile.email == username)
@@ -105,16 +104,6 @@ def login():
 
 @app.route("/logout")
 def logout():
-    # receiver_email = current_user.email
-    # if receiver_email:
-    #     context = {"username": current_user.username,
-    #                "title": get_app_info()["title"]
-    #                }
-    #     logout_message_template = os.path.join(
-    #         ROOT_DIR, "src/templates/email_templates/logout.html"
-    #     )
-    #     email_body = render_template_from_file(logout_message_template, **context)
-    #     send_smtp_email(receiver_email, "Logout Alert", email_body, is_html=True)
     logout_user()
     return redirect(url_for("login"))
 
@@ -196,4 +185,5 @@ def signup():
         flash("Account created successfully, Contact Admin to activate your account", "success")
         return redirect(url_for("login"))
 
-    return render_template("auths/signup.html")
+    total_users = UserProfile.fetch_total_count()
+    return render_template("auths/signup.html", total_users=total_users)

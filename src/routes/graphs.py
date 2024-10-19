@@ -34,7 +34,6 @@ def get_form_value(key, default):
 def chart_configurations():
     if request.method == 'POST':
         config_id = request.form.get('config_id')
-        is_active = request.form.get('is_active') == 'on'
         
         if config_id:  # Editing an existing configuration
             config = ChartConfiguration.query.get(config_id)

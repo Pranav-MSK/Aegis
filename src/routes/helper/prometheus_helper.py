@@ -211,7 +211,7 @@ def fetch_active_alerts():
     alerts = alerts_data["data"]["alerts"]  # Extract the alerts
     return alerts
 
-def total_rules():
+def calculate_total_rules():
     """Return the total number of rules."""
     config = load_yaml(alert_rules_path)
     total_rules = 0
@@ -220,7 +220,7 @@ def total_rules():
         total_rules += len(rules)
     return total_rules
 
-def total_targets():
+def count_of_targets():
     """Return the total number of targets."""
     config = load_yaml(prometheus_yml_path)
     total_targets = 0
@@ -230,12 +230,15 @@ def total_targets():
     return total_targets
 
 def get_active_alert_manager():
-    url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"
-    response = requests.get(url)
+    try:
+        url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"
+        response = requests.get(url)
 
-    if response.status_code == 200:
-        alertmanager_data = response.json()
-        active_alertmanagers = alertmanager_data["data"]["activeAlertmanagers"]
-        return active_alertmanagers
-    else:
-        return None
+        if response.status_code == 200:
+            alertmanager_data = response.json()
+            active_alertmanagers = alertmanager_data["data"]["activeAlertmanagers"]
+            return active_alertmanagers
+    except Exception as e:
+        return [
+            {"url": "No active Alertmanager found", "cluster": "Unknown", "cluster_version": "Unknown"}
+        ]

@@ -32,7 +32,9 @@ from src.routes.helper.prometheus_helper import (
     update_prometheus_config,
     save_updated_alert_manager_config,
     fetch_active_alerts,
-    get_active_alert_manager
+    get_active_alert_manager,
+    count_of_targets,
+    calculate_total_rules
 )
 
 # Define the Prometheus Blueprint
@@ -131,173 +133,165 @@ def delete_file_path(id):
     return redirect(url_for("external_monitoring"))
 
 
-@app.route("/configure_targets")
+@app.route("/configure_targets", methods=["GET", "POST", "PUT", "DELETE"])
 @admin_required
 def configure_targets():
     update_prometheus_config()
     save_updated_alert_manager_config()
     targets_info = show_targets()
-    return render_template("prometheus/targets.html", targets_info=targets_info)
 
+
+    if request.form.get("_method") == "POST":
+    
+        job_name = request.form.get("job_name")
+        new_target = request.form.get("new_target")
+        username = request.form.get("username")
+        password = request.form.get("password")
+        scrape_interval = (
+            request.form.get("scrape_interval", "15s") + "s"
+        )  # New scrape interval
+        config = load_yaml(prometheus_yml_path)
+
+        # Validate target format
+        if ":" not in new_target:
+            flash(
+                "Invalid target format. It should be in the format <ip>:<port>.", "danger"
+            )
+            return redirect(url_for("configure_targets"))
+
+        job_found = False
+
+        # if job name already exists, add new target to the job
+        for scrape_config in config["scrape_configs"]:
+            if scrape_config["job_name"] == job_name:
+                # Append new target
+                scrape_config["static_configs"][0]["targets"].append(new_target)
+                job_found = True
+
+                # Update scrape interval
+                scrape_config["scrape_interval"] = scrape_interval
+
+                # Prepare the updated job dictionary to maintain order
+                updated_job = OrderedDict()
+                updated_job["job_name"] = scrape_config["job_name"]
+                updated_job["static_configs"] = scrape_config["static_configs"]
+                updated_job["scrape_interval"] = scrape_config["scrape_interval"]
+                updated_job["basic_auth"] = scrape_config.get("basic_auth", None)
+
+                # Replace the existing job with the updated one
+                index = config["scrape_configs"].index(scrape_config)
+                config["scrape_configs"][index] = updated_job
+
+                break
+
+        if not job_found:
+            # Create new job entry
+            new_job = OrderedDict()
+            new_job["job_name"] = job_name
+            new_job["static_configs"] = [{"targets": [new_target]}]
+            new_job["scrape_interval"] = scrape_interval
+
+            # Add basic_auth if provided
+            if username and password:
+                new_job["basic_auth"] = {"username": username, "password": password}
+            # Append the new job to scrape_configs
+            config["scrape_configs"].append(new_job)
+
+        for index, j in enumerate(config["scrape_configs"]):
+            config["scrape_configs"][index] = OrderedDict(j)
+
+        # Save the updated config
+        save_yaml(config, prometheus_yml_path)
+        flash("Target added successfully!", "success")
+        
+        return redirect(url_for("configure_targets"))
+    
+    if request.form.get("_method") == "DELETE":
+        job_name = request.form.get("job_name")
+        target_to_remove = request.form.get("target_to_remove")
+        config = load_yaml(prometheus_yml_path)
+
+        for scrape_config in config["scrape_configs"]:
+            if scrape_config["job_name"] == job_name:
+                targets = scrape_config["static_configs"][0]["targets"]
+                if target_to_remove in targets:
+                    targets.remove(target_to_remove)
+                    flash(f"Target {target_to_remove} removed successfully!", "success")
+
+                    # Check if this was the last target, then remove the job
+                    if not targets:  # If the list is now empty
+                        config["scrape_configs"].remove(scrape_config)
+                        flash(
+                            f"Job {job_name} removed because it had no targets left.",
+                            "success",
+                        )
+                else:
+                    flash(
+                        f"Target {target_to_remove} not found in job {job_name}.", "warning"
+                    )
+                break
+
+        for index, j in enumerate(config["scrape_configs"]):
+            config["scrape_configs"][index] = OrderedDict(j)
+
+        else:
+            flash(f"Job {job_name} not found.", "warning")
+
+        save_yaml(config, prometheus_yml_path)
+        update_prometheus_container()
+        return redirect(url_for("configure_targets"))
+
+    if request.form.get("_method") == "PUT":
+        if request.form.get("action") == "update_interval":
+            job_name = request.form.get("job_name")
+            new_interval = request.form.get("new_interval") + "s"  # New scrape interval
+            config = load_yaml(prometheus_yml_path)
+
+            for scrape_config in config["scrape_configs"]:
+                if scrape_config["job_name"] == job_name:
+                    scrape_config["scrape_interval"] = new_interval
+                    flash("Scrape interval updated successfully!", "success")
+                    break
+
+            for index, j in enumerate(config["scrape_configs"]):
+                config["scrape_configs"][index] = OrderedDict(j)
+
+            save_yaml(config, prometheus_yml_path)
+            return redirect(url_for("configure_targets"))
+        
+        elif request.form.get("action") == "update_auth":
+            job_name = request.form.get("job_name")
+            username = request.form.get("username")
+            password = request.form.get("password")
+            config = load_yaml(prometheus_yml_path)
+
+            found = False
+            for scrape_config in config["scrape_configs"]:
+                if scrape_config["job_name"] == job_name:
+                    found = True
+                    if username and password:
+                        scrape_config["basic_auth"] = {"username": username, "password": password}
+                    flash("Basic Auth updated successfully!", "success")
+                    break
+
+            if not found:
+                flash(f"Job {job_name} not found.", "warning")
+
+            for index, j in enumerate(config["scrape_configs"]):
+                config["scrape_configs"][index] = OrderedDict(j)
+
+            save_yaml(config, prometheus_yml_path)
+            # update_prometheus_container()
+            return redirect(url_for("configure_targets"))
+                    
+    
+    return render_template("prometheus/targets.html", targets_info=targets_info, total_targets=count_of_targets())
 
 @app.route("/targets/restart_prometheus")
 @admin_required
 def restart_prometheus():
     update_prometheus_container()
     flash("Prometheus container restarted successfully!", "success")
-    return redirect(url_for("configure_targets"))
-
-
-@app.route("/targets/add_target", methods=["POST"])
-def add_target():
-    job_name = request.form.get("job_name")
-    new_target = request.form.get("new_target")
-    username = request.form.get("username")
-    password = request.form.get("password")
-    scrape_interval = (
-        request.form.get("scrape_interval", "15s") + "s"
-    )  # New scrape interval
-    config = load_yaml(prometheus_yml_path)
-
-    # Validate target format
-    if ":" not in new_target:
-        flash(
-            "Invalid target format. It should be in the format <ip>:<port>.", "danger"
-        )
-        return redirect(url_for("configure_targets"))
-
-    job_found = False
-
-    # if job name already exists, add new target to the job
-    for scrape_config in config["scrape_configs"]:
-        if scrape_config["job_name"] == job_name:
-            # Append new target
-            scrape_config["static_configs"][0]["targets"].append(new_target)
-            job_found = True
-
-            # Update scrape interval
-            scrape_config["scrape_interval"] = scrape_interval
-
-            # Prepare the updated job dictionary to maintain order
-            updated_job = OrderedDict()
-            updated_job["job_name"] = scrape_config["job_name"]
-            updated_job["static_configs"] = scrape_config["static_configs"]
-            updated_job["scrape_interval"] = scrape_config["scrape_interval"]
-            updated_job["basic_auth"] = scrape_config.get("basic_auth", None)
-
-            # Replace the existing job with the updated one
-            index = config["scrape_configs"].index(scrape_config)
-            config["scrape_configs"][index] = updated_job
-
-            break
-
-    if not job_found:
-        # Create new job entry
-        new_job = OrderedDict()
-        new_job["job_name"] = job_name
-        new_job["static_configs"] = [{"targets": [new_target]}]
-        new_job["scrape_interval"] = scrape_interval
-
-        # Add basic_auth if provided
-        if username and password:
-            new_job["basic_auth"] = {"username": username, "password": password}
-        # Append the new job to scrape_configs
-        config["scrape_configs"].append(new_job)
-
-    for index, j in enumerate(config["scrape_configs"]):
-        config["scrape_configs"][index] = OrderedDict(j)
-
-    # Save the updated config
-    save_yaml(config, prometheus_yml_path)
-    flash("Target added successfully!", "success")
-    return redirect(url_for("configure_targets"))
-
-
-@app.route("/targets/remove_target", methods=["POST"])
-@admin_required
-def remove_target():
-    job_name = request.form.get("job_name")
-    target_to_remove = request.form.get("target_to_remove")
-    config = load_yaml(prometheus_yml_path)
-
-    for scrape_config in config["scrape_configs"]:
-        if scrape_config["job_name"] == job_name:
-            targets = scrape_config["static_configs"][0]["targets"]
-            if target_to_remove in targets:
-                targets.remove(target_to_remove)
-                flash(f"Target {target_to_remove} removed successfully!", "success")
-
-                # Check if this was the last target, then remove the job
-                if not targets:  # If the list is now empty
-                    config["scrape_configs"].remove(scrape_config)
-                    flash(
-                        f"Job {job_name} removed because it had no targets left.",
-                        "success",
-                    )
-            else:
-                flash(
-                    f"Target {target_to_remove} not found in job {job_name}.", "warning"
-                )
-            break
-
-    for index, j in enumerate(config["scrape_configs"]):
-        config["scrape_configs"][index] = OrderedDict(j)
-
-    else:
-        flash(f"Job {job_name} not found.", "warning")
-
-    save_yaml(config, prometheus_yml_path)
-    # update_prometheus_container()
-    return redirect(url_for("configure_targets"))
-
-
-@app.route("/targets/change_interval", methods=["POST"])
-@admin_required
-def change_interval():
-    job_name = request.form.get("job_name")
-    new_interval = request.form.get("new_interval") + "s"  # New scrape interval
-    config = load_yaml(prometheus_yml_path)
-
-    for scrape_config in config["scrape_configs"]:
-        if scrape_config["job_name"] == job_name:
-            scrape_config["scrape_interval"] = new_interval
-            flash("Scrape interval updated successfully!", "success")
-            break
-
-    for index, j in enumerate(config["scrape_configs"]):
-        config["scrape_configs"][index] = OrderedDict(j)
-
-    save_yaml(config, prometheus_yml_path)
-    # update_prometheus_container()
-    return redirect(url_for("configure_targets"))
-
-
-# change username and password
-@app.route("/targets/change_auth", methods=["POST"])
-@admin_required
-def change_auth():
-    job_name = request.form.get("job_name")
-    username = request.form.get("username")
-    password = request.form.get("password")
-    config = load_yaml(prometheus_yml_path)
-
-    found = False
-    for scrape_config in config["scrape_configs"]:
-        if scrape_config["job_name"] == job_name:
-            found = True
-            if username and password:
-                scrape_config["basic_auth"] = {"username": username, "password": password}
-            flash("Basic Auth updated successfully!", "success")
-            break
-
-    if not found:
-        flash(f"Job {job_name} not found.", "warning")
-
-    for index, j in enumerate(config["scrape_configs"]):
-        config["scrape_configs"][index] = OrderedDict(j)
-
-    save_yaml(config, prometheus_yml_path)
-    # update_prometheus_container()
     return redirect(url_for("configure_targets"))
 
 
@@ -330,6 +324,8 @@ def view_rules():
     # Load existing rules from the YAML file
     with open(RULES_FILE_PATH, 'r') as file:
         rules = yaml.safe_load(file)
+
+    total_rules = calculate_total_rules()
 
     if request.method == "POST":
         action = request.form.get("action")
@@ -408,7 +404,7 @@ def view_rules():
             flash("Rule deleted successfully!", "success")
             return redirect(url_for("view_rules"))
 
-    return render_template("alerts/view_rules.html", rules=rules)
+    return render_template("alerts/view_rules.html", rules=rules, total_rules=total_rules)
 
 @app.route("/alertmanager/status")
 def alertmanager_status():

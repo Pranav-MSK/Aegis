@@ -6,7 +6,7 @@ from sqlalchemy import func, case
 from src.config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration
 from src.utils import get_system_info
-from src.routes.helper.prometheus_helper import total_targets, total_rules, get_active_alert_manager
+from src.routes.helper.prometheus_helper import count_of_targets, calculate_total_rules, get_active_alert_manager
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -39,8 +39,8 @@ def dashboard():
     system_info.update(ticket_stats._asdict())
 
     # Prometheus metrics
-    system_info["total_targets"] = total_targets()
-    system_info["total_rules"] = total_rules()
+    system_info["total_targets"] = count_of_targets()
+    system_info["total_rules"] = calculate_total_rules()
     system_info["active_alertmanagers"] = get_active_alert_manager()
 
        # number of chart 
@@ -105,8 +105,8 @@ def api_dashboard_stats():
     response_data = {
         "user_stats": user_stats._asdict(),
         "ticket_stats": ticket_stats._asdict(),
-        "total_targets": total_targets(),
-        "total_rules": total_rules(),
+        "total_targets": count_of_targets(),
+        "total_rules": calculate_total_rules(),
         "chart_stats": chart_stats._asdict(),
         "active_alertmanagers": get_active_alert_manager(),
         "max_scrap_target": max_scrap_target,
@@ -114,8 +114,6 @@ def api_dashboard_stats():
         "max_number_of_graphs": max_number_of_graphs,
         "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
         "max_users_allowed": max_users_allowed,
-        "total_rules": total_rules(),
-        "total_targets": total_targets(),
         "top_alert_tickets": [ticket.to_dict() for ticket in AlertTicket.query.order_by(AlertTicket.created_at.desc()).limit(5).all()]
     }
 

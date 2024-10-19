@@ -8,15 +8,13 @@
 <div class="container" x-data="{ editingRule: null }">
     <h1 class="title">Manage Alert Rules</h1>
 
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            <div class="messages">
-            {% for category, message in messages %}
-                <div class="message {{ category }}">{{ message }}</div>
-            {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+    {% include 'ext/message.html' %}
+
+    {% if total_rules >= max_alert_rules | int %}
+        <div class="alert alert-warning">
+            Maximum number of alert rules ({{ max_alert_rules | int }}) reached. Please delete existing rules before adding new ones.
+        </div>
+    {% endif %}
 
     <div class="rules-container">
         {% for group in rules.groups %}
@@ -67,7 +65,7 @@
                                 <button type="button" class="btn btn-secondary" @click="editingRule = null">Cancel</button>
                             </div>
                         </form>
-                        <form method="POST" action="{{ url_for('view_rules') }}" class="delete-form">
+                        <form method="POST" action="{{ url_for('view_rules') }}" class="delete-form" method="DELETE">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="index" value="{{ loop.index0 }}">
@@ -83,25 +81,25 @@
 
     <div class="add-rule-container">
         <h2 class="subtitle">Add New Rule</h2>
-        <form method="POST" action="{{ url_for('view_rules') }}" class="add-form">
+        <form method="POST" action="{{ url_for('view_rules') }}" class="add-form" {% if total_rules >= max_alert_rules | int %}onsubmit="return false;"{% endif %}>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="group_name" value="SystemGuard's alert rules">
             <div class="form-group">
                 <label for="alert_name">Alert Name:</label>
-                <input type="text" id="alert_name" name="alert_name" required>
+                <input type="text" id="alert_name" name="alert_name" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
             </div>
             <div class="form-group">
                 <label for="new_expr">Expression:</label>
-                <input type="text" id="new_expr" name="expr" required>
+                <input type="text" id="new_expr" name="expr" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
             </div>
             <div class="form-group">
                 <label for="new_for">For:</label>
-                <input type="text" id="new_for" name="for" required>
+                <input type="text" id="new_for" name="for" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
             </div>
             <div class="form-group">
                 <label for="new_severity">Severity:</label>
-                <select id="new_severity" name="severity" required>
+                <select id="new_severity" name="severity" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
                     <option value="info">Info</option>
                     <option value="warning">Warning</option>
                     <option value="critical">Critical</option>
@@ -109,17 +107,17 @@
             </div>
             <div class="form-group">
                 <label for="new_description">Description:</label>
-                <input type="text" id="new_description" name="description" required>
+                <input type="text" id="new_description" name="description" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
             </div>
             <div class="form-group">
                 <label for="new_summary">Summary:</label>
-                <input type="text" id="new_summary" name="summary" required>
+                <input type="text" id="new_summary" name="summary" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
             </div>
             <div class="form-group">
                 <label for="new_runbook_url">Runbook URL:</label>
-                <input type="text" id="new_runbook_url" name="runbook_url" required>
+                <input type="text" id="new_runbook_url" name="runbook_url" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
             </div>
-            <button type="submit" class="btn btn-success">Add Rule</button>
+            <button type="submit" class="btn btn-success" {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>Add Rule</button>
         </form>
     </div>
 </div>

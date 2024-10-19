@@ -17,6 +17,7 @@ from src.alert_manager import (
 from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
+from src.routes.helper.alert_helper import can_create_alert
 
 
 def send_test_alert(alertmanager_url, alert_name, severity, instance):
@@ -107,10 +108,10 @@ def process_alert(alert):
     runbook_url = alert["annotations"].get("runbook_url", None)
 
     log_alert(severity, alert_name, instance, description, summary)
-    save_alert_data(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)
+    create_alert_ticket(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)
     notify_alert(alert_name, instance, severity, description, summary)
 
-def save_alert_data(alert_name, alert_status, instance, severity, 
+def create_alert_ticket(alert_name, alert_status, instance, severity, 
                     description, summary, system_username, system_hostname, 
                     fingerprint, runbook_url=None):
     """
@@ -125,6 +126,10 @@ def save_alert_data(alert_name, alert_status, instance, severity,
     """
     # Fetch all supervisors with user_level "admin"
     all_supervisors = UserProfile.query.filter_by(user_level="admin").all()
+
+    if not can_create_alert():
+        logger.warning("Monthly alert ticket limit reached. Ignoring the alert.")
+        return
 
     # check if fingerprint already exists
     if fingerprint:
@@ -146,8 +151,6 @@ def save_alert_data(alert_name, alert_status, instance, severity,
         elif existing_alert and existing_alert.alert_status == "resolved" and alert_status == "firing":
             logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
             return
-
-        
     
     if not all_supervisors:
         assigned_supervisor_id = None

@@ -20,3 +20,7 @@ class BaseModel(db.Model):
     @classmethod
     def get_by_id(cls, record_id):
         return cls.query.get(record_id)
+
+    @classmethod
+    def fetch_total_count(cls):
+        return cls.query.count()

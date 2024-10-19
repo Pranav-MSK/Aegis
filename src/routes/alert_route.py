@@ -1,16 +1,106 @@
 # cython: language_level=3
-from flask import request, jsonify, Blueprint, render_template, redirect, url_for, flash, abort
+from http import HTTPStatus
+from datetime import datetime
+from flask import (
+    request,
+    jsonify,
+    Blueprint,
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    abort,
+)
 from flask_login import current_user, login_required
 
-from src.config import app, csrf, db
+from src.config import app, csrf, db, get_app_info
 from src.logger import logger
 from src.routes.helper.notification_helper import send_test_alert, process_alert
 from src.utils import get_ip_address
-from src.models import AlertTicket, UserProfile, InvestigationNote, AlertLog, CustomFields
-from src.routes.helper.access_decorators import systemguard_enterprise, community_edition
+from src.models import (
+    AlertTicket,
+    UserProfile,
+    InvestigationNote,
+    AlertLog,
+    CustomFields,
+)
+from src.routes.helper.access_decorators import (
+    systemguard_enterprise,
+    community_edition,
+)
 from src.routes.helper.alert_helper import user_has_access_to_alert, user_id_to_username
 
 alert_bp = Blueprint("alert", __name__)
+
+
+@app.route("/api/v1/check_monthly_alerts")
+def check_monthly_alerts():
+    try:
+        # Get the first day of current month at midnight (00:00:00)
+        current_date = datetime.now()
+        first_date_of_month = current_date.replace(
+            day=1, hour=0, minute=0, second=0, microsecond=0
+        )
+
+        # Get the first day of next month for upper bound
+        if current_date.month == 12:
+            next_month = current_date.replace(
+                year=current_date.year + 1,
+                month=1,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+        else:
+            next_month = current_date.replace(
+                month=current_date.month + 1,
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )
+
+        # Query total alerts for current month
+        total_alerts = AlertTicket.query.filter(
+            AlertTicket.created_at >= first_date_of_month,
+            AlertTicket.created_at < next_month,
+        ).count()
+
+        # Get monthly limit from config
+        monthly_limit = get_app_info().get("monthly_alert_tickets_limit", 100)
+
+        # Check if limit is reached
+        limit_reached = total_alerts >= monthly_limit
+
+        response = {
+            "status": "success",
+            "data": {
+                "total_alerts": total_alerts,
+                "monthly_limit": monthly_limit,
+                "limit_reached": limit_reached,
+                "current_month": current_date.strftime("%B %Y"),
+                "alerts_remaining": max(0, monthly_limit - total_alerts),
+            },
+        }
+
+        return jsonify(response), HTTPStatus.OK
+
+    except Exception as e:
+        app.logger.error(f"Error checking monthly alerts: {str(e)}")
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "Failed to check monthly alerts",
+                    "error": str(e),
+                }
+            ),
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
+
 
 @app.route("/alerts", methods=["POST"])
 @csrf.exempt
@@ -106,19 +196,19 @@ def alert_history():
     resolved_page = request.args.get("resolved_page", 1, type=int)
     closed_page = request.args.get("closed_page", 1, type=int)
 
-
-    unassigned_alerts = base_query.filter(AlertTicket.assigned_user_id.is_(None)).paginate(
-        page=unassigned_page, per_page=per_page, error_out=False
-    )
-    open_alerts = base_query.filter(AlertTicket.ticket_status == "Open",
-                                    AlertTicket.assigned_user_id.isnot(None)).paginate(
-        page=open_page, per_page=per_page, error_out=False
-    )
+    unassigned_alerts = base_query.filter(
+        AlertTicket.assigned_user_id.is_(None)
+    ).paginate(page=unassigned_page, per_page=per_page, error_out=False)
+    open_alerts = base_query.filter(
+        AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)
+    ).paginate(page=open_page, per_page=per_page, error_out=False)
     in_progress_alerts = base_query.filter(
-        AlertTicket.ticket_status == "In Progress", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "In Progress",
+        AlertTicket.assigned_user_id.isnot(None),
     ).paginate(page=in_progress_page, per_page=per_page, error_out=False)
     resolved_alerts = base_query.filter(
-        AlertTicket.ticket_status == "Resolved", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "Resolved",
+        AlertTicket.assigned_user_id.isnot(None),
     ).paginate(page=resolved_page, per_page=per_page, error_out=False)
     closed_alerts = base_query.filter(
         AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)
@@ -130,20 +220,20 @@ def alert_history():
         AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)
     ).count()
     in_progress_count = base_query.filter(
-        AlertTicket.ticket_status == "In Progress", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "In Progress",
+        AlertTicket.assigned_user_id.isnot(None),
     ).count()
     resolved_count = base_query.filter(
-        AlertTicket.ticket_status == "Resolved", AlertTicket.assigned_user_id.isnot(None)
+        AlertTicket.ticket_status == "Resolved",
+        AlertTicket.assigned_user_id.isnot(None),
     ).count()
     closed_count = base_query.filter(
         AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)
     ).count()
 
-
     critical_count = base_query.filter(AlertTicket.severity == "critical").count()
     warning_count = base_query.filter(AlertTicket.severity == "warning").count()
     info_count = base_query.filter(AlertTicket.severity == "info").count()
-
 
     return render_template(
         "alerts/alert_history.html",
@@ -166,6 +256,7 @@ def alert_history():
         current_user=current_user,
     )
 
+
 @app.route("/alerts/ticket/<int:alert_id>", methods=["GET", "POST"])
 @systemguard_enterprise()
 @user_has_access_to_alert
@@ -185,8 +276,16 @@ def alert_ticket(alert_id):
 
         # User Assignment
         if form_type in ["assign_user", "assign_supervisor"]:
-            assigned_user_id = request.form.get("assigned_user_id" if form_type == "assign_user" else "assigned_supervisor_id")
-            previous_user_id = alert.assigned_user_id if form_type == "assign_user" else alert.assigned_supervisor_id
+            assigned_user_id = request.form.get(
+                "assigned_user_id"
+                if form_type == "assign_user"
+                else "assigned_supervisor_id"
+            )
+            previous_user_id = (
+                alert.assigned_user_id
+                if form_type == "assign_user"
+                else alert.assigned_supervisor_id
+            )
 
             if assigned_user_id:
                 if form_type == "assign_user":
@@ -211,18 +310,30 @@ def alert_ticket(alert_id):
             return redirect(url_for("alert_ticket", alert_id=alert.id))
 
         # Edit Status, Severity, Description, Summary
-        elif form_type in ["edit_status", "edit_severity", "edit_description", "edit_summary"]:
-            new_value = request.form.get("ticket_status" if form_type == "edit_status" else
-                                           "severity" if form_type == "edit_severity" else
-                                           "description" if form_type == "edit_description" else
-                                           "summary")
+        elif form_type in [
+            "edit_status",
+            "edit_severity",
+            "edit_description",
+            "edit_summary",
+        ]:
+            new_value = request.form.get(
+                "ticket_status"
+                if form_type == "edit_status"
+                else (
+                    "severity"
+                    if form_type == "edit_severity"
+                    else "description" if form_type == "edit_description" else "summary"
+                )
+            )
             if form_type == "edit_status":
                 alert.ticket_status = new_value
                 log_message = f"Status changed to '{alert.ticket_status}' by {current_user.username}"
                 flash("Status updated successfully!", "success")
             elif form_type == "edit_severity":
                 alert.severity = new_value
-                log_message = f"Severity changed to '{alert.severity}' by {current_user.username}"
+                log_message = (
+                    f"Severity changed to '{alert.severity}' by {current_user.username}"
+                )
                 flash("Severity updated successfully!", "success")
             elif form_type == "edit_description":
                 alert.description = new_value
@@ -240,7 +351,9 @@ def alert_ticket(alert_id):
         elif form_type == "add_comment":
             note_content = request.form.get("investigation_notes")
             if note_content:
-                InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                InvestigationNote(
+                    alert_ticket_id=alert.id, user_id=current_user.id, note=note_content
+                ).save()
                 log_message = f"Comment added by {current_user.username}"
                 log_and_save(log_message)
                 flash("Your comment has been added successfully!", "success")
@@ -255,8 +368,12 @@ def alert_ticket(alert_id):
                 field_name = request.form.get("field_name")
                 field_value = request.form.get("field_value")
                 if field_name and field_value:
-                    alert.customfields.append(CustomFields(field_name=field_name, field_value=field_value))
-                    log_message = f"Custom field '{field_name}' added by {current_user.username}"
+                    alert.customfields.append(
+                        CustomFields(field_name=field_name, field_value=field_value)
+                    )
+                    log_message = (
+                        f"Custom field '{field_name}' added by {current_user.username}"
+                    )
                     flash("Field added successfully!", "success")
                 else:
                     flash("Field name and value cannot be empty!", "error")
@@ -286,15 +403,26 @@ def alert_ticket(alert_id):
             log_and_save(log_message)
             alert.save()
             return redirect(url_for("alert_ticket", alert_id=alert.id))
- 
-        elif form_type in ["close_ticket", "reopen_ticket", "progress_ticket", "resolve_ticket"]:
+
+        elif form_type in [
+            "close_ticket",
+            "reopen_ticket",
+            "progress_ticket",
+            "resolve_ticket",
+        ]:
             if form_type == "close_ticket":
                 alert.ticket_status = "Closed"
                 alert.assigned_user_id = current_user.id
                 note_content = request.form.get("investigation_notes")
                 if note_content:
-                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
-                    log_message = f"Ticket closed as 'Resolved' by {current_user.username}"
+                    InvestigationNote(
+                        alert_ticket_id=alert.id,
+                        user_id=current_user.id,
+                        note=note_content,
+                    ).save()
+                    log_message = (
+                        f"Ticket closed as 'Resolved' by {current_user.username}"
+                    )
                     flash("Ticket closed successfully!", "success")
                 else:
                     flash("Note cannot be empty!", "error")
@@ -302,7 +430,11 @@ def alert_ticket(alert_id):
                 alert.ticket_status = "Open"
                 note_content = request.form.get("investigation_notes")
                 if note_content:
-                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    InvestigationNote(
+                        alert_ticket_id=alert.id,
+                        user_id=current_user.id,
+                        note=note_content,
+                    ).save()
                     log_message = f"Ticket reopened for further investigation by {current_user.username}"
                     flash("Ticket reopened successfully!", "success")
                 else:
@@ -312,33 +444,48 @@ def alert_ticket(alert_id):
                 alert.ticket_status = "In Progress"
                 note_content = request.form.get("investigation_notes")
                 if note_content:
-                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
-                    log_message = f"Ticket marked as 'In Progress' by {current_user.username}"
+                    InvestigationNote(
+                        alert_ticket_id=alert.id,
+                        user_id=current_user.id,
+                        note=note_content,
+                    ).save()
+                    log_message = (
+                        f"Ticket marked as 'In Progress' by {current_user.username}"
+                    )
                     flash("Ticket marked as in progress successfully!", "success")
                 else:
                     flash("Note cannot be empty!", "error")
-            
+
             elif form_type == "resolve_ticket":
                 alert.ticket_status = "Resolved"
                 note_content = request.form.get("investigation_notes")
                 if note_content:
-                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
-                    log_message = f"Ticket marked as 'Resolved' by {current_user.username}"
+                    InvestigationNote(
+                        alert_ticket_id=alert.id,
+                        user_id=current_user.id,
+                        note=note_content,
+                    ).save()
+                    log_message = (
+                        f"Ticket marked as 'Resolved' by {current_user.username}"
+                    )
                     flash("Ticket marked as resolved successfully!", "success")
                 else:
                     flash("Note cannot be empty!", "error")
 
-            
             log_and_save(log_message)
             alert.save()
             return redirect(url_for("alert_ticket", alert_id=alert.id))
-        
+
         elif form_type in ["warning_ticket", "info_ticket", "critical_ticket"]:
             if form_type == "critical_ticket":
                 alert.severity = "critical"
                 note_content = request.form.get("investigation_notes")
                 if note_content:
-                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    InvestigationNote(
+                        alert_ticket_id=alert.id,
+                        user_id=current_user.id,
+                        note=note_content,
+                    ).save()
                     log_message = f"Ticket marked as 'Critical Severity' by {current_user.username}"
                     flash("Ticket marked as critical severity successfully!", "success")
                 else:
@@ -348,7 +495,11 @@ def alert_ticket(alert_id):
                 alert.severity = "warning"
                 note_content = request.form.get("investigation_notes")
                 if note_content:
-                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
+                    InvestigationNote(
+                        alert_ticket_id=alert.id,
+                        user_id=current_user.id,
+                        note=note_content,
+                    ).save()
                     log_message = f"Ticket marked as 'Warning Severity' by {current_user.username}"
                     flash("Ticket marked as warning severity successfully!", "success")
                 else:
@@ -358,8 +509,14 @@ def alert_ticket(alert_id):
                 alert.severity = "info"
                 note_content = request.form.get("investigation_notes")
                 if note_content:
-                    InvestigationNote(alert_ticket_id=alert.id, user_id=current_user.id, note=note_content).save()
-                    log_message = f"Ticket marked as 'Info Severity' by {current_user.username}"
+                    InvestigationNote(
+                        alert_ticket_id=alert.id,
+                        user_id=current_user.id,
+                        note=note_content,
+                    ).save()
+                    log_message = (
+                        f"Ticket marked as 'Info Severity' by {current_user.username}"
+                    )
                     flash("Ticket marked as info severity successfully!", "success")
                 else:
                     flash("Note cannot be empty!", "error")
@@ -367,7 +524,7 @@ def alert_ticket(alert_id):
             log_and_save(log_message)
             alert.save()
             return redirect(url_for("alert_ticket", alert_id=alert.id))
-      
+
         elif form_type in ["assign_me", "assign_user"]:
             if form_type == "assign_me":
                 assigned_user_id = request.form.get("assigned_user_id")
@@ -377,16 +534,14 @@ def alert_ticket(alert_id):
                     flash("User assigned successfully!", "success")
                 else:
                     flash("User not found!", "error")
-            
+
             elif form_type == "assign_user":
                 # assign some user based on load balancer and other factors
                 pass
 
-
             log_and_save(log_message)
             alert.save()
             return redirect(url_for("alert_ticket", alert_id=alert.id))
-        
 
         alert.save()
         flash("Changes saved successfully!", "success")

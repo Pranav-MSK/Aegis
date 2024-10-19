@@ -9,7 +9,20 @@
 <h1>Chart Configurations</h1>
 {% include 'ext/message.html' %}
 
-<button id="addConfigBtn" class="btn btn-primary">Add New Configuration</button>
+{% if configs|length >= max_number_of_graphs | int %}
+<div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>Maximum number of charts ({{ max_number_of_graphs | int }}) reached. Please delete existing charts before adding new ones.</p>
+</div>
+<button id="addConfigBtn" class="btn btn-primary" disabled title="Maximum number of charts reached">
+    <i class="fas fa-chart-line"></i> Add New Configuration
+</button>
+{% else %}
+<button id="addConfigBtn" class="btn btn-primary">
+    <i class="fas fa-chart-line"></i> Add New Configuration 
+    ({{ configs|length }}/{{ max_number_of_graphs | int }})
+</button>
+{% endif %}
 
 <table class="table table-striped mt-4">
     <thead>
@@ -32,17 +45,22 @@
             <td>
                 <div class="toggle-group">
                     <label class="toggle">
-                        <input type="checkbox" class="is-active" data-id="{{ config.id }}" {{ 'checked' if
-                            config.is_active else '' }}>
+                        <input type="checkbox" class="is-active" data-id="{{ config.id }}" 
+                               {{ 'checked' if config.is_active else '' }}>
                         <span class="slider"></span>
                     </label>
                 </div>
             </td>
             <td>
-                <button class="btn-edit" data-id="{{ config.id }}" data-metric-name="{{ config.metric_name }}"
-                    data-title="{{ config.title }}" data-xlabel="{{ config.xlabel }}" data-ylabel="{{ config.ylabel }}"
-                    data-tension="{{ config.tension }}" data-point-radius="{{ config.point_radius }}"
-                    data-point-hover-radius="{{ config.point_hover_radius }}" data-chart-type="{{ config.chart_type }}">
+                <button class="btn-edit" data-id="{{ config.id }}" 
+                        data-metric-name="{{ config.metric_name }}"
+                        data-title="{{ config.title }}" 
+                        data-xlabel="{{ config.xlabel }}" 
+                        data-ylabel="{{ config.ylabel }}"
+                        data-tension="{{ config.tension }}" 
+                        data-point-radius="{{ config.point_radius }}"
+                        data-point-hover-radius="{{ config.point_hover_radius }}" 
+                        data-chart-type="{{ config.chart_type }}">
                     <i class="fas fa-edit"></i> Edit
                 </button>
                 <button class="btn-delete" data-id="{{ config.id }}">
@@ -85,19 +103,22 @@
 
             <div class="form-group">
                 <label for="tension">Tension</label>
-                <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4" oninput="this.nextElementSibling.value = this.value">
+                <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4" 
+                       oninput="this.nextElementSibling.value = this.value">
                 <output>0.4</output>
             </div>
             
             <div class="form-group">
                 <label for="pointRadius">Point Radius</label>
-                <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0" oninput="this.nextElementSibling.value = this.value">
+                <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0" 
+                       oninput="this.nextElementSibling.value = this.value">
                 <output>0</output>
             </div>
             
             <div class="form-group">
                 <label for="pointHoverRadius">Point Hover Radius</label>
-                <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6" oninput="this.nextElementSibling.value = this.value">
+                <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6" 
+                       oninput="this.nextElementSibling.value = this.value">
                 <output>6</output>
             </div>            
 
@@ -111,7 +132,7 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Update Configuration</button>
+            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Update Configuration</button>
         </form>
     </div>
 </div>
@@ -121,6 +142,12 @@
     <div class="modal-content">
         <span class="close" onclick="document.getElementById('addModal').style.display='none'">&times;</span>
         <h2>Add New Chart Configuration</h2>
+        {% if configs|length >= max_number_of_graphs | int %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Maximum number of charts reached. Please delete existing charts before adding new ones.</p>
+        </div>
+        {% else %}
         <form id="newChartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -146,22 +173,24 @@
 
             <div class="form-group">
                 <label for="tension">Tension</label>
-                <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4" oninput="this.nextElementSibling.value = this.value">
+                <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4" 
+                       oninput="this.nextElementSibling.value = this.value">
                 <output>0.4</output>
             </div>
             
             <div class="form-group">
                 <label for="pointRadius">Point Radius</label>
-                <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0" oninput="this.nextElementSibling.value = this.value">
+                <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0" 
+                       oninput="this.nextElementSibling.value = this.value">
                 <output>0</output>
             </div>
             
             <div class="form-group">
                 <label for="pointHoverRadius">Point Hover Radius</label>
-                <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6" oninput="this.nextElementSibling.value = this.value">
+                <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6" 
+                       oninput="this.nextElementSibling.value = this.value">
                 <output>6</output>
             </div>
-            
 
             <div class="form-group">
                 <label for="newChartType">Chart Type</label>
@@ -175,6 +204,7 @@
 
             <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Create Configuration</button>
         </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

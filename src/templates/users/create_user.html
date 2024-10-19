@@ -1,58 +1,65 @@
 {% extends 'base/base.html' %}
 {% block title %}Add New User{% endblock %}
-
 {% block extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/create_user.css') }}">
 {% endblock %}
-
 {% block content %}
 <div class="page-container">
   <div class="form-card">
     <h1 class="page-title">Create New User</h1>
-    
-    <form action="{{ url_for('create_user') }}" method="post">
+    {% if total_users >= max_users_allowed | int %}
+    <div class="alert alert-warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>Maximum user limit reached. New user creation is currently disabled.</p>
+      <p>Please contact the system administrator for assistance.</p>
+    </div>
+    {% endif %}
+
+    <form action="{{ url_for('create_user') }}" method="post" {% if total_users >= max_users_allowed | int %}disabled="disabled"{% endif %}>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      
       <div class="form-grid">
         <div class="form-group">
           <label for="username">
             <i class="fas fa-user"></i>Username
           </label>
-          <input type="text" id="username" name="username" required class="form-control">
+          <input type="text" id="username" name="username" required 
+                 class="form-control" {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
         </div>
-
         <div class="form-group">
           <label for="email">
             <i class="fas fa-envelope"></i>Email
           </label>
-          <input type="email" id="email" name="email" required class="form-control">
+          <input type="email" id="email" name="email" required 
+                 class="form-control" {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
         </div>
       </div>
-
+      
       <div class="form-group">
         <label for="password">
           <i class="fas fa-key"></i>Password
         </label>
-        <input type="password" id="password" name="password" required class="form-control">
+        <input type="password" id="password" name="password" required 
+               class="form-control" {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
       </div>
-
+      
       <div class="form-grid">
         <div class="form-group">
           <label for="user_level">
             <i class="fas fa-user-shield"></i>User Level
           </label>
-          <select id="user_level" name="user_level" class="form-control">
+          <select id="user_level" name="user_level" 
+                  class="form-control" {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </select>
         </div>
-
         <div class="form-group">
           <label for="profession">
             <i class="fas fa-briefcase"></i>Profession
           </label>
-          <select id="profession" name="profession" class="form-control">
+          <select id="profession" name="profession" 
+                  class="form-control" {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
             <option value="Software Developer">Software Developer</option>
             <option value="Network Engineer">Network Engineer</option>
             <option value="System Administrator">System Administrator</option>
@@ -61,20 +68,30 @@
           </select>
         </div>
       </div>
-
+      
       <div class="checkbox-group">
-        <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" checked>
+        <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" 
+               checked {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
         <label for="receive_email_alerts">Receive Email Alerts</label>
       </div>
-
+      
       <div class="checkbox-group">
-        <input type="checkbox" id="assign_tickets" name="assign_tickets">
+        <input type="checkbox" id="assign_tickets" name="assign_tickets"
+               {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
         <label for="assign_tickets">Opt-in for Ticket Assignment</label>
       </div>
-
-      <button type="submit" class="submit-button">
+      
+      <button type="submit" class="submit-button" 
+              {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
         <i class="fas fa-user-plus"></i> Create User
       </button>
+      
+      {% if total_users >= max_users_allowed | int %}
+      <p class="limit-message">
+        <i class="fas fa-info-circle"></i>
+        Current users: {{ total_users }} / {{ max_users_allowed }}
+      </p>
+      {% endif %}
     </form>
   </div>
 </div>
