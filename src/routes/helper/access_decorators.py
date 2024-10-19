@@ -1,10 +1,10 @@
 # cython: language_level=3
 from functools import wraps
 from flask import abort
-from src.config import plan_details
+from src.activator import get_plan_details
 
 # Get the current user's plan type
-current_plan = plan_details["plan_type"]
+current_plan = get_plan_details().get("plan_type")
 
 # All plan types in increasing order of privileges
 all_plan_types = [
