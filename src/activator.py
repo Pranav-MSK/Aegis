@@ -52,25 +52,36 @@ def verify_activation_code(activation_code, hardware_id, obfuscated_key):
 def check_license_expiration(license_key, obfuscated_key):
     base_plan = "Free Edition"
     is_trial = False
+    max_scrap_target = 1
+    max_alert_rules = 5
+    max_number_of_graphs = 5
+    monthly_alert_tickets_limit = 10
+    max_users_allowed = 5
     cipher = Fernet(obfuscated_key)
     decrypted_license_data = cipher.decrypt(license_key.encode()).decode()
     
     license_parts = decrypted_license_data.split('|')
     if len(license_parts) < 3:
-        return False, "Invalid license format.", base_plan, is_trial
+        return False, "Invalid license format.", base_plan, is_trial, max_scrap_target, max_alert_rules, max_number_of_graphs, monthly_alert_tickets_limit, max_users_allowed
 
     plan_type = license_parts[0]
     expiration_date_str = license_parts[1]
     is_trial = license_parts[2]
+    max_scrap_target = license_parts[3]
+    max_alert_rules = license_parts[4]
+    max_number_of_graphs = license_parts[5]
+    monthly_alert_tickets_limit = license_parts[6]
+    max_users_allowed = license_parts[7]
+
     expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
 
     today = datetime.now() + timedelta(days=0)
     expiration_date_str = expiration_date.strftime('%Y-%m-%d')
     if today >= expiration_date:
-        return False, "License has expired {}. Please renew the license.".format(expiration_date_str), base_plan, is_trial
+        return False, "License has expired {}. Please renew the license.".format(expiration_date_str), base_plan, is_trial, max_scrap_target, max_alert_rules, max_number_of_graphs, monthly_alert_tickets_limit, max_users_allowed
 
     remaining_plan_days = (expiration_date - today).days
-    return True, remaining_plan_days, plan_type, is_trial
+    return True, remaining_plan_days, plan_type, is_trial, max_scrap_target, max_alert_rules, max_number_of_graphs, monthly_alert_tickets_limit, max_users_allowed
 
 def get_plan_details():
     obfuscated_key = load_secret_key("obfuscation.so")
@@ -80,7 +91,12 @@ def get_plan_details():
     is_trial = False
     license_key = ""
     activation_code = ""
-    systemguard_unique_id = ""
+    systemguard_unique_id = calculate_unique_system_id()
+    max_scrap_target = 1
+    max_alert_rules = 5
+    max_number_of_graphs = 5
+    monthly_alert_tickets_limit = 10
+    max_users_allowed = 5
     try:
         with open(internal_license_key_path, 'r') as f:
             license_data = f.read()
@@ -97,11 +113,18 @@ def get_plan_details():
                     "is_trial": is_trial,
                     "license_key": license_key,
                     "activation_code": activation_code,
-                    "systemguard_unique_id": systemguard_unique_id
+                    "systemguard_unique_id": systemguard_unique_id,
+                    "max_scrap_target": max_scrap_target,
+                    "max_alert_rules": max_alert_rules,
+                    "max_number_of_graphs": max_number_of_graphs,
+                    "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
+                    "max_users_allowed": max_users_allowed
                 }
 
 
-            is_plan_not_expired, remaining_plan_days, plan_type, is_trial = check_license_expiration(license_key, obfuscated_key)
+            is_plan_not_expired, remaining_plan_days, plan_type, is_trial, \
+                max_scrap_target, max_alert_rules, max_number_of_graphs, \
+                    monthly_alert_tickets_limit, max_users_allowed = check_license_expiration(license_key, obfuscated_key)
             if not is_plan_not_expired:
                 print("License has expired. Please activate the application.", "danger")
                 return {
@@ -111,7 +134,12 @@ def get_plan_details():
                         "is_trial": is_trial,
                         "license_key": license_key,
                         "activation_code": activation_code,
-                        "systemguard_unique_id": systemguard_unique_id
+                        "systemguard_unique_id": systemguard_unique_id,
+                        "max_scrap_target": max_scrap_target,
+                        "max_alert_rules": max_alert_rules,
+                        "max_number_of_graphs": max_number_of_graphs,
+                        "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
+                        "max_users_allowed": max_users_allowed
 
                     }
             else:
@@ -122,7 +150,12 @@ def get_plan_details():
                         "is_trial": is_trial,
                         "license_key": license_key,
                         "activation_code": activation_code,
-                        "systemguard_unique_id": systemguard_unique_id
+                        "systemguard_unique_id": systemguard_unique_id,
+                        "max_scrap_target": max_scrap_target,
+                        "max_alert_rules": max_alert_rules,
+                        "max_number_of_graphs": max_number_of_graphs,
+                        "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
+                        "max_users_allowed": max_users_allowed
                     }
     except FileNotFoundError:
         return {
@@ -132,5 +165,10 @@ def get_plan_details():
             "is_trial": is_trial,
             "license_key": license_key,
             "activation_code": activation_code,
-            "systemguard_unique_id": systemguard_unique_id
+            "systemguard_unique_id": systemguard_unique_id,
+            "max_scrap_target": max_scrap_target,
+            "max_alert_rules": max_alert_rules,
+            "max_number_of_graphs": max_number_of_graphs,
+            "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
+            "max_users_allowed": max_users_allowed
         }

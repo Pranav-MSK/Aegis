@@ -238,20 +238,23 @@ class DashboardController {
 
   updateDashboardStats(data) {
     const stats = {
-      'total-users': data.user_stats?.total_users,
+      'total-users': `${data.user_stats?.total_users} / ${data.max_users_allowed}`,
       'active-users': data.user_stats?.active_users,
       'inactive-users': data.user_stats?.inactive_users,
       'admin-users': data.user_stats?.admin_users,
-      'total-tickets': data.ticket_stats?.total_tickets,
+      'total-tickets': `${data.ticket_stats?.total_tickets} / ${data.monthly_alert_tickets_limit}`,
       'open-tickets': data.ticket_stats?.open_tickets,
       'in-progress-tickets': data.ticket_stats?.in_progress_tickets,
       'resolved-tickets': data.ticket_stats?.resolved_tickets,
       'closed-tickets': data.ticket_stats?.closed_tickets,
-      'total-charts': data.chart_stats?.total_charts,
+      'total-charts': `${data.chart_stats?.total_charts} / ${data.max_number_of_graphs}`,
       'active-charts': data.chart_stats?.active_charts,
       'critical-tickets': data.ticket_stats?.critical_tickets,
       'warning-tickets': data.ticket_stats?.warning_tickets,
-      'info-tickets': data.ticket_stats?.info_tickets
+      'info-tickets': data.ticket_stats?.info_tickets,
+      'total-rules': `${data.total_rules} / ${data.max_alert_rules}`,
+      'total-targets': `${data.total_targets} / ${data.max_scrap_target}`,
+
     };
 
     Object.entries(stats).forEach(([className, value]) => {

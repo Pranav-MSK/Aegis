@@ -3,7 +3,7 @@ from flask import render_template, Blueprint
 from flask_login import login_required, current_user
 from sqlalchemy import func, case
 
-from src.config import app, csrf
+from src.config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration
 from src.utils import get_system_info
 from src.routes.helper.prometheus_helper import total_targets, total_rules, get_active_alert_manager
@@ -93,6 +93,14 @@ def api_dashboard_stats():
         func.sum(case((ChartConfiguration.is_active == True, 1), else_=0)).label('active_charts')
     ).filter(ChartConfiguration.user_id == current_user.id).first()
 
+    app_info = get_app_info()
+    max_scrap_target = app_info.get('max_scrap_target')
+    max_alert_rules = app_info.get('max_alert_rules')
+    max_number_of_graphs = app_info.get('max_number_of_graphs')
+    monthly_alert_tickets_limit = app_info.get('monthly_alert_tickets_limit')
+    max_users_allowed = app_info.get('max_users_allowed')
+
+
     # Prepare the response data
     response_data = {
         "user_stats": user_stats._asdict(),
@@ -101,6 +109,13 @@ def api_dashboard_stats():
         "total_rules": total_rules(),
         "chart_stats": chart_stats._asdict(),
         "active_alertmanagers": get_active_alert_manager(),
+        "max_scrap_target": max_scrap_target,
+        "max_alert_rules": max_alert_rules,
+        "max_number_of_graphs": max_number_of_graphs,
+        "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
+        "max_users_allowed": max_users_allowed,
+        "total_rules": total_rules(),
+        "total_targets": total_targets(),
         "top_alert_tickets": [ticket.to_dict() for ticket in AlertTicket.query.order_by(AlertTicket.created_at.desc()).limit(5).all()]
     }
 

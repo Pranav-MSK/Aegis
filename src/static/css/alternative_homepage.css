@@ -395,10 +395,14 @@ body {
     padding: 0.75rem;
     background-color: var(--gray-50);
     border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2px;
 }
 
 .info-label {
-    color: var(--text-secondary);
+    color: var(--text-primary);
     font-weight: 500;
 }
 
@@ -646,22 +650,6 @@ temp-alert-badge {
 
 .process-footer a:hover {
     text-decoration: underline;
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.info-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.info-value {
-    font-size: 14px;
 }
 
 /* Responsive adjustments */
@@ -1117,3 +1105,31 @@ temp-alert-badge {
     font-weight: 600;
     color: var(--primary-color);
 }
+
+.warning-bg {
+    background-color: var(--warning-50);
+    color: var(--warning-500);
+    padding: 1rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.critical-bg {
+    background-color: var(--danger-50);
+    color: var(--danger-500);
+    padding: 1rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.info-bg {
+    background-color: var(--primary-50);
+    color: var(--primary-500);
+    padding: 1rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+

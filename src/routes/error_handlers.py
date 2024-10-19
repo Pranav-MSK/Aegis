@@ -8,7 +8,6 @@ from src.config import app
 from src.logger import logger
 from src.activator import get_plan_details
 from src.background_task.prometheus_metrics import metrics
-# from src.activator import check_license_expiration
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
 

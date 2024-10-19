@@ -180,29 +180,21 @@
                 <h3>System Information</h3>
                 <span class="refresh-indicator"></span>
             </div>
+
             <div class="card-content">
                 <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-desktop info-icon"></i>OS:</span>
-                        <span class="info-value">{{ system_info.os_info.os_full_name }}</span>
+                    {% for label, value in [
+                    ("OS", system_info.os_info.os_full_name),
+                    ("Processor Name", system_info.processor_name),
+                    ("Boot Time", system_info.boot_time),
+                    ("Process Count", system_info.process_count),
+                    ("Kernel Version", system_info.os_info.kernel_version)]
+                    %}
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-desktop info-icon"></i>{{ label }}:</span>
+                        <span class="info-value info-value">{{ value }}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-microchip info-icon"></i>Processor Name:</span>
-                        <span class="info-value">{{ system_info.processor_name }}</span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-clock info-icon"></i>Boot Time:</span>
-                        <span class="info-value">{{ system_info.boot_time }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-tasks info-icon"></i>Process Count:</span>
-                        <span class="info-value">{{ system_info.process_count }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Kernel Version:</span>
-                        <span class="info-value">{{ system_info.os_info.kernel_version }}</span>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -237,27 +229,18 @@
             </div>
             <div class="card-content">
                 <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-tag info-icon"></i>Product Name:</span>
-                        <span class="info-value">{{ plan_type }}</span>
+                    {% for label, value in [
+                    ("Product Name", plan_type),
+                    ("Product Version", version),
+                    ("SystemGuard Unique ID", systemguard_unique_id),
+                    ("Remaining Days", remaining_plan_days),
+                    ("Username", system_info.system_username)]
+                    %}
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-tag info-icon"></i>{{ label }}:</span>
+                        <span class="info-value">{{ value }}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Product Version:</span>
-                        <span class="info-value">{{ version }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-id-badge info-icon"></i>SystemGuard Unique
-                            ID:</span>
-                        <span class="info-value">{{ systemguard_unique_id }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-calendar-alt info-icon"></i>Remaining Days:</span>
-                        <span class="info-value">{{ remaining_plan_days }} days</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-user info-icon"></i>Username:</span>
-                        <span class="info-value">{{ system_info.system_username }}</span>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -271,6 +254,7 @@
                 <h3>Disk and Network Status</h3>
                 <span class="refresh-indicator"></span>
             </div>
+
             <div class="card-content">
                 <div class="network-stats">
                     <div class="stat-item">
@@ -332,25 +316,26 @@
             </div>
             <div class="card-content">
                 <div class="info-grid">
-                    <div class="info-item">
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-users info-icon"></i>Total Users:</span>
-                        <span class="info-value total-users">{{ system_info.total_users }}</span>
+                        <span class="info-value total-users">{{ system_info.total_users }} / {{ max_users_allowed
+                            }}</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-user-shield info-icon"></i>Admin Users:</span>
                         <span class="info-value admin-users">{{ system_info.admin_users }}</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-user info-icon"></i>Active Users:</span>
                         <span class="info-value active-users">{{ system_info.active_users }}</span>
                     </div>
                     <!-- func.sum(case((UserProfile.is_active == False, 1), else_=0)).label('inactive_users'), -->
-                    <div class="info-item">
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-user-slash info-icon"></i>Inactive Users:</span>
                         <span class="info-value inactive-users">{{ system_info.inactive_users }}</span>
                     </div>
                     {% if system_info.active_alertmanagers %}
-                    <div class="info-item">
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-user info-icon"></i>Active Alert Managers:</span>
                         {% for alertmanager in system_info.active_alertmanagers %}
                         <span class="info-value active-alertmanagers">{{ alertmanager["url"] }}</span>
@@ -363,28 +348,23 @@
         </div>
 
         <div class="metric-card">
+            {% if plan_type == 'SystemGuard Enterprise' %}
             <div class="card-header">
                 <h3>All Tickets Information</h3>
                 <span class="refresh-indicator"></span>
             </div>
             <div class="card-content">
                 <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Total
-                            Tickets:</span>
-                        <span class="info-value total-tickets">{{ system_info.total_tickets }}</span>
-                    </div>
-                    <hr>
                     <div class="row">
                         <div class="col">
-                            <div class="info-item">
+                            <div class="info-item info-bg">
                                 <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Open
                                     Tickets:</span>
                                 <span class="info-value open-tickets">{{ system_info.open_tickets }}</span>
                             </div>
                         </div>
                         <div class="col">
-                            <div class="info-item">
+                            <div class="info-item info-bg">
                                 <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Closed
                                     Tickets:</span>
                                 <span class="info-value closed-tickets">{{ system_info.closed_tickets }}</span>
@@ -393,7 +373,7 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <div class="info-item">
+                            <div class="info-item info-bg">
                                 <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Progress
                                     Tickets:</span>
                                 <span class="info-value in-progress-tickets">{{ system_info.in_progress_tickets
@@ -401,7 +381,7 @@
                             </div>
                         </div>
                         <div class="col">
-                            <div class="info-item">
+                            <div class="info-item info-bg">
                                 <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Resolved
                                     Tickets:</span>
                                 <span class="info-value resolved-tickets">{{ system_info.resolved_tickets }}</span>
@@ -411,7 +391,7 @@
                     <hr>
                     <div class="row">
                         <div class="col">
-                            <div class="info-item">
+                            <div class="info-item critical-bg">
                                 <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Critical
                                     Tickets:</span>
                                 <span class="info-value critical-tickets">{{ system_info.critical_tickets }}</span>
@@ -421,14 +401,14 @@
 
                     <div class="row">
                         <div class="col">
-                            <div class="info-item">
+                            <div class="info-item warning-bg">
                                 <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Warning
                                     Tickets:</span>
                                 <span class="info-value warning-tickets">{{ system_info.warning_tickets }}</span>
                             </div>
                         </div>
                         <div class="col">
-                            <div class="info-item">
+                            <div class="info-item info-bg">
                                 <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Info
                                     Tickets:</span>
                                 <span class="info-value info-tickets">{{ system_info.info_tickets }}</span>
@@ -438,6 +418,18 @@
 
                 </div>
             </div>
+            {% else %}
+            <div class="card-content">
+                <h3 class="text-center">Alert Tickets Information</h3>
+                <p class="text-center text-gray-500">Alert Tickets Information is only available for SystemGuard
+                    Enterprise.
+                    Upgrade to SystemGuard Enterprise to access detailed alert ticket information, including open,
+                    closed,
+                    in-progress, resolved, critical, warning, and informational tickets. This feature helps in better
+                    monitoring and managing system alerts efficiently.</p>
+            </div>
+            {% endif %}
+
         </div>
 
         <!-- other information -->
@@ -448,28 +440,30 @@
             </div>
             <div class="card-content">
                 <div class="info-grid">
-                    <div class="info-item">
-                        <!-- total_rules -->
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Total Tickets:</span>
+                        <span class="info-value total-tickets">{{ system_info.total_tickets }} / {{
+                            monthly_alert_tickets_limit }}</span>
+                    </div>
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Total Alerts
                             Rules:</span>
-                        <span class="info-value">{{ system_info.total_rules }}</span>
+                        <span class="info-value total-rules">{{ system_info.total_rules }} / {{max_alert_rules}}</span>
                     </div>
 
-                    <div class="info-item">
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-bullseye info-icon"></i>Total Srapping
                             Targets:</span>
-                        <span class="info-value">{{ system_info.total_targets }}</span>
+                        <span class="info-value total-targets">{{ system_info.total_targets }} /
+                            {{max_scrap_target}}</span>
                     </div>
-
-                    <!-- func.count().label('total_charts'),
-                    func.sum(case((ChartConfiguration.is_active == True, 1), else_=0)).label('active_charts') -->
-
-                    <div class="info-item">
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-chart-line info-icon"></i>Total Charts:</span>
-                        <span class="info-value total-charts">{{ system_info.total_charts }}</span>
+                        <span class="info-value total-charts">{{ system_info.total_charts }} /
+                            {{max_number_of_graphs}}</span>
                     </div>
 
-                    <div class="info-item">
+                    <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-chart-line info-icon"></i>Active Charts:</span>
                         <span class="info-value active-charts">{{ system_info.active_charts }}</span>
                     </div>

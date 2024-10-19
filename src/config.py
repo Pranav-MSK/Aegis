@@ -78,6 +78,11 @@ app.jinja_env.globals.update(
     license_key=plan_details.get('license_key'),
     activation_code=plan_details.get('activation_code'),
     systemguard_unique_id=plan_details.get('systemguard_unique_id'),
+    max_scrap_target=plan_details.get('max_scrap_target'),
+    max_alert_rules=plan_details.get('max_alert_rules'),
+    max_number_of_graphs=plan_details.get('max_number_of_graphs'),
+    monthly_alert_tickets_limit=plan_details.get('monthly_alert_tickets_limit'),
+    max_users_allowed=plan_details.get('max_users_allowed')
 
 )
 
@@ -101,4 +106,9 @@ def get_app_info():
         "license_key": plan_details.get('license_key'),
         "activation_code": plan_details.get('activation_code'),
         "systemguard_unique_id": plan_details.get('systemguard_unique_id'),
+        "max_scrap_target": plan_details.get('max_scrap_target'),
+        "max_alert_rules": plan_details.get('max_alert_rules'),
+        "max_number_of_graphs": plan_details.get('max_number_of_graphs'),
+        "monthly_alert_tickets_limit": plan_details.get('monthly_alert_tickets_limit'),
+        "max_users_allowed": plan_details.get('max_users_allowed')
     }
