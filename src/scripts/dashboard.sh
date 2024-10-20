@@ -216,11 +216,7 @@ is_flask_running() {
 # Check if Flask app is running
 if ! is_flask_running; then
     conda run -n "$CONDA_ENV_NAME" pip install -r "$REQUIREMENTS_FILE"
-    log_message "INFO" "Flask app is not running. Checking repository and starting it..."
-    [ "$auto_update" = true ] && fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
-
     log_message "INFO" "Starting Flask app..."
-    # Ensure environment activation and `flask` command
     bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && flask run --host=0.0.0.0 --port=$FLASK_PORT" &>>"$LOG_FILE" &
 else
     log_message "INFO" "Flask app is already running."

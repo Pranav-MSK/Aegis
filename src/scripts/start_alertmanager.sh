@@ -31,7 +31,7 @@ SYSTEM_LABEL="systemguard-metrics"
 JOB_NAME="localhost"
 PROMETHEUS_USERNAME="prometheus_admin"
 PROMETHEUS_PASSWORD="prometheus_password"
-SCRAPE_INTERVAL="2s"
+SCRAPE_INTERVAL="1s"
 username=$(whoami)
 system_hostname=$(hostname)
 
