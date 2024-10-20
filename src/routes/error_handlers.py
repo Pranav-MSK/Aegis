@@ -119,6 +119,10 @@ def check_password_expiry():
 
 @app.after_request
 def after_request(response):
+    # pass the static
+    if request.endpoint in ['static']:
+        return response
+
     request_duration = time.time() - request.start_time
     REQUEST_TIME.observe(request_duration)
     REQUEST_HISTOGRAM.labels(route=request.path).observe(request_duration)

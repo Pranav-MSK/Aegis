@@ -1,0 +1,96 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ system_info['system_username'] }}@{{ system_info['nodename'] }} - SystemGuard{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bar.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/cardChart.js')}}"></script>
+{% endblock %}
+{% block content %}
+{% if plan_type == 'Free Edition' or plan_type == 'Community Edition' %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>Notice:</strong> You are using the <strong>{{ plan_type }}</strong> plan. Upgrade to a premium plan to unlock all features.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+{% if is_trial == 'true' and is_plan_not_expired %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Notice:</strong> Your trial plan will expire in {{ remaining_plan_days }} days. Please renew your plan to continue using the service.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+{% if remaining_plan_days|int <= 10 and is_trial == 'false' and is_plan_not_expired %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Notice:</strong> Your plan will expire in {{ remaining_plan_days }} days. Please renew your plan to continue using the service.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<script>
+    setTimeout(function() {
+        document.querySelector('.alert').style.display = 'none';
+    }, 5000);
+</script>
+
+{% include 'card_comp/selector/refresh_button.html' %}
+<div class="row">
+        {% include 'ext/message.html' %}
+        <!-- Container for positioning the select input on the right -->
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/other/username.html' %}
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/plan/plan_info.html' %}
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/other/os_info.html' %}
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/cpu/core.html' %}
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/other/server_time.html' %}
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/battery/percentage.html' %}
+        </div>
+
+        <div class="col-md-6 col-lg-6 mb-4">
+                {% include 'card_comp/cpu/usages.html' %}
+        </div>
+        <div class="col-md-6 col-lg-6 mb-4">
+                {% include 'card_comp/memory/usage.html' %}
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/disk/usage.html' %}
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/cpu/current_temp.html' %}
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/cpu/frequency.html' %}
+        </div>
+        <div class="col-md-6 col-lg-6 mb-4">
+        {% include 'card_comp/other/uptime.html' %}
+        </div>
+        <div class="col-md-6 col-lg-6 mb-4">
+        {% include 'card_comp/network/stats.html' %}
+        </div>
+        <div class="col-md-6 col-lg-12 mb-4">
+        {% include 'card_comp/other/speedtest.html' %}
+        </div>
+</div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/bootTime.js')}}"></script>
+<script src="{{ url_for('static', filename='js/refreshCardData.js')}}"></script>
+<script src="{{ url_for('static', filename='js/poweredByFooter.js') }}"></script>
+
+{% endblock %}

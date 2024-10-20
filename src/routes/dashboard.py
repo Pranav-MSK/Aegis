@@ -55,7 +55,7 @@ def dashboard():
     system_info["top_alert_tickets"] = top_alert_tickets
 
     return render_template(
-        "dashboard/alternative_homepage.html",
+        "dashboard/homepage.html",
         system_info=system_info,
         current_user=current_user,
     )
