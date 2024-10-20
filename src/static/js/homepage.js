@@ -205,7 +205,11 @@ class DashboardController {
       'battery-status': data.battery_status,
       'current-server-time': data.timestamp,
       'disk-read': data.disk_read,
-      'disk-write': data.disk_write
+      'disk-write': data.disk_write,
+      'disk-write-per-sec': data.disk_write_per_sec,
+      'disk-read-per-sec': data.disk_read_per_sec,
+      'upload-speed': data.upload_speed,
+      'download-speed': data.download_speed,
     };
 
     Object.entries(metrics).forEach(([className, value]) => {

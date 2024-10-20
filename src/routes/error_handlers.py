@@ -14,6 +14,7 @@ from src.background_task.prometheus_metrics import metrics
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
 
 REQUEST_TIME = Summary('request_processing_seconds_systemguard', 'Time spent processing request')
+RESPONSE_SIZE = Summary('response_size_bytes_systemguard', 'Response size in bytes', ['route'])
 REQUEST_HISTOGRAM = Histogram('request_duration_seconds_systemguard', 'Duration of requests in seconds', ['route'])
 
 class CustomError(Exception):
@@ -119,11 +120,14 @@ def check_password_expiry():
 
 @app.after_request
 def after_request(response):
-    # pass the static
     if request.endpoint in ['static']:
         return response
 
     request_duration = time.time() - request.start_time
     REQUEST_TIME.observe(request_duration)
     REQUEST_HISTOGRAM.labels(route=request.path).observe(request_duration)
+    
+    if response.data:
+        RESPONSE_SIZE.labels(route=request.path).observe(len(response.data))
+
     return response

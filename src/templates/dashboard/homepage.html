@@ -261,7 +261,7 @@
                         <div class="stat-details">
                             <div class="stat-value">
                                 <span class="network-received">{{ system_info.network_received }}</span>
-                                <!-- <span class="speed-indicator speed-up">2.1 MB/s</span> -->
+                                <span class="speed-indicator download-speed">{{ system_info.download_speed }}
                             </div>
                             <span class="stat-label">Downloaded</span>
                         </div>
@@ -272,7 +272,7 @@
                         <div class="stat-details">
                             <div class="stat-value">
                                 <span class="network-sent">{{ system_info.network_sent }}</span>
-                                <!-- <span class="speed-indicator speed-down">1.2 MB/s</span> -->
+                                <span class="speed-indicator upload-speed">{{ system_info.upload_speed }}
                             </div>
                             <span class="stat-label">Uploaded</span>
                         </div>
@@ -283,7 +283,7 @@
                         <div class="stat-details">
                             <div class="stat-value">
                                 <span class="disk-read">{{ system_info.disk_read }}</span>
-                                <!-- <span class="speed-indicator speed-up">2.1 MB/s</span> -->
+                                <span class="speed-indicator disk-read-per-sec">{{ system_info.disk_read_per_sec }}</span>
                             </div>
                             <span class="stat-label">Disk Read</span>
                         </div>
@@ -294,7 +294,7 @@
                         <div class="stat-details">
                             <div class="stat-value">
                                 <span class="disk-write">{{ system_info.disk_write }}</span>
-                                <!-- <span class="speed-indicator speed-down">1.2 MB/s</span> -->
+                                <span class="speed-indicator disk-write-per-sec">{{ system_info.disk_write_per_sec }}</span>
                             </div>
                             <span class="stat-label">Disk Write</span>
                         </div>

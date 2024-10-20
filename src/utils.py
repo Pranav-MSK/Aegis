@@ -156,26 +156,52 @@ def get_memory_metrics():
 
 def get_disk_metrics():
     """Collect all disk-related metrics in one go"""
+    # Initial metrics
+    initial_io = psutil.disk_io_counters()
     disk_info = psutil.disk_usage('/')
-    disk_io = psutil.disk_io_counters()
+    
+    # Wait for a second to measure real-time speeds
+    time.sleep(1)
+
+    # Metrics after 1 second
+    final_io = psutil.disk_io_counters()
+
+    # Calculate read/write speeds
+    read_per_sec = final_io.read_bytes - initial_io.read_bytes
+    write_per_sec = final_io.write_bytes - initial_io.write_bytes
+    
     return {
         'disk_percent': round(disk_info.percent, 2),
         'disk_total': round(disk_info.total / CONVERSION_FACTOR_GB, 1),
         'disk_used': round(disk_info.used / CONVERSION_FACTOR_GB, 1),
         'disk_free': round(disk_info.free / CONVERSION_FACTOR_GB, 1),
-        'disk_read': format_speed(disk_io.read_bytes),
-        'disk_write': format_speed(disk_io.write_bytes)
+        'disk_read': format_speed(final_io.read_bytes),
+        'disk_write': format_speed(final_io.write_bytes),
+        'disk_read_per_sec': format_speed(read_per_sec),
+        'disk_write_per_sec': format_speed(write_per_sec)
     }
+
 
 def get_network_metrics():
     """Collect all network-related metrics in one go"""
-    net_io = psutil.net_io_counters()
-    network_sent = round(net_io.bytes_sent / CONVERSION_FACTOR_MB, 1)
-    network_received = round(net_io.bytes_recv / CONVERSION_FACTOR_MB, 1)
+    # Initial metrics
+    initial_net_io = psutil.net_io_counters()
+
+    # Wait for a second to measure real-time speeds
+    time.sleep(1)
+
+    # Metrics after 1 second
+    final_net_io = psutil.net_io_counters()
+    
+    # Calculate upload/download speeds
+    upload_speed = final_net_io.bytes_sent - initial_net_io.bytes_sent
+    download_speed = final_net_io.bytes_recv - initial_net_io.bytes_recv
+
     return {
-        'network_sent': network_sent,
-        'network_received': network_received,
-        'network_stats': f"D: {network_sent} MB / U: {network_received} MB"
+        'network_sent': round(final_net_io.bytes_sent / CONVERSION_FACTOR_MB, 2),
+        'network_received': round(final_net_io.bytes_recv / CONVERSION_FACTOR_MB, 2),
+        'upload_speed': format_speed(upload_speed),
+        'download_speed': format_speed(download_speed),
     }
 
 def get_battery_metrics():
