@@ -1,9 +1,5 @@
 # cython: language_level=3
-from src.routes.cpu_info import cpu_info_bp
-from src.routes.disk_info import disk_info_bp
 from src.routes.dashboard import dashboard_bp
-from src.routes.memory_info import memory_info_bp
-from src.routes.network_info import network_info_bp
 from src.routes.settings import settings_bp
 from src.routes.speedtest import speedtest_bp
 from src.routes.process_info import process_bp
@@ -26,11 +22,7 @@ from src.routes.update_webhooks import webhooks_bp
 from src.routes.activation import activation_bp
 
 __all__ = [
-    "cpu_info_bp",
-    "disk_info_bp",
     "dashboard_bp",
-    "memory_info_bp",
-    "network_info_bp",
     "settings_bp",
     "speedtest_bp",
     "process_bp",
