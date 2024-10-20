@@ -75,6 +75,13 @@ global:
     username: $username
     system_hostname: $system_hostname
 
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - $FLASK_APP_IP:$FLASK_APP_PORT
+      timeout: 5m
+
 rule_files:
   - /etc/prometheus/alert_rules.yml
 

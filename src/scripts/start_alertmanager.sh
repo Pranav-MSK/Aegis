@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Set strict error handling
-set -euo pipefail
-IFS=$'\n\t'
-
-# Initialize TMP_FILE variable
-TMP_FILE=""
-
 # Function to log informational messages
 log_info() {
     echo "[INFO] $1"
@@ -18,166 +11,99 @@ log_error() {
     exit 1
 }
 
-# Function to log warnings
-log_warn() {
-    echo "[WARN] $1"
-}
+# Define script directory and configuration directory (two levels up)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+CONFIG_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")/prometheus_config"
 
-# Function to cleanup temporary files
-cleanup() {
-    local exit_code=$?
-    if [ -n "$TMP_FILE" ] && [ -f "$TMP_FILE" ]; then
-        rm -f "$TMP_FILE"
-        log_info "Cleaned up temporary file"
-    fi
-    if [ $exit_code -ne 0 ]; then
-        log_error "Script failed with exit code $exit_code"
-    fi
-    exit $exit_code
-}
+# Configuration variables
+ALERTMANAGER_CONTAINER="alertmanager"
+ALERTMANAGER_IMAGE="prom/alertmanager:latest"
+ALERTMANAGER_PORT="9093"
+ALERTMANAGER_CONFIG="$CONFIG_DIR/alertmanager.yml"
+PROMETHEUS_CONFIG="$CONFIG_DIR/prometheus.yml"
+SYSTEMGUARD_APP_IP=$(hostname -I | cut -d' ' -f1)
+SYSTEMGUARD_APP_PORT="5050"
+ALERTMANAGER_PORT="9093"
+ALERTMANAGER_DATA_DIR="/home/$(whoami)/.database/alertmanager"
+DOCKER_NETWORK="flask-prometheus-net"
+INIT_ALERTMANAGER_SCRIPT="$SCRIPT_DIR/initialization/init_alertmanager.sh"
+SYSTEM_LABEL="systemguard-metrics"
+JOB_NAME="localhost"
+PROMETHEUS_USERNAME="prometheus_admin"
+PROMETHEUS_PASSWORD="prometheus_password"
+SCRAPE_INTERVAL="2s"
+username=$(whoami)
+system_hostname=$(hostname)
 
-# Set trap for cleanup
-trap cleanup EXIT
+# Verify that initialization script exists
+if [ ! -f "$INIT_ALERTMANAGER_SCRIPT" ]; then
+  log_error "Initialization script $INIT_ALERTMANAGER_SCRIPT does not exist."
+fi
 
-# Function to validate YAML syntax
-# validate_yaml() {
-#     local yaml_file="$1"
-#     if command -v python3 >/dev/null 2>&1; then
-#         python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>/dev/null || {
-#             log_error "Invalid YAML syntax in $yaml_file"
-#         }
-#     else
-#         log_warn "Python3 not found. Skipping YAML validation"
-#     fi
-# }
+# Execute the initialization script
+bash "$INIT_ALERTMANAGER_SCRIPT"
 
-# Function to check if AlertManager is reachable
-check_alertmanager() {
-    local ip="$1"
-    local port="$2"
-    timeout 5 bash -c ">/dev/tcp/$ip/$port" 2>/dev/null || {
-        log_warn "AlertManager not reachable at $ip:$port. Configuration will still be updated."
-    }
-}
+# Ensure configuration and data directories exist
+log_info "Creating necessary directories if they don't exist."
+mkdir -p "$CONFIG_DIR" || log_error "Failed to create directory: $CONFIG_DIR"
+mkdir -p "$ALERTMANAGER_DATA_DIR" || log_error "Failed to create directory: $ALERTMANAGER_DATA_DIR"
 
-# Function to create backup with timestamp
-create_backup() {
-    local config_file="$1"
-    local backup_file="${config_file}.backup.$(date +%Y%m%d_%H%M%S)"
-    cp "$config_file" "$backup_file" || {
-        log_error "Failed to create backup at $backup_file"
-    }
-    log_info "Backup created at $backup_file"
-}
+# Generate default alertmanager.yml if it does not exist
+if [ ! -f "$ALERTMANAGER_CONFIG" ]; then
+    log_info "Generating default alertmanager.yml configuration."
+    cat > "$ALERTMANAGER_CONFIG" <<EOL
+global:
+  resolve_timeout: 5m
 
-# Function to check if alerting configuration exists
-check_alerting_exists() {
-    local config_file="$1"
-    if grep -q "^alerting:" "$config_file"; then
-        log_info "AlertManager configuration already exists"
-        return 0
-    fi
-    return 1
-}
+route:
+  receiver: 'default'
 
-# Main script starts here
-main() {
-    # Define script directory and configuration directory (two levels up)
-    local SCRIPT_DIR
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)" || {
-        log_error "Failed to determine script directory"
-    }
-    
-    local CONFIG_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")/prometheus_config"
-    local PROMETHEUS_CONFIG="$CONFIG_DIR/prometheus.yml"
-    
-    # Get IP address with error handling
-    local SYSTEMGUARD_APP_IP
-    SYSTEMGUARD_APP_IP=$(hostname -I | cut -d' ' -f1) || {
-        log_error "Failed to determine system IP address"
-    }
-    
-    if [ -z "$SYSTEMGUARD_APP_IP" ]; then
-        log_error "Could not determine system IP address"
-    fi
-    
-    local ALERTMANAGER_PORT="9093"
+receivers:
+  - name: 'default'
 
-    # Validate directory and file existence
-    if [ ! -d "$CONFIG_DIR" ]; then
-        log_error "Configuration directory not found at $CONFIG_DIR"
-    fi
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'service']
+EOL
+else
+    log_info "Using existing alertmanager.yml configuration file."
+fi
 
-    if [ ! -f "$PROMETHEUS_CONFIG" ]; then
-        log_error "Prometheus configuration file not found at $PROMETHEUS_CONFIG"
-    fi
+# Check if Docker network exists, create if necessary
+if ! docker network ls | grep -q "$DOCKER_NETWORK"; then
+    log_info "Creating Docker network: $DOCKER_NETWORK"
+    docker network create "$DOCKER_NETWORK" || log_error "Failed to create Docker network."
+else
+    log_info "Docker network $DOCKER_NETWORK already exists."
+fi
 
-    if [ ! -w "$PROMETHEUS_CONFIG" ]; then
-        log_error "No write permission for $PROMETHEUS_CONFIG"
-    fi
+# Stop and remove existing Alertmanager container if it's running
+if docker ps -a --format '{{.Names}}' | grep -q "$ALERTMANAGER_CONTAINER"; then
+    log_info "Stopping and removing existing Alertmanager container."
+    docker stop "$ALERTMANAGER_CONTAINER" &> /dev/null || log_error "Failed to stop container."
+    docker rm "$ALERTMANAGER_CONTAINER" &> /dev/null || log_error "Failed to remove container."
+else
+    log_info "No existing Alertmanager container found."
+fi
 
-    # Validate existing configuration
-    # validate_yaml "$PROMETHEUS_CONFIG"
+# Start the Alertmanager container
+log_info "Starting Alertmanager container: $ALERTMANAGER_CONTAINER"
+run_output=$(docker run -d \
+    --name "$ALERTMANAGER_CONTAINER" \
+    --network "$DOCKER_NETWORK" \
+    -p "$ALERTMANAGER_PORT:9093" \
+    --restart always \
+    -v "$ALERTMANAGER_CONFIG:/etc/alertmanager/alertmanager.yml" \
+    -v "$ALERTMANAGER_DATA_DIR:/alertmanager" \
+    "$ALERTMANAGER_IMAGE" 2>&1)
 
-    # Check if alerting configuration already exists
-    if check_alerting_exists "$PROMETHEUS_CONFIG"; then
-        log_info "No changes needed. Exiting."
-        exit 0
-    fi
-
-    # Check AlertManager accessibility
-    check_alertmanager "$SYSTEMGUARD_APP_IP" "$ALERTMANAGER_PORT"
-
-    # Create temporary file with error handling
-    TMP_FILE=$(mktemp) || {
-        log_error "Failed to create temporary file"
-    }
-
-    # Create backup before modifications
-    # create_backup "$PROMETHEUS_CONFIG"
-
-    # Process the configuration file
-    {
-        local found_global=false
-        while IFS= read -r line || [ -n "$line" ]; do
-            echo "$line"
-            
-            # If we find the global section, add alerting config after it
-            if [[ "$line" =~ ^global: ]] && [ "$found_global" = false ]; then
-                found_global=true
-                # Read until we find a line that doesn't start with whitespace
-                while IFS= read -r subline || [ -n "$subline" ]; do
-                    echo "$subline"
-                    if [[ ! "$subline" =~ ^[[:space:]] ]]; then
-                        # Add our alerting configuration before the next section
-                        cat << EOF
-
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-            - ${SYSTEMGUARD_APP_IP}:${ALERTMANAGER_PORT}
-      timeout: 5m
-EOF
-                        break
-                    fi
-                done
-            fi
-        done
-    } < "$PROMETHEUS_CONFIG" > "$TMP_FILE" || {
-        log_error "Failed to process configuration file"
-    }
-
-    # Validate new configuration before applying
-    # validate_yaml "$TMP_FILE"
-
-    # Move temporary file to prometheus.yml
-    mv "$TMP_FILE" "$PROMETHEUS_CONFIG" || {
-        log_error "Failed to update configuration file"
-    }
-
-    log_info "Successfully updated alerting configuration in $PROMETHEUS_CONFIG"
-}
-
-# Execute main function
-main
+# Verify if the container started successfully
+if [ $? -eq 0 ]; then
+    log_info "Alertmanager container started successfully on port $ALERTMANAGER_PORT."
+    log_info "Alertmanager config file located at $ALERTMANAGER_CONFIG"
+else
+    log_error "Failed to start Alertmanager container: $run_output"
+fi
