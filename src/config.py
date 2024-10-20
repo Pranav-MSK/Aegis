@@ -86,6 +86,13 @@ app.jinja_env.globals.update(
 
 )
 
+def safe_int_conversion(value, default=0):
+    """Safely convert a value to an integer."""
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
 def get_app_info():
     """Retrieve application metadata."""
     return {
@@ -100,15 +107,15 @@ def get_app_info():
         "system_name": SYSTEM_NAME,
         "system_ip_address": SYSTEM_IP_ADDRESS,
         "is_plan_not_expired": plan_details.get('is_plan_not_expired'),
-        "remaining_plan_days": int(plan_details.get('remaining_plan_days', 0)),
+        "remaining_plan_days": safe_int_conversion(plan_details.get('remaining_plan_days', 0)),
         "plan_type": plan_details.get('plan_type'),
         "is_trial": plan_details.get('is_trial'),
         "license_key": plan_details.get('license_key'),
         "activation_code": plan_details.get('activation_code'),
         "systemguard_unique_id": plan_details.get('systemguard_unique_id'),
-        "max_scrap_target": int(plan_details.get('max_scrap_target', 0)),
-        "max_alert_rules": int(plan_details.get('max_alert_rules', 0)),
-        "max_number_of_graphs": int(plan_details.get('max_number_of_graphs', 0)),
-        "monthly_alert_tickets_limit": int(plan_details.get('monthly_alert_tickets_limit', 0)),
-        "max_users_allowed": int(plan_details.get('max_users_allowed', 0))
+        "max_scrap_target": safe_int_conversion(plan_details.get('max_scrap_target', 0)),
+        "max_alert_rules": safe_int_conversion(plan_details.get('max_alert_rules', 0)),
+        "max_number_of_graphs": safe_int_conversion(plan_details.get('max_number_of_graphs', 0)),
+        "monthly_alert_tickets_limit": safe_int_conversion(plan_details.get('monthly_alert_tickets_limit', 0)),
+        "max_users_allowed": safe_int_conversion(plan_details.get('max_users_allowed', 0))
     }

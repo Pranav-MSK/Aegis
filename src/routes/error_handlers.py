@@ -1,8 +1,10 @@
 # cython: language_level=3
+import time
 import datetime
 from flask import render_template, blueprints, request, redirect, url_for, flash
 from flask_login import current_user
 from flask_wtf.csrf import CSRFError
+from prometheus_client import Summary, Histogram
 
 from src.config import app
 from src.logger import logger
@@ -10,6 +12,9 @@ from src.activator import get_plan_details
 from src.background_task.prometheus_metrics import metrics
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
+
+REQUEST_TIME = Summary('request_processing_seconds_systemguard', 'Time spent processing request')
+REQUEST_HISTOGRAM = Histogram('request_duration_seconds_systemguard', 'Duration of requests in seconds', ['route'])
 
 class CustomError(Exception):
     """Custom exception for application-specific errors."""
@@ -72,6 +77,8 @@ def days_until_password_expiry(user):
 @app.before_request
 def check_password_expiry():
     # Allow access to login, password change, and static files routes without restriction
+    request.start_time = time.time()
+
     if request.endpoint in ['login', 'change_password', 'static']:
         return
 
@@ -109,3 +116,10 @@ def check_password_expiry():
             monthly_alert_tickets_limit=plan_details.get('monthly_alert_tickets_limit'),
             max_users_allowed=plan_details.get('max_users_allowed')
         )
+
+@app.after_request
+def after_request(response):
+    request_duration = time.time() - request.start_time
+    REQUEST_TIME.observe(request_duration)
+    REQUEST_HISTOGRAM.labels(route=request.path).observe(request_duration)
+    return response
