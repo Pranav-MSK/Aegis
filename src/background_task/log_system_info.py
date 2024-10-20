@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from src.logger import logger
 from src.config import app, db
-from src.utils import _get_system_info
+from src.utils import _collect_metrics
 from src.logger import logger
 from src.models import GeneralSettings, SystemInformation
 # Flag to track if logging is already scheduled
@@ -61,7 +61,7 @@ def log_system_info_to_db():
     """
     with app.app_context():
         try:
-            system_info = _get_system_info()
+            system_info = _collect_metrics()
 
             # Update Prometheus metrics
             update_prometheus_metrics(system_info)

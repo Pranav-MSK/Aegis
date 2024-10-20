@@ -5,7 +5,7 @@ from sqlalchemy import func, case
 
 from src.config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration
-from src.utils import get_system_info
+from src.utils import fetch_system_metrics
 from src.routes.helper.prometheus_helper import count_of_targets, calculate_total_rules, retrieve_active_alertmanagers
 
 dashboard_bp = Blueprint("dashboard", __name__)
@@ -13,7 +13,7 @@ dashboard_bp = Blueprint("dashboard", __name__)
 @app.route("/", methods=["GET"])
 @login_required
 def dashboard():
-    system_info = get_system_info()
+    system_info = fetch_system_metrics()
 
     # User statistics in a single query
     user_stats = UserProfile.query.with_entities(

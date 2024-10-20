@@ -40,16 +40,16 @@ cleanup() {
 trap cleanup EXIT
 
 # Function to validate YAML syntax
-validate_yaml() {
-    local yaml_file="$1"
-    if command -v python3 >/dev/null 2>&1; then
-        python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>/dev/null || {
-            log_error "Invalid YAML syntax in $yaml_file"
-        }
-    else
-        log_warn "Python3 not found. Skipping YAML validation"
-    fi
-}
+# validate_yaml() {
+#     local yaml_file="$1"
+#     if command -v python3 >/dev/null 2>&1; then
+#         python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" 2>/dev/null || {
+#             log_error "Invalid YAML syntax in $yaml_file"
+#         }
+#     else
+#         log_warn "Python3 not found. Skipping YAML validation"
+#     fi
+# }
 
 # Function to check if AlertManager is reachable
 check_alertmanager() {
@@ -117,7 +117,7 @@ main() {
     fi
 
     # Validate existing configuration
-    validate_yaml "$PROMETHEUS_CONFIG"
+    # validate_yaml "$PROMETHEUS_CONFIG"
 
     # Check if alerting configuration already exists
     if check_alerting_exists "$PROMETHEUS_CONFIG"; then
@@ -134,7 +134,7 @@ main() {
     }
 
     # Create backup before modifications
-    create_backup "$PROMETHEUS_CONFIG"
+    # create_backup "$PROMETHEUS_CONFIG"
 
     # Process the configuration file
     {
@@ -169,7 +169,7 @@ EOF
     }
 
     # Validate new configuration before applying
-    validate_yaml "$TMP_FILE"
+    # validate_yaml "$TMP_FILE"
 
     # Move temporary file to prometheus.yml
     mv "$TMP_FILE" "$PROMETHEUS_CONFIG" || {

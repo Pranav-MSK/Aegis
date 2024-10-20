@@ -8,6 +8,8 @@ import psutil
 import functools
 from jinja2 import Environment, FileSystemLoader
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
 from src.logger import logger
 from src.models import GeneralSettings
@@ -560,62 +562,153 @@ def get_network_io():
     network_received = round(net_io.bytes_recv / CONVERSION_FACTOR_MB, 1)  # In MB
     return network_sent, network_received
 
-def _get_system_info():
-    """ sub function required by the get_system_info function and front-end dashboard to 
-    update the system information with fresh data for certain values and cached data for others.
-    ---
-    Parameters:
-    ---
-    Returns:
-        dict: System information dictionary with various system metrics.
-    """
+
+def get_cpu_metrics():
+    """Collect all CPU-related metrics in one go"""
+    try:
+        cpu_freq = psutil.cpu_freq()
+        temps = psutil.sensors_temperatures().get('coretemp', [None])[0]
+        return {
+            'cpu_percent': psutil.cpu_percent(interval=0.1),  # Reduced interval
+            'cpu_frequency': round(cpu_freq.current) if cpu_freq else 0,
+            'cpu_max_frequency': round(cpu_freq.max) if cpu_freq else 0,
+            'current_temp': getattr(temps, 'current', 0) if temps else 0,
+            'high_temp': getattr(temps, 'high', 0) if temps else 0,
+            'critical_temp': getattr(temps, 'critical', 0) if temps else 0,
+            'cpu_usage_core': [round(x, 2) for x in psutil.cpu_percent(interval=0.1, percpu=True)]
+        }
+    except Exception as e:
+        logger.error(f"Error collecting CPU metrics: {e}")
+        return {}
     
-    disk_total = get_disk_total()
-    disk_read, disk_write = get_disk_io()
-    memory_available = get_memory_available()
-    battery_data = check_battery_status()
-    memory_info = psutil.virtual_memory()
-    disk_info = psutil.disk_usage('/')
-    network_sent, network_received = get_network_io()
-    cpu_freq, max_freq = get_cpu_frequency()
-    current_temp, high_temp, critical_temp = get_cpu_temp()
-    # cpu_usage_per_core
-    cpu_usage_core = cpu_usage_per_core()
-    # ifconfig | grep -E 'RX packets|TX packets' -A 1
+def get_memory_metrics():
+    """Collect all memory-related metrics in one go"""
+    try:
+        memory_info = psutil.virtual_memory()
+        return {
+            'memory_percent': round(memory_info.percent, 2),
+            'memory_used': round((memory_info.total - memory_info.available) / CONVERSION_FACTOR_GB, 2),
+            'memory_available': round(memory_info.total / CONVERSION_FACTOR_GB, 1),
+            'dashboard_memory_usage': round(psutil.Process().memory_info().rss / CONVERSION_FACTOR_MB)
+        }
+    except Exception as e:
+        logger.error(f"Error collecting memory metrics: {e}")
+        return {}
+    
+def get_disk_metrics():
+    """Collect all disk-related metrics in one go"""
+    try:
+        disk_info = psutil.disk_usage('/')
+        disk_total = round(disk_info.total / CONVERSION_FACTOR_GB, 1)
+        
+        # Get disk I/O without sleep
+        disk_io = psutil.disk_io_counters()
+        read_speed = format_speed(disk_io.read_bytes)
+        write_speed = format_speed(disk_io.write_bytes)
 
-    # Prepare system information dictionary
-    top_processes = get_top_processes(8, combined=True)
-    info = {
-        'cpu_percent': cpu_usage_percent(),
-        'memory_percent': round(memory_info.percent, 2),
-        "memory_used": get_memory_used(),
-        'memory_available': memory_available,
-        'disk_percent': round(disk_info.percent, 2),
-        'disk_total': disk_total,
-        'network_sent': network_sent,
-        'network_received': network_received,
-        "network_stats" : f"D: {network_sent} MB / U: {network_received} MB",
-        'battery_percent': battery_data['percent'],
-        'battery_status': battery_data['status'],
-        'dashboard_memory_usage': get_flask_memory_usage(),
-        'cpu_frequency': cpu_freq,
-        'cpu_max_frequency': max_freq,
-        'current_temp': current_temp,
-        'high_temp': high_temp,
-        'critical_temp': critical_temp,
-        'timestamp': datetime.datetime.now(),
-        "disk_used": get_disk_used(),
-        "disk_free": get_disk_free(),
-        "disk_read": disk_read,
-        "disk_write": disk_write,
-        "cpu_usage_core": cpu_usage_core
-    }
-    info.update({
-        'top_processes': top_processes
-    })
-    return info
+        return {
+            'disk_percent': round(disk_info.percent, 2),
+            'disk_total': disk_total,
+            'disk_used': round(disk_info.used / CONVERSION_FACTOR_GB, 1),
+            'disk_free': round(disk_info.free / CONVERSION_FACTOR_GB, 1),
+            'disk_read': read_speed,
+            'disk_write': write_speed
+        }
+    except Exception as e:
+        logger.error(f"Error collecting disk metrics: {e}")
+        return {}
+    
+def get_network_metrics():
+    """Collect all network-related metrics in one go"""
+    try:
+        net_io = psutil.net_io_counters()
+        network_sent = round(net_io.bytes_sent / CONVERSION_FACTOR_MB, 1)
+        network_received = round(net_io.bytes_recv / CONVERSION_FACTOR_MB, 1)
+        return {
+            'network_sent': network_sent,
+            'network_received': network_received,
+            'network_stats': f"D: {network_sent} MB / U: {network_received} MB"
+        }
+    except Exception as e:
+        logger.error(f"Error collecting network metrics: {e}")
+        return {}
+    
+def get_battery_metrics():
+    """Collect battery metrics"""
+    try:
+        battery = psutil.sensors_battery()
+        if battery:
+            return {
+                'battery_percent': round(battery.percent),
+                'battery_status': "Charging" if battery.power_plugged else "Discharging"
+            }
+        return {'battery_percent': 0, 'battery_status': "Not available"}
+    except Exception as e:
+        logger.error(f"Error collecting battery metrics: {e}")
+        return {'battery_percent': 0, 'battery_status': "Not available"}
+    
+def get_process_metrics():
+    """Collect process metrics with optimized collection"""
+    try:
+        process_dict = {}
+        for p in psutil.process_iter(['name', 'cpu_percent', 'memory_percent', 'pid'], ad_value=None):
+            try:
+                pinfo = p.info
+                name = pinfo['name'].title()
+                if name not in process_dict or pinfo['memory_percent'] > process_dict[name]['memory_percent']:
+                    process_dict[name] = {
+                        'cpu_percent': pinfo['cpu_percent'] or 0,
+                        'memory_percent': pinfo['memory_percent'] or 0,
+                        'pid': pinfo['pid']
+                    }
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
 
-def get_system_info():
+        top_processes = sorted(
+            [(name, info['cpu_percent'], round(info['memory_percent'], 2), info['pid'])
+             for name, info in process_dict.items()],
+            key=lambda x: x[2],
+            reverse=True
+        )[:8]
+
+        return {'top_processes': top_processes}
+    except Exception as e:
+        logger.error(f"Error collecting process metrics: {e}")
+        return {'top_processes': []}
+
+def _collect_metrics():
+    """Optimized system information collection using parallel processing"""
+    try:
+        # Create a ThreadPoolExecutor to run metrics collection in parallel
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            # Submit all metric collection tasks
+            futures = {
+                'cpu': executor.submit(get_cpu_metrics),
+                'memory': executor.submit(get_memory_metrics),
+                'disk': executor.submit(get_disk_metrics),
+                'network': executor.submit(get_network_metrics),
+                'battery': executor.submit(get_battery_metrics),
+                'processes': executor.submit(get_process_metrics)
+            }
+
+            # Collect all results
+            results = {}
+            for key, future in futures.items():
+                try:
+                    results.update(future.result())
+                except Exception as e:
+                    logger.error(f"Error collecting {key} metrics: {e}")
+
+        # Add timestamp
+        results['timestamp'] = datetime.datetime.now()
+        
+        return results
+
+    except Exception as e:
+        logger.error(f"Error in _collect_metrics: {e}")
+        return {}
+
+def fetch_system_metrics():
     """ Get system information with caching for certain values and fresh data for others. 
     ---
     Parameters:
@@ -649,7 +742,7 @@ def get_system_info():
         'os_info': os_info
     }
     # update uptime dictionary
-    _info = _get_system_info()
+    _info = _collect_metrics()
     info.update(uptime_dict)
     info.update(_info)
 

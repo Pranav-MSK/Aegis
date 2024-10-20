@@ -8,7 +8,7 @@ from flask_login import login_required, current_user
 from flask_compress import Compress
 from src.config import app, db, csrf
 from src.models import UserDashboardSettings, AlertTicket, ChartConfiguration, UserProfile
-from src.utils import _get_system_info, get_os_release_info, get_os_info, get_cached_value
+from src.utils import _collect_metrics, get_os_release_info, get_os_info, get_cached_value
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
     load_prometheus_config, 
@@ -31,7 +31,7 @@ TARGETS_API_URL = f'{PROMETHEUS_BASE_URL}/api/v1/targets'
 @login_required
 def system_api():
     try:
-        system_info = _get_system_info()
+        system_info = _collect_metrics()
         return jsonify(system_info), 200
     except Exception as e:
         return jsonify({"error": "An error occurred while fetching the system information", "details": str(e)}), 500
