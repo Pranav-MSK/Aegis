@@ -37,23 +37,11 @@
         "is_active": true
     },
     {
-        "metric_name": "network_bytes_received",
-        "label": "Data Transferred (MB)",
-        "title": "Data Transferred",
-        "xlabel": "Time",
-        "ylabel": "Data Transferred (MB)",
-        "chart_type": "line",
-        "tension": 0.4,
-        "point_radius": 0,
-        "point_hover_radius": 6,
-        "is_active": true
-    },
-    {
         "metric_name": "dashboard_memory_usage_percentage",
         "label": "Dashboard Memory Usage",
         "title": "Dashboard Memory Usage",
         "xlabel": "Time",
-        "ylabel": "Memory Usage (%)",
+        "ylabel": "Memory Usage by systemguard",
         "chart_type": "line",
         "tension": 0.4,
         "point_radius": 0,

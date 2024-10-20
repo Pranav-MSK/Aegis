@@ -18,6 +18,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading_spinner.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
 
@@ -26,6 +27,11 @@
 
 <body>
     {% include 'ext/navbar.html' %}
+
+    <div id="spinnerOverlay" class="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
+
     {% include 'ext/siderbar.html' %}
 
     <main class="content">
@@ -44,8 +50,8 @@
         crossorigin="anonymous"></script>
 
     <!-- Custom Scripts -->
-
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 
     {% block extra_scripts %}{% endblock %}
 
