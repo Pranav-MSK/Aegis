@@ -51,7 +51,6 @@ RULES_FILE_PATH = os.path.join(ROOT_DIR, "prometheus_config/alert_rules.yml")
 # Cache user queries with LRU cache (memory-based, not ideal for distributed apps)
 @lru_cache(maxsize=128)
 def get_user_by_username(username):
-    print("Querying the database...")
     # return UserProfile.query.filter_by(username=username).first()
     return UserProfile.get_by_username(username)
 
@@ -325,7 +324,6 @@ def active_alerts():
         alerts = retrieve_active_alerts()
     except Exception as e:
         alerts = []
-        print(f"Error fetching alerts: {e}")
     return render_template("alerts/active_alerts.html", alerts=alerts)
 
 

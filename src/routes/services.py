@@ -47,5 +47,5 @@ def get_categories():
 
 
 @app.get("/system/services")
-def services_page():
+def system_services():
     return render_template('other/services.html')

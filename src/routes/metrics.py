@@ -20,7 +20,6 @@ def query_prometheus(query):
 def get_histogram_metrics():
     """Fetch all histogram metrics and their endpoints from Prometheus."""
     query = 'count by (route, __name__) ({__name__=~".*_bucket"})'
-    print(f"query : {query}")
     result = query_prometheus(query)
 
     metrics = {}
@@ -75,8 +74,6 @@ def get_metrics(endpoint, metric_name):
         count_query = f'{metric_name}_count{{route="{endpoint}"}}'
         
         bucket_result = query_prometheus(bucket_query)
-
-        print(f"bucket_result : {bucket_query}")
         
         sum_result = query_prometheus(sum_query)
         count_result = query_prometheus(count_query)

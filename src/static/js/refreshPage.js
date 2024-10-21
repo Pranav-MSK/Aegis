@@ -7,7 +7,6 @@ function fetchRefreshInterval() {
         .then(data => {
             if (data.success) {
                 refreshInterval = data.refresh_interval * 1000; // Multiply by 1000 to convert to milliseconds
-                console.log('Refresh interval fetched successfully:', data.refresh_interval);
                 startRefresh(); // Start refreshing after fetching the interval
             } else {
                 console.error('Failed to fetch refresh interval:', data.error);

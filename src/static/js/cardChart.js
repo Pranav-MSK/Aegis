@@ -100,7 +100,6 @@ function createLineChart(canvasId, label, dataStorageKey, borderColor, updateFun
 
         if (percentageUsage) {
             const percentageUsageValue = parseFloat(percentageUsage.style.width.replace('%', ''));
-            console.log('percentageUsage', percentageUsageValue);
             
             // Find existing span or create a new one
             let span = document.querySelector(`#${canvasId} + span`);

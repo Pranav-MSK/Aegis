@@ -123,11 +123,14 @@ def after_request(response):
     if request.endpoint in ['static']:
         return response
 
-    request_duration = time.time() - request.start_time
-    REQUEST_TIME.observe(request_duration)
-    REQUEST_HISTOGRAM.labels(route=request.path).observe(request_duration)
-    
-    if response.data:
-        RESPONSE_SIZE.labels(route=request.path).observe(len(response.data))
+    try:
+        request_duration = time.time() - request.start_time
+        REQUEST_TIME.observe(request_duration)
+        REQUEST_HISTOGRAM.labels(route=request.path).observe(request_duration)
+        
+        if response.data:
+            RESPONSE_SIZE.labels(route=request.path).observe(len(response.data))
+    except Exception as e:
+        logger.error(f"Error in after_request: {e}")
 
     return response

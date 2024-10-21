@@ -130,7 +130,6 @@ class DashboardController {
         this.fetchData(CONFIG.API_ENDPOINTS.SYSTEM_INFO),
         this.fetchData(CONFIG.API_ENDPOINTS.DASHBOARD_STATS)
       ]);
-      console.log(systemInfo);
 
       this.updateCharts(systemInfo);
       this.updateMetricsDisplay(systemInfo);

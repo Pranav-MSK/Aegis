@@ -75,7 +75,6 @@ def update_prometheus_config():
             ['hostname', '-I'], capture_output=True, text=True, check=True
         ).stdout.split()[0]
     except subprocess.CalledProcessError as e:
-        print(f"Error getting IP address: {e}")
         return False
 
     # Load the existing config

@@ -12,7 +12,6 @@ def load_library(filename):
         lib = ctypes.CDLL(os.path.join(lib_path, filename))
         return lib
     except OSError as e:
-        print(f"Error loading library: {e}")
         raise
 
 def retrieve_obfuscated_key(key_name):

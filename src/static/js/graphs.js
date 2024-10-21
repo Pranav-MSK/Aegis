@@ -440,7 +440,6 @@ class DataFetcher {
             return await response.json();
         } catch (error) {
             if (retries > 0) {
-                console.log(`Retrying fetch to ${url}. Attempts left: ${retries - 1}`);
                 return this.fetchWithRetry(url, options, retries - 1);
             } else {
                 console.error(`Failed to fetch ${url}: ${error.message}`);
@@ -617,8 +616,6 @@ class App {
                 DataFetcher.fetchChartConfigurations(),
                 DataFetcher.fetchChartData(this.filterValue)
             ]);
-
-            console.log('Fetched data:', data);
 
             // Update active charts counter
             const activeCharts = document.getElementById('activeCharts');

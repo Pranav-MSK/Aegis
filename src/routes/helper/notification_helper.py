@@ -55,10 +55,6 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
             data=json.dumps(alert_data),
         )
 
-        # Log response details
-        print(f"Response Code: {response.status_code}")
-        print(f"Response Body: {response.text}")
-
         # Check the response
         if response.status_code in (200, 202):
             return {

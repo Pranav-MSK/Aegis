@@ -126,7 +126,6 @@ def get_plan_details():
                 max_scrap_target, max_alert_rules, max_number_of_graphs, \
                     monthly_alert_tickets_limit, max_users_allowed = check_license_expiration(license_key, obfuscated_key)
             if not is_plan_not_expired:
-                print("License has expired. Please activate the application.", "danger")
                 return {
                         "is_plan_not_expired": is_plan_not_expired,
                         "remaining_plan_days": remaining_plan_days,

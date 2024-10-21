@@ -109,3 +109,63 @@ def process():
         toggle_order=toggle_order,
     )
 
+@admin_required
+@app.route("/kill_process", methods=["POST"])
+def kill_process():
+    sudo_password = session.get("sudo_password", "")
+    if request.method == "POST":
+        if "kill_pid" in request.form:
+            pid_to_kill = request.form.get("kill_pid")
+            process_name = request.form.get("process_name")
+            if pid_to_kill and process_name:
+                try:
+                    # First, try to kill the process normally
+                    result = subprocess.run(
+                        ['sudo', '-S', 'kill', str(pid_to_kill)],
+                        input=sudo_password + '\n',
+                        capture_output=True,
+                        text=True,
+                        timeout=5
+                    )
+                    
+                    if result.returncode != 0:
+                        # If normal kill fails, try SIGKILL
+                        result = subprocess.run(
+                            ['sudo', '-S', 'kill', '-9', str(pid_to_kill)],
+                            input=sudo_password + '\n',
+                            capture_output=True,
+                            text=True,
+                            timeout=5
+                        )
+                    
+                    if result.returncode == 0:
+                        flash(f"Process '{process_name}' (PID {pid_to_kill}) killed successfully.", "success")
+                        logger.info(f"Killed process '{process_name}' (PID {pid_to_kill}) successfully by user '{current_user.username}' (IP: {request.remote_addr})")
+                    else:
+                        # If both methods fail, check if the process still exists
+                        check_process = subprocess.run(
+                            ['ps', '-p', str(pid_to_kill)],
+                            capture_output=True,
+                            text=True
+                        )
+                        
+                        if check_process.returncode != 0:
+                            # Process doesn't exist, assume it was killed
+                            flash(f"Process '{process_name}' (PID {pid_to_kill}) no longer exists. It may have been terminated.", "success")
+                            logger.info(f"Process '{process_name}' (PID {pid_to_kill}) no longer exists. Assumed terminated.")
+                        else:
+                            # Process still exists, report failure
+                            flash(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {result.stderr.strip()}", "danger")
+                            logger.error(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {result.stderr.strip()}")
+                
+                except subprocess.TimeoutExpired:
+                    flash(f"Timeout while attempting to kill process '{process_name}' (PID {pid_to_kill}).", "danger")
+                    logger.error(f"Timeout while attempting to kill process '{process_name}' (PID {pid_to_kill}).")
+                except Exception as e:
+                    flash(f"Error executing command: {str(e)}", "danger")
+                    logger.error(f"Error executing command to kill process '{process_name}' (PID {pid_to_kill}): {str(e)}")
+            else:
+                flash("Invalid process ID or name.", "danger")
+                logger.error("Invalid process ID or name.")
+        
+        return redirect(url_for("system_services"))

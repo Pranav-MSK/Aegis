@@ -56,9 +56,6 @@ def main(directory):
     # Save the dataframe to a CSV file
     df.to_csv('permission_level.csv', index=False)
     
-    # Print the dataframe in a tabular format
-    print(df.to_string(index=False))
-
 if __name__ == "__main__":
     directory_to_analyze = "src/routes"  # Change this to your target directory
     main(directory_to_analyze)
