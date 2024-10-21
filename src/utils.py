@@ -273,7 +273,7 @@ def get_top_processes(number=5, combined=False):
 
     return processes
 
-def get_process_metrics(num_processes=8):
+def get_process_metrics(num_processes=7):
     """Collect process metrics with optimized collection"""
     try:
         return {'top_processes': get_top_processes(number=num_processes, combined=True)}
@@ -281,6 +281,18 @@ def get_process_metrics(num_processes=8):
         logger.error(f"Error collecting process metrics: {e}")
         return {'top_processes': []}
 
+def get_running_daemons():
+    """Get the list of running daemons on the system."""
+    try:
+        daemons = []
+        for proc in psutil.process_iter(['name', 'cmdline']):
+            if proc.info['cmdline'] and 'python' in proc.info['cmdline'][0]:
+                daemons.append(proc.info['cmdline'][1])
+        return daemons
+    except Exception as e:
+        logger.error(f"Error collecting running daemons: {e}")
+        return []
+    
 def _collect_metrics():
     """Optimized system information collection using parallel processing"""
     try:

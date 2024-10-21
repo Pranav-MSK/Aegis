@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Metrics Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f5f5;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .endpoint-selector {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stats-table th {
+            font-weight: 600;
+            background-color: var(--secondary-color);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: var(--text-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>API Metrics Dashboard</h1>
+            <select id="endpointSelector" class="endpoint-selector">
+                <option value="">Select an endpoint</option>
+            </select>
+            <select id="metricSelector" class="endpoint-selector" disabled>
+                <option value="">Select a metric</option>
+            </select>
+        </div>
+
+        <div id="loading" class="loading">Loading...</div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2 class="card-title">Summary Statistics</h2>
+                <table class="stats-table">
+                    <tbody id="summaryStats">
+                        <tr>
+                            <td>Total Count</td>
+                            <td id="totalCount">-</td>
+                        </tr>
+                        <tr>
+                            <td>Total Sum (seconds)</td>
+                            <td id="totalSum">-</td>
+                        </tr>
+                        <tr>
+                            <td>Average Duration (seconds)</td>
+                            <td id="avgDuration">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Response Time Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="histogramChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Detailed Metrics</h2>
+            <table class="stats-table" id="metricsTable">
+                <thead>
+                    <tr>
+                        <th>Duration (seconds)</th>
+                        <th>Request Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let histogramChart = null;
+        const metricsData = {};
+
+        async function fetchEndpoints() {
+            const response = await fetch('/api/metrics/endpoints');
+            const endpoints = await response.json();
+            const endpointSelector = document.getElementById('endpointSelector');
+            
+            for (const [endpoint, metrics] of Object.entries(endpoints)) {
+                const option = document.createElement('option');
+                option.value = endpoint;
+                option.textContent = endpoint;
+                endpointSelector.appendChild(option);
+                metricsData[endpoint] = metrics;
+            }
+        }
+
+        function populateMetricSelector(endpoint) {
+            const metricSelector = document.getElementById('metricSelector');
+            metricSelector.innerHTML = '<option value="">Select a metric</option>';
+            const metrics = metricsData[endpoint];
+
+            if (metrics) {
+                metrics.forEach(metric => {
+                    const option = document.createElement('option');
+                    option.value = metric;
+                    option.textContent = metric;
+                    metricSelector.appendChild(option);
+                });
+                metricSelector.disabled = false;
+            } else {
+                metricSelector.disabled = true;
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function updateSummaryStats(data) {
+            document.getElementById('totalCount').textContent = data.count.toFixed(2);
+            document.getElementById('totalSum').textContent = data.sum.toFixed(2);
+            document.getElementById('avgDuration').textContent = data.average.toFixed(3);
+        }
+
+        function updateMetricsTable(buckets) {
+            const tbody = document.querySelector('#metricsTable tbody');
+            tbody.innerHTML = '';
+            
+            buckets.forEach(bucket => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>≤ ${bucket.le}</td>
+                    <td>${bucket.value}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateHistogramChart(buckets) {
+            const ctx = document.getElementById('histogramChart').getContext('2d');
+            
+            if (histogramChart) {
+                histogramChart.destroy();
+            }
+
+            histogramChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: buckets.map(b => b.le),
+                    datasets: [{
+                        label: 'Request Count',
+                        data: buckets.map(b => b.value),
+                        backgroundColor: 'rgba(74, 144, 226, 0.6)',
+                        borderColor: 'rgba(74, 144, 226, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        async function fetchMetrics(endpoint, metricName) {
+            showLoading(true);
+            
+            try {
+                // if endpoint is "/", replace it with "root"
+                if (endpoint === '/') {
+                    endpoint = 'root';
+                }
+                const response = await fetch(`/api/metrics/data/${endpoint}/${metricName}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    alert('Error loading metrics: ' + data.error);
+                    return;
+                }
+
+                console.log('Metrics data:', data);
+
+                updateSummaryStats(data);
+                updateMetricsTable(data.buckets);
+                updateHistogramChart(data.buckets);
+            } catch (error) {
+                console.error('Error fetching metrics:', error);
+                alert('Error loading metrics data');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        document.getElementById('endpointSelector').addEventListener('change', (e) => {
+            const endpoint = e.target.value;
+            populateMetricSelector(endpoint);
+            document.getElementById('metricSelector').value = ''; // Reset metric selection
+        });
+
+        document.getElementById('metricSelector').addEventListener('change', (e) => {
+            const endpoint = document.getElementById('endpointSelector').value;
+            const metricName = e.target.value;
+
+            if (endpoint && metricName) {
+                fetchMetrics(endpoint, metricName);
+            }
+        });
+
+        // Initialize
+        fetchEndpoints();
+    </script>
+</body>
+</html>

@@ -173,17 +173,17 @@ def alert_history():
     if search_query:
         base_query = base_query.filter(
             db.or_(
-                AlertTicket.alert_name.contains(search_query),
-                AlertTicket.severity.contains(search_query),
-                AlertTicket.instance.contains(search_query),
-                AlertTicket.description.contains(search_query),
-                AlertTicket.summary.contains(search_query),
-                AlertTicket.alert_status.contains(search_query),
-                AlertTicket.ticket_status.contains(search_query),
-                AlertTicket.assigned_user_id.contains(search_query),
-                AlertTicket.assigned_supervisor_id.contains(search_query),
-                AlertTicket.created_at.contains(search_query),
-                AlertTicket.updated_at.contains(search_query),
+                AlertTicket.alert_name.ilike(f"%{search_query}%"),
+                AlertTicket.severity.ilike(f"%{search_query}%"),
+                AlertTicket.instance.ilike(f"%{search_query}%"),
+                AlertTicket.description.ilike(f"%{search_query}%"),
+                AlertTicket.summary.ilike(f"%{search_query}%"),
+                AlertTicket.alert_status.ilike(f"%{search_query}%"),
+                AlertTicket.ticket_status.ilike(f"%{search_query}%"),
+                AlertTicket.assigned_user_id.ilike(f"%{search_query}%"),
+                AlertTicket.assigned_supervisor_id.ilike(f"%{search_query}%"),
+                db.func.date(AlertTicket.created_at).ilike(f"%{search_query}%"),
+                db.func.date(AlertTicket.updated_at).ilike(f"%{search_query}%"),
             )
         )
 
@@ -196,40 +196,36 @@ def alert_history():
     resolved_page = request.args.get("resolved_page", 1, type=int)
     closed_page = request.args.get("closed_page", 1, type=int)
 
-    unassigned_alerts = base_query.filter(
-        AlertTicket.assigned_user_id.is_(None)
-    ).paginate(page=unassigned_page, per_page=per_page, error_out=False)
-    open_alerts = base_query.filter(
-        AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)
-    ).paginate(page=open_page, per_page=per_page, error_out=False)
-    in_progress_alerts = base_query.filter(
-        AlertTicket.ticket_status == "In Progress",
-        AlertTicket.assigned_user_id.isnot(None),
-    ).paginate(page=in_progress_page, per_page=per_page, error_out=False)
-    resolved_alerts = base_query.filter(
-        AlertTicket.ticket_status == "Resolved",
-        AlertTicket.assigned_user_id.isnot(None),
-    ).paginate(page=resolved_page, per_page=per_page, error_out=False)
-    closed_alerts = base_query.filter(
-        AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)
-    ).paginate(page=closed_page, per_page=per_page, error_out=False)
+    def paginate_alerts(query, page):
+        return query.order_by(AlertTicket.updated_at.desc(), AlertTicket.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    unassigned_alerts = paginate_alerts(
+        base_query.filter(AlertTicket.assigned_user_id.is_(None)),
+        unassigned_page
+    )
+    open_alerts = paginate_alerts(
+        base_query.filter(AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)),
+        open_page
+    )
+    in_progress_alerts = paginate_alerts(
+        base_query.filter(AlertTicket.ticket_status == "In Progress", AlertTicket.assigned_user_id.isnot(None)),
+        in_progress_page
+    )
+    resolved_alerts = paginate_alerts(
+        base_query.filter(AlertTicket.ticket_status == "Resolved", AlertTicket.assigned_user_id.isnot(None)),
+        resolved_page
+    )
+    closed_alerts = paginate_alerts(
+        base_query.filter(AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)),
+        closed_page
+    )
 
     # Get counts for unassigned, open, in progress, resolved, and closed alerts
     unassigned_count = base_query.filter(AlertTicket.assigned_user_id.is_(None)).count()
-    open_count = base_query.filter(
-        AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)
-    ).count()
-    in_progress_count = base_query.filter(
-        AlertTicket.ticket_status == "In Progress",
-        AlertTicket.assigned_user_id.isnot(None),
-    ).count()
-    resolved_count = base_query.filter(
-        AlertTicket.ticket_status == "Resolved",
-        AlertTicket.assigned_user_id.isnot(None),
-    ).count()
-    closed_count = base_query.filter(
-        AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)
-    ).count()
+    open_count = base_query.filter(AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)).count()
+    in_progress_count = base_query.filter(AlertTicket.ticket_status == "In Progress", AlertTicket.assigned_user_id.isnot(None)).count()
+    resolved_count = base_query.filter(AlertTicket.ticket_status == "Resolved", AlertTicket.assigned_user_id.isnot(None)).count()
+    closed_count = base_query.filter(AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)).count()
 
     critical_count = base_query.filter(AlertTicket.severity == "critical").count()
     warning_count = base_query.filter(AlertTicket.severity == "warning").count()
@@ -255,7 +251,6 @@ def alert_history():
         info_count=info_count,
         current_user=current_user,
     )
-
 
 @app.route("/alerts/ticket/<int:alert_id>", methods=["GET", "POST"])
 @systemguard_enterprise()

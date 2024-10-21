@@ -183,6 +183,96 @@
 
     </div>
 
+    <div class="details-grid">
+        <!-- Top Process running -->
+         <div class="metric-card">
+            <div class="card-header">
+                <h3>Top Processes</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="process-grid">
+                    {% for process in system_info.top_processes %}
+                    <div class="process-item">
+                        <span class="process-name">{{ process[0] }}</span>
+                        <span class="process-cpu">CPU: {{ process[1] }}%</span>
+                        <span class="process-memory">Memory: {{ process[2] }}%</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="process-footer">
+                    <a href="url_for('process')" class="view-all">View All Processes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- docker container info -->
+        <!-- #         print(f"\nContainer: {container['name']}")
+        #         print(f"ID: {container['id']}")
+        #         print(f"Status: {container['status']}")
+        #         print(f"Image: {container['image']}")
+        #         print(f"Created: {container['created']}")
+        #         print(f"CPU Usage: {container['cpu_percent']}%")
+        #         print(f"Memory Usage: {container['memory']['usage']} ({container['memory']['percent']}%)")
+        #         print(f"Network - Received: {container['network']['received']}")
+        #         print(f"Network - Transmitted: {container['network']['transmitted']}") -->
+    <div class="details-grid">
+
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Docker Containers</h3>
+                <span class="refresh-indicator" title="Data is up to date"></span>
+            </div>
+            <div class="card-content">
+                <div class="container-grid">
+                    <!-- show loader here until data is loaded -->
+                    <div class="loader-container">
+                        <div class="loader"></div>
+                    </div>
+
+                    <!-- {% for container in docker_containers %}
+                    <div class="container-item">
+                        <div class="container-header">
+                            <span class="container-name">{{ container['name'] }}</span>
+                            <span class="container-status {{ 'running' if container['status'] == 'running' else 'stopped' }}">
+                                {{ container['status'] }}
+                            </span>
+                        </div>
+                        <div class="container-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Image:</span>
+                                <span class="detail-value container-image">{{ container['image'] }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Created:</span>
+                                <span class="detail-value container-created">{{ container['created'] }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">CPU:</span>
+                                <span class="detail-value container-cpu">{{ container['cpu_percent'] }}%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Memory:</span>
+                                <span class="detail-value container-memory">{{ container['memory']['usage'] }} ({{ container['memory']['percent'] }}%)</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Network Received:</span>
+                                <span class="detail-value container-network-received">{{ container['network']['received'] }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Network Transmitted:</span>
+                                <span class="detail-value container-network-transmitted">{{ container['network']['transmitted'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %} -->
+                </div>
+            </div>
+        </div>
+        
+    
+    </div>
 
     <div class="details-grid">
 
@@ -207,28 +297,6 @@
                         <span class="info-value info-value {{class }}">{{ value }}</span>
                     </div>
                     {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Top 5 Processes dummy data -->
-        <div class="metric-card">
-            <div class="card-header">
-                <h3>Top 10 Processes</h3>
-                <span class="refresh-indicator"></span>
-            </div>
-            <div class="card-content">
-                <div class="process-grid">
-                    {% for process in system_info.top_processes %}
-                    <div class="process-item">
-                        <span class="process-name">{{ process[0] }}</span>
-                        <span class="process-cpu">CPU: {{ process[1] }}%</span>
-                        <span class="process-memory">Memory: {{ process[2] }}%</span>
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="process-footer">
-                    <a href="url_for('process')" class="view-all">View All Processes</a>
                 </div>
             </div>
         </div>
@@ -542,6 +610,7 @@
     </div>
 </div>
 {% endblock %}
+
 
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/homepage.js')}}"></script>

@@ -10,7 +10,8 @@ const CONFIG = {
   },
   API_ENDPOINTS: {
     SYSTEM_INFO: '/api/v1/system-info',
-    DASHBOARD_STATS: '/api/dashboard/stats'
+    DASHBOARD_STATS: '/api/dashboard/stats',
+    PERFORMANCE_API: '/api/v1/metrics/system/performance'
   }
 };
 
@@ -129,6 +130,7 @@ class DashboardController {
         this.fetchData(CONFIG.API_ENDPOINTS.SYSTEM_INFO),
         this.fetchData(CONFIG.API_ENDPOINTS.DASHBOARD_STATS)
       ]);
+      console.log(systemInfo);
 
       this.updateCharts(systemInfo);
       this.updateMetricsDisplay(systemInfo);
@@ -138,6 +140,117 @@ class DashboardController {
       this.handleError('Failed to update dashboard', error);
     }
   }
+
+  async fetchPerformanceAPI() {
+    try {
+      const [systemPerformanceData] = await Promise.all([
+        this.fetchData(CONFIG.API_ENDPOINTS.PERFORMANCE_API),
+      ]);
+      console.log(systemPerformanceData);
+
+      this.updatePerformanceData(systemPerformanceData);
+    } catch (error) {
+      this.handleError('Failed to update performance data', error);
+    }
+  }
+
+  //   <div class="card-content">
+  //   <div class="container-grid">
+  //       {% for container in docker_containers %}
+  //       <div class="container-item">
+  //           <div class="container-header">
+  //               <span class="container-name">{{ container['name'] }}</span>
+  //               <span class="container-status {{ 'running' if container['status'] == 'running' else 'stopped' }}">
+  //                   {{ container['status'] }}
+  //               </span>
+  //           </div>
+  //           <div class="container-details">
+  //               <div class="detail-item">
+  //                   <span class="detail-label">Image:</span>
+  //                   <span class="detail-value container-image">{{ container['image'] }}</span>
+  //               </div>
+  //               <div class="detail-item">
+  //                   <span class="detail-label">Created:</span>
+  //                   <span class="detail-value container-created">{{ container['created'] }}</span>
+  //               </div>
+  //               <div class="detail-item">
+  //                   <span class="detail-label">CPU:</span>
+  //                   <span class="detail-value container-cpu">{{ container['cpu_percent'] }}%</span>
+  //               </div>
+  //               <div class="detail-item">
+  //                   <span class="detail-label">Memory:</span>
+  //                   <span class="detail-value container-memory">{{ container['memory']['usage'] }} ({{ container['memory']['percent'] }}%)</span>
+  //               </div>
+  //               <div class="detail-item">
+  //                   <span class="detail-label">Network Received:</span>
+  //                   <span class="detail-value container-network-received">{{ container['network']['received'] }}</span>
+  //               </div>
+  //               <div class="detail-item">
+  //                   <span class="detail-label">Network Transmitted:</span>
+  //                   <span class="detail-value container-network-transmitted">{{ container['network']['transmitted'] }}</span>
+  //               </div>
+  //           </div>
+  //       </div>
+  //       {% endfor %}
+  //   </div>
+  // </div>
+
+  async updatePerformanceData(data) {
+    // loop over containers data to update the UI
+    const containers = data.containers;
+
+    // const fragment = document.createDocumentFragment();
+
+    const containerGrid = document.querySelector('.container-grid');
+    if (!containerGrid) return;
+
+    const fragment = document.createDocumentFragment();
+    containers.forEach(container => {
+      const item = document.createElement('div');
+      item.className = 'container-item';
+      item.innerHTML = `
+          <div class="container-header">
+              <span class="container-name">${this.sanitizeHTML(container.name)}</span>
+              <span class="container-status ${container.status === 'running' ? 'running' : 'stopped'}">
+                  ${container.status}
+              </span>
+          </div>
+          <div class="container-details">
+              <div class="detail-item">
+                  <span class="detail-label">Image:</span>
+                  <span class="detail-value container-image">${this.sanitizeHTML(container.image)}</span>
+              </div>
+              <div class="detail-item">
+                  <span class="detail-label">Created:</span>
+                  <span class="detail-value container-created">${this.sanitizeHTML(container.created)}</span>
+              </div>
+              <div class="detail-item">
+                  <span class="detail-label">CPU:</span>
+                  <span class="detail-value container-cpu">${container.cpu_percent}%</span>
+              </div>
+              <div class="detail-item">
+                  <span class="detail-label">Memory:</span>
+                  <span class="detail-value container-memory">${container.memory.usage} (${container.memory.percent}%)</span>
+              </div>
+              <div class="detail-item">
+                  <span class="detail-label">Network Received:</span>
+                  <span class="detail-value container-network-received">${container.network.received}</span>
+              </div>
+              <div class="detail-item">
+                  <span class="detail label container-network-transmitted">Network Transmitted:</span>
+                  <span class="detail-value container-network-transmitted">${container.network.transmitted}</span>
+              </div>
+          </div>
+      `;
+
+      fragment.appendChild(item);
+    });
+
+    containerGrid.innerHTML = '';
+    containerGrid.appendChild(fragment);
+  
+  }
+
 
   async fetchData(endpoint) {
     const response = await fetch(endpoint);
@@ -283,9 +396,15 @@ class DashboardController {
     // Implement your error handling strategy here (e.g., show toast notification)
   }
 
+  callPerformanceAPI() {
+    this.fetchPerformanceAPI();
+  }
+
   start() {
     this.updateDashboard(); // Initial update
     setInterval(() => this.updateDashboard(), CONFIG.REFRESH_INTERVAL);
+    setInterval(() => this.callPerformanceAPI(), 1000);
+
   }
 }
 
