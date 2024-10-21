@@ -1153,6 +1153,24 @@ temp-alert-badge {
     background: var(--text-secondary);
 }
 
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.loader::after {
+    content: '';
+    width: 32px;
+    height: 32px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
     .container-item {
