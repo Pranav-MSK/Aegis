@@ -30,22 +30,25 @@ def get_services_by_category(category: str):
             'timestamp': data['timestamp'],
             'category': category,
             'processes': data['services'][category],
-            'summary': data['summary'][category]
+            'summary': data['summary'][category],
+            'count': len(data['services'][category])
         })
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/v1/categories")
+@app.get("/api/v1/services/categories")
 def get_categories():
     """Get list of available service categories."""
     monitor = ServiceMonitor()
     return jsonify({
-        'categories': list(monitor.service_patterns.keys())
+        'categories': list(monitor.service_patterns.keys()),
+        'count': len(monitor.service_patterns),
     })
 
 
 @app.get("/system/services")
 def system_services():
     return render_template('other/services.html')
+

@@ -59,7 +59,7 @@
     }
 
     // Fetch categories and populate the filter
-    fetch('/api/v1/categories')
+    fetch('/api/v1/services/categories')
         .then(response => response.json())
         .then(data => {
             categories = data.categories;

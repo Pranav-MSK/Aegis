@@ -174,16 +174,35 @@
         </div>
         <!-- {% endif %} -->
 
-        <!-- option to add new metric card -->
-        <!-- <div class="metric-card add-new-metric">
-            <a href="{{ url_for('health') }}" class="add-metric">
-                <i class="fas fa-plus"></i> Add New Metric
-            </a>
-        </div> -->
-
     </div>
 
     <div class="details-grid">
+
+        <!-- System Information -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>System Information</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+
+            <div class="card-content">
+                <div class="info-grid">
+                    {% for label, value, class in [
+                    ("OS", system_info.os_info.os_full_name, 'system-info'),
+                    ("Processor Name", system_info.processor_name, 'processor-name'),
+                    ("Boot Time", system_info.boot_time, 'boot-time'),
+                    ("Process Count", system_info.process_count, 'process-count'),
+                    ("Kernel Version", system_info.os_info.kernel_version, 'kernel-version')]
+                    %}
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-desktop info-icon"></i>{{ label }}:</span>
+                        <span class="info-value info-value {{class }}">{{ value }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
         <!-- Top Process running -->
         <div class="metric-card">
             <div class="card-header">
@@ -201,10 +220,141 @@
                     {% endfor %}
                 </div>
                 <div class="process-footer">
-                    <a href="url_for('process')" class="view-all">View All Processes</a>
+                    <a href="{{ url_for('process') }}" class="view-all">View All Processes</a>
                 </div>
             </div>
         </div>
+
+        <!-- Product Information -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Product Information</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    {% for label, value in [
+                    ("Product Name", plan_type),
+                    ("Product Version", version),
+                    ("SystemGuard Unique ID", systemguard_unique_id),
+                    ("Remaining Days", remaining_plan_days),
+                    ("Username", system_info.system_username)]
+                    %}
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-tag info-icon"></i>{{ label }}:</span>
+                        <span class="info-value">{{ value }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- service monitor -->
+    <div class="details-grid">
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Service Monitor</h3>
+                <div class="header-actions">
+                    <select id="rowsPerPage" class="form-select">
+                        <option value="5">5 Rows</option>
+                        <option value="10">10 Rows</option>
+                        <option value="20">20 Rows</option>
+                    </select>
+                    <a href="{{ url_for('system_services') }}" class="view-all">
+                        View Service Details
+                    </a>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="container">
+                    <div class="filter-section">
+                        <select id="categoryFilter">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table id="servicesTable">
+                            <thead>
+                                <tr>
+                                    <th>PID</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>CPU (%)</th>
+                                    <th>Memory (MB)</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- api metrics -->
+        <!-- Add this to your metrics-grid section in homepage -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>API Metrics</h3>
+                <div class="header-actions">
+                    <select id="apiMetricSelector" class="form-select">
+                        <option value="">Select a metric</option>
+                    </select>
+                    <select id="apiEndpointSelector" class="form-select" disabled>
+                        <option value="">Select an endpoint</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-content">
+                <div id="apiMetricsLoading" class="loading-indicator">Loading...</div>
+
+                <div id="apiMetricsPlaceholder" class="api-metrics-placeholder">
+                    <div class="placeholder-content">
+                        <i class="fas fa-filter placeholder-icon"></i>
+                        <p>Please select a metric and endpoint to view the API metrics dashboard</p>
+                        <div class="placeholder-steps">
+                            <div class="step">
+                                <span class="step-number">1</span>
+                                <span class="step-text">Choose a metric from the dropdown</span>
+                            </div>
+                            <div class="step">
+                                <span class="step-number">2</span>
+                                <span class="step-text">Select an endpoint to analyze</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="apiMetricsContent" class="api-metrics-content">
+                    <div class="metrics-summary">
+                        <div class="metric-item">
+                            <div class="metric-value">
+                                <span class="large-number" id="apiTotalCount">-</span>
+                            </div>
+                            <div class="metric-label">Total Count</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">
+                                <span class="large-number" id="apiTotalSum">-</span>
+                                <span class="unit">s</span>
+                            </div>
+                            <div class="metric-label">Total Duration</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">
+                                <span class="large-number" id="apiAvgDuration">-</span>
+                                <span class="unit">s</span>
+                            </div>
+                            <div class="metric-label">Average Duration</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="apiHistogramChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="details-grid">
@@ -220,342 +370,290 @@
                 </div>
             </div>
         </div>
-</div>
+    </div>
 
-<div class="details-grid">
+    <div class="details-grid">
 
-    <!-- System Information -->
-    <div class="metric-card">
-        <div class="card-header">
-            <h3>System Information</h3>
-            <span class="refresh-indicator"></span>
-        </div>
+        <!-- Network Section -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Disk and Network Status</h3>
+                <span class="refresh-indicator"></span>
+            </div>
 
-        <div class="card-content">
-            <div class="info-grid">
-                {% for label, value, class in [
-                ("OS", system_info.os_info.os_full_name, 'system-info'),
-                ("Processor Name", system_info.processor_name, 'processor-name'),
-                ("Boot Time", system_info.boot_time, 'boot-time'),
-                ("Process Count", system_info.process_count, 'process-count'),
-                ("Kernel Version", system_info.os_info.kernel_version, 'kernel-version')]
-                %}
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="fas fa-desktop info-icon"></i>{{ label }}:</span>
-                    <span class="info-value info-value {{class }}">{{ value }}</span>
+            <div class="card-content">
+                <div class="network-stats">
+                    <div class="stat-item">
+                        <span class="stat-icon download"></span>
+                        <div class="stat-details">
+                            <div class="stat-value">
+                                <span class="network-received">{{ system_info.network_received }}</span>
+                                <span class="speed-indicator download-speed">{{ system_info.download_speed }}
+                            </div>
+                            <span class="stat-label">Downloaded</span>
+                        </div>
+                    </div>
+                    <!-- # disk_read, disk_write -->
+                    <div class="stat-item">
+                        <span class="stat-icon upload"></span>
+                        <div class="stat-details">
+                            <div class="stat-value">
+                                <span class="network-sent">{{ system_info.network_sent }}</span>
+                                <span class="speed-indicator upload-speed">{{ system_info.upload_speed }}
+                            </div>
+                            <span class="stat-label">Uploaded</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-item">
+                        <span class="stat-icon floppy-disk"></span>
+                        <div class="stat-details">
+                            <div class="stat-value">
+                                <span class="disk-read">{{ system_info.disk_read }}</span>
+                                <span class="speed-indicator disk-read-per-sec">{{ system_info.disk_read_per_sec
+                                    }}</span>
+                            </div>
+                            <span class="stat-label">Disk Read</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-item">
+                        <span class="stat-icon floppy-disk"></span>
+                        <div class="stat-details">
+                            <div class="stat-value">
+                                <span class="disk-write">{{ system_info.disk_write }}</span>
+                                <span class="speed-indicator disk-write-per-sec">{{ system_info.disk_write_per_sec
+                                    }}</span>
+                            </div>
+                            <span class="stat-label">Disk Write</span>
+                        </div>
+                    </div>
+
                 </div>
-                {% endfor %}
             </div>
         </div>
     </div>
 
-    <!-- Product Information -->
-    <div class="metric-card">
-        <div class="card-header">
-            <h3>Product Information</h3>
-            <span class="refresh-indicator"></span>
-        </div>
-        <div class="card-content">
-            <div class="info-grid">
-                {% for label, value in [
-                ("Product Name", plan_type),
-                ("Product Version", version),
-                ("SystemGuard Unique ID", systemguard_unique_id),
-                ("Remaining Days", remaining_plan_days),
-                ("Username", system_info.system_username)]
-                %}
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="fas fa-tag info-icon"></i>{{ label }}:</span>
-                    <span class="info-value">{{ value }}</span>
+    <!-- System Details Section -->
+    <div class="details-grid">
+        <!-- other information -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Users Information</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    {% for label, value, icon_class, item_class in [
+                    ("Total Users", system_info.total_users ~ " / " ~ max_users_allowed, "fas fa-users", "total-users"),
+                    ("Admin Users", system_info.admin_users, "fas fa-user-shield", "admin-users"),
+                    ("Active Users", system_info.active_users, "fas fa-user", "active-users"),
+                    ("Inactive Users", system_info.inactive_users, "fas fa-user-slash", "inactive-users")
+                    ] %}
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="{{ icon_class }} info-icon"></i>{{ label }}:</span>
+                        <span class="info-value {{ item_class }}">{{ value }}</span>
+                    </div>
+                    {% endfor %}
+                    {% if system_info.active_alertmanagers %}
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-user info-icon"></i>Active Alert Managers:</span>
+                        {% for alertmanager in system_info.active_alertmanagers %}
+                        <span class="info-value active-alertmanagers">{{ alertmanager["url"] }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
                 </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
-</div>
 
-<div class="details-grid">
+        <div class="metric-card">
+            {% if plan_type == 'SystemGuard Enterprise' %}
+            <div class="card-header">
+                <h3>All Tickets Information</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="row">
+                        <div class="col">
+                            <div class="info-item info-bg">
+                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Open
+                                    Tickets:</span>
+                                <span class="info-value open-tickets">{{ system_info.open_tickets }}</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="info-item info-bg">
+                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Closed
+                                    Tickets:</span>
+                                <span class="info-value closed-tickets">{{ system_info.closed_tickets }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="info-item info-bg">
+                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Progress
+                                    Tickets:</span>
+                                <span class="info-value in-progress-tickets">{{ system_info.in_progress_tickets
+                                    }}</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="info-item info-bg">
+                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Resolved
+                                    Tickets:</span>
+                                <span class="info-value resolved-tickets">{{ system_info.resolved_tickets }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <div class="info-item critical-bg">
+                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Critical
+                                    Tickets:</span>
+                                <span class="info-value critical-tickets">{{ system_info.critical_tickets }}</span>
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- Network Section -->
-    <div class="metric-card">
-        <div class="card-header">
-            <h3>Disk and Network Status</h3>
-            <span class="refresh-indicator"></span>
+                    <div class="row">
+                        <div class="col">
+                            <div class="info-item warning-bg">
+                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Warning
+                                    Tickets:</span>
+                                <span class="info-value warning-tickets">{{ system_info.warning_tickets }}</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="info-item info-bg">
+                                <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Info
+                                    Tickets:</span>
+                                <span class="info-value info-tickets">{{ system_info.info_tickets }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {% else %}
+            <div class="card-content">
+                <h3 class="text-center">Alert Tickets Information</h3>
+                <p class="text-center text-gray-500">Alert Tickets Information is only available for SystemGuard
+                    Enterprise.
+                    Upgrade to SystemGuard Enterprise to access detailed alert ticket information, including open,
+                    closed,
+                    in-progress, resolved, critical, warning, and informational tickets. This feature helps in better
+                    monitoring and managing system alerts efficiently.</p>
+            </div>
+            {% endif %}
+
         </div>
 
-        <div class="card-content">
-            <div class="network-stats">
-                <div class="stat-item">
-                    <span class="stat-icon download"></span>
-                    <div class="stat-details">
-                        <div class="stat-value">
-                            <span class="network-received">{{ system_info.network_received }}</span>
-                            <span class="speed-indicator download-speed">{{ system_info.download_speed }}
-                        </div>
-                        <span class="stat-label">Downloaded</span>
+        <!-- other information -->
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Other Information</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Total Tickets:</span>
+                        <span class="info-value total-tickets">{{ system_info.total_tickets }} / {{
+                            monthly_alert_tickets_limit }}</span>
                     </div>
-                </div>
-                <!-- # disk_read, disk_write -->
-                <div class="stat-item">
-                    <span class="stat-icon upload"></span>
-                    <div class="stat-details">
-                        <div class="stat-value">
-                            <span class="network-sent">{{ system_info.network_sent }}</span>
-                            <span class="speed-indicator upload-speed">{{ system_info.upload_speed }}
-                        </div>
-                        <span class="stat-label">Uploaded</span>
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Total Alerts
+                            Rules:</span>
+                        <span class="info-value total-rules">{{ system_info.total_rules }} / {{max_alert_rules}}</span>
                     </div>
-                </div>
 
-                <div class="stat-item">
-                    <span class="stat-icon floppy-disk"></span>
-                    <div class="stat-details">
-                        <div class="stat-value">
-                            <span class="disk-read">{{ system_info.disk_read }}</span>
-                            <span class="speed-indicator disk-read-per-sec">{{ system_info.disk_read_per_sec
-                                }}</span>
-                        </div>
-                        <span class="stat-label">Disk Read</span>
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-bullseye info-icon"></i>Total Srapping
+                            Targets:</span>
+                        <span class="info-value total-targets">{{ system_info.total_targets }} /
+                            {{max_scrap_target}}</span>
                     </div>
-                </div>
-
-                <div class="stat-item">
-                    <span class="stat-icon floppy-disk"></span>
-                    <div class="stat-details">
-                        <div class="stat-value">
-                            <span class="disk-write">{{ system_info.disk_write }}</span>
-                            <span class="speed-indicator disk-write-per-sec">{{ system_info.disk_write_per_sec
-                                }}</span>
-                        </div>
-                        <span class="stat-label">Disk Write</span>
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-chart-line info-icon"></i>Total Charts:</span>
+                        <span class="info-value total-charts">{{ system_info.total_charts }} /
+                            {{max_number_of_graphs}}</span>
                     </div>
-                </div>
 
+                    <div class="info-item info-bg">
+                        <span class="info-label"><i class="fas fa-chart-line info-icon"></i>Active Charts:</span>
+                        <span class="info-value active-charts">{{ system_info.active_charts }}</span>
+                    </div>
+
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- System Details Section -->
-<div class="details-grid">
-    <!-- other information -->
-    <div class="metric-card">
-        <div class="card-header">
-            <h3>Users Information</h3>
-            <span class="refresh-indicator"></span>
-        </div>
-        <div class="card-content">
-            <div class="info-grid">
-                {% for label, value, icon_class, item_class in [
-                ("Total Users", system_info.total_users ~ " / " ~ max_users_allowed, "fas fa-users", "total-users"),
-                ("Admin Users", system_info.admin_users, "fas fa-user-shield", "admin-users"),
-                ("Active Users", system_info.active_users, "fas fa-user", "active-users"),
-                ("Inactive Users", system_info.inactive_users, "fas fa-user-slash", "inactive-users")
-                ] %}
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="{{ icon_class }} info-icon"></i>{{ label }}:</span>
-                    <span class="info-value {{ item_class }}">{{ value }}</span>
-                </div>
-                {% endfor %}
-                {% if system_info.active_alertmanagers %}
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="fas fa-user info-icon"></i>Active Alert Managers:</span>
-                    {% for alertmanager in system_info.active_alertmanagers %}
-                    <span class="info-value active-alertmanagers">{{ alertmanager["url"] }}</span>
+    </div>
+
+
+    <div class="details-grid">
+        <div class="metric-card">
+            {% if system_info.top_alert_tickets %}
+            <div class="card-header">
+                <h3>Alert Tickets Dashboard</h3>
+                <a href="{{ url_for('alert_history') }}" class="view-all">
+                    View All Tickets
+                </a>
+            </div>
+            <div class="card-content">
+                <div class="alert-grid">
+                    {% for alert in system_info.top_alert_tickets %}
+                    <div class="alert-item severity-{{ alert.severity }}">
+                        <span class="alert-severity">{{ alert.severity | capitalize }}</span>
+                        <span class="alert-name">{{ alert.alert_name }}</span>
+                        <span class="alert-instance">{{ alert.instance }}</span>
+                        <span class="alert-created-at">{{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        <a href="{{ url_for('alert_ticket', alert_id=alert.id) }}" class="alert-link">
+                            <i class="fas fa-info-circle"></i> View Details
+                        </a>
+                    </div>
                     {% endfor %}
                 </div>
-                {% endif %}
+            </div>
+            {% else %}
+            <div class="card-content">
+                <p class="text-center text-gray-500">No alert tickets found</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>System Metrics History</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <canvas id="system-metrics"></canvas>
             </div>
         </div>
     </div>
 
-    <div class="metric-card">
-        {% if plan_type == 'SystemGuard Enterprise' %}
-        <div class="card-header">
-            <h3>All Tickets Information</h3>
-            <span class="refresh-indicator"></span>
-        </div>
-        <div class="card-content">
-            <div class="info-grid">
-                <div class="row">
-                    <div class="col">
-                        <div class="info-item info-bg">
-                            <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Open
-                                Tickets:</span>
-                            <span class="info-value open-tickets">{{ system_info.open_tickets }}</span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="info-item info-bg">
-                            <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Closed
-                                Tickets:</span>
-                            <span class="info-value closed-tickets">{{ system_info.closed_tickets }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="info-item info-bg">
-                            <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Progress
-                                Tickets:</span>
-                            <span class="info-value in-progress-tickets">{{ system_info.in_progress_tickets
-                                }}</span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="info-item info-bg">
-                            <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Resolved
-                                Tickets:</span>
-                            <span class="info-value resolved-tickets">{{ system_info.resolved_tickets }}</span>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col">
-                        <div class="info-item critical-bg">
-                            <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Critical
-                                Tickets:</span>
-                            <span class="info-value critical-tickets">{{ system_info.critical_tickets }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col">
-                        <div class="info-item warning-bg">
-                            <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Warning
-                                Tickets:</span>
-                            <span class="info-value warning-tickets">{{ system_info.warning_tickets }}</span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="info-item info-bg">
-                            <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Info
-                                Tickets:</span>
-                            <span class="info-value info-tickets">{{ system_info.info_tickets }}</span>
-                        </div>
-                    </div>
-                </div>
-
+    <!-- cpu_usage_core -->
+    <div class="charts-section">
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>CPU Usage Per Core</h3>
+                <span class="refresh-indicator"></span>
             </div>
-        </div>
-        {% else %}
-        <div class="card-content">
-            <h3 class="text-center">Alert Tickets Information</h3>
-            <p class="text-center text-gray-500">Alert Tickets Information is only available for SystemGuard
-                Enterprise.
-                Upgrade to SystemGuard Enterprise to access detailed alert ticket information, including open,
-                closed,
-                in-progress, resolved, critical, warning, and informational tickets. This feature helps in better
-                monitoring and managing system alerts efficiently.</p>
-        </div>
-        {% endif %}
-
-    </div>
-
-    <!-- other information -->
-    <div class="metric-card">
-        <div class="card-header">
-            <h3>Other Information</h3>
-            <span class="refresh-indicator"></span>
-        </div>
-        <div class="card-content">
-            <div class="info-grid">
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="fas fa-ticket-alt info-icon"></i>Total Tickets:</span>
-                    <span class="info-value total-tickets">{{ system_info.total_tickets }} / {{
-                        monthly_alert_tickets_limit }}</span>
-                </div>
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Total Alerts
-                        Rules:</span>
-                    <span class="info-value total-rules">{{ system_info.total_rules }} / {{max_alert_rules}}</span>
-                </div>
-
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="fas fa-bullseye info-icon"></i>Total Srapping
-                        Targets:</span>
-                    <span class="info-value total-targets">{{ system_info.total_targets }} /
-                        {{max_scrap_target}}</span>
-                </div>
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="fas fa-chart-line info-icon"></i>Total Charts:</span>
-                    <span class="info-value total-charts">{{ system_info.total_charts }} /
-                        {{max_number_of_graphs}}</span>
-                </div>
-
-                <div class="info-item info-bg">
-                    <span class="info-label"><i class="fas fa-chart-line info-icon"></i>Active Charts:</span>
-                    <span class="info-value active-charts">{{ system_info.active_charts }}</span>
-                </div>
-
+            <div class="card-content">
+                <canvas id="cpu-usage-core"></canvas>
             </div>
         </div>
     </div>
-
-</div>
-
-
-<div class="details-grid">
-    <div class="metric-card">
-        {% if system_info.top_alert_tickets %}
-        <div class="card-header">
-            <h3>Alert Tickets Dashboard</h3>
-            <a href="{{ url_for('alert_history') }}" class="view-all">
-                View All Tickets
-            </a>
-        </div>
-        <div class="card-content">
-            <div class="alert-grid">
-                {% for alert in system_info.top_alert_tickets %}
-                <div class="alert-item severity-{{ alert.severity }}">
-                    <span class="alert-severity">{{ alert.severity | capitalize }}</span>
-                    <span class="alert-name">{{ alert.alert_name }}</span>
-                    <span class="alert-instance">{{ alert.instance }}</span>
-                    <span class="alert-created-at">{{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
-                    <a href="{{ url_for('alert_ticket', alert_id=alert.id) }}" class="alert-link">
-                        <i class="fas fa-info-circle"></i> View Details
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% else %}
-        <div class="card-content">
-            <p class="text-center text-gray-500">No alert tickets found</p>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-
-<!-- Charts Section -->
-<div class="charts-section">
-    <div class="metric-card">
-        <div class="card-header">
-            <h3>System Metrics History</h3>
-            <span class="refresh-indicator"></span>
-        </div>
-        <div class="card-content">
-            <canvas id="system-metrics"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- cpu_usage_core -->
-<div class="charts-section">
-    <div class="metric-card">
-        <div class="card-header">
-            <h3>CPU Usage Per Core</h3>
-            <span class="refresh-indicator"></span>
-        </div>
-        <div class="card-content">
-            <canvas id="cpu-usage-core"></canvas>
-        </div>
-    </div>
-</div>
 </div>
 
 {% endblock %}

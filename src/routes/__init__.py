@@ -21,7 +21,7 @@ from src.routes.alert_route import alert_bp
 from src.routes.update_webhooks import webhooks_bp
 from src.routes.activation import activation_bp
 from src.routes.services import services_bp
-from src.routes.metrics import metrics_bp
+from src.routes.api_metrics import metrics_bp
 
 __all__ = [
     "dashboard_bp",

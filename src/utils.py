@@ -182,7 +182,7 @@ def get_disk_metrics():
     disk_info = psutil.disk_usage('/')
     
     # Wait for a second to measure real-time speeds
-    time.sleep(1)
+    #time.sleep(1)
 
     # Metrics after 1 second
     final_io = psutil.disk_io_counters()
@@ -209,7 +209,7 @@ def get_network_metrics():
     initial_net_io = psutil.net_io_counters()
 
     # Wait for a second to measure real-time speeds
-    time.sleep(1)
+    #time.sleep(1)
 
     # Metrics after 1 second
     final_net_io = psutil.net_io_counters()
@@ -273,7 +273,7 @@ def get_top_processes(number=5, combined=False):
 
     return processes
 
-def get_process_metrics(num_processes=7):
+def get_process_metrics(num_processes=8):
     """Collect process metrics with optimized collection"""
     try:
         return {'top_processes': get_top_processes(number=num_processes, combined=True)}

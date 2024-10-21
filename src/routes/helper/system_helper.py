@@ -78,8 +78,29 @@ def calculate_cpu_percent(stats: dict) -> float:
 def format_container_creation_time(created_str):
     """Convert the container creation timestamp to a formatted string."""
     try:
-        formatted_created = datetime.strptime(created_str.split('.')[0], "%Y-%m-%dT%H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
-        return formatted_created
+        created_time = datetime.strptime(created_str.split('.')[0], "%Y-%m-%dT%H:%M:%S")
+        now = datetime.utcnow()
+        diff = now - created_time
+
+        seconds = diff.total_seconds()
+        minutes = seconds // 60
+        hours = minutes // 60
+        days = hours // 24
+        months = days // 30
+        years = days // 365
+
+        if years >= 1:
+            return f"{int(years)} year{'s' if years > 1 else ''} ago"
+        elif months >= 1:
+            return f"{int(months)} month{'s' if months > 1 else ''} ago"
+        elif days >= 1:
+            return f"{int(days)} day{'s' if days > 1 else ''} ago"
+        elif hours >= 1:
+            return f"{int(hours)} hour{'s' if hours > 1 else ''} ago"
+        elif minutes >= 1:
+            return f"{int(minutes)} minute{'s' if minutes > 1 else ''} ago"
+        else:
+            return f"{int(seconds)} second{'s' if seconds > 1 else ''} ago"
     except ValueError as e:
         print(f"Error formatting container creation time: {e}")
         return "Unknown"

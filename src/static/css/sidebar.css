@@ -152,12 +152,13 @@
 
 /* Toggle Button */
 .sidebar-toggle {
+    
     left: 1rem;
     top: 1rem;
     z-index: 1001;
     padding: 0.75rem 1.25rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    color: white;   
+    background: #fff;
+    color: rgb(0, 0, 0);   
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
@@ -171,7 +172,6 @@
 }
 
 .sidebar-toggle:hover {
-    background: linear-gradient(135deg, var(--primary-light), var(--primary-lighter));
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
 }
