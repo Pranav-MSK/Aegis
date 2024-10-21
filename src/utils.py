@@ -5,6 +5,7 @@ import platform
 import datetime
 import subprocess
 import psutil
+import GPUtil
 import functools
 from jinja2 import Environment, FileSystemLoader
 from concurrent.futures import ThreadPoolExecutor
@@ -135,6 +136,7 @@ def get_cpu_metrics():
     cpu_freq = psutil.cpu_freq()
     temps = psutil.sensors_temperatures().get('coretemp', [None])[0]
     return {
+        'cpu_core': psutil.cpu_count(logical=True),
         'cpu_percent': psutil.cpu_percent(interval=0.1),
         'cpu_frequency': round(cpu_freq.current) if cpu_freq else 0,
         'cpu_max_frequency': round(cpu_freq.max) if cpu_freq else 0,
@@ -143,6 +145,25 @@ def get_cpu_metrics():
         'critical_temp': getattr(temps, 'critical', 0) if temps else 0,
         'cpu_usage_core': [round(x, 2) for x in psutil.cpu_percent(interval=0.1, percpu=True)]
     }
+
+
+def get_gpu_metrics():
+    """Collect all GPU-related metrics in one go"""
+    gpus = GPUtil.getGPUs()
+    gpu_metrics = []
+    
+    for gpu in gpus:
+        gpu_metrics.append({
+            'gpu_id': gpu.id,
+            'gpu_name': gpu.name,
+            'gpu_load': round(gpu.load * 100, 2),  # Load in percentage
+            'gpu_memory_total': gpu.memoryTotal,
+            'gpu_memory_used': gpu.memoryUsed,
+            'gpu_memory_free': gpu.memoryFree,
+            'gpu_temperature': gpu.temperature,
+        })
+    
+    return gpu_metrics
 
 def get_memory_metrics():
     """Collect all memory-related metrics in one go"""
@@ -214,7 +235,7 @@ def get_battery_metrics():
         }
     except Exception as e:
         logger.error(f"Error collecting battery metrics: {e}")
-        return {'battery_percent': 0, 'battery_status': "Not available"}
+        return {'battery_percent': 0, 'battery_status': "N/A"}
 
 def get_top_processes(number=5, combined=False):
     """Get the top processes by memory usage."""
@@ -281,6 +302,7 @@ def _collect_metrics():
                     logger.error(f"Error collecting {key} metrics: {e}")
 
         results['timestamp'] = datetime.datetime.now()
+        results['process_count'] = len(psutil.pids())
         return results
 
     except Exception as e:
@@ -292,7 +314,6 @@ def fetch_system_metrics():
     system_username = get_cached_value('system_username', get_system_username)
     nodename = get_cached_value('nodename', get_system_node_name)
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
-    uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
     current_server_time = datetime.datetime.now()
     ipv4_address = get_ip_address()
     os_info = get_cached_value('os_info', get_os_info)
@@ -303,14 +324,11 @@ def fetch_system_metrics():
         'nodename': nodename,
         'processor_name': get_linux_processor_name(),
         'boot_time': boot_time.strftime("%Y-%m-%d %H:%M:%S"),
-        'process_count': len(psutil.pids()),
         'swap_memory': psutil.swap_memory().percent,
         'ipv4_connections': ipv4_address,
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
-        'timestamp': current_server_time,
         'os_info': os_info
     }
-    info.update(uptime_dict)
     info.update(_collect_metrics())
 
     return info

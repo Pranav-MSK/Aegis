@@ -7,7 +7,6 @@
 {% block content %}
 <div class="content">
 
-
     <!-- Header Section -->
     <header class="header-section">
         <div class="header-container">
@@ -26,6 +25,7 @@
 
     <!-- Main Grid Section -->
     <div class="metrics-grid">
+        
         <!-- CPU Section -->
         <div class="metric-card">
             <div class="card-header">
@@ -56,6 +56,7 @@
                 </div>
             </div>
         </div>
+        
 
         <!-- Storage Section -->
         <div class="metric-card">
@@ -120,6 +121,7 @@
         </div>
 
         <!-- Temperature Section -->
+        <!-- {% if system_info.current_temp != "N/A" %} -->
         <div class="metric-card">
             <div class="card-header">
                 <h3>Temperature</h3>
@@ -145,8 +147,10 @@
                 </div>
             </div>
         </div>
+        <!-- {% endif %} -->
 
         <!-- Battery Status -->
+        <!-- {% if system_info.battery_status != "N/A" %} -->
         <div class="metric-card">
             <div class="card-header">
                 <h3>Battery Status</h3>
@@ -168,6 +172,15 @@
                 </div>
             </div>
         </div>
+        <!-- {% endif %} -->
+
+        <!-- option to add new metric card -->
+        <!-- <div class="metric-card add-new-metric">
+            <a href="{{ url_for('health') }}" class="add-metric">
+                <i class="fas fa-plus"></i> Add New Metric
+            </a>
+        </div> -->
+
     </div>
 
 
@@ -182,16 +195,16 @@
 
             <div class="card-content">
                 <div class="info-grid">
-                    {% for label, value in [
-                    ("OS", system_info.os_info.os_full_name),
-                    ("Processor Name", system_info.processor_name),
-                    ("Boot Time", system_info.boot_time),
-                    ("Process Count", system_info.process_count),
-                    ("Kernel Version", system_info.os_info.kernel_version)]
+                    {% for label, value, class in [
+                    ("OS", system_info.os_info.os_full_name, 'system-info'),
+                    ("Processor Name", system_info.processor_name, 'processor-name'),
+                    ("Boot Time", system_info.boot_time, 'boot-time'),
+                    ("Process Count", system_info.process_count, 'process-count'),
+                    ("Kernel Version", system_info.os_info.kernel_version, 'kernel-version')]
                     %}
                     <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-desktop info-icon"></i>{{ label }}:</span>
-                        <span class="info-value info-value">{{ value }}</span>
+                        <span class="info-value info-value {{class }}">{{ value }}</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -283,7 +296,8 @@
                         <div class="stat-details">
                             <div class="stat-value">
                                 <span class="disk-read">{{ system_info.disk_read }}</span>
-                                <span class="speed-indicator disk-read-per-sec">{{ system_info.disk_read_per_sec }}</span>
+                                <span class="speed-indicator disk-read-per-sec">{{ system_info.disk_read_per_sec
+                                    }}</span>
                             </div>
                             <span class="stat-label">Disk Read</span>
                         </div>
@@ -294,7 +308,8 @@
                         <div class="stat-details">
                             <div class="stat-value">
                                 <span class="disk-write">{{ system_info.disk_write }}</span>
-                                <span class="speed-indicator disk-write-per-sec">{{ system_info.disk_write_per_sec }}</span>
+                                <span class="speed-indicator disk-write-per-sec">{{ system_info.disk_write_per_sec
+                                    }}</span>
                             </div>
                             <span class="stat-label">Disk Write</span>
                         </div>
@@ -315,24 +330,17 @@
             </div>
             <div class="card-content">
                 <div class="info-grid">
+                    {% for label, value, icon_class, item_class in [
+                        ("Total Users", system_info.total_users ~ " / " ~ max_users_allowed, "fas fa-users", "total-users"),
+                        ("Admin Users", system_info.admin_users, "fas fa-user-shield", "admin-users"),
+                        ("Active Users", system_info.active_users, "fas fa-user", "active-users"),
+                        ("Inactive Users", system_info.inactive_users, "fas fa-user-slash", "inactive-users")
+                    ] %}
                     <div class="info-item info-bg">
-                        <span class="info-label"><i class="fas fa-users info-icon"></i>Total Users:</span>
-                        <span class="info-value total-users">{{ system_info.total_users }} / {{ max_users_allowed
-                            }}</span>
+                        <span class="info-label"><i class="{{ icon_class }} info-icon"></i>{{ label }}:</span>
+                        <span class="info-value {{ item_class }}">{{ value }}</span>
                     </div>
-                    <div class="info-item info-bg">
-                        <span class="info-label"><i class="fas fa-user-shield info-icon"></i>Admin Users:</span>
-                        <span class="info-value admin-users">{{ system_info.admin_users }}</span>
-                    </div>
-                    <div class="info-item info-bg">
-                        <span class="info-label"><i class="fas fa-user info-icon"></i>Active Users:</span>
-                        <span class="info-value active-users">{{ system_info.active_users }}</span>
-                    </div>
-                    <!-- func.sum(case((UserProfile.is_active == False, 1), else_=0)).label('inactive_users'), -->
-                    <div class="info-item info-bg">
-                        <span class="info-label"><i class="fas fa-user-slash info-icon"></i>Inactive Users:</span>
-                        <span class="info-value inactive-users">{{ system_info.inactive_users }}</span>
-                    </div>
+                    {% endfor %}
                     {% if system_info.active_alertmanagers %}
                     <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-user info-icon"></i>Active Alert Managers:</span>
@@ -489,11 +497,8 @@
                     <div class="alert-item severity-{{ alert.severity }}">
                         <span class="alert-severity">{{ alert.severity | capitalize }}</span>
                         <span class="alert-name">{{ alert.alert_name }}</span>
-                        <span class="alert-instance">{{ alert.instance }}
-                        </span>
-                        <span class="alert-created-at">{{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}
-                        </span>
-
+                        <span class="alert-instance">{{ alert.instance }}</span>
+                        <span class="alert-created-at">{{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
                         <a href="{{ url_for('alert_ticket', alert_id=alert.id) }}" class="alert-link">
                             <i class="fas fa-info-circle"></i> View Details
                         </a>

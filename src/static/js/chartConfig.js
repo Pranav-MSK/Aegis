@@ -66,9 +66,9 @@ document.querySelectorAll('.is-active').forEach(checkbox => {
             body: JSON.stringify({ is_active: isActive })
         }).then(response => {
             if (response.ok) {
-                alert('Configuration updated successfully');
+                // Configuration updated successfully
             } else {
-                alert('Error updating configuration');
+                // Error updating configuration
             }
         });
     });

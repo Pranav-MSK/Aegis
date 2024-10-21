@@ -210,6 +210,7 @@ class DashboardController {
       'disk-read-per-sec': data.disk_read_per_sec,
       'upload-speed': data.upload_speed,
       'download-speed': data.download_speed,
+      'process-count': data.process_count,
     };
 
     Object.entries(metrics).forEach(([className, value]) => {

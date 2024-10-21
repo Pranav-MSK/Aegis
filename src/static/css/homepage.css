@@ -92,6 +92,32 @@
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --primary-color: #4a90e2;
+    /* Blue */
+    --secondary-color: #6b7280;
+    /* Gray */
+    --success-color: #34d399;
+    /* Green */
+    --warning-color: #fbbf24;
+    /* Yellow */
+    --danger-color: #f87171;
+    /* Red */
+    --info-color: #60a5fa;
+    /* Light Blue */
+    --light-bg: #f9fafb;
+    /* Light Gray */
+    --dark-bg: #1f2937;
+    /* Dark Gray */
+    --text-primary: #1e293b;
+    /* Dark Text */
+    --text-secondary: #64748b;
+    /* Secondary Text */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.15);
+    --transition-fast: 0.2s;
+    --transition-normal: 0.3s;
+    --transition-slow: 0.5s;
 }
 
 /* Base Styles */
@@ -804,7 +830,6 @@ temp-alert-badge {
     color: #64748b;
 }
 
-
 /* Alert Grid */
 .alert-grid {
     display: grid;
@@ -820,10 +845,12 @@ temp-alert-badge {
     border-left: 4px solid var(--color-primary);
     border-radius: 0.75rem;
     padding: 1.25rem;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 0.75rem;
     transition: all var(--transition-normal);
     cursor: pointer;
+    box-shadow: var(--shadow-sm);
 }
 
 .alert-item::before {
@@ -838,6 +865,11 @@ temp-alert-badge {
             rgba(255, 255, 255, 0.06),
             transparent 40%);
 }
+
+.alert-item:hover::before {
+    opacity: 1;
+}
+
 
 .alert-item:hover {
     transform: translateY(-2px);
@@ -867,63 +899,6 @@ temp-alert-badge {
     height: 8px;
     border-radius: 50%;
     background-color: currentColor;
-}
-
-/* Base Styles */
-:root {
-    --primary-color: #4a90e2;
-    /* Blue */
-    --secondary-color: #6b7280;
-    /* Gray */
-    --success-color: #34d399;
-    /* Green */
-    --warning-color: #fbbf24;
-    /* Yellow */
-    --danger-color: #f87171;
-    /* Red */
-    --info-color: #60a5fa;
-    /* Light Blue */
-    --light-bg: #f9fafb;
-    /* Light Gray */
-    --dark-bg: #1f2937;
-    /* Dark Gray */
-    --text-primary: #1e293b;
-    /* Dark Text */
-    --text-secondary: #64748b;
-    /* Secondary Text */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.15);
-    --transition-fast: 0.2s;
-    --transition-normal: 0.3s;
-    --transition-slow: 0.5s;
-}
-
-/* Alert Grid */
-.alert-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-}
-
-/* Alert Item */
-.alert-item {
-    padding: 1rem;
-    border-radius: 0.75rem;
-    background: #ffffff;
-    box-shadow: var(--shadow-sm);
-    transition: transform var(--transition-normal);
-    position: relative;
-}
-
-.alert-item:hover {
-    transform: translateY(-2px);
-}
-
-/* Alert Name */
-.alert-name {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--text-primary);
 }
 
 /* Alert Instance */

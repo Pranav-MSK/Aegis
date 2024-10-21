@@ -4,6 +4,7 @@ Cython==3.0.11              # C-extensions for Python
 
 # System information and performance monitoring
 psutil==6.0.0               # Retrieves system metrics (CPU, memory, etc.)
+GPUtil==1.4.0               # Retrieves GPU metrics (if available)
 
 # Environment variable management
 python-dotenv==1.0.1        # Loads environment variables from .env file
