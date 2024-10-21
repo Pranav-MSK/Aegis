@@ -1,47 +1,11 @@
 # cython: language_level=3
-import psutil
 import docker
 from datetime import datetime
 from typing import List, Dict, Any, Union
 import traceback
 
-
-KNOWN_SERVICES = [
-    'apache', 'nginx', 'mysql', 'postgresql', 'mongodb', 'redis',
-    'memcached', 'elasticsearch', 'rabbitmq', 'docker', 'sshd',
-    'ftpd', 'smbd', 'ntpd', 'named', 'httpd', 'tomcat', 'jenkins',
-    'gitlab', 'zookeeper', 'kafka', 'cassandra', 'prometheus',
-    'grafana', 'influxd', 'telegraf', 'logstash', 'kibana', 'haproxy',
-    'varnishd', 'squid', 'postfix', 'dovecot', 'cups', 'ntp', 'cron',
-    'systemd', 'udev', 'dbus', 'rsyslogd', 'supervisord'
-]
-
 # Type aliases
 ContainerMetrics = Dict[str, Any]
-
-def get_running_daemons() -> List[str]:
-    """
-    Get the list of running Python daemons on the system.
-    
-    Returns:
-        List[str]: List of daemon process names
-    """
-    try:
-        daemons = []
-        for proc in psutil.process_iter(['name', 'cmdline']):
-            try:
-                proc_info = proc.info
-                if proc_info['cmdline'] and any('python' in cmd.lower() for cmd in proc_info['cmdline']):
-                    # Get the actual script name being run
-                    script_name = proc_info['cmdline'][-1]
-                    if script_name.endswith('.py'):
-                        daemons.append(script_name)
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-                continue
-        return daemons
-    except Exception as e:
-        print(f"Error collecting running daemons: {e}")
-        return []
 
 def format_bytes(bytes_value: Union[int, float, str]) -> str:
     """

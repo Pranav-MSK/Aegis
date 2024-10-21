@@ -7,7 +7,6 @@ from src.config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration
 from src.utils import fetch_system_metrics
 from src.routes.helper.prometheus_helper import count_of_targets, calculate_total_rules, retrieve_active_alertmanagers
-from src.routes.helper.system_performance_helper import get_running_docker_containers
 
 dashboard_bp = Blueprint("dashboard", __name__)
 

@@ -8,6 +8,7 @@ from src.routes.helper.firewall_helper import (
     disable_port)
 from src.routes.helper.common_helper import admin_required, handle_sudo_password
 from src.logger import logger
+from src.routes.helper.network_helper import handle_network_scan, handle_port_scan
 
 firewall_bp = Blueprint('firewall', __name__)
 
@@ -95,3 +96,16 @@ def validate_port(port):
         return 1 <= port_number <= 65535
     except ValueError:
         return False
+    
+
+@app.route('/security_analysis', methods=['GET', 'POST'])
+def security_analysis():
+    if request.method == 'POST':
+        if 'scan_network' in request.form:
+            return handle_network_scan()
+        elif 'scan_ports' in request.form:
+            return handle_port_scan()
+    
+    # Render the default scan page if the request method is GET or no valid action is found in POST.
+    return render_template('experimental/scan.html')
+

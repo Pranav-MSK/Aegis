@@ -3,40 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Discovery</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Service Monitor Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f6fa;
+            --accent-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            background-color: var(--secondary-color);
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        #categoryFilter {
+            padding: 0.75rem;
+            border: 1px solid #e1e1e1;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            width: 200px;
+            cursor: pointer;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        #categoryFilter:hover, #categoryFilter:focus {
+            border-color: var(--primary-color);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        #servicesTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        #servicesTable th {
+            background-color: var(--secondary-color);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid #e1e1e1;
+        }
+
+        #servicesTable td {
+            padding: 1rem;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        #servicesTable tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-running {
+            background-color: #e3fcef;
+            color: #00875a;
+        }
+
+        .status-stopped {
+            background-color: #ffe9e9;
+            color: #de350b;
+        }
+
+        .kill-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: #f8f9fa;
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .kill-button:hover {
+            background-color: #e9ecef;
+        }
+
+        #summaryCharts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            #summaryCharts {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Running Services</h1>
-        {% if services %}
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {% for service in services %}
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ service.pid }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ service.name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if service.status == 'running' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                                    {{ service.status }}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<body>
+    <div class="container">
+        <header class="dashboard-header">
+            <h1 class="dashboard-title">Service Monitor Dashboard</h1>
+            <div class="filter-section">
+                <select id="categoryFilter">
+                    <option value="all">All Categories</option>
+                </select>
             </div>
-        {% else %}
-            <p class="text-center text-gray-600">No services found running on the system.</p>
-        {% endif %}
+        </header>
+
+        <div class="table-container">
+            <table id="servicesTable">
+                <thead>
+                    <tr>
+                        <th>PID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>CPU (%)</th>
+                        <th>Memory (MB)</th>
+                        <th>Ports</th>
+                        <th>Uptime</th>
+                        <th>Command</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="summaryCharts">
+            <div class="chart-container">
+                <canvas id="serviceCountChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="memoryUsageChart"></canvas>
+            </div>
+        </div>
     </div>
+
+    <script>
+        const categoryFilter = document.getElementById('categoryFilter');
+        const servicesTable = document.getElementById('servicesTable').getElementsByTagName('tbody')[0];
+        let serviceData = {};
+        let categories = [];
+
+        function getStatusBadgeClass(status) {
+            return status.toLowerCase() === 'running' ? 'status-running' : 'status-stopped';
+        }
+
+        // Fetch categories and populate the filter
+        fetch('/api/v1/categories')
+            .then(response => response.json())
+            .then(data => {
+                categories = data.categories;
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categoryFilter.appendChild(option);
+                });
+            });
+
+        // Fetch and display service data
+        function fetchServices(category = 'all') {
+            const url = category === 'all' ? '/api/v1/services' : `/api/v1/services/${category}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    serviceData = data;
+                    displayServices(category);
+                    updateCharts();
+                });
+        }
+
+        function displayServices(category) {
+            servicesTable.innerHTML = '';
+            const services = category === 'all' ? Object.values(serviceData.services).flat() : serviceData.processes;
+            services.forEach(service => {
+                const row = servicesTable.insertRow();
+                row.innerHTML = `
+                    <td>${service.pid}</td>
+                    <td>${service.name}</td>
+                    <td><span class="status-badge ${getStatusBadgeClass(service.status)}">${service.status}</span></td>
+                    <td>${service.cpu}%</td>
+                    <td>${service.memory_mb} MB</td>
+                    <td>${service.ports.join(', ') || '-'}</td>
+                    <td>${service.uptime_human}</td>
+                    <td>${service.cmd}</td>
+                    <td><button class="kill-button" disabled title="Coming Soon">Kill Process</button></td>
+                `;
+            });
+        }
+
+        function updateCharts() {
+            updateServiceCountChart();
+            updateMemoryUsageChart();
+        }
+
+        function updateServiceCountChart() {
+            const ctx = document.getElementById('serviceCountChart').getContext('2d');
+            const labels = Object.keys(serviceData.summary);
+            const data = labels.map(category => serviceData.summary[category].count);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Service Count',
+                        data: data,
+                        backgroundColor: 'rgba(74, 144, 226, 0.6)',
+                        borderColor: 'rgba(74, 144, 226, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Service Count by Category'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateMemoryUsageChart() {
+            const ctx = document.getElementById('memoryUsageChart').getContext('2d');
+            const labels = Object.keys(serviceData.summary);
+            const data = labels.map(category => serviceData.summary[category].total_memory_mb);
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            'rgba(74, 144, 226, 0.6)',
+                            'rgba(46, 204, 113, 0.6)',
+                            'rgba(241, 196, 15, 0.6)',
+                            'rgba(231, 76, 60, 0.6)',
+                            'rgba(155, 89, 182, 0.6)',
+                            'rgba(52, 152, 219, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(74, 144, 226, 1)',
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(241, 196, 15, 1)',
+                            'rgba(231, 76, 60, 1)',
+                            'rgba(155, 89, 182, 1)',
+                            'rgba(52, 152, 219, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Memory Usage by Category (MB)'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listener for category filter
+        categoryFilter.addEventListener('change', (e) => {
+            fetchServices(e.target.value);
+        });
+
+        // Initial data fetch
+        fetchServices();
+    </script>
 </body>
 </html>

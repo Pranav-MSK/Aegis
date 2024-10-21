@@ -11,7 +11,7 @@ const CONFIG = {
   API_ENDPOINTS: {
     SYSTEM_INFO: '/api/v1/system-info',
     DASHBOARD_STATS: '/api/dashboard/stats',
-    PERFORMANCE_API: '/api/v1/metrics/system/performance'
+    SYSTEM_CONTAINER_API: '/api/v1/system/containers'
   }
 };
 
@@ -143,59 +143,16 @@ class DashboardController {
 
   async fetchPerformanceAPI() {
     try {
-      const [systemPerformanceData] = await Promise.all([
-        this.fetchData(CONFIG.API_ENDPOINTS.PERFORMANCE_API),
+      const [containerSystemData] = await Promise.all([
+        this.fetchData(CONFIG.API_ENDPOINTS.SYSTEM_CONTAINER_API),
       ]);
-      console.log(systemPerformanceData);
-
-      this.updatePerformanceData(systemPerformanceData);
+      this.populateContainerDetails(containerSystemData);
     } catch (error) {
       this.handleError('Failed to update performance data', error);
     }
   }
 
-  //   <div class="card-content">
-  //   <div class="container-grid">
-  //       {% for container in docker_containers %}
-  //       <div class="container-item">
-  //           <div class="container-header">
-  //               <span class="container-name">{{ container['name'] }}</span>
-  //               <span class="container-status {{ 'running' if container['status'] == 'running' else 'stopped' }}">
-  //                   {{ container['status'] }}
-  //               </span>
-  //           </div>
-  //           <div class="container-details">
-  //               <div class="detail-item">
-  //                   <span class="detail-label">Image:</span>
-  //                   <span class="detail-value container-image">{{ container['image'] }}</span>
-  //               </div>
-  //               <div class="detail-item">
-  //                   <span class="detail-label">Created:</span>
-  //                   <span class="detail-value container-created">{{ container['created'] }}</span>
-  //               </div>
-  //               <div class="detail-item">
-  //                   <span class="detail-label">CPU:</span>
-  //                   <span class="detail-value container-cpu">{{ container['cpu_percent'] }}%</span>
-  //               </div>
-  //               <div class="detail-item">
-  //                   <span class="detail-label">Memory:</span>
-  //                   <span class="detail-value container-memory">{{ container['memory']['usage'] }} ({{ container['memory']['percent'] }}%)</span>
-  //               </div>
-  //               <div class="detail-item">
-  //                   <span class="detail-label">Network Received:</span>
-  //                   <span class="detail-value container-network-received">{{ container['network']['received'] }}</span>
-  //               </div>
-  //               <div class="detail-item">
-  //                   <span class="detail-label">Network Transmitted:</span>
-  //                   <span class="detail-value container-network-transmitted">{{ container['network']['transmitted'] }}</span>
-  //               </div>
-  //           </div>
-  //       </div>
-  //       {% endfor %}
-  //   </div>
-  // </div>
-
-  async updatePerformanceData(data) {
+  async populateContainerDetails(data) {
     // loop over containers data to update the UI
     const containers = data.containers;
 
@@ -250,7 +207,6 @@ class DashboardController {
     containerGrid.appendChild(fragment);
   
   }
-
 
   async fetchData(endpoint) {
     const response = await fetch(endpoint);
@@ -403,7 +359,7 @@ class DashboardController {
   start() {
     this.updateDashboard(); // Initial update
     setInterval(() => this.updateDashboard(), CONFIG.REFRESH_INTERVAL);
-    setInterval(() => this.callPerformanceAPI(), 1000);
+    setInterval(() => this.callPerformanceAPI(), CONFIG.REFRESH_INTERVAL);
 
   }
 }
