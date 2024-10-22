@@ -14,7 +14,7 @@ from src.background_task.prometheus_metrics import metrics
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
 
 REQUEST_TIME = Summary('request_processing_seconds_systemguard', 'Time spent processing request')
-RESPONSE_SIZE = Histogram('response_size_bytes_systemguard', 'Response size in bytes', ['route'])
+RESPONSE_SIZE = Summary('response_size_bytes_systemguard', 'Response size in bytes', ['route'])
 REQUEST_HISTOGRAM = Histogram('request_duration_seconds_systemguard', 'Duration of requests in seconds', ['route'])
 
 class CustomError(Exception):

@@ -1,8 +1,11 @@
 # cython: language_level=3
 from datetime import datetime
 import requests
-from flask import render_template, blueprints, jsonify
+from flask import render_template, blueprints, jsonify, request
 from datetime import datetime
+from functools import lru_cache
+import requests
+
 
 from src.config import app
 from src.routes.helper.system_helper import get_running_docker_containers
@@ -12,10 +15,18 @@ metrics_bp = blueprints.Blueprint('metrics', __name__)
 PROMETHEUS_URL = 'http://localhost:9090'
 
 def query_prometheus(query):
-    """Helper function to query Prometheus"""
-    response = requests.get(f'{PROMETHEUS_URL}/api/v1/query', params={'query': query})
-    response.raise_for_status()
-    return response.json()
+    """Execute a query against Prometheus."""
+    try:
+        response = requests.get(
+            f'{PROMETHEUS_URL}/api/v1/query',
+            params={'query': query},
+            timeout=5
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Prometheus query failed: {str(e)}")
+        return {"status": "error", "data": {"result": []}}
 
 def get_histogram_metrics():
     """Fetch all histogram metrics and their endpoints from Prometheus."""
@@ -44,12 +55,9 @@ def fetch_running_docker_containers():
         'containers': containers
     })
 
-@app.route('/system/metrics')
-def api_metrics_analysis():
-    return render_template('other/metrics.html')
 
 @app.route('/api/v1/metrics/endpoints')
-def get_endpoints():
+def get_endpoints_histogram():
     """Get list of endpoints that have histogram metrics."""
     try:
         metrics = get_histogram_metrics()
@@ -112,3 +120,139 @@ def get_metrics(endpoint, metric_name):
         return jsonify({"error": f"Prometheus connection error: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"error": f"Error processing data: {str(e)}"}), 500
+
+
+# only for sum and count, don't include the metrics from the bucket
+@lru_cache(maxsize=128)
+def get_available_metrics():
+    """Get list of available metrics from Prometheus."""
+    try:
+        # Query to get all metric names
+        result = query_prometheus('{__name__=~".+"}')
+        if result['status'] != 'success':
+            print("Failed to fetch metrics:", result)
+            return []
+            
+        # Extract unique metric names and filter for histogram metrics
+        metrics = set()
+        for item in result['data']['result']:
+            metric_name = item['metric']['__name__']
+            if metric_name.endswith('_sum') or metric_name.endswith('_count'):
+                # Remove the _sum or _count suffix to get base metric name
+                base_name = metric_name.rsplit('_', 1)[0]
+                metrics.add(base_name)
+        
+        return sorted(list(metrics))
+    except Exception as e:
+        print("Error fetching metrics:", str(e))
+        return []
+
+# only for sum and count, don't include the metrics from the bucket
+@app.route('/api/v1/metrics/available')
+def get_metrics_list():
+    """Get list of available metrics and their endpoints."""
+    try:
+        metrics = {}
+        base_metrics = get_available_metrics()
+        
+        for base_metric in base_metrics:
+            # Query to get all routes for this metric using the _sum suffix
+            # We use _sum since it will have the same routes as _count
+            query = f'{base_metric}_sum'
+            result = query_prometheus(query)
+            
+            if result['status'] == 'success':
+                endpoints = set()
+                for item in result['data']['result']:
+                    # Get route label, default to '' if not present
+                    route = item['metric'].get('route', '')
+                    endpoints.add(route)
+                
+                # Only include metrics that have route information
+                if endpoints:
+                    metrics[base_metric] = sorted(list(endpoints))
+        
+        # Debug logging
+        print("Available metrics:", metrics)
+        
+        return jsonify({
+            "status": "success",
+            "data": metrics
+        })
+    except Exception as e:
+        print("Error in get_metrics_list:", str(e))
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+# only for sum and count, don't include the metrics from the bucket
+@app.route('/api/v1/metrics/summary')
+def get_metrics_summary():
+    """Get summary metrics for specific metric and optional endpoint."""
+    try:
+        metric_name = request.args.get('metric')
+        endpoint = request.args.get('endpoint')
+        
+        if not metric_name:
+            return jsonify({"error": "Metric name is required"}), 400
+            
+        # Build route filter if endpoint is specified
+        route_filter = f',route="{endpoint}"' if endpoint else ''
+        
+        queries = {
+            'sum': f'{metric_name}_sum{{{route_filter}}}',
+            'count': f'{metric_name}_count{{{route_filter}}}',
+            'last_hour': f'rate({metric_name}_count{{{route_filter}}}[1h])',
+            'last_day': f'rate({metric_name}_count{{{route_filter}}}[24h])',
+            'p95': f'histogram_quantile(0.95, rate({metric_name}_bucket{{{route_filter}}}[24h]))',
+            'p99': f'histogram_quantile(0.99, rate({metric_name}_bucket{{{route_filter}}}[24h]))'
+        }
+        
+        results = {}
+        for query_name, query in queries.items():
+            result = query_prometheus(query)
+            if result['status'] == 'success' and result['data']['result']:
+                # Handle multiple results when no endpoint specified
+                results[query_name] = [
+                    {
+                        'endpoint': r['metric'].get('route', 'all'),
+                        'value': float(r['value'][1])
+                    }
+                    for r in result['data']['result']
+                ]
+            else:
+                results[query_name] = []
+                
+        # Calculate averages
+        results['averages'] = []
+        for sum_data in results['sum']:
+            matching_count = next(
+                (c for c in results['count'] if c['endpoint'] == sum_data['endpoint']),
+                None
+            )
+            if matching_count and matching_count['value'] > 0:
+                results['averages'].append({
+                    'endpoint': sum_data['endpoint'],
+                    'value': sum_data['value'] / matching_count['value']
+                })
+        
+        return jsonify({
+            "status": "success",
+            "data": results
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    
+
+
+@app.route('/system/bucket_metrics')
+def get_bucket_metrics():
+    return render_template('other/bucket_metrics.html')
+
+
+@app.route('/system/summary_metrics')
+def get_summary_metrics():
+    return render_template('other/summary_metrics.html')
+
+
