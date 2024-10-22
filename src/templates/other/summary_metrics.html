@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="card">
-                    <h2 class="card-title">Average Response Time</h2>
+                    <h2 class="card-title">Average</h2>
                     <div id="averageTime"></div>
                 </div>
 
@@ -83,7 +83,6 @@
         try {
             const response = await fetch('/api/v1/metrics/available');
             const data = await response.json();
-
             const endpointSelect = document.getElementById('endpointSelect');
             endpointSelect.innerHTML = '<option value="">All endpoints</option>';
 
@@ -109,6 +108,8 @@
 
             const response = await fetch(`/api/v1/metrics/summary?${params}`);
             const data = await response.json();
+            
+            console.log(data);
 
             if (data.status === 'success') {
                 updateDashboard(data.data);

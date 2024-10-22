@@ -1,3 +1,4 @@
+# cython: language_level=3
 import psutil
 import threading
 import time

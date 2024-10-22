@@ -36,8 +36,13 @@ def get_histogram_metrics():
     metrics = {}
     if result['status'] == 'success':
         for metric in result['data']['result']:
-            route = metric['metric']['route']
+            print(metric)
+            if 'route' not in metric['metric']:
+                route = 'root'
+            else:
+                route = metric['metric']['route']
             metric_name = metric['metric']['__name__']
+            
             if route not in metrics:
                 metrics[route] = []
             if metric_name not in metrics[route]:
@@ -45,26 +50,15 @@ def get_histogram_metrics():
 
     return metrics
 
-@app.route('/api/v1/system/containers')
-def fetch_running_docker_containers():
-    """Get all system metrics including running daemons and Docker containers"""
-    containers = get_running_docker_containers()
-    
-    return jsonify({
-        'timestamp': datetime.now().isoformat(),
-        'containers': containers
-    })
-
-
 @app.route('/api/v1/metrics/endpoints')
 def get_endpoints_histogram():
     """Get list of endpoints that have histogram metrics."""
     try:
         metrics = get_histogram_metrics()
+        print(metrics)
         return jsonify(metrics)
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Prometheus connection error: {str(e)}"}), 500
-
 
 @app.route('/api/v1/metrics/data/<path:endpoint>/<metric_name>')
 def get_metrics(endpoint, metric_name):
@@ -123,7 +117,6 @@ def get_metrics(endpoint, metric_name):
 
 
 # only for sum and count, don't include the metrics from the bucket
-@lru_cache(maxsize=128)
 def get_available_metrics():
     """Get list of available metrics from Prometheus."""
     try:
@@ -205,7 +198,6 @@ def get_metrics_summary():
             'count': f'{metric_name}_count{{{route_filter}}}',
             'last_hour': f'rate({metric_name}_count{{{route_filter}}}[1h])',
             'last_day': f'rate({metric_name}_count{{{route_filter}}}[24h])',
-            
         }
         
         results = {}
@@ -216,7 +208,8 @@ def get_metrics_summary():
                 results[query_name] = [
                     {
                         'endpoint': r['metric'].get('route', 'all'),
-                        'value': float(r['value'][1])
+                        'value': float(r['value'][1]),
+                        'timestamp': r['value'][0]
                     }
                     for r in result['data']['result']
                 ]
@@ -233,12 +226,13 @@ def get_metrics_summary():
             if matching_count and matching_count['value'] > 0:
                 results['averages'].append({
                     'endpoint': sum_data['endpoint'],
-                    'value': sum_data['value'] / matching_count['value']
+                    'value': sum_data['value'] / matching_count['value'],
+                    'timestamp': sum_data['timestamp']
                 })
         
         return jsonify({
             "status": "success",
-            "data": results
+            "data": results,
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -255,3 +249,12 @@ def get_summary_metrics():
     return render_template('other/summary_metrics.html')
 
 
+@app.route('/api/v1/system/containers')
+def fetch_running_docker_containers():
+    """Get all system metrics including running daemons and Docker containers"""
+    containers = get_running_docker_containers()
+    
+    return jsonify({
+        'timestamp': datetime.now().isoformat(),
+        'containers': containers
+    })
