@@ -36,7 +36,6 @@ def get_histogram_metrics():
     metrics = {}
     if result['status'] == 'success':
         for metric in result['data']['result']:
-            print(metric)
             if 'route' not in metric['metric']:
                 route = 'root'
             else:
@@ -55,7 +54,6 @@ def get_endpoints_histogram():
     """Get list of endpoints that have histogram metrics."""
     try:
         metrics = get_histogram_metrics()
-        print(metrics)
         return jsonify(metrics)
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Prometheus connection error: {str(e)}"}), 500
@@ -91,14 +89,12 @@ def get_metrics(endpoint, metric_name):
             value = float(item['value'][1]) if item['value'][1] else 0.0
             buckets.append({"le": le, "value": value})
 
-        # Sort buckets by le value, handling "+Inf" specially
+        # Sort buckets by le value
         buckets.sort(key=lambda x: float(x['le']) if x['le'] != '+Inf' else float('inf'))
 
-        # Get sum and count
+        # Calculate statistics
         total_sum = float(sum_result['data']['result'][0]['value'][1]) if sum_result['data']['result'] else 0.0
         total_count = float(count_result['data']['result'][0]['value'][1]) if count_result['data']['result'] else 0.0
-        
-        # Calculate average
         average = total_sum / total_count if total_count > 0 else 0.0
 
         return jsonify({
@@ -114,7 +110,6 @@ def get_metrics(endpoint, metric_name):
         return jsonify({"error": f"Prometheus connection error: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"error": f"Error processing data: {str(e)}"}), 500
-
 
 # only for sum and count, don't include the metrics from the bucket
 def get_available_metrics():
@@ -166,7 +161,6 @@ def get_metrics_list():
                     metrics[base_metric] = sorted(list(endpoints))
         
         # Debug logging
-        print("Available metrics:", metrics)
         
         return jsonify({
             "status": "success",
@@ -179,7 +173,7 @@ def get_metrics_list():
             "message": str(e)
         }), 500
 
-# only for sum and count, don't include the metrics from the bucket
+
 @app.route('/api/v1/metrics/summary')
 def get_metrics_summary():
     """Get summary metrics for specific metric and optional endpoint."""
@@ -203,14 +197,30 @@ def get_metrics_summary():
         results = {}
         for query_name, query in queries.items():
             result = query_prometheus(query)
+            print(result)
             if result['status'] == 'success' and result['data']['result']:
-                # Handle multiple results when no endpoint specified
                 results[query_name] = [
                     {
-                        'endpoint': r['metric'].get('route', 'all'),
+                        'endpoint': r['metric'].get('route', ''),
+                        'query_type': r['metric'].get('query_type', ''),
+                        'method': r['metric'].get('method', ''),
+                        'status': r['metric'].get('status', ''),
+                        'status_code': r['metric'].get('status_code', ''),
+                        'reason': r['metric'].get('reason', ''),
+                        'error': r['metric'].get('error', ''),
+                        'error_code': r['metric'].get('error_code', ''),
+                        'error_type': r['metric'].get('error_type', ''),
+                        'payment_method': r['metric'].get('payment_method', ''),
+                        'user_id': r['metric'].get('user_id', ''),
+
+                        'timestamp': r['value'][0],
                         'value': float(r['value'][1]),
-                        'timestamp': r['value'][0]
+                        
+                        'instance': r['metric'].get('instance', ''),
+                        'job': r['metric'].get('job', ''),
+                        
                     }
+                    # also need to update in the summary_metrics.html
                     for r in result['data']['result']
                 ]
             else:
@@ -226,8 +236,23 @@ def get_metrics_summary():
             if matching_count and matching_count['value'] > 0:
                 results['averages'].append({
                     'endpoint': sum_data['endpoint'],
+                    'query_type': sum_data['query_type'],
+                    'method': sum_data['method'],
+                    'status': sum_data['status'],
+                    'status_code': sum_data['status_code'],
+                    'reason': sum_data['reason'],
+                    'error': sum_data['error'],
+                    'error_code': sum_data['error_code'],
+                    'error_type': sum_data['error_type'],
+                    'payment_method': sum_data['payment_method'],
+                    'user_id': sum_data['user_id'],
+
+                    'timestamp': sum_data['timestamp'],
                     'value': sum_data['value'] / matching_count['value'],
-                    'timestamp': sum_data['timestamp']
+                    
+                    'instance': sum_data['instance'],
+                    'job': sum_data['job'],
+                    
                 })
         
         return jsonify({

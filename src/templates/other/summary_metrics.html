@@ -1,7 +1,6 @@
 {% extends 'base/base.html' %}
-{% block title %}Metrics Dashboard{% endblock %}
+{% block title %}Histogram Metrics{% endblock %}
 {% block extra_head %}
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/summary_metrics.css') }}">
 {% endblock %}
@@ -32,11 +31,11 @@
                     <div id="totalRequests"></div>
                 </div>
 
-                <div class="card">
-                    <h2 class="card-title">Average</h2>
-                    <div id="averageTime"></div>
-                </div>
-
+                <!-- <div class="card">
+                        <h2 class="card-title">Average</h2>
+                        <div id="averageTime"></div>
+                    </div>
+                     -->
                 <!-- <div class="card">
                         <h2 class="card-title">Percentiles (24h)</h2>
                         <div id="percentiles"></div>
@@ -74,7 +73,7 @@
                 });
             }
         } catch (error) {
-            showError('Failed to load metrics');
+            showError(`Failed to load metrics, error: ${error.message}`);
         }
     }
 
@@ -83,6 +82,7 @@
         try {
             const response = await fetch('/api/v1/metrics/available');
             const data = await response.json();
+
             const endpointSelect = document.getElementById('endpointSelect');
             endpointSelect.innerHTML = '<option value="">All endpoints</option>';
 
@@ -108,8 +108,6 @@
 
             const response = await fetch(`/api/v1/metrics/summary?${params}`);
             const data = await response.json();
-            
-            console.log(data);
 
             if (data.status === 'success') {
                 updateDashboard(data.data);
@@ -128,42 +126,100 @@
 
         // Update total requests
         const totalRequestsEl = document.getElementById('totalRequests');
-        totalRequestsEl.innerHTML = createMetricTable(data.count, 'Total');
 
-        // Update average time
-        const averageTimeEl = document.getElementById('averageTime');
-        averageTimeEl.innerHTML = createMetricTable(data.averages, 'Average');
+        let displayKey;
+        let dataKey;
+        let label3;
+        let label4;
 
-        // Update percentiles
-        // const percentilesEl = document.getElementById('percentiles');
-        // percentilesEl.innerHTML = createPercentilesTable(data.p95, data.p99);
+        if (data.count.length > 0) {
+            if (data.count[0].endpoint) {
+                displayKey = 'Endpoint';
+                dataKey = 'endpoint';
+                label3 = 'Total Requests';
+                label4 = 'Average';
+            } else if (data.count[0].query_type) {
+                displayKey = 'Query Type';
+                dataKey = 'query_type';
+                label3 = 'Total Queries';
+                label4 = 'Average Query Time';
+            } else if (data.count[0].method) {
+                displayKey = 'Method';
+                dataKey = 'method';
+                label3 = 'Total Requests';
+                label4 = 'Average';
+            } else if (data.count[0].status) {
+                displayKey = 'Status';
+                dataKey = 'status';
+                label3 = 'Total Requests';
+                label4 = 'Average';
+            } else if (data.count[0].status_code) {
+                displayKey = 'Status Code';
+                dataKey = 'status_code';
+                label3 = 'Total Requests';
+                label4 = 'Average';
+            } else if (data.count[0].reason) {
+                displayKey = 'Reason';
+                dataKey = 'reason';
+                label3 = 'Total Requests';
+                label4 = 'Average';
+            } else if (data.count[0].error) {
+                displayKey = 'Error';
+                dataKey = 'error';
+                label3 = 'Total Requests';
+                label4 = 'Average';
+            } else if (data.count[0].error_code) {
+                displayKey = 'Error Code';
+                dataKey = 'error_code';
+                label3 = 'Total Requests';
+                label4 = 'Average';
+            } else if (data.count[0].payment_method) {
+                displayKey = 'Payment Method';
+                dataKey = 'payment_method';
+                label3 = 'Total Amount';
+                label4 = 'Average Amount';
+            } else if (data.count[0].user_id) {
+                displayKey = 'User ID';
+                dataKey = 'user_id';
+                label3 = 'Total Duration';
+                label4 = 'Average Duration';
+            }
+        } else {
+            displayKey = 'Endpoint';
+            dataKey = 'endpoint';
+        }
+
+        totalRequestsEl.innerHTML = createMetricTable(data, 'Instance', displayKey, label3, label4, dataKey);
 
         // Update chart
         updateRateChart(data);
     }
 
     // Create metric table HTML
-    function createMetricTable(data, label) {
+    function createMetricTable(data, label1, displayKey, label3, label4, dataKey) {
         return `
                 <table class="metric-table">
                     <thead>
                         <tr>
-                            <th>Endpoint</th>
-                            <th>${label}</th>
+                            <th>${label1}</th>
+                            <th>${displayKey || 'All'}</th>
+                            <th>${label3}</th>
+                            <th>${label4}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.map(item => `
+                        ${data.count.map((item, index) => `
                             <tr>
-                                <td>${item.endpoint || 'all'}</td>
+                                <td>${item.instance || 'Unknown'}</td>
+                                <td>${item[dataKey] || 'All'}</td>
                                 <td>${formatNumber(item.value)}</td>
+                                <td>${formatNumber(data.averages[index]?.value)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
             `;
     }
-
 
     // Update rate chart
     function updateRateChart(data) {
@@ -227,6 +283,12 @@
         const errorEl = document.getElementById('error');
         errorEl.textContent = message;
         errorEl.style.display = message ? 'block' : 'none';
+
+        if (message) {
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 2000);
+        }
     }
 
     // Event listeners
