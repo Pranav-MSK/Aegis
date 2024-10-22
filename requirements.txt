@@ -12,6 +12,7 @@ cryptography==43.0.1
 
 # WSGI HTTP server for production
 gunicorn==23.0.0            # Production server for running Flask applications
+docker==7.1.0               # Python API for Docker containers
 
 # Flask extensions for database and session management
 flask-sqlalchemy==3.1.1     # SQLAlchemy ORM integration with Flask
