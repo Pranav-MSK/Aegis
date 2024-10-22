@@ -57,6 +57,39 @@
             </div>
         </div>
 
+        <!-- GPU Metrics -->
+         {% if system_info.is_gpu %}
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>GPU Status(Dummy)</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="metric-primary">
+                    <div class="metric-value">
+                        <span class="large-number gpu-load">{{ system_info.gpu_load }}</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="metric-label">GPU Utilization</div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">{{ system_info.gpu_name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Memory:</span>
+                        <span class="detail-value">{{ system_info.gpu_memory_used }} / {{ system_info.gpu_memory_total }} MB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Temperature:</span>
+                        <span class="detail-value">{{ system_info.gpu_temperature }}°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
 
         <!-- Storage Section -->
         <div class="metric-card">
@@ -256,15 +289,15 @@
             <div class="card-header">
                 <h3>Service Monitor</h3>
                 <div class="header-actions">
-                    <select id="rowsPerPage" class="form-select">
+                    <select id="rowsPerPage" class="form-select" style="width: 200px;">
                         <option value="5">5 Rows</option>
                         <option value="10">10 Rows</option>
                         <option value="20">20 Rows</option>
                     </select>
-                    <a href="{{ url_for('system_services') }}" class="view-all">
-                        View Service Details
-                    </a>
                 </div>
+                <a href="{{ url_for('system_services') }}" class="view-all">
+                    View Service Details
+                </a>
             </div>
             <div class="card-content">
                 <div class="container">
@@ -297,10 +330,10 @@
             <div class="card-header">
                 <h3>API Metrics</h3>
                 <div class="header-actions">
-                    <select id="apiMetricSelector" class="form-select">
+                    <select id="apiMetricSelector" class="form-select" style="width: 250px;">
                         <option value="">Select a metric</option>
                     </select>
-                    <select id="apiEndpointSelector" class="form-select" disabled>
+                    <select id="apiEndpointSelector" class="form-select" style="width: 250px;" disabled>
                         <option value="">Select an endpoint</option>
                     </select>
                 </div>
@@ -359,7 +392,7 @@
 
     <div class="details-grid">
 
-        <div class="metric-card">
+        <div class="docker metric-card">
             <div class="card-header">
                 <h3>Docker Containers</h3>
                 <span class="refresh-indicator" title="Data is up to date"></span>
@@ -445,7 +478,8 @@
             <div class="card-content">
                 <div class="info-grid">
                     {% for label, value, icon_class, item_class in [
-                    ("Total Users", system_info.total_users ~ " / " ~ max_users_allowed, "fas fa-users", "total-users"),
+                    ("Total Users", system_info.total_users ~ " / " ~ max_users_allowed, "fas fa-users",
+                    "total-users"),
                     ("Admin Users", system_info.admin_users, "fas fa-user-shield", "admin-users"),
                     ("Active Users", system_info.active_users, "fas fa-user", "active-users"),
                     ("Inactive Users", system_info.inactive_users, "fas fa-user-slash", "inactive-users")
@@ -546,7 +580,8 @@
                     Enterprise.
                     Upgrade to SystemGuard Enterprise to access detailed alert ticket information, including open,
                     closed,
-                    in-progress, resolved, critical, warning, and informational tickets. This feature helps in better
+                    in-progress, resolved, critical, warning, and informational tickets. This feature helps in
+                    better
                     monitoring and managing system alerts efficiently.</p>
             </div>
             {% endif %}
@@ -569,7 +604,8 @@
                     <div class="info-item info-bg">
                         <span class="info-label"><i class="fas fa-code-branch info-icon"></i>Total Alerts
                             Rules:</span>
-                        <span class="info-value total-rules">{{ system_info.total_rules }} / {{max_alert_rules}}</span>
+                        <span class="info-value total-rules">{{ system_info.total_rules }} /
+                            {{max_alert_rules}}</span>
                     </div>
 
                     <div class="info-item info-bg">

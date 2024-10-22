@@ -150,21 +150,32 @@ def get_cpu_metrics():
 
 def get_gpu_metrics():
     """Collect all GPU-related metrics in one go"""
-    gpus = GPUtil.getGPUs()
+    # gpus = GPUtil.getGPUs()
     gpu_metrics = []
     
-    for gpu in gpus:
-        gpu_metrics.append({
-            'gpu_id': gpu.id,
-            'gpu_name': gpu.name,
-            'gpu_load': round(gpu.load * 100, 2),  # Load in percentage
-            'gpu_memory_total': gpu.memoryTotal,
-            'gpu_memory_used': gpu.memoryUsed,
-            'gpu_memory_free': gpu.memoryFree,
-            'gpu_temperature': gpu.temperature,
-        })
+    # for gpu in gpus:
+    #     gpu_metrics.append({
+    #         'gpu_id': gpu.id,
+    #         'gpu_name': gpu.name,
+    #         'gpu_load': round(gpu.load * 100, 2),  # Load in percentage
+    #         'gpu_memory_total': gpu.memoryTotal,
+    #         'gpu_memory_used': gpu.memoryUsed,
+    #         'gpu_memory_free': gpu.memoryFree,
+    #         'gpu_temperature': gpu.temperature,
+    #     })
+
+    # add dummy data
+    return {
+        'is_gpu': False,
+        'gpu_id': 0,
+        'gpu_name': 'Nvidia GTX 1080',
+        'gpu_load': 50,
+        'gpu_memory_total': 8000,
+        'gpu_memory_used': 4000,
+        'gpu_memory_free': 4000,
+        'gpu_temperature': 60,
+    }
     
-    return gpu_metrics
 
 def get_memory_metrics():
     """Collect all memory-related metrics in one go"""
@@ -183,7 +194,7 @@ def get_disk_metrics():
     disk_info = psutil.disk_usage('/')
     
     # Wait for a second to measure real-time speeds
-    time.sleep(1)
+    # time.sleep(1)
 
     # Metrics after 1 second
     final_io = psutil.disk_io_counters()
@@ -210,7 +221,7 @@ def get_network_metrics():
     initial_net_io = psutil.net_io_counters()
 
     # Wait for a second to measure real-time speeds
-    time.sleep(1)
+    # time.sleep(1)
 
     # Metrics after 1 second
     final_net_io = psutil.net_io_counters()
@@ -297,9 +308,10 @@ def get_running_daemons():
 def _collect_metrics():
     """Optimized system information collection using parallel processing"""
     try:
-        with ThreadPoolExecutor(max_workers=6) as executor:
+        with ThreadPoolExecutor(max_workers=7) as executor:
             futures = {
                 'cpu': executor.submit(get_cpu_metrics),
+                'gpu': executor.submit(get_gpu_metrics),
                 'memory': executor.submit(get_memory_metrics),
                 'disk': executor.submit(get_disk_metrics),
                 'network': executor.submit(get_network_metrics),

@@ -663,19 +663,6 @@ temp-alert-badge {
     padding: 20px;
 }
 
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.card-header h3 {
-    margin: 0;
-    font-size: 1.5em;
-    color: #333;
-}
-
 .card-content {
     display: flex;
     flex-direction: column;
@@ -1374,4 +1361,15 @@ temp-alert-badge {
     .placeholder-steps {
         padding: 1rem;
     }
+}
+
+.no-containers {
+    padding: 20px;
+    text-align: center;
+    color: #888; /* Light gray color for the text */
+    font-size: 1.2em; /* Slightly larger font size */
+    border: 1px dashed #ccc; /* Dashed border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background color */
+    margin: 10px; /* Margin around the message */
 }
