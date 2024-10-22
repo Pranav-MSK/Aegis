@@ -62,12 +62,12 @@ def run_speedtest():
 
 def format_speed(speed):
     """Format the speed in appropriate units."""
-    if speed < 1024:
+    if speed < 1000:
         return f"{speed:.2f} Bytes/s"
-    elif speed < 1024 ** 2:
-        return f"{speed / 1024:.2f} KB/s"
+    elif speed < 1000 ** 2:
+        return f"{speed / 1000:.2f} KB/s"
     else:
-        return f"{speed / (1024 ** 2):.2f} MB/s"
+        return f"{speed / (1000 ** 2):.2f} MB/s"
 
 
 def render_template_from_file(template_file_path, **context):

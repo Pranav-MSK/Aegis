@@ -8,7 +8,7 @@ import requests
 
 
 from src.config import app
-from src.routes.helper.system_helper import get_running_docker_containers
+from src.routes.helper.service_helper import get_running_docker_containers
 
 metrics_bp = blueprints.Blueprint('metrics', __name__)
 

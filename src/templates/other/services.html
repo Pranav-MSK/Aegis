@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +25,7 @@
             background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .filter-group {
@@ -33,7 +34,8 @@
             align-items: center;
         }
 
-        .page-size-select, .category-select {
+        .page-size-select,
+        .category-select {
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -70,7 +72,7 @@
         .table-container {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             overflow-x: auto;
         }
@@ -122,14 +124,14 @@
             background: white;
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         @media (max-width: 768px) {
             .charts-container {
                 grid-template-columns: 1fr;
             }
-            
+
             .controls-section {
                 flex-direction: column;
                 gap: 15px;
@@ -138,6 +140,7 @@
     </style>
     {% endblock %}
 </head>
+
 <body>
     {% block content %}
     <div class="dashboard-container">
@@ -160,7 +163,8 @@
                 </select>
             </div>
             <div class="pagination-info">
-                Showing <span id="startRange">1</span>-<span id="endRange">15</span> of <span id="totalItems">0</span> items
+                Showing <span id="startRange">1</span>-<span id="endRange">15</span> of <span id="totalItems">0</span>
+                items
             </div>
         </div>
 
@@ -200,7 +204,7 @@
             filteredServices: [],
             category: 'all'
         };
-
+    
         // Initialize UI elements
         const elements = {
             categoryFilter: document.getElementById('categoryFilter'),
@@ -212,31 +216,31 @@
             endRange: document.getElementById('endRange'),
             totalItems: document.getElementById('totalItems')
         };
-
+    
         // Set initial page size from localStorage
         elements.pageSizeSelect.value = state.pageSize;
-
+    
         function getStatusBadgeClass(status) {
             return status.toLowerCase() === 'running' ? 'status-running' : 'status-stopped';
         }
-
+    
         function updatePagination() {
             const totalPages = Math.ceil(state.filteredServices.length / state.pageSize);
             const start = (state.currentPage - 1) * state.pageSize + 1;
             const end = Math.min(start + state.pageSize - 1, state.filteredServices.length);
-
+    
             elements.prevButton.disabled = state.currentPage === 1;
             elements.nextButton.disabled = state.currentPage >= totalPages;
             elements.startRange.textContent = start;
             elements.endRange.textContent = end;
             elements.totalItems.textContent = state.filteredServices.length;
         }
-
+    
         function displayServices() {
             const start = (state.currentPage - 1) * state.pageSize;
             const end = start + state.pageSize;
             const pageServices = state.filteredServices.slice(start, end);
-
+    
             elements.servicesTable.innerHTML = '';
             pageServices.forEach(service => {
                 const row = elements.servicesTable.insertRow();
@@ -258,11 +262,35 @@
                     {% endif %}
                 `;
             });
-
+    
             updatePagination();
         }
-
-
+    
+        async function fetchCategories() {
+            try {
+                const response = await fetch('/api/v1/services/categories');  // Updated endpoint
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                populateCategoryFilter(data.categories);  // Updated to use 'categories' from response
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                const errorText = await response.text(); // Read the response body
+                console.error('Response body:', errorText); // Log the response body
+            }
+        }
+    
+        function populateCategoryFilter(categories) {
+            elements.categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                elements.categoryFilter.appendChild(option);
+            });
+        }
+    
         async function fetchServices() {
             try {
                 const url = state.category === 'all' ? '/api/v1/services' : `/api/v1/services/${state.category}`;
@@ -276,28 +304,28 @@
                 console.error('Error fetching services:', error);
             }
         }
-
+    
         // Event Listeners
         elements.categoryFilter.addEventListener('change', (e) => {
             state.category = e.target.value;
             state.currentPage = 1;
             fetchServices();
         });
-
+    
         elements.pageSizeSelect.addEventListener('change', (e) => {
             state.pageSize = parseInt(e.target.value);
             state.currentPage = 1;
             localStorage.setItem('processPageSize', state.pageSize);
             displayServices();
         });
-
+    
         elements.prevButton.addEventListener('click', () => {
             if (state.currentPage > 1) {
                 state.currentPage--;
                 displayServices();
             }
         });
-
+    
         elements.nextButton.addEventListener('click', () => {
             const totalPages = Math.ceil(state.filteredServices.length / state.pageSize);
             if (state.currentPage < totalPages) {
@@ -305,13 +333,17 @@
                 displayServices();
             }
         });
-
+    
         // Auto-refresh every 30 seconds
         setInterval(fetchServices, 30000);
-
-        // Initial fetch
+    
+        // Initial fetch for categories and services
+        fetchCategories();
         fetchServices();
     </script>
+    
+
     {% endblock %}
 </body>
+
 </html>
