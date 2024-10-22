@@ -1,5 +1,5 @@
 {% extends 'base/base.html' %}
-{% block title %}SystemGuard{% endblock %}
+{% block title %}Histogram Metrics{% endblock %}
 {% block extra_head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bucket_metrics.css') }}">
@@ -29,7 +29,7 @@
                 <table class="stats-table">
                     <tbody id="summaryStats">
                         <tr>
-                            <td>Total Count</td>
+                            <td>Total Request Count</td>
                             <td id="totalCount">-</td>
                         </tr>
                         <tr>
@@ -167,8 +167,19 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Time distribution (seconds)' 
+                        }
+                    },
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Request Count'
+                        }
                     }
                 }
             }

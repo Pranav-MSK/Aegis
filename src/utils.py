@@ -69,6 +69,7 @@ def format_speed(speed):
     else:
         return f"{speed / (1024 ** 2):.2f} MB/s"
 
+
 def render_template_from_file(template_file_path, **context):
     """Renders a Jinja template from a file with the given context and returns the rendered HTML content."""
     template_dir = os.path.dirname(template_file_path)
@@ -182,7 +183,7 @@ def get_disk_metrics():
     disk_info = psutil.disk_usage('/')
     
     # Wait for a second to measure real-time speeds
-    #time.sleep(1)
+    time.sleep(1)
 
     # Metrics after 1 second
     final_io = psutil.disk_io_counters()
@@ -209,7 +210,7 @@ def get_network_metrics():
     initial_net_io = psutil.net_io_counters()
 
     # Wait for a second to measure real-time speeds
-    #time.sleep(1)
+    time.sleep(1)
 
     # Metrics after 1 second
     final_net_io = psutil.net_io_counters()

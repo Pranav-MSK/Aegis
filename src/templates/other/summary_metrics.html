@@ -1,270 +1,149 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metrics Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #64748b;
-            --background: #f8fafc;
-            --card: #ffffff;
-            --border: #e2e8f0;
-            --text: #1e293b;
-        }
+{% extends 'base/base.html' %}
+{% block title %}Metrics Dashboard{% endblock %}
+{% block extra_head %}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/summary_metrics.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="card">
+        <h1 class="card-title">Metrics Dashboard</h1>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--background);
-            color: var(--text);
-            line-height: 1.5;
-            padding: 20px;
-        }
+        <div class="select-container">
+            <label for="metricSelect">Select Metric</label>
+            <select id="metricSelect">
+                <option value="">Choose a metric</option>
+            </select>
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+            <label for="endpointSelect">Select Endpoint (Optional)</label>
+            <select id="endpointSelect">
+                <option value="">All endpoints</option>
+            </select>
+        </div>
 
-        .card {
-            background: var(--card);
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="loading" class="loading" style="display: none;">Loading...</div>
 
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .select-container {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background-color: white;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin: 0.5rem 0;
-        }
-
-        .metric-label {
-            color: var(--secondary);
-            font-size: 0.875rem;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--secondary);
-        }
-
-        .error {
-            color: #ef4444;
-            padding: 1rem;
-            text-align: center;
-            background: #fee2e2;
-            border-radius: 6px;
-            margin: 1rem 0;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
-
-        .metric-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .metric-table th,
-        .metric-table td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .metric-table th {
-            font-weight: 600;
-            color: var(--secondary);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="card">
-            <h1 class="card-title">Metrics Dashboard</h1>
-            
-            <div class="select-container">
-                <label for="metricSelect">Select Metric</label>
-                <select id="metricSelect">
-                    <option value="">Choose a metric</option>
-                </select>
-
-                <label for="endpointSelect">Select Endpoint (Optional)</label>
-                <select id="endpointSelect">
-                    <option value="">All endpoints</option>
-                </select>
-            </div>
-
-            <div id="error" class="error" style="display: none;"></div>
-            <div id="loading" class="loading" style="display: none;">Loading...</div>
-
-            <div id="dashboard" style="display: none;">
-                <div class="grid">
-                    <div class="card">
-                        <h2 class="card-title">Total Requests</h2>
-                        <div id="totalRequests"></div>
-                    </div>
-                    
-                    <div class="card">
-                        <h2 class="card-title">Average Response Time</h2>
-                        <div id="averageTime"></div>
-                    </div>
-                    
-                    <div class="card">
-                        <h2 class="card-title">Percentiles (24h)</h2>
-                        <div id="percentiles"></div>
-                    </div>
+        <div id="dashboard" style="display: none;">
+            <div class="grid">
+                <div class="card">
+                    <h2 class="card-title">Total Requests</h2>
+                    <div id="totalRequests"></div>
                 </div>
 
                 <div class="card">
-                    <h2 class="card-title">Request Rate</h2>
-                    <div class="chart-container">
-                        <canvas id="rateChart"></canvas>
-                    </div>
+                    <h2 class="card-title">Average Response Time</h2>
+                    <div id="averageTime"></div>
+                </div>
+
+                <!-- <div class="card">
+                        <h2 class="card-title">Percentiles (24h)</h2>
+                        <div id="percentiles"></div>
+                    </div> -->
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Request Rate</h2>
+                <div class="chart-container">
+                    <canvas id="rateChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        let rateChart = null;
+<script>
+    let rateChart = null;
 
-        // Fetch available metrics
-        async function fetchMetrics() {
-            try {
-                const response = await fetch('/api/v1/metrics/available');
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    const metricSelect = document.getElementById('metricSelect');
-                    metricSelect.innerHTML = '<option value="">Choose a metric</option>';
-                    
-                    Object.keys(data.data).forEach(metric => {
-                        const option = document.createElement('option');
-                        option.value = metric;
-                        option.textContent = metric;
-                        metricSelect.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                showError('Failed to load metrics');
+    // Fetch available metrics
+    async function fetchMetrics() {
+        try {
+            const response = await fetch('/api/v1/metrics/available');
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const metricSelect = document.getElementById('metricSelect');
+                metricSelect.innerHTML = '<option value="">Choose a metric</option>';
+
+                Object.keys(data.data).forEach(metric => {
+                    const option = document.createElement('option');
+                    option.value = metric;
+                    option.textContent = metric;
+                    metricSelect.appendChild(option);
+                });
             }
+        } catch (error) {
+            showError('Failed to load metrics');
         }
+    }
 
-        // Fetch endpoints for selected metric
-        async function updateEndpoints(metric) {
-            try {
-                const response = await fetch('/api/v1/metrics/available');
-                const data = await response.json();
-                
-                const endpointSelect = document.getElementById('endpointSelect');
-                endpointSelect.innerHTML = '<option value="">All endpoints</option>';
-                
-                if (data.status === 'success' && data.data[metric]) {
-                    data.data[metric].forEach(endpoint => {
-                        const option = document.createElement('option');
-                        option.value = endpoint;
-                        option.textContent = endpoint || '(root)';
-                        endpointSelect.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                showError('Failed to load endpoints');
+    // Fetch endpoints for selected metric
+    async function updateEndpoints(metric) {
+        try {
+            const response = await fetch('/api/v1/metrics/available');
+            const data = await response.json();
+
+            const endpointSelect = document.getElementById('endpointSelect');
+            endpointSelect.innerHTML = '<option value="">All endpoints</option>';
+
+            if (data.status === 'success' && data.data[metric]) {
+                data.data[metric].forEach(endpoint => {
+                    const option = document.createElement('option');
+                    option.value = endpoint;
+                    option.textContent = endpoint || '(root)';
+                    endpointSelect.appendChild(option);
+                });
             }
+        } catch (error) {
+            showError('Failed to load endpoints');
         }
+    }
 
-        // Fetch and display metric summary
-        async function fetchSummary(metric, endpoint) {
-            showLoading(true);
-            try {
-                const params = new URLSearchParams({ metric });
-                if (endpoint) params.append('endpoint', endpoint);
-                
-                const response = await fetch(`/api/v1/metrics/summary?${params}`);
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    updateDashboard(data.data);
-                } else {
-                    showError(data.message || 'Failed to load metrics data');
-                }
-            } catch (error) {
-                showError('Failed to load metrics data');
+    // Fetch and display metric summary
+    async function fetchSummary(metric, endpoint) {
+        showLoading(true);
+        try {
+            const params = new URLSearchParams({ metric });
+            if (endpoint) params.append('endpoint', endpoint);
+
+            const response = await fetch(`/api/v1/metrics/summary?${params}`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                updateDashboard(data.data);
+            } else {
+                showError(data.message || 'Failed to load metrics data');
             }
-            showLoading(false);
+        } catch (error) {
+            showError('Failed to load metrics data');
         }
+        showLoading(false);
+    }
 
-        // Update dashboard with new data
-        function updateDashboard(data) {
-            document.getElementById('dashboard').style.display = 'block';
-            
-            // Update total requests
-            const totalRequestsEl = document.getElementById('totalRequests');
-            totalRequestsEl.innerHTML = createMetricTable(data.count, 'Total');
-            
-            // Update average time
-            const averageTimeEl = document.getElementById('averageTime');
-            averageTimeEl.innerHTML = createMetricTable(data.averages, 'Average');
-            
-            // Update percentiles
-            const percentilesEl = document.getElementById('percentiles');
-            percentilesEl.innerHTML = createPercentilesTable(data.p95, data.p99);
-            
-            // Update chart
-            updateRateChart(data);
-        }
+    // Update dashboard with new data
+    function updateDashboard(data) {
+        document.getElementById('dashboard').style.display = 'block';
 
-        // Create metric table HTML
-        function createMetricTable(data, label) {
-            return `
+        // Update total requests
+        const totalRequestsEl = document.getElementById('totalRequests');
+        totalRequestsEl.innerHTML = createMetricTable(data.count, 'Total');
+
+        // Update average time
+        const averageTimeEl = document.getElementById('averageTime');
+        averageTimeEl.innerHTML = createMetricTable(data.averages, 'Average');
+
+        // Update percentiles
+        // const percentilesEl = document.getElementById('percentiles');
+        // percentilesEl.innerHTML = createPercentilesTable(data.p95, data.p99);
+
+        // Update chart
+        updateRateChart(data);
+    }
+
+    // Create metric table HTML
+    function createMetricTable(data, label) {
+        return `
                 <table class="metric-table">
                     <thead>
                         <tr>
@@ -282,117 +161,90 @@
                     </tbody>
                 </table>
             `;
+    }
+
+
+    // Update rate chart
+    function updateRateChart(data) {
+        const ctx = document.getElementById('rateChart').getContext('2d');
+
+        if (rateChart) {
+            rateChart.destroy();
         }
 
-        // Create percentiles table HTML
-        function createPercentilesTable(p95Data, p99Data) {
-            return `
-                <table class="metric-table">
-                    <thead>
-                        <tr>
-                            <th>Endpoint</th>
-                            <th>p95</th>
-                            <th>p99</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${p95Data.map(item => {
-                            const p99 = p99Data.find(p => p.endpoint === item.endpoint);
-                            return `
-                                <tr>
-                                    <td>${item.endpoint || 'all'}</td>
-                                    <td>${formatNumber(item.value)}</td>
-                                    <td>${formatNumber(p99?.value)}</td>
-                                </tr>
-                            `;
-                        }).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
+        const chartData = data.last_hour.map(item => ({
+            endpoint: item.endpoint,
+            hourly: item.value,
+            daily: data.last_day.find(d => d.endpoint === item.endpoint)?.value
+        }));
 
-        // Update rate chart
-        function updateRateChart(data) {
-            const ctx = document.getElementById('rateChart').getContext('2d');
-            
-            if (rateChart) {
-                rateChart.destroy();
-            }
-
-            const chartData = data.last_hour.map(item => ({
-                endpoint: item.endpoint,
-                hourly: item.value,
-                daily: data.last_day.find(d => d.endpoint === item.endpoint)?.value
-            }));
-
-            rateChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartData.map(d => d.endpoint),
-                    datasets: [
-                        {
-                            label: 'Requests per Hour',
-                            data: chartData.map(d => d.hourly),
-                            backgroundColor: 'rgba(37, 99, 235, 0.5)',
-                            borderColor: 'rgba(37, 99, 235, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Requests per Day',
-                            data: chartData.map(d => d.daily),
-                            backgroundColor: 'rgba(34, 197, 94, 0.5)',
-                            borderColor: 'rgba(34, 197, 94, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+        rateChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.map(d => d.endpoint),
+                datasets: [
+                    {
+                        label: 'Requests per Hour',
+                        data: chartData.map(d => d.hourly),
+                        backgroundColor: 'rgba(37, 99, 235, 0.5)',
+                        borderColor: 'rgba(37, 99, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Requests per Day',
+                        data: chartData.map(d => d.daily),
+                        backgroundColor: 'rgba(34, 197, 94, 0.5)',
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            });
-        }
-
-        // Utility functions
-        function formatNumber(value) {
-            if (value === undefined || value === null) return 'N/A';
-            return typeof value === 'number' ? value.toFixed(2) : value;
-        }
-
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
-            document.getElementById('dashboard').style.display = show ? 'none' : 'block';
-        }
-
-        function showError(message) {
-            const errorEl = document.getElementById('error');
-            errorEl.textContent = message;
-            errorEl.style.display = message ? 'block' : 'none';
-        }
-
-        // Event listeners
-        document.getElementById('metricSelect').addEventListener('change', (e) => {
-            const metric = e.target.value;
-            if (metric) {
-                updateEndpoints(metric);
-                fetchSummary(metric, document.getElementById('endpointSelect').value);
             }
         });
+    }
 
-        document.getElementById('endpointSelect').addEventListener('change', (e) => {
-            const metric = document.getElementById('metricSelect').value;
-            if (metric) {
-                fetchSummary(metric, e.target.value);
-            }
-        });
+    // Utility functions
+    function formatNumber(value) {
+        if (value === undefined || value === null) return 'N/A';
+        return typeof value === 'number' ? value.toFixed(2) : value;
+    }
 
-        // Initialize
-        fetchMetrics();
-    </script>
-</body>
-</html>
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'block' : 'none';
+        document.getElementById('dashboard').style.display = show ? 'none' : 'block';
+    }
+
+    function showError(message) {
+        const errorEl = document.getElementById('error');
+        errorEl.textContent = message;
+        errorEl.style.display = message ? 'block' : 'none';
+    }
+
+    // Event listeners
+    document.getElementById('metricSelect').addEventListener('change', (e) => {
+        const metric = e.target.value;
+        if (metric) {
+            updateEndpoints(metric);
+            fetchSummary(metric, document.getElementById('endpointSelect').value);
+        }
+    });
+
+    document.getElementById('endpointSelect').addEventListener('change', (e) => {
+        const metric = document.getElementById('metricSelect').value;
+        if (metric) {
+            fetchSummary(metric, e.target.value);
+        }
+    });
+
+    // Initialize
+    fetchMetrics();
+</script>
+{% endblock %}

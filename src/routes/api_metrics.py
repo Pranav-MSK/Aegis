@@ -205,8 +205,7 @@ def get_metrics_summary():
             'count': f'{metric_name}_count{{{route_filter}}}',
             'last_hour': f'rate({metric_name}_count{{{route_filter}}}[1h])',
             'last_day': f'rate({metric_name}_count{{{route_filter}}}[24h])',
-            'p95': f'histogram_quantile(0.95, rate({metric_name}_bucket{{{route_filter}}}[24h]))',
-            'p99': f'histogram_quantile(0.99, rate({metric_name}_bucket{{{route_filter}}}[24h]))'
+            
         }
         
         results = {}
