@@ -2,6 +2,8 @@
 import os
 from src.background_task.monitor_website import start_website_monitoring
 from src.background_task.log_system_info import monitor_settings
+from src.background_task.disk_manager import DiskMetrics
+from src.background_task.network_manager import NetworkMetrics
 from src.logger import logger
 
 
