@@ -1,9 +1,8 @@
 # cython: language_level=3
 import os
-from flask import render_template, request, Blueprint, jsonify, session, flash, redirect, url_for, send_file
+from flask import render_template, request, Blueprint, flash, redirect, url_for, send_file
 from flask_login import login_required
 
-from src.utils import ROOT_DIR
 from src.config import app, limiter
 from src.activator import (
     calculate_unique_system_id, 

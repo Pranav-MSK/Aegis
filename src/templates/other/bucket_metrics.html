@@ -74,7 +74,7 @@
     const metricToEndpoints = {};
 
     async function fetchEndpoints() {
-        const response = await fetch('/api/v1/metrics/endpoints');
+        const response = await fetch('/api/v1/histogram/endpoints');
         const endpoints = await response.json();
 
         // Reorganize data to group by metrics instead of endpoints
@@ -194,7 +194,7 @@
             if (endpoint === '/') {
                 endpoint = 'root';
             }
-            const response = await fetch(`/api/v1/metrics/data/${endpoint}/${metricName}`);
+            const response = await fetch(`/api/v1/histogram/data/${endpoint}/${metricName}`);
             const data = await response.json();
 
             if (data.error) {

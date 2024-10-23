@@ -12,9 +12,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from src.config import app
-from src.utils import get_top_processes, render_template_from_file, ROOT_DIR
-from src.alert_manager import send_smtp_email
-from src.config import get_app_info
+from src.utils import get_top_processes
 from src.logger import logger
 from src.routes.helper.common_helper import (
     admin_required,

@@ -8,7 +8,7 @@ from flask_login import login_required, current_user
 from src.models import AlertTicket
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from src.config import app, db
+from src.config import app
 
 profile_bp = blueprints.Blueprint('profile', __name__)
 

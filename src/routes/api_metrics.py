@@ -1,11 +1,8 @@
 # cython: language_level=3
 from datetime import datetime
 import requests
-from flask import render_template, blueprints, jsonify, request
-from datetime import datetime
-from functools import lru_cache
 import requests
-
+from flask import render_template, blueprints, jsonify, request
 
 from src.config import app
 from src.routes.helper.service_helper import get_running_docker_containers
@@ -49,7 +46,7 @@ def get_histogram_metrics():
 
     return metrics
 
-@app.route('/api/v1/metrics/endpoints')
+@app.route('/api/v1/histogram/endpoints')
 def get_endpoints_histogram():
     """Get list of endpoints that have histogram metrics."""
     try:
@@ -58,7 +55,7 @@ def get_endpoints_histogram():
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Prometheus connection error: {str(e)}"}), 500
 
-@app.route('/api/v1/metrics/data/<path:endpoint>/<metric_name>')
+@app.route('/api/v1/histogram/data/<path:endpoint>/<metric_name>')
 def get_metrics(endpoint, metric_name):
     """Get histogram data for specific endpoint and metric."""
     try:
@@ -112,7 +109,7 @@ def get_metrics(endpoint, metric_name):
         return jsonify({"error": f"Error processing data: {str(e)}"}), 500
 
 # only for sum and count, don't include the metrics from the bucket
-def get_available_metrics():
+def get_available_summary_metrics():
     """Get list of available metrics from Prometheus."""
     try:
         # Query to get all metric names
@@ -136,12 +133,12 @@ def get_available_metrics():
         return []
 
 # only for sum and count, don't include the metrics from the bucket
-@app.route('/api/v1/metrics/available')
+@app.route('/api/v1/summary/endpoints')
 def get_metrics_list():
     """Get list of available metrics and their endpoints."""
     try:
         metrics = {}
-        base_metrics = get_available_metrics()
+        base_metrics = get_available_summary_metrics()
         
         for base_metric in base_metrics:
             # Query to get all routes for this metric using the _sum suffix
@@ -174,7 +171,7 @@ def get_metrics_list():
         }), 500
 
 
-@app.route('/api/v1/metrics/summary')
+@app.route('/api/v1/summary/data')
 def get_metrics_summary():
     """Get summary metrics for specific metric and optional endpoint."""
     try:

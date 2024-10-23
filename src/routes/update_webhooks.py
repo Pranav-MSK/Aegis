@@ -1,6 +1,6 @@
 # cython: language_level=3
-from flask import Flask, render_template, request, redirect, url_for, flash, blueprints
-from src.config import db, app
+from flask import render_template, request, redirect, url_for, flash, blueprints
+from src.config import app
 from src.models import NotificationSettings, GeneralSettings
 
 webhooks_bp = blueprints.Blueprint("webhooks", __name__)
@@ -41,7 +41,7 @@ def update_webhooks():
         # Update and save the general settings
         if not general_settings:
             general_settings = GeneralSettings(enable_alerts=enable_alerts)
-            db.session.add(general_settings)
+            general_settings.save()
         else:
             general_settings.enable_alerts = enable_alerts
         general_settings.save()
@@ -59,7 +59,7 @@ def update_webhooks():
                 is_teams_alert_enabled=is_teams_alert_enabled,
                 is_google_chat_alert_enabled=is_google_chat_alert_enabled,
             )
-            db.session.add(webhook_settings)
+            webhook_settings.save()
         else:
             # Update the existing webhook URLs and alert settings
             webhook_settings.slack_webhook_url = slack_webhook_url

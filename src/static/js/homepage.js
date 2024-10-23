@@ -493,7 +493,7 @@ class APIMetricsManager {
 
   async fetchEndpoints() {
     try {
-      const response = await fetch('/api/v1/metrics/endpoints');
+      const response = await fetch('/api/v1/histogram/endpoints');
       const endpoints = await response.json();
 
       for (const [endpoint, metrics] of Object.entries(endpoints)) {
@@ -592,7 +592,7 @@ class APIMetricsManager {
 
     try {
       if (endpoint === '/') endpoint = 'root';
-      const response = await fetch(`/api/v1/metrics/data/${endpoint}/${metricName}`);
+      const response = await fetch(`/api/v1/histogram/data/${endpoint}/${metricName}`);
       const data = await response.json();
 
       if (data.error) {

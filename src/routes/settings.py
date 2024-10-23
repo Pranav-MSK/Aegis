@@ -5,7 +5,7 @@ import datetime
 import subprocess
 from flask import render_template, request, flash, blueprints, redirect, url_for, session
 
-from src.config import app, db
+from src.config import app
 from src.models import UserCardSettings, UserDashboardSettings, GeneralSettings, PageToggleSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR

@@ -46,6 +46,7 @@ def login():
                 return redirect(url_for("login"))
             
             login_user(user, remember=remember_me)
+            logger.info(f"User {user.username} logged in")
  
             user.last_login = datetime.datetime.utcnow()
             user.save()
@@ -106,6 +107,7 @@ def login():
 @app.route("/logout")
 def logout():
     logout_user()
+    logger.info(f"user {current_user.username} logged out")
     return redirect(url_for("login"))
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -199,6 +201,7 @@ def signup():
         db.session.add(PageToggleSettings(user_id=new_user.id))
         db.session.commit()
         flash("Account created successfully, Contact Admin to activate your account", "success")
+        logger.info(f"New user {new_user.username} created")
         return redirect(url_for("login"))
 
     return render_template("auths/signup.html", total_users=total_users)

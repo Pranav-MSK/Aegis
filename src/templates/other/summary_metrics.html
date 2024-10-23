@@ -58,7 +58,7 @@
     // Fetch available metrics
     async function fetchMetrics() {
         try {
-            const response = await fetch('/api/v1/metrics/available');
+            const response = await fetch('/api/v1/summary/endpoints');
             const data = await response.json();
 
             if (data.status === 'success') {
@@ -80,7 +80,7 @@
     // Fetch endpoints for selected metric
     async function updateEndpoints(metric) {
         try {
-            const response = await fetch('/api/v1/metrics/available');
+            const response = await fetch('/api/v1/summary/endpoints');
             const data = await response.json();
 
             const endpointSelect = document.getElementById('endpointSelect');
@@ -106,7 +106,7 @@
             const params = new URLSearchParams({ metric });
             if (endpoint) params.append('endpoint', endpoint);
 
-            const response = await fetch(`/api/v1/metrics/summary?${params}`);
+            const response = await fetch(`/api/v1/summary/data?${params}`);
             const data = await response.json();
 
             if (data.status === 'success') {
@@ -129,82 +129,53 @@
 
         let displayKey;
         let dataKey;
-        let label3;
-        let label4;
-
+        let totalLabel;
+        let averageLabel;
         if (data.count.length > 0) {
-            if (data.count[0].endpoint) {
-                displayKey = 'Endpoint';
-                dataKey = 'endpoint';
-                label3 = 'Total Requests';
-                label4 = 'Average';
-            } else if (data.count[0].query_type) {
-                displayKey = 'Query Type';
-                dataKey = 'query_type';
-                label3 = 'Total Queries';
-                label4 = 'Average Query Time';
-            } else if (data.count[0].method) {
-                displayKey = 'Method';
-                dataKey = 'method';
-                label3 = 'Total Requests';
-                label4 = 'Average';
-            } else if (data.count[0].status) {
-                displayKey = 'Status';
-                dataKey = 'status';
-                label3 = 'Total Requests';
-                label4 = 'Average';
-            } else if (data.count[0].status_code) {
-                displayKey = 'Status Code';
-                dataKey = 'status_code';
-                label3 = 'Total Requests';
-                label4 = 'Average';
-            } else if (data.count[0].reason) {
-                displayKey = 'Reason';
-                dataKey = 'reason';
-                label3 = 'Total Requests';
-                label4 = 'Average';
-            } else if (data.count[0].error) {
-                displayKey = 'Error';
-                dataKey = 'error';
-                label3 = 'Total Requests';
-                label4 = 'Average';
-            } else if (data.count[0].error_code) {
-                displayKey = 'Error Code';
-                dataKey = 'error_code';
-                label3 = 'Total Requests';
-                label4 = 'Average';
-            } else if (data.count[0].payment_method) {
-                displayKey = 'Payment Method';
-                dataKey = 'payment_method';
-                label3 = 'Total Amount';
-                label4 = 'Average Amount';
-            } else if (data.count[0].user_id) {
-                displayKey = 'User ID';
-                dataKey = 'user_id';
-                label3 = 'Total Duration';
-                label4 = 'Average Duration';
+            const keys = [
+                { identifier: 'endpoint', display: 'Endpoint', totalLabel: 'Total Requests', averageLabel: 'Average' },
+                { identifier: 'query_type', display: 'Query Type', totalLabel: 'Total Queries', averageLabel: 'Average Query Time' },
+                { identifier: 'method', display: 'Method', totalLabel: 'Total Requests', averageLabel: 'Average' },
+                { identifier: 'status', display: 'Status', totalLabel: 'Total Requests', averageLabel: 'Average' },
+                { identifier: 'status_code', display: 'Status Code', totalLabel: 'Total Requests', averageLabel: 'Average' },
+                { identifier: 'reason', display: 'Reason', totalLabel: 'Total Requests', averageLabel: 'Average' },
+                { identifier: 'error', display: 'Error', totalLabel: 'Total Requests', averageLabel: 'Average' },
+                { identifier: 'error_code', display: 'Error Code', totalLabel: 'Total Requests', averageLabel: 'Average' },
+                { identifier: 'payment_method', display: 'Payment Method', totalLabel: 'Total Amount', averageLabel: 'Average Amount' },
+                { identifier: 'user_id', display: 'User ID', totalLabel: 'Total Duration', averageLabel: 'Average Duration' }
+            ];
+
+            const match = keys.find(k => data.count[0][k.identifier] !== undefined);
+            if (match) {
+                displayKey = match.display;
+                dataKey = match.identifier;
+                totalLabel = match.totalLabel;
+                averageLabel = match.averageLabel;
+            } else {
+                displayKey = '';
+                dataKey = '';
             }
         } else {
-            displayKey = 'Endpoint';
-            dataKey = 'endpoint';
+            displayKey = '';
+            dataKey = '';
         }
 
-        totalRequestsEl.innerHTML = createMetricTable(data, 'Instance', displayKey, label3, label4, dataKey);
+        totalRequestsEl.innerHTML = createMetricTable(data, 'Instance', displayKey, totalLabel, averageLabel, dataKey);
 
         // Update chart
         updateRateChart(data);
     }
 
     // Create metric table HTML
-    function createMetricTable(data, label1, displayKey, label3, label4, dataKey) {
+    function createMetricTable(data, label1, displayKey, totalLabel, averageLabel, dataKey) {
         return `
                 <table class="metric-table">
                     <thead>
                         <tr>
                             <th>${label1}</th>
                             <th>${displayKey || 'All'}</th>
-                            <th>${label3}</th>
-                            <th>${label4}</th>
+                            <th>${totalLabel}</th>
+                            <th>${averageLabel}</th>
                         </tr>
                     </thead>
                     <tbody>

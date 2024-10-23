@@ -9,7 +9,6 @@ from flask import (
     redirect,
     url_for,
     flash,
-    abort,
 )
 from flask_login import current_user, login_required
 

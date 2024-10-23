@@ -3,8 +3,6 @@ import time
 import datetime
 from flask import render_template, blueprints, request, redirect, url_for, flash
 from flask_login import current_user
-from flask_wtf.csrf import CSRFError
-from prometheus_client import Summary, Histogram
 
 from src.config import app
 from src.logger import logger
@@ -13,31 +11,23 @@ from src.background_task.prometheus_metrics import metrics
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
 
-REQUEST_TIME = Summary('request_processing_seconds_systemguard', 'Time spent processing request')
-RESPONSE_SIZE = Summary('response_size_bytes_systemguard', 'Response size in bytes', ['route'])
-REQUEST_HISTOGRAM = Histogram('request_duration_seconds_systemguard', 'Duration of requests in seconds', ['route'])
 
 class CustomError(Exception):
     """Custom exception for application-specific errors."""
     pass
 
-@app.cli.command("run")
-def server_start():
-    """Log server start."""
-    logger.info("Server started")
-
 # Error Handlers
 @app.errorhandler(403)
 def forbidden(e):
     """Handle 403 Forbidden error.k"""
-    metrics['error_count'].labels(error_type='403').inc()
+    metrics['error_codes'].labels(error_code='403').observe(1)
     return render_template("error/403.html",
                            error_message=e.description,
                            ), 403
 @app.errorhandler(404)
 def page_not_found(e):
     """Handle 404 Not Found error."""
-    metrics['error_count'].labels(error_type='404').inc()
+    metrics['error_codes'].labels(error_code='404').observe(1)
     return render_template("error/404.html"), 404
 
 @app.errorhandler(405)
@@ -47,7 +37,7 @@ def method_not_allowed(e):
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
-    metrics['error_count'].labels(error_type='429').inc()
+    metrics['error_codes'].labels(error_code='429').observe(1)
     return render_template("error/429.html", 
                            error_message=e.description,
                            ), 429
@@ -55,19 +45,19 @@ def ratelimit_handler(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     """Handle 500 Internal Server Error."""
-    metrics['error_count'].labels(error_type='500').inc()
+    metrics['error_codes'].labels(error_code='500').observe(1)
     return "Internal server error", 500
 
 @app.errorhandler(502)
 def bad_gateway(e):
     """Handle 502 Bad Gateway error."""
-    metrics['error_count'].labels(error_type='502').inc()
+    metrics['error_codes'].labels(error_code='502').observe(1)
     return "Bad gateway", 502
 
 @app.errorhandler(503)
 def service_unavailable(e):
     """Handle 503 Service Unavailable error."""
-    metrics['error_count'].labels(error_type='503').inc()
+    metrics['error_codes'].labels(error_code='503').observe(1)
     return "Service unavailable", 503
 
 
@@ -82,6 +72,9 @@ def check_password_expiry():
 
     if request.endpoint in ['login', 'change_password', 'static']:
         return
+    
+    if request.endpoint.startswith('/api/v1'):
+        metrics['API_REQUESTS'].labels(route=request.path).observe(1)
 
     # Perform checks only for authenticated users
     if current_user.is_authenticated:
@@ -124,12 +117,12 @@ def after_request(response):
         return response
 
     try:
-        request_duration = time.time() - request.start_time
-        REQUEST_TIME.observe(request_duration)
-        REQUEST_HISTOGRAM.labels(route=request.path).observe(request_duration)
+        elapsed_time = time.time() - request.start_time
+        metrics['REQUEST_HISTOGRAM'].labels(route=request.path).observe(elapsed_time)
+        metrics['REQUEST_METHOD_COUNT'].labels(method=request.method).observe(1)
         
         if response.data:
-            RESPONSE_SIZE.labels(route=request.path).observe(len(response.data))
+            metrics['RESPONSE_SIZE'].labels(route=request.path).observe(len(response.data))
     except Exception as e:
         logger.error(f"Error in after_request: {e}")
 
