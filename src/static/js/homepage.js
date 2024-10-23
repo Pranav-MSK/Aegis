@@ -374,7 +374,7 @@ class DashboardController {
   start() {
     this.updateDashboard(); // Initial update
     setInterval(() => this.updateDashboard(), CONFIG.REFRESH_INTERVAL);
-    setInterval(() => this.callContainerDataAPI(), 60000);
+    setInterval(() => this.callContainerDataAPI(), 5000);
 
   }
 }

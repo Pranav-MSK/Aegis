@@ -441,8 +441,9 @@ body {
     align-items: center;
     margin-bottom: 1rem;
     box-shadow: var(--shadow-sm);
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 
 .info-item:hover {
     background-color: var(--gray-100);
@@ -1372,4 +1373,29 @@ temp-alert-badge {
     border-radius: 5px; /* Rounded corners */
     background-color: #f9f9f9; /* Light background color */
     margin: 10px; /* Margin around the message */
+}
+
+.metric-selector {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.metric-primary {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.empty-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    text-align: center;
+    color: var(--text-secondary);
 }

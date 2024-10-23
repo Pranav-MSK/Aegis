@@ -72,10 +72,6 @@ def check_password_expiry():
 
     if request.endpoint in ['login', 'change_password', 'static']:
         return
-    
-    if request.endpoint.startswith('/api/v1'):
-        metrics['API_REQUESTS'].labels(route=request.path).observe(1)
-
     # Perform checks only for authenticated users
     if current_user.is_authenticated:
         remaining_days = days_until_password_expiry(current_user)

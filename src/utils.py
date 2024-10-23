@@ -150,32 +150,20 @@ def get_cpu_metrics():
 
 def get_gpu_metrics():
     """Collect all GPU-related metrics in one go"""
-    # gpus = GPUtil.getGPUs()
-    gpu_metrics = []
+    gpus = GPUtil.getGPUs()
     
-    # for gpu in gpus:
-    #     gpu_metrics.append({
-    #         'gpu_id': gpu.id,
-    #         'gpu_name': gpu.name,
-    #         'gpu_load': round(gpu.load * 100, 2),  # Load in percentage
-    #         'gpu_memory_total': gpu.memoryTotal,
-    #         'gpu_memory_used': gpu.memoryUsed,
-    #         'gpu_memory_free': gpu.memoryFree,
-    #         'gpu_temperature': gpu.temperature,
-    #     })
-
-    # add dummy data
-    return {
-        'is_gpu': False,
-        'gpu_id': 0,
-        'gpu_name': 'Nvidia GTX 1080',
-        'gpu_load': 50,
-        'gpu_memory_total': 8000,
-        'gpu_memory_used': 4000,
-        'gpu_memory_free': 4000,
-        'gpu_temperature': 60,
-    }
-    
+    if gpus:
+        main_gpu = gpus[0]  # Assuming the first GPU is the main one
+        return {
+            'is_gpu': True,
+            'gpu_id': main_gpu.id,
+            'gpu_name': main_gpu.name,
+            'gpu_load': round(main_gpu.load * 100, 2),  # Load in percentage
+            'gpu_memory_total': main_gpu.memoryTotal,
+            'gpu_memory_used': main_gpu.memoryUsed,
+            'gpu_memory_free': main_gpu.memoryFree,
+            'gpu_temperature': main_gpu.temperature,
+        }
 
 def get_memory_metrics():
     """Collect all memory-related metrics in one go"""

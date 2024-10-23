@@ -90,6 +90,36 @@
         </div>
         {% endif %}
 
+        <div class="metric-card">
+            <div class="card-header">
+                <h3>Memory Status</h3>
+                <span class="refresh-indicator"></span>
+            </div>
+            <div class="card-content">
+                <div class="metric-primary">
+                    <div class="metric-value">
+                        <span class="large-number memory-percent">{{ system_info.memory_percent }}</span>
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="metric-label">Memory Usage</div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Used:</span>
+                        <span class="detail-value memory-used">{{ system_info.memory_used }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Available:</span>
+                        <span class="detail-value">{{ system_info.memory_available }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Swap:</span>
+                        <span class="detail-value">{{ system_info.swap_memory }}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Storage Section -->
         <div class="metric-card">
@@ -122,40 +152,10 @@
             </div>
         </div>
 
-        <!-- Memory Section -->
-        <div class="metric-card">
-            <div class="card-header">
-                <h3>Memory Status</h3>
-                <span class="refresh-indicator"></span>
-            </div>
-            <div class="card-content">
-                <div class="metric-primary">
-                    <div class="metric-value">
-                        <span class="large-number memory-percent">{{ system_info.memory_percent }}</span>
-                        <span class="unit">%</span>
-                    </div>
-                    <div class="metric-label">Memory Usage</div>
-                </div>
-                <div class="metric-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Used:</span>
-                        <span class="detail-value memory-used">{{ system_info.memory_used }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Available:</span>
-                        <span class="detail-value">{{ system_info.memory_available }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Swap:</span>
-                        <span class="detail-value">{{ system_info.swap_memory }}%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+       
         <!-- Temperature Section -->
         <!-- {% if system_info.current_temp != "N/A" %} -->
-        <div class="metric-card">
+        <!-- <div class="metric-card">
             <div class="card-header">
                 <h3>Temperature</h3>
                 <span class="refresh-indicator"></span>
@@ -179,12 +179,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!-- {% endif %} -->
 
         <!-- Battery Status -->
         <!-- {% if system_info.battery_status != "N/A" %} -->
-        <div class="metric-card">
+        <!-- <div class="metric-card">
             <div class="card-header">
                 <h3>Battery Status</h3>
                 <span class="refresh-indicator"></span>
@@ -204,7 +204,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!-- {% endif %} -->
 
     </div>
