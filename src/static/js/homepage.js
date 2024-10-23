@@ -630,6 +630,7 @@ class APIMetricsManager {
   }
 }
 
+
 // Initialize API Metrics when the page loads
 document.addEventListener('DOMContentLoaded', () => {
   const apiMetrics = new APIMetricsManager();
