@@ -22,6 +22,7 @@ from src.routes.update_webhooks import webhooks_bp
 from src.routes.activation import activation_bp
 from src.routes.services import services_bp
 from src.routes.api_metrics import metrics_bp
+from src.routes.middleware import middleware_bp
 
 __all__ = [
     "dashboard_bp",

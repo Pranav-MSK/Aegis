@@ -30,24 +30,14 @@
                     <h2 class="card-title">Total Requests</h2>
                     <div id="totalRequests"></div>
                 </div>
-
-                <!-- <div class="card">
-                        <h2 class="card-title">Average</h2>
-                        <div id="averageTime"></div>
-                    </div>
-                     -->
-                <!-- <div class="card">
-                        <h2 class="card-title">Percentiles (24h)</h2>
-                        <div id="percentiles"></div>
-                    </div> -->
             </div>
-
+<!-- 
             <div class="card">
                 <h2 class="card-title">Request Rate</h2>
                 <div class="chart-container">
                     <canvas id="rateChart"></canvas>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
@@ -164,7 +154,7 @@
         totalRequestsEl.innerHTML = createMetricTable(data, 'Instance', displayKey, totalLabel, averageLabel, dataKey);
 
         // Update chart
-        updateRateChart(data);
+        // updateRateChart(data);
     }
 
     // Create metric table HTML

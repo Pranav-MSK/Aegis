@@ -11,4 +11,5 @@ def start_background_tasks():
     """
     Starts the background tasks for the application.
     """
-    initialize_logging()
+    if os.getenv('FLASK_ENV') == 'production':
+        initialize_logging()

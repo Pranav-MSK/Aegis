@@ -18,4 +18,9 @@ metrics = {
     'RESPONSE_SIZE': Summary('response_size_bytes', 'Response size in bytes', ['route']),
     'REQUEST_HISTOGRAM': Histogram('request_duration_seconds', 'Duration of requests in seconds', ['route']),
     'API_REQUESTS': Summary('api_requests_total', 'Total API requests made', ['route']),
+    'DB_REQUESTS': Summary('db_requests_total', 'Total database requests made', ['route']),
+    'DB_QUERY_TIME': Summary('db_query_time_seconds', 'Database query time in seconds', ['query_type']),
+    'SLOW_DB_QUERY': Summary('slow_db_query_time_seconds', 'Slow database query time in seconds', ['query_type']),
+    'DB_REQUESTS_COUNTER': Counter('db_requests_counter', 'Total database requests made'),
+    'ERROR_QUERY_COUNTER': Counter('error_query_counter', 'Total error queries made'),
 }
