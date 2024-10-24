@@ -10,7 +10,7 @@ const CONFIG = {
   },
   API_ENDPOINTS: {
     SYSTEM_INFO: '/api/v1/system-info',
-    DASHBOARD_STATS: '/api/dashboard/stats',
+    DASHBOARD_STATS: '/api/v1/dashboard/stats',
     CONTAINER_INFO_API: '/api/v1/system/containers'
   }
 };

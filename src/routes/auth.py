@@ -84,21 +84,6 @@ def login():
                         is_html=True,
                     )
 
-            # # log in alert to user
-            # if receiver_email:
-            #     context = {
-            #         "username": current_user.username,
-            #         "login_time": datetime.datetime.now(),
-            #     }
-
-            #     login_message_template = os.path.join(
-            #         ROOT_DIR, "src/templates/email_templates/login.html"
-            #     )
-            #     email_body = render_template_from_file(
-            #         login_message_template, **context
-            #     )
-
-            #     send_smtp_email(receiver_email, "Login Alert", email_body, is_html=True)
             return redirect(url_for("dashboard"))
         flash("Invalid username or password", "danger")
     return render_template("auths/login.html")

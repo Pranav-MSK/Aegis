@@ -54,4 +54,8 @@ def service_unavailable(e):
     metrics['error_codes'].labels(error_code='503').observe(1)
     return "Service unavailable", 503
 
-
+@app.errorhandler(504)
+def gateway_timeout(e):
+    """Handle 504 Gateway Timeout error."""
+    metrics['error_codes'].labels(error_code='504').observe(1)
+    return "Gateway timeout", 504

@@ -102,7 +102,7 @@ def handle_network_scan():
     ip_address_with_mask = f"{ip_address}/24"
     scan_result = scan_network(ip_address_with_mask)
     return render_template(
-        'experimental/scan.html', 
+        'security/scan.html', 
         network_result=scan_result, 
         ip_address=ip_address
     )
@@ -111,7 +111,7 @@ def handle_port_scan():
     ip_address = request.form['ip_address']
     scan_results = scan_ports(ip_address)
     return render_template(
-        'experimental/scan.html', 
+        'security/scan.html', 
         port_results=scan_results, 
         ip_address=ip_address
     )

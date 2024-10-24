@@ -63,7 +63,7 @@ def dashboard():
 
 from flask import jsonify
 
-@app.route("/api/dashboard/stats", methods=["GET"])
+@app.route("/api/v1/dashboard/stats", methods=["GET"])
 @login_required
 @csrf.exempt
 def api_dashboard_stats():

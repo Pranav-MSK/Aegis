@@ -36,6 +36,7 @@ from src.routes.helper.prometheus_helper import (
     count_of_targets,
     calculate_total_rules,
 )
+from src.routes.helper.access_decorators import systemguard_enterprise
 
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint("prometheus", __name__)
@@ -137,6 +138,7 @@ def delete_file_path(id):
 
 
 @app.route("/configure_targets", methods=["GET", "POST", "PUT", "DELETE"])
+@systemguard_enterprise()
 @admin_required
 def configure_targets():
     update_prometheus_config()
@@ -349,6 +351,7 @@ def api_rules():
     return jsonify(rules)
 
 @app.route("/view_rules", methods=["GET", "POST"])
+@systemguard_enterprise()
 def view_rules():
     # Load existing rules from the YAML file
     with open(RULES_FILE_PATH, "r") as file:

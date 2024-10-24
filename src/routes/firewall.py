@@ -98,8 +98,8 @@ def validate_port(port):
         return False
     
 
-@app.route('/security_analysis', methods=['GET', 'POST'])
-def security_analysis():
+@app.route('/system/security', methods=['GET', 'POST'])
+def perform_security_analysis():
     if request.method == 'POST':
         if 'scan_network' in request.form:
             return handle_network_scan()
@@ -107,5 +107,4 @@ def security_analysis():
             return handle_port_scan()
     
     # Render the default scan page if the request method is GET or no valid action is found in POST.
-    return render_template('experimental/scan.html')
-
+    return render_template('security/scan.html')
