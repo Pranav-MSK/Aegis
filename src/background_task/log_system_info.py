@@ -1,115 +1,145 @@
 # cython: language_level=3
 import datetime
-from threading import Timer
+from threading import Timer, Lock
 from sqlalchemy.exc import SQLAlchemyError
+from contextlib import contextmanager
 
 from src.logger import logger
 from src.config import app, db
 from src.utils import _collect_metrics
-from src.logger import logger
 from src.models import GeneralSettings, SystemInformation
-# Flag to track if logging is already scheduled
-is_logging_scheduled = False
-fetch_system_info_interval = 1
-
 from src.background_task.prometheus_metrics import metrics
+
+# Constants
+LOGGING_INTERVAL = 1  # Log every second
+SETTINGS_CHECK_INTERVAL = 60  # Check settings every minute
+
+# Global state management
+class LoggingState:
+    def __init__(self):
+        self.is_logging_scheduled = False
+        self.is_enabled = False
+        self.lock = Lock()
+
+state = LoggingState()
+
+@contextmanager
+def app_context():
+    """
+    Context manager to ensure proper application context handling.
+    """
+    ctx = app.app_context()
+    ctx.push()
+    try:
+        yield
+    finally:
+        ctx.pop()
 
 def log_system_info():
     """
-    Logs system information at regular intervals based on the general settings.
-    This function checks if logging is enabled and schedules the next log if active.
+    Logs system information at regular intervals.
+    Ensures all database operations occur within application context.
     """
-    global is_logging_scheduled
-    with app.app_context():
-        try:
-            if not is_logging_enabled():
-                logger.info("System info logging has been stopped.")
-                is_logging_scheduled = False
-                return
+    if not state.is_enabled:
+        return
 
-            log_system_info_to_db()
-            logger.debug("System information logged successfully.")
-            schedule_next_log(interval=fetch_system_info_interval)
-
-        except Exception as e:
-            logger.error(f"Error during system info logging: {e}")
-            is_logging_scheduled = False
-
-
-def is_logging_enabled():
-    """
-    Checks if system info logging is enabled in the general settings.
-    """
     try:
-        general_settings = GeneralSettings.query.first()
-        return general_settings.is_logging_system_info if general_settings else False
-    except SQLAlchemyError as e:
-        logger.error(f"Error fetching general settings: {e}")
-        return False
-
-
-def schedule_next_log(interval=10):
-    """
-    Schedules the next logging event after the specified interval (in seconds).
-    """
-    Timer(interval, log_system_info).start()
-
-
-def log_system_info_to_db():
-    """
-    Fetches system information and logs it to the database and updates Prometheus metrics.
-    """
-    with app.app_context():
-        try:
-            system_info = _collect_metrics()
-
-            # Update Prometheus metrics
+        # Collect metrics outside app context as it doesn't need database
+        system_info = _collect_metrics()
+        
+        with app_context():
             update_prometheus_metrics(system_info)
-
-            logger.info("System information logged to database.")
-
-        except SQLAlchemyError as db_err:
-            logger.error(f"Database error while logging system info: {db_err}")
-            db.session.rollback()
-        except Exception as e:
-            logger.error(f"Failed to log system information: {e}")
+        
+        # Schedule next log immediately to maintain timing accuracy
+        Timer(LOGGING_INTERVAL, log_system_info).start()
+        
+    except Exception as e:
+        logger.error(f"Error during system info logging: {e}")
+        # Attempt to recover by scheduling next run
+        Timer(LOGGING_INTERVAL, log_system_info).start()
 
 
 def update_prometheus_metrics(system_info):
     """
     Updates Prometheus metrics with the latest system information.
     """
-    metrics['cpu_usage_metric'].set(system_info['cpu_percent'])
-    metrics['memory_usage_metric'].set(system_info['memory_percent'])
-    metrics['disk_usage_metric'].set(system_info['disk_percent'])
-    metrics['network_sent_metric'].set(system_info['network_sent'])
-    metrics['network_recv_metric'].set(system_info['network_received'])
-    metrics['cpu_temp_metric'].set(system_info['current_temp'])
-    metrics['cpu_frequency_metric'].set(system_info['cpu_frequency'])
-    metrics['battery_percentage_metric'].set(system_info['battery_percent'])
-    metrics['dashboard_memory_usage_metric'].set(system_info['dashboard_memory_usage'])
-    metrics['request_count'].inc()
+    try:
+        metrics_mapping = {
+            'cpu_usage_metric': system_info['cpu_percent'],
+            'memory_usage_metric': system_info['memory_percent'],
+            'disk_usage_metric': system_info['disk_percent'],
+            'network_sent_metric': system_info['network_sent'],
+            'network_recv_metric': system_info['network_received'],
+            'cpu_temp_metric': system_info['current_temp'],
+            'cpu_frequency_metric': system_info['cpu_frequency'],
+            'battery_percentage_metric': system_info['battery_percent'],
+            'dashboard_memory_usage_metric': system_info['dashboard_memory_usage']
+        }
+        logger.info(f"Updating Prometheus metrics: {metrics_mapping}")
+        # Batch update metrics
+        for metric_name, value in metrics_mapping.items():
+            metrics[metric_name].set(value)
+            
+        metrics['request_count'].inc()
+    except Exception as e:
+        logger.error(f"Failed to update Prometheus metrics: {e}")
 
 
-def monitor_settings():
+def check_settings():
     """
-    Monitors application general settings for changes and controls system logging dynamically.
+    Periodically checks application settings and manages logging state.
+    Ensures proper application context for database operations.
     """
-    global is_logging_scheduled
-    with app.app_context():
-        try:
-            if is_logging_enabled():
-                logger.info("System logging enabled. Starting system info logging.")
-                if not is_logging_scheduled:
-                    logger.debug("Scheduling system info logging.")
-                    Timer(0, log_system_info).start()
-                    is_logging_scheduled = True
-            else:
-                logger.info("System logging disabled. Stopping system info logging.")
-                is_logging_scheduled = False
+    try:
+        with app_context():
+            with state.lock:
+                previous_state = state.is_enabled
+                current_state = is_logging_enabled()
+                state.is_enabled = current_state
 
-            # Recheck settings every 10 seconds
-            Timer(10, monitor_settings).start()
+                # Only log state changes to reduce noise
+                if previous_state != current_state:
+                    if current_state:
+                        logger.info("System logging enabled. Starting system info logging.")
+                        if not state.is_logging_scheduled:
+                            Timer(0, log_system_info).start()
+                            state.is_logging_scheduled = True
+                    else:
+                        logger.info("System logging disabled. Stopping system info logging.")
+                        state.is_logging_scheduled = False
 
-        except SQLAlchemyError as db_err:
-            logger.error(f"Error fetching settings: {db_err}")
+        # Schedule next settings check
+        Timer(SETTINGS_CHECK_INTERVAL, check_settings).start()
+
+    except Exception as e:
+        logger.error(f"Error checking settings: {e}")
+        # Retry settings check after a delay
+        Timer(SETTINGS_CHECK_INTERVAL, check_settings).start()
+
+
+def is_logging_enabled():
+    """
+    Checks if system info logging is enabled in the general settings.
+    Must be called within application context.
+    """
+    try:
+        general_settings = GeneralSettings.query.first()
+        return bool(general_settings and general_settings.is_logging_system_info)
+    except SQLAlchemyError as e:
+        logger.error(f"Error fetching general settings: {e}")
+        return False
+
+
+def initialize_logging():
+    """
+    Initialize the logging system with proper state management and application context.
+    """
+    with app_context():
+        with state.lock:
+            state.is_enabled = is_logging_enabled()
+            if state.is_enabled and not state.is_logging_scheduled:
+                Timer(0, log_system_info).start()
+                state.is_logging_scheduled = True
+    
+    # Start the settings monitoring loop
+    Timer(0, check_settings).start()

@@ -315,7 +315,6 @@ def _collect_metrics():
         with ThreadPoolExecutor(max_workers=7) as executor:
             futures = {
                 'cpu': executor.submit(get_cpu_metrics),
-                'gpu': executor.submit(get_gpu_metrics),
                 'memory': executor.submit(get_memory_metrics),
                 'disk': executor.submit(get_disk_metrics),
                 'network': executor.submit(get_network_metrics),
