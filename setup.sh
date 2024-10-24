@@ -74,12 +74,6 @@ ADMIN_PASSWORD="admin"
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
-if [ "$EUID" -ne 0 ]; then
-    echo "Please run this program with sudo, exiting..."
-    exit 1
-fi
-
-
 log() {
     # Check if the level is passed; if not, set it to "INFO" as default.
     local level="${1:-INFO}"

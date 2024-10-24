@@ -339,6 +339,14 @@ def show_alerts():
     except requests.exceptions.RequestException as e:
         return f"Error fetching alerts: {str(e)}", 500
 
+@app.route("/api/v1/rules", methods=["GET"])
+def api_rules():
+    # Load existing rules from the YAML file
+    with open(RULES_FILE_PATH, "r") as file:
+        rules = yaml.safe_load(file)
+
+    # Return the rules as JSON
+    return jsonify(rules)
 
 @app.route("/view_rules", methods=["GET", "POST"])
 def view_rules():

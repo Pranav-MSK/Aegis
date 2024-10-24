@@ -181,6 +181,7 @@ def alert_history():
                 AlertTicket.ticket_status.ilike(f"%{search_query}%"),
                 AlertTicket.assigned_user_id.ilike(f"%{search_query}%"),
                 AlertTicket.assigned_supervisor_id.ilike(f"%{search_query}%"),
+                AlertTicket.fingerprint.ilike(f"%{search_query}%"),
                 db.func.date(AlertTicket.created_at).ilike(f"%{search_query}%"),
                 db.func.date(AlertTicket.updated_at).ilike(f"%{search_query}%"),
             )
