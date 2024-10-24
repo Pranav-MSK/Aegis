@@ -225,17 +225,33 @@ def get_network_metrics():
         'download_speed': format_speed(download_speed),
     }
 
+
 def get_battery_metrics():
     """Collect battery metrics"""
     try:
         battery = psutil.sensors_battery()
-        return {
-            'battery_percent': round(battery.percent) if battery else 0,
-            'battery_status': "Charging" if battery and battery.power_plugged else "Discharging" if battery else "Not available"
-        }
+        if battery:
+            time_remaining = battery.secsleft
+            if time_remaining == psutil.POWER_TIME_UNKNOWN:
+                time_remaining_str = "Calculating..."
+            else:
+                hours, remainder = divmod(time_remaining, 3600)
+                minutes, seconds = divmod(remainder, 60)
+                time_remaining_str = f"{hours}h {minutes}m {seconds}s"
+
+            return {
+                'battery_percent': round(battery.percent),
+                'battery_status': "Charging" if battery.power_plugged else "Discharging",
+                'battery_time_remaining': time_remaining_str,
+                'battery_health': "Good" if battery.percent > 20 else "Low",
+            }
+        else:
+            return {'battery_percent': 0, 'battery_status': "Not available", 'time_remaining': "N/A", 'battery_health': "N/A"}
     except Exception as e:
         logger.error(f"Error collecting battery metrics: {e}")
-        return {'battery_percent': 0, 'battery_status': "N/A"}
+        return {'battery_percent': 0, 'battery_status': "N/A", 'time_remaining': "N/A", 'battery_health': "N/A"}
+
+
 
 def get_top_processes(number=5, combined=False):
     """Get the top processes by memory usage."""
