@@ -194,7 +194,6 @@ def get_metrics_summary():
         results = {}
         for query_name, query in queries.items():
             result = query_prometheus(query)
-            print(result)
             if result['status'] == 'success' and result['data']['result']:
                 results[query_name] = [
                     {

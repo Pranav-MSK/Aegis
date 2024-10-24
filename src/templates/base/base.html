@@ -27,19 +27,10 @@
 
 <body>
     {% include 'ext/navbar.html' %}
-
-    {% if request.endpoint != 'control_panel' %}
-    <div id="spinnerOverlay" class="spinner-overlay">
-        <div class="spinner"></div>
-    </div>
-    {% endif %}
-
     {% include 'ext/siderbar.html' %}
-
     <main class="content">
         {% block content %}{% endblock %}
     </main>
-
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
 

@@ -91,24 +91,6 @@ def update_prometheus_metrics(system_info):
     metrics['request_count'].inc()
 
 
-def store_system_info_in_db(system_info):
-    """
-    Stores the collected system information into the database.
-    """
-    system_log = SystemInformation(
-        cpu_percent=system_info["cpu_percent"],
-        memory_percent=system_info["memory_percent"],
-        battery_percent=system_info["battery_percent"],
-        network_sent=system_info["network_sent"],
-        network_received=system_info["network_received"],
-        dashboard_memory_usage=system_info["dashboard_memory_usage"],
-        cpu_frequency=system_info["cpu_frequency"],
-        current_temp=system_info["current_temp"],
-        timestamp=datetime.datetime.now(),
-    )
-    system_log.save()
-
-
 def monitor_settings():
     """
     Monitors application general settings for changes and controls system logging dynamically.

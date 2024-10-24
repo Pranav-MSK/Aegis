@@ -115,7 +115,7 @@ def after_request(response):
     try:
         elapsed_time = time.time() - request.start_time
         metrics['REQUEST_HISTOGRAM'].labels(route=request.path).observe(elapsed_time)
-        metrics['REQUEST_METHOD_COUNT'].labels(method=request.method).observe(1)
+        metrics['REQUEST_METHOD_COUNT'].labels(method=request.method).observe(elapsed_time) 
         
         if response.data:
             metrics['RESPONSE_SIZE'].labels(route=request.path).observe(len(response.data))

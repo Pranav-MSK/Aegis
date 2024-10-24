@@ -139,13 +139,14 @@
                 { identifier: 'status', display: 'Status', totalLabel: 'Total Requests', averageLabel: 'Average' },
                 { identifier: 'status_code', display: 'Status Code', totalLabel: 'Total Requests', averageLabel: 'Average' },
                 { identifier: 'reason', display: 'Reason', totalLabel: 'Total Requests', averageLabel: 'Average' },
-                { identifier: 'error', display: 'Error', totalLabel: 'Total Requests', averageLabel: 'Average' },
-                { identifier: 'error_code', display: 'Error Code', totalLabel: 'Total Requests', averageLabel: 'Average' },
+                { identifier: 'error', display: 'Error', totalLabel: 'Total Requests', averageLabel: '' },
+                { identifier: 'error_code', display: 'Error Code', totalLabel: 'Total Requests', averageLabel: '' },
+                { identifier: 'error_type', display: 'Error Type', totalLabel: 'Total Requests', averageLabel: '' },
                 { identifier: 'payment_method', display: 'Payment Method', totalLabel: 'Total Amount', averageLabel: 'Average Amount' },
                 { identifier: 'user_id', display: 'User ID', totalLabel: 'Total Duration', averageLabel: 'Average Duration' }
             ];
 
-            const match = keys.find(k => data.count[0][k.identifier] !== undefined);
+            const match = keys.find(k => data.count[0][k.identifier] !== '');
             if (match) {
                 displayKey = match.display;
                 dataKey = match.identifier;
@@ -184,7 +185,7 @@
                                 <td>${item.instance || 'Unknown'}</td>
                                 <td>${item[dataKey] || 'All'}</td>
                                 <td>${formatNumber(item.value)}</td>
-                                <td>${formatNumber(data.averages[index]?.value)}</td>
+                                ${['error', 'error_code', 'error_type'].includes(dataKey) ? '' : `<td>${formatNumber(data.averages[index]?.value)}</td>`}
                             </tr>
                         `).join('')}
                     </tbody>
