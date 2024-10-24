@@ -58,7 +58,7 @@ log_message() {
 # Determine the directory where this script is located
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
-FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/app.py}"
+FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/systemguard.py}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
 SCRIPT_TO_CHECK_REQUIREMENTS="$SCRIPT_DIR/missing_dependency.py"
 FLASK_PORT="${FLASK_PORT:-5050}"

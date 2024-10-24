@@ -166,4 +166,4 @@ def kill_process():
                 flash("Invalid process ID or name.", "danger")
                 logger.error("Invalid process ID or name.")
         
-        return redirect(url_for("system_services"))
+        return redirect(url_for("show_system_services"))

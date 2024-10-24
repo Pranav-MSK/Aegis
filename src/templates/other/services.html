@@ -1,349 +1,209 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base/base.html' %}
+{% block title %}Service Monitor Dashboard{% endblock %}
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/dayjs.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/services.css') }}">
+{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1 class="dashboard-title">Service Monitor Dashboard</h1>
+    </header>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% extends 'base/base.html' %}
-    {% block title %}Service Monitor Dashboard{% endblock %}
-    {% block extra_head %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.7/dayjs.min.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/services.css') }}">
-    <style>
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    {% include 'ext/message.html' %}
 
-        .controls-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .page-size-select,
-        .category-select {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            min-width: 120px;
-        }
-
-        .pagination-controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .pagination-button {
-            padding: 8px 16px;
-            border: none;
-            background: #4a90e2;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .pagination-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .pagination-info {
-            line-height: 35px;
-            color: #666;
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-
-        #servicesTable {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        #servicesTable th {
-            background: #f8f9fa;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        #servicesTable td {
-            padding: 12px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-
-        .status-running {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-stopped {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .charts-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .chart-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        @media (max-width: 768px) {
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
-
-            .controls-section {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
-    </style>
-    {% endblock %}
-</head>
-
-<body>
-    {% block content %}
-    <div class="dashboard-container">
-        <header class="dashboard-header">
-            <h1 class="dashboard-title">Service Monitor Dashboard</h1>
-        </header>
-
-        {% include 'ext/message.html' %}
-
-        <div class="controls-section">
-            <div class="filter-group">
-                <select id="categoryFilter" class="category-select">
-                    <option value="all">All Categories</option>
-                </select>
-                <select id="pageSizeSelect" class="page-size-select">
-                    <option value="15">15 per page</option>
-                    <option value="25">25 per page</option>
-                    <option value="50">50 per page</option>
-                    <option value="100">100 per page</option>
-                </select>
-            </div>
-            <div class="pagination-info">
-                Showing <span id="startRange">1</span>-<span id="endRange">15</span> of <span id="totalItems">0</span>
-                items
-            </div>
+    <div class="controls-section">
+        <div class="filter-group">
+            <select id="categoryFilter" class="category-select">
+                <option value="all">All Categories</option>
+            </select>
+            <select id="pageSizeSelect" class="page-size-select">
+                <option value="15">15 per page</option>
+                <option value="25">25 per page</option>
+                <option value="50">50 per page</option>
+                <option value="100">100 per page</option>
+            </select>
         </div>
-
-        <div class="table-container">
-            <table id="servicesTable">
-                <thead>
-                    <tr>
-                        <th>PID</th>
-                        <th>Name</th>
-                        <th>Status</th>
-                        <th>CPU (%)</th>
-                        <th>Memory (MB)</th>
-                        <th>Ports</th>
-                        <th>Uptime</th>
-                        <th>Command</th>
-                        {% if session.get('sudo_password') %}
-                        <th>Actions</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <div class="pagination-controls">
-            <button id="prevPage" class="pagination-button" disabled>Previous</button>
-            <button id="nextPage" class="pagination-button">Next</button>
+        <div class="pagination-info">
+            Showing <span id="startRange">1</span>-<span id="endRange">15</span> of <span id="totalItems">0</span>
+            items
         </div>
     </div>
 
-    <script>
-        // State management
-        const state = {
-            currentPage: 1,
-            pageSize: parseInt(localStorage.getItem('processPageSize')) || 15,
-            serviceData: {},
-            filteredServices: [],
-            category: 'all'
-        };
-    
-        // Initialize UI elements
-        const elements = {
-            categoryFilter: document.getElementById('categoryFilter'),
-            pageSizeSelect: document.getElementById('pageSizeSelect'),
-            servicesTable: document.getElementById('servicesTable').getElementsByTagName('tbody')[0],
-            prevButton: document.getElementById('prevPage'),
-            nextButton: document.getElementById('nextPage'),
-            startRange: document.getElementById('startRange'),
-            endRange: document.getElementById('endRange'),
-            totalItems: document.getElementById('totalItems')
-        };
-    
-        // Set initial page size from localStorage
-        elements.pageSizeSelect.value = state.pageSize;
-    
-        function getStatusBadgeClass(status) {
-            return status.toLowerCase() === 'running' ? 'status-running' : 'status-stopped';
-        }
-    
-        function updatePagination() {
-            const totalPages = Math.ceil(state.filteredServices.length / state.pageSize);
-            const start = (state.currentPage - 1) * state.pageSize + 1;
-            const end = Math.min(start + state.pageSize - 1, state.filteredServices.length);
-    
-            elements.prevButton.disabled = state.currentPage === 1;
-            elements.nextButton.disabled = state.currentPage >= totalPages;
-            elements.startRange.textContent = start;
-            elements.endRange.textContent = end;
-            elements.totalItems.textContent = state.filteredServices.length;
-        }
-    
-        function displayServices() {
-            const start = (state.currentPage - 1) * state.pageSize;
-            const end = start + state.pageSize;
-            const pageServices = state.filteredServices.slice(start, end);
-    
-            elements.servicesTable.innerHTML = '';
-            pageServices.forEach(service => {
-                const row = elements.servicesTable.insertRow();
-                row.innerHTML = `
-                    <td>${service.pid}</td>
-                    <td>${service.name}</td>
-                    <td><span class="status-badge ${getStatusBadgeClass(service.status)}">${service.status}</span></td>
-                    <td>${service.cpu}%</td>
-                    <td>${service.memory_mb} MB</td>
-                    <td>${service.ports.join(', ') || '-'}</td>
-                    <td>${service.uptime_human}</td>
-                    <td>${service.cmd}</td>
+    <div class="table-container">
+        <table id="servicesTable">
+            <thead>
+                <tr>
+                    <th>PID</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>CPU (%)</th>
+                    <th>Memory (MB)</th>
+                    <th>Ports</th>
+                    <th>Uptime</th>
+                    <th>Command</th>
                     {% if session.get('sudo_password') %}
-                    <td>
-                        <button onclick="killProcess(${service.pid}, '${service.name}')" class="kill-button">
-                            Kill Process
-                        </button>
-                    </td>
+                    <th>Actions</th>
                     {% endif %}
-                `;
-            });
-    
-            updatePagination();
-        }
-    
-        async function fetchCategories() {
-            try {
-                const response = await fetch('/api/v1/services/categories');  // Updated endpoint
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                populateCategoryFilter(data.categories);  // Updated to use 'categories' from response
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-                const errorText = await response.text(); // Read the response body
-                console.error('Response body:', errorText); // Log the response body
-            }
-        }
-    
-        function populateCategoryFilter(categories) {
-            elements.categoryFilter.innerHTML = '<option value="all">All Categories</option>';
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                elements.categoryFilter.appendChild(option);
-            });
-        }
-    
-        async function fetchServices() {
-            try {
-                const url = state.category === 'all' ? '/api/v1/services' : `/api/v1/services/${state.category}`;
-                const response = await fetch(url);
-                state.serviceData = await response.json();
-                state.filteredServices = state.category === 'all' 
-                    ? Object.values(state.serviceData.services).flat() 
-                    : state.serviceData.processes;
-                displayServices();
-            } catch (error) {
-                console.error('Error fetching services:', error);
-            }
-        }
-    
-        // Event Listeners
-        elements.categoryFilter.addEventListener('change', (e) => {
-            state.category = e.target.value;
-            state.currentPage = 1;
-            fetchServices();
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="pagination-controls">
+        <button id="prevPage" class="pagination-button" disabled>Previous</button>
+        <button id="nextPage" class="pagination-button">Next</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // State management
+    const state = {
+        currentPage: 1,
+        pageSize: parseInt(localStorage.getItem('processPageSize')) || 15,
+        serviceData: {},
+        filteredServices: [],
+        category: 'all'
+    };
+
+    // Initialize UI elements
+    const elements = {
+        categoryFilter: document.getElementById('categoryFilter'),
+        pageSizeSelect: document.getElementById('pageSizeSelect'),
+        servicesTable: document.getElementById('servicesTable').getElementsByTagName('tbody')[0],
+        prevButton: document.getElementById('prevPage'),
+        nextButton: document.getElementById('nextPage'),
+        startRange: document.getElementById('startRange'),
+        endRange: document.getElementById('endRange'),
+        totalItems: document.getElementById('totalItems')
+    };
+
+    // Set initial page size from localStorage
+    elements.pageSizeSelect.value = state.pageSize;
+
+    function getStatusBadgeClass(status) {
+        return status.toLowerCase() === 'running' ? 'status-running' : 'status-stopped';
+    }
+
+    function updatePagination() {
+        const totalPages = Math.ceil(state.filteredServices.length / state.pageSize);
+        const start = (state.currentPage - 1) * state.pageSize + 1;
+        const end = Math.min(start + state.pageSize - 1, state.filteredServices.length);
+
+        elements.prevButton.disabled = state.currentPage === 1;
+        elements.nextButton.disabled = state.currentPage >= totalPages;
+        elements.startRange.textContent = start;
+        elements.endRange.textContent = end;
+        elements.totalItems.textContent = state.filteredServices.length;
+    }
+
+    function displayServices() {
+        const start = (state.currentPage - 1) * state.pageSize;
+        const end = start + state.pageSize;
+        const pageServices = state.filteredServices.slice(start, end);
+
+        elements.servicesTable.innerHTML = '';
+        pageServices.forEach(service => {
+            const row = elements.servicesTable.insertRow();
+            row.innerHTML = `
+                <td>${service.pid}</td>
+                <td>${service.name}</td>
+                <td><span class="status-badge ${getStatusBadgeClass(service.status)}">${service.status}</span></td>
+                <td>${service.cpu}%</td>
+                <td>${service.memory_mb} MB</td>
+                <td>${service.ports.join(', ') || '-'}</td>
+                <td>${service.uptime_human}</td>
+                <td>${service.cmd}</td>
+                {% if session.get('sudo_password') %}
+                <td>
+                    <button onclick="killProcess(${service.pid}, '${service.name}')" class="kill-button">
+                        Kill Process
+                    </button>
+                </td>
+                {% endif %}
+            `;
         });
-    
-        elements.pageSizeSelect.addEventListener('change', (e) => {
-            state.pageSize = parseInt(e.target.value);
-            state.currentPage = 1;
-            localStorage.setItem('processPageSize', state.pageSize);
+
+        updatePagination();
+    }
+
+    async function fetchCategories() {
+        try {
+            const response = await fetch('/api/v1/services/categories');  // Updated endpoint
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            populateCategoryFilter(data.categories);  // Updated to use 'categories' from response
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            const errorText = await response.text(); // Read the response body
+            console.error('Response body:', errorText); // Log the response body
+        }
+    }
+
+    function populateCategoryFilter(categories) {
+        elements.categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            elements.categoryFilter.appendChild(option);
+        });
+    }
+
+    async function fetchServices() {
+        try {
+            const url = state.category === 'all' ? '/api/v1/services' : `/api/v1/services/${state.category}`;
+            const response = await fetch(url);
+            state.serviceData = await response.json();
+            state.filteredServices = state.category === 'all' 
+                ? Object.values(state.serviceData.services).flat() 
+                : state.serviceData.processes;
             displayServices();
-        });
-    
-        elements.prevButton.addEventListener('click', () => {
-            if (state.currentPage > 1) {
-                state.currentPage--;
-                displayServices();
-            }
-        });
-    
-        elements.nextButton.addEventListener('click', () => {
-            const totalPages = Math.ceil(state.filteredServices.length / state.pageSize);
-            if (state.currentPage < totalPages) {
-                state.currentPage++;
-                displayServices();
-            }
-        });
-    
-        // Auto-refresh every 30 seconds
-        setInterval(fetchServices, 30000);
-    
-        // Initial fetch for categories and services
-        fetchCategories();
+        } catch (error) {
+            console.error('Error fetching services:', error);
+        }
+    }
+
+    // Event Listeners
+    elements.categoryFilter.addEventListener('change', (e) => {
+        state.category = e.target.value;
+        state.currentPage = 1;
         fetchServices();
-    </script>
-    
+    });
 
-    {% endblock %}
-</body>
+    elements.pageSizeSelect.addEventListener('change', (e) => {
+        state.pageSize = parseInt(e.target.value);
+        state.currentPage = 1;
+        localStorage.setItem('processPageSize', state.pageSize);
+        displayServices();
+    });
 
-</html>
+    elements.prevButton.addEventListener('click', () => {
+        if (state.currentPage > 1) {
+            state.currentPage--;
+            displayServices();
+        }
+    });
+
+    elements.nextButton.addEventListener('click', () => {
+        const totalPages = Math.ceil(state.filteredServices.length / state.pageSize);
+        if (state.currentPage < totalPages) {
+            state.currentPage++;
+            displayServices();
+        }
+    });
+
+    // Auto-refresh every 30 seconds
+    setInterval(fetchServices, 30000);
+
+    // Initial fetch for categories and services
+    fetchCategories();
+    fetchServices();
+</script>
+{% endblock %}

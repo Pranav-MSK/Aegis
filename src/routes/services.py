@@ -9,7 +9,7 @@ services_bp = blueprints.Blueprint('services', __name__)
 
 
 @app.get("/api/v1/services")
-def get_services():
+def fetch_all_running_services():
     """Get all running services."""
     monitor = ServiceMonitor()
     try:
@@ -39,7 +39,7 @@ def get_services_by_category(category: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/v1/services/categories")
-def get_categories():
+def list_service_categories():
     """Get list of available service categories."""
     monitor = ServiceMonitor()
     return jsonify({
@@ -49,6 +49,6 @@ def get_categories():
 
 
 @app.get("/system/services")
-def system_services():
+def show_system_services():
     return render_template('other/services.html')
 
