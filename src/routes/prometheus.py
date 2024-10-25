@@ -315,7 +315,7 @@ def configure_targets():
 @admin_required
 def restart_prometheus():
     update_prometheus_container()
-    flash("Prometheus container restarted successfully!", "success")
+    flash("Prometheus service updated successfully!", "success")
     return redirect(url_for("configure_targets"))
 
 

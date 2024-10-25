@@ -123,20 +123,23 @@ class DashboardController {
       this.handleError('Chart update failed');
     });
   }
-
-  async updateDashboard() {
+  async updateSystemInfo() {
     try {
-      const [systemInfo, dashboardStats] = await Promise.all([
-        this.fetchData(CONFIG.API_ENDPOINTS.SYSTEM_INFO),
-        this.fetchData(CONFIG.API_ENDPOINTS.DASHBOARD_STATS)
-      ]);
-
+      const systemInfo = await this.fetchData(CONFIG.API_ENDPOINTS.SYSTEM_INFO);
       this.updateCharts(systemInfo);
       this.updateMetricsDisplay(systemInfo);
       this.updateProcessGrid(systemInfo.top_processes);
+    } catch (error) {
+      this.handleError('Failed to update system info', error);
+    }
+  }
+
+  async updateDashboard() {
+    try {
+      const dashboardStats = await this.fetchData(CONFIG.API_ENDPOINTS.DASHBOARD_STATS);
       this.updateDashboardStats(dashboardStats);
     } catch (error) {
-      this.handleError('Failed to update dashboard', error);
+      this.handleError('Failed to update dashboard stats', error);
     }
   }
 
@@ -373,8 +376,9 @@ class DashboardController {
 
   start() {
     this.updateDashboard(); // Initial update
-    setInterval(() => this.updateDashboard(), CONFIG.REFRESH_INTERVAL);
-    setInterval(() => this.callContainerDataAPI(), 5000);
+    setInterval(() => this.updateSystemInfo(), CONFIG.REFRESH_INTERVAL);
+    setInterval(() => this.updateDashboard(), 30000);
+    setInterval(() => this.callContainerDataAPI(), 30000);
 
   }
 }
