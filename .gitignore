@@ -180,3 +180,6 @@ compiled_code/*
 
 migrations/*
 permission_level.csv
+
+systemguard_compiled/*
+*.c

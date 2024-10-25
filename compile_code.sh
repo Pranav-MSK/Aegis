@@ -3,7 +3,7 @@
 # Define directories
 ROOT_DIRECTORY=$(pwd)
 SOURCE_DIRECTORY="$ROOT_DIRECTORY/src"
-COMPILED_CODE_DIRECTORY="$ROOT_DIRECTORY/compiled_code"
+COMPILED_CODE_DIRECTORY="$ROOT_DIRECTORY/systemguard_compiled"
 COMPILED_CODE_SOURCE_DIRECTORY="$COMPILED_CODE_DIRECTORY/src"
 PROMETHEUS_OUTPUT_DIRECTORY="$COMPILED_CODE_DIRECTORY/prometheus_config"
 
@@ -106,4 +106,4 @@ compile_c_files "$SOURCE_DIRECTORY"
 echo "Build process completed successfully."
 
 # make zip file as systemguru.zip
-zip -r systemguard.zip compiled_code
+zip -r systemguard.zip "$COMPILED_CODE_DIRECTORY"
