@@ -22,7 +22,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('view_profile') }}">
                         {% if session.get('sudo_password') %}
-                        <span class="badge bg-danger">
+                        <span class="badge bg-danger d-inline-flex align-items-center">
                             <i class="fas fa-user-shield"></i> SuperAdmin
                         </span>
                         {% else %}
@@ -47,7 +47,7 @@
                 {% if is_trial == 'true' %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('activation') }}">
-                        <span class="badge bg-warning text-dark">
+                        <span class="badge bg-warning d-inline-flex align-items-center">
                             <i class="fas fa-exclamation-triangle"></i> Trial Version
                         </span>
                     </a>

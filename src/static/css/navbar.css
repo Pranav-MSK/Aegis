@@ -97,15 +97,19 @@ body {
     border-radius: 4px;
     font-size: 0.8rem;
     margin-left: 0.5rem;
+    align-items: center;
+    display: inline-flex;
+    padding: 5px;
 }
 
 .badge.danger {
     background-color: #dc3545;
+    color: white;
 }
 
 .badge.warning {
-    background-color: #ffc107;
-    color: #333;
+    background-color: #dbd1b1;
+    color: #fff9f9;
 }
 
 @media screen and (max-width: 1023px) {

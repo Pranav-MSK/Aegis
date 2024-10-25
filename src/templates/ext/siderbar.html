@@ -24,7 +24,7 @@
     {% for route, title, icon in navigation_items %}
     {% if not (request.endpoint == route) %}
     <div class="feature-list">
-        <div class="feature-element {% if request.endpoint == route %}active{% endif %}" data-section="{{ route }}">
+        <div class="feature-element {% if request.endpoint == route %}active{% endif %}" data-section="{{ route }}" onclick="location.href='{{ url_for(route) }}';" style="cursor: pointer;">
             <i class="{{ icon }}"></i>
             <a href="{{ url_for(route) }}" class="feature-link" style="text-decoration: none;">{{ title }}</a>
         </div>

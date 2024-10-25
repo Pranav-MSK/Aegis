@@ -1,167 +1,239 @@
 {% extends 'base/base.html' %}
 {% block title %}SystemGuard Targets{% endblock %}
-
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/targets.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 {% endblock %}
-
 {% block content %}
-<div class="container">
-    <h1>SystemGuard/Prometheus Targets</h1>
-    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the
-        scrape interval of the targets here.</p>
+<div class="min-h-screen bg-gray-50 p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3 mb-4">
+                <i class="fas fa-crosshairs text-blue-600"></i>
+                SystemGuard Targets
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the
+                scrape interval of the targets here.
+            </p>
+        </div>
 
-    {% include 'ext/message.html' %}
+        {% include 'ext/message.html' %}
 
-    {% if total_targets >= max_scrap_target | int %}
-    <div class="alert alert-warning">
-        <i class="fas fa-exclamation-triangle"></i>
-        Maximum target limit reached ({{ total_targets }}/{{ max_scrap_target | int }}). Cannot add new targets.
-    </div>
-    {% endif %}
+        {% if total_targets >= max_scrap_target | int %}
+        <div class="mb-6 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-md">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-amber-400 mr-3"></i>
+                <span class="text-amber-700">
+                    Maximum target limit reached ({{ total_targets }}/{{ max_scrap_target | int }}). Cannot add new targets.
+                </span>
+            </div>
+        </div>
+        {% endif %}
 
-    <div class="card">
-        <h2>Targets</h2>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Group Name <i class="fas fa-info-circle"
-                                title="Job Name is the name of the service that is being monitored."></i></th>
-                        <th>Targets <i class="fas fa-info-circle"
-                                title="Targets are the IP addresses of the services that are being monitored."></i></th>
-                        <th>Scrape Interval <i class="fas fa-info-circle"
-                                title="Scrape Interval is the time interval between each scrape of the target."></i>
-                        </th>
-                        <th>New Interval <i class="fas fa-info-circle"
-                                title="Change the scrape interval of the target."></i></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for info in targets_info %}
-                    <tr>
-                        <td>{{ info.job_name }}</td>
-                        <td>
-                            <ul class="target-list">
-                                {% for target in info.targets %}
-                                <li>
-                                    {{ target }}
-                                    {% if not system_ip_address ~ ':5050' in target %}
-                                    <form action="{{ url_for('configure_targets') }}" method="post" class="inline-form" onsubmit="return confirm('Are you sure you want to remove this target?');">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                                        <input type="hidden" name="target_to_remove" value="{{ target }}">
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            <i class="fas fa-times"></i> Remove
-                                        </button>
-                                    </form>
-                                    {% endif %}
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </td>
-                        <td>{{ info.scrape_interval }}</td>
-                        <td>
-                            <form action="{{ url_for('configure_targets') }}" method="post" class="inline-form">
-                                <input type="hidden" name="_method" value="PUT">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                                <input type="text" name="new_interval" placeholder="New Interval" required
-                                    class="input-field">
-                                <input type="hidden" name="action" value="update_interval">
-                                <button type="submit" class="btn btn-primary">Change</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Targets Table Card -->
+        <div class="bg-white rounded-xl shadow-sm mb-8 overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Current Targets</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Group Name 
+                                <i class="fas fa-info-circle text-gray-400 ml-1" title="Job Name is the name of the service that is being monitored."></i>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Targets
+                                <i class="fas fa-info-circle text-gray-400 ml-1" title="Targets are the IP addresses of the services that are being monitored."></i>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Scrape Interval
+                                <i class="fas fa-info-circle text-gray-400 ml-1" title="Scrape Interval is the time interval between each scrape of the target."></i>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for info in targets_info %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ info.job_name }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <ul class="space-y-2">
+                                    {% for target in info.targets %}
+                                    <li class="flex items-center justify-between text-sm">
+                                        <span class="text-gray-900">{{ target }}</span>
+                                        {% if not system_ip_address ~ ':5050' in target %}
+                                        <form action="{{ url_for('configure_targets') }}" method="post" class="inline-flex" 
+                                              onsubmit="return confirm('Are you sure you want to remove this target?');">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                            <input type="hidden" name="target_to_remove" value="{{ target }}">
+                                            <button type="submit" class="ml-2 inline-flex items-center px-2.5 py-1.5 border border-red-300 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                                <i class="fas fa-times mr-1"></i> Remove
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ info.scrape_interval }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <form action="{{ url_for('configure_targets') }}" method="post" class="flex items-center gap-2">
+                                    <input type="hidden" name="_method" value="PUT">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                    <input type="hidden" name="action" value="update_interval">
+                                    <input type="text" name="new_interval" placeholder="New Interval" required
+                                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-32 sm:text-sm border-gray-300 rounded-md">
+                                    <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        Change
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add New Target Card -->
+        <div class="bg-white rounded-xl shadow-sm mb-8 {% if total_targets >= max_scrap_target | int %}opacity-50 pointer-events-none{% endif %}">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Add New Target</h2>
+            </div>
+            <div class="p-6">
+                <form action="{{ url_for('configure_targets') }}" method="post" class="space-y-6" 
+                      {% if total_targets >= max_scrap_target | int %}onsubmit="return false;"{% endif %}>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="_method" value="POST">
+                    
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Job Name</label>
+                            <input type="text" name="job_name" placeholder="Enter job name" required
+                                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Target URL</label>
+                            <input type="text" name="new_target" placeholder="Enter target URL" required
+                                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Scrape Interval</label>
+                            <input type="text" name="scrape_interval" placeholder="e.g., 15s" required
+                                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div class="auth-fields">
+                            <label class="block text-sm font-medium text-gray-700">Username</label>
+                            <input type="text" name="username" placeholder="Enter username"
+                                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div class="auth-fields">
+                            <label class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" name="password" placeholder="Enter password"
+                                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-2"></i> Add Target
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Update Auth Card -->
+        <div class="bg-white rounded-xl shadow-sm mb-8">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Update Basic Auth</h2>
+            </div>
+            <div class="p-6">
+                <form action="{{ url_for('configure_targets') }}" method="post" id="change-auth-form" class="space-y-6">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="_method" value="PUT">
+                    <input type="hidden" name="action" value="update_auth">
+                    
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Job Name</label>
+                            <input type="text" name="job_name" placeholder="Enter job name" required
+                                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Username</label>
+                            <input type="text" name="username" placeholder="Enter username"
+                                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" name="password" placeholder="Enter password"
+                                   class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-edit mr-2"></i> Update Auth
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Update Prometheus Card -->
+        <div class="bg-white rounded-xl shadow-sm mb-8">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Update Prometheus</h2>
+            </div>
+            <div class="p-6">
+                <form action="{{ url_for('restart_prometheus') }}" class="inline-block">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-sync-alt mr-2"></i> Update Prometheus
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="bg-gray-50 rounded-xl p-6 space-y-2">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Important Notes</h3>
+            <div class="space-y-2 text-sm text-gray-600">
+                <p class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    After adding a new target, it may take a few minutes for the target to be scraped by Prometheus.
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    If you are adding a target that is not localhost, you need to provide the username and password.
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    If you are adding a target that is localhost, you do not need to provide the username and password.
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    After making any changes, you need to update Prometheus to apply the changes.
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                    Maximum number of targets allowed is {{ max_scrap_target | int }}.
+                </p>
+            </div>
         </div>
     </div>
-
-    <div class="card {% if total_targets >= max_scrap_target | int %}disabled{% endif %}">
-        <h2>Add New Target</h2>
-        <form action="{{ url_for('configure_targets') }}" method="post" class="add-target-form" 
-              {% if total_targets >= max_scrap_target | int %}onsubmit="return false;"{% endif %}>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="_method" value="POST">
-            <div class="form-group">
-                <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
-            </div>
-            <div class="form-group">
-                <input type="text" name="new_target" placeholder="New Target" class="input-field" required>
-            </div>
-            <div class="form-group">
-                <input type="text" name="scrape_interval" placeholder="Scrape Interval" class="input-field" required>
-            </div>
-            <div class="form-group">
-                <input type="text" name="username" placeholder="Username" class="input-field">
-            </div>
-            <div class="form-group">
-                <input type="password" name="password" placeholder="Password" class="input-field">
-            </div>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add Target
-            </button>
-        </form>
-    </div>
-
-    <div class="card">
-        <h2>Update Basic Auth</h2>
-        <form action="{{ url_for('configure_targets') }}" method="post" id="change-auth-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="_method" value="PUT">
-            <div class="form-group">
-                <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
-            </div>
-            <div class="form-group">
-                <input type="text" name="username" placeholder="Username" class="input-field">
-            </div>
-            <div class="form-group">
-                <input type="password" name="password" placeholder="Password" class="input-field">
-            </div>
-            <input type="hidden" name="action" value="update_auth">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-edit"></i> Change Auth
-            </button>
-        </form>
-    </div>
-
-    <div class="card">
-        <h2>Update Prometheus</h2>
-        <form action="{{ url_for('restart_prometheus') }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="btn btn-success">Update Prometheus</button>
-        </form>
-    </div>
-
-    <p class="text-note">Note: After adding a new target, it may take a few minutes for the target to be scraped by
-        Prometheus.</p>
-    <p class="text-note">Note: If you are adding a target that is not localhost, you need to provide the username and
-        password for the target.</p>
-    <p class="text-note">Note: If you are adding a target that is localhost, you do not need to provide the username and
-        password.</p>
-    <p class="text-note">Note: After making any changes, you need to update Prometheus to apply the changes.</p>
-    <p class="text-note">Note: Maximum number of targets allowed is {{ max_scrap_target | int }}.</p>
 </div>
-
-<script>
-    // Hide username/password if localhost is entered
-    document.querySelector('.add-target-form input[name="job_name"]').addEventListener('input', function () {
-        const usernameField = document.querySelector('.add-target-form input[name="username"]');
-        const passwordField = document.querySelector('.add-target-form input[name="password"]');
-        if (this.value === 'localhost') {
-            usernameField.style.display = 'none';
-            passwordField.style.display = 'none';
-        } else {
-            usernameField.style.display = 'block';
-            passwordField.style.display = 'block';
-        }
-    });
-</script>
-{% endblock %}
-
-{% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/targets.js') }}"></script>
 {% endblock %}
