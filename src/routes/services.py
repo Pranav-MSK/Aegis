@@ -4,6 +4,7 @@ from http.client import HTTPException
 
 from src.config import app
 from src.routes.helper.service_helper import ServiceMonitor
+from src.routes.helper.common_helper import admin_required
 
 services_bp = blueprints.Blueprint('services', __name__)
 
@@ -18,6 +19,7 @@ def fetch_all_running_services():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/v1/services/<category>")
+@admin_required
 def get_services_by_category(category: str):
     """Get services for a specific category."""
     try:
@@ -49,6 +51,7 @@ def list_service_categories():
 
 
 @app.get("/system/services")
+@admin_required
 def show_system_services():
     return render_template('other/services.html')
 

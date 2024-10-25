@@ -2,11 +2,13 @@
 from flask import render_template, request, redirect, url_for, flash, blueprints
 from src.config import app
 from src.models import NotificationSettings, GeneralSettings
+from src.routes.helper.common_helper import admin_required
 
 webhooks_bp = blueprints.Blueprint("webhooks", __name__)
 
 
 @app.route("/update-webhooks", methods=["GET", "POST"])
+@admin_required
 def update_webhooks():
     # Fetch existing webhook and general settings from the database
     webhook_settings = NotificationSettings.query.first()
