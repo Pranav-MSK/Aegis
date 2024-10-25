@@ -1,13 +1,14 @@
 <!-- Sidebar -->
 <div class="sidebar">
-    
+
     <div class="sidebar-header" style="text-align: right;">
         <h2>System Features</h2>
     </div>
 
+
     {% set navigation_items = [
     ('dashboard', 'Dashboard', 'fas fa-tachometer-alt'),
-    ('historical_system_metrics', 'Counter Metrics', 'fas fa-chart-line'),
+    ('historical_system_metrics', 'Historical System Metrics', 'fas fa-chart-line'),
     ('get_summary_metrics', 'Summary Metrics', 'fas fa-chart-line'),
     ('dashboard_network', 'Active Target', 'fas fa-network-wired'),
     ('configure_targets', 'Configure Targets', 'fas fa-cog'),
@@ -21,10 +22,21 @@
     ('view_users', 'User Management', 'fas fa-users')
     ] %}
 
+    {% if plan_type == "Free Edition" %}
+    {% set navigation_items = [
+    ('dashboard', 'Dashboard', 'fas fa-tachometer-alt'),
+    ('historical_system_metrics', 'Historical System Metrics', 'fas fa-chart-line'),
+    ('get_summary_metrics', 'Summary Metrics', 'fas fa-chart-line'),
+    ('general_settings', 'General Settings', 'fas fa-cogs'),
+    ('user_settings', 'User Settings', 'fas fa-user-cog'),
+    ] %}
+    {% endif %}
+
     {% for route, title, icon in navigation_items %}
     {% if not (request.endpoint == route) %}
     <div class="feature-list">
-        <div class="feature-element {% if request.endpoint == route %}active{% endif %}" data-section="{{ route }}" onclick="location.href='{{ url_for(route) }}';" style="cursor: pointer;">
+        <div class="feature-element {% if request.endpoint == route %}active{% endif %}" data-section="{{ route }}"
+            onclick="location.href='{{ url_for(route) }}';" style="cursor: pointer;">
             <i class="{{ icon }}"></i>
             <a href="{{ url_for(route) }}" class="feature-link" style="text-decoration: none;">{{ title }}</a>
         </div>

@@ -1,3 +1,4 @@
+# cython: language_level=3
 # Import necessary libraries
 from flask import render_template, Blueprint, jsonify
 from flask_login import login_required, current_user

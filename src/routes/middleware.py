@@ -108,7 +108,7 @@ plan_middleware = PlanMiddleware()
 
 # Define routes that bypass certain middleware checks
 BYPASS_ROUTES = {
-    'login', 'change_password', 'static', 'health_check', 'metrics'
+    'login', 'change_password', 'static', 'health_check', 'metrics', 'activation', 'signup', 'logout',
 }
 
 @app.before_request

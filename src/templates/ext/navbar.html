@@ -53,6 +53,15 @@
                     </a>
                 </li>
                 {% endif %}
+                {% if plan_type == "Free Edition" %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('activation') }}">
+                        <span class="badge bg-info d-inline-flex align-items-center">
+                            <i class="fas fa-arrow-up"></i> Upgrade
+                        </span>
+                    </a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>

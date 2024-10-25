@@ -1,3 +1,4 @@
+# cython: language_level=3
 
 # from threading import Lock
 # from functools import wraps
