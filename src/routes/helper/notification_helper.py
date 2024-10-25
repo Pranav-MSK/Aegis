@@ -103,6 +103,27 @@ def process_alert(alert):
     fingerprint = alert.get("fingerprint", None)
     runbook_url = alert["annotations"].get("runbook_url", None)
 
+    # check if fingerprint already exists
+    if fingerprint:
+        existing_alert = AlertTicket.query.filter_by(fingerprint=fingerprint).first()
+        # if alert_status of existing alert is "firing" and new alert_status is "resolved", update the existing alert
+        if existing_alert and existing_alert.alert_status == "firing" and alert_status == "resolved":
+            existing_alert.alert_status = alert_status
+            existing_alert.updated_at = datetime.utcnow()
+            # also log 
+            log_message = f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
+            alert_log = AlertLog(
+                alert_ticket_id=existing_alert.id,
+                log=log_message
+            )
+            alert_log.save()
+            existing_alert.save()
+            logger.info(f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve).")
+            return 
+        elif existing_alert and existing_alert.alert_status == "resolved" and alert_status == "firing":
+            logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
+            return
+
     log_alert(severity, alert_name, instance, description, summary)
     create_alert_ticket(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)
     notify_alert(alert_name, instance, severity, description, summary)
@@ -126,27 +147,6 @@ def create_alert_ticket(alert_name, alert_status, instance, severity,
     if not can_create_alert():
         logger.warning("Monthly alert ticket limit reached. Ignoring the alert.")
         return
-
-    # check if fingerprint already exists
-    if fingerprint:
-        existing_alert = AlertTicket.query.filter_by(fingerprint=fingerprint).first()
-        # if alert_status of existing alert is "firing" and new alert_status is "resolved", update the existing alert
-        if existing_alert and existing_alert.alert_status == "firing" and alert_status == "resolved":
-            existing_alert.alert_status = alert_status
-            existing_alert.updated_at = datetime.utcnow()
-            # also log 
-            log_message = f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
-            alert_log = AlertLog(
-                alert_ticket_id=existing_alert.id,
-                log=log_message
-            )
-            alert_log.save()
-            existing_alert.save()
-            logger.info(f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve).")
-            return 
-        elif existing_alert and existing_alert.alert_status == "resolved" and alert_status == "firing":
-            logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
-            return
     
     if not all_supervisors:
         assigned_supervisor_id = None

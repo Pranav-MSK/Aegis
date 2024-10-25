@@ -1,1 +1,84 @@
-z
+{% extends 'base/base.html' %}
+{% block title %}Update Notification Webhooks{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/update_webhooks.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Update Notification Webhooks</h1>
+    <p class="description">Manage your alert notifications by configuring webhooks for various services.</p>
+    {% include 'ext/message.html' %}
+    <form method="POST" action="{{ url_for('update_webhooks') }}" class="webhook-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-grid">
+            <div class="form-section">
+                <h2>Webhook URLs</h2>
+                <div class="input-group">
+                    <label for="slack_webhook_url">Slack</label>
+                    <input type="url" id="slack_webhook_url" name="slack_webhook_url" value="{{ webhook_settings.slack_webhook_url }}">
+                </div>
+                <div class="input-group">
+                    <label for="discord_webhook_url">Discord</label>
+                    <input type="url" id="discord_webhook_url" name="discord_webhook_url" value="{{ webhook_settings.discord_webhook_url }}">
+                </div>
+                <div class="input-group">
+                    <label for="teams_webhook_url">Microsoft Teams</label>
+                    <input type="url" id="teams_webhook_url" name="teams_webhook_url" value="{{ webhook_settings.teams_webhook_url }}">
+                </div>
+                <div class="input-group">
+                    <label for="google_chat_webhook_url">Google Chat</label>
+                    <input type="url" id="google_chat_webhook_url" name="google_chat_webhook_url" value="{{ webhook_settings.google_chat_webhook_url }}">
+                </div>
+            </div>
+            <div class="form-section">
+                <h2>Alert Settings</h2>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="enable_alerts" name="enable_alerts" {% if enable_alerts %}checked{% endif %}>
+                        <span class="slider"></span>
+                        <span class="label-text">Master Alert</span>
+                    </label>
+                </div>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="is_slack_alert_enabled" name="is_slack_alert_enabled" {% if webhook_settings.is_slack_alert_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                        <span class="label-text">Slack Alerts</span>
+                    </label>
+                </div>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="is_discord_alert_enabled" name="is_discord_alert_enabled" {% if webhook_settings.is_discord_alert_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                        <span class="label-text">Discord Alerts</span>
+                    </label>
+                </div>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="is_teams_alert_enabled" name="is_teams_alert_enabled" {% if webhook_settings.is_teams_alert_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                        <span class="label-text">Microsoft Teams Alerts</span>
+                    </label>
+                </div>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="is_google_chat_alert_enabled" name="is_google_chat_alert_enabled" {% if webhook_settings.is_google_chat_alert_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                        <span class="label-text">Google Chat Alerts</span>
+                    </label>
+                </div>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="is_email_alert_enabled" name="is_email_alert_enabled" {% if webhook_settings.is_email_alert_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                        <span class="label-text">Email Alerts</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn-submit">Update Webhooks</button>
+    </form>
+</div>
+{% endblock %}
