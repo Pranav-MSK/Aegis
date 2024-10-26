@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="System Dashboard - Manage and monitor your system">
     <title>{% block title %}System Dashboard{% endblock %}</title>
     <link rel="icon" href="https://img.icons8.com/emoji/48/shield-emoji.png">
     <link rel="icon" type="image/png" sizes="96x96" href="https://img.icons8.com/emoji/96/shield-emoji.png">
@@ -12,76 +13,120 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <!-- Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
     {% block extra_head %}{% endblock %}
 </head>
 
-<body class="bg-gray-100">
+<body class="h-full bg-gray-50">
+    <!-- Page Loader -->
     {% include 'ext/loader.html' %}
-    <div class="min-h-screen flex">
-        {% include 'ext/sidebar.html' %}
-        <!--- Main Content --->
-        <div class="flex-1 flex flex-col min-h-screen lg:pl-64">
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-4"></div>
+
+    <div class="min-h-screen">
+        <!-- Sidebar -->
+        <div class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+            {% if current_user.is_authenticated %}
+            {% include 'ext/sidebar.html' %}
+            {% else %}
+            <div class="flex flex-col flex-grow bg-white pt-5 pb-4 overflow-y-auto border-r border-gray-200">
+                <div class="px-4 space-y-4">
+                    <div class="flex items-center">
+                        <img class="h-8 w-auto" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+                        <span class="ml-3 text-xl font-medium text-gray-900">Dashboard</span>
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <p class="text-gray-600">Please log in to access the dashboard.</p>
+                        <a href="{{ url_for('login') }}"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Log In
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Mobile header & Main content -->
+        <div class="lg:pl-64 flex flex-col flex-1">
             <!-- Mobile Header -->
-            <div class="lg:hidden flex items-center p-4 bg-white border-b">
-                <button type="button" class="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100"
+            <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:hidden">
+                <button type="button"
+                    class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 lg:hidden"
                     onclick="toggleSidebar()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                    <span class="sr-only">Open sidebar</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <h1 class="ml-4 text-xl font-semibold text-gray-900">{% block page_title %}Dashboard{% endblock %}</h1>
+                <div class="flex-1 flex justify-between px-4 sm:px-6 lg:px-8">
+                    <div class="flex-1 flex">
+                        <h1 class="text-xl font-semibold text-gray-900 my-auto">
+                            {% block page_title %}Dashboard{% endblock %}
+                        </h1>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                    <div class="flex items-center">
+                        <!-- User dropdown -->
+                        <div class="ml-3 relative">
+                            <button type="button"
+                                class="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                id="user-menu-button">
+                                <img class="h-8 w-8 rounded-full"
+                                    src="{{ current_user.avatar_url or url_for('static', filename='images/default-avatar.png') }}"
+                                    alt="User avatar">
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
 
-            <!-- Main Content Area -->
-            <main class="flex-1 p-6">
+            <!-- Main Content -->
+            <main class="flex-1">
                 {% block content %}{% endblock %}
             </main>
-
-            <!-- Footer -->
-            {% include 'ext/footer.html' %}
         </div>
     </div>
 
     <!-- Scripts -->
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function (event) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-
-            if (window.innerWidth < 1024 &&
-                !sidebar.contains(event.target) &&
-                !event.target.closest('button')) {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
-        });
-    </script>
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <!-- Custom Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
 
+    <script>
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+
+            toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-lg transition-opacity duration-300`;
+            toast.innerHTML = message;
+
+            document.getElementById('toast-container').appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.lg\\:hidden');
+            sidebar.classList.toggle('hidden');
+        }
+    </script>
+
     {% block extra_scripts %}{% endblock %}
-
-
 </body>
 
 </html>

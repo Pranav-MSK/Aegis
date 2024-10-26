@@ -5,11 +5,15 @@ import platform
 import datetime
 import subprocess
 import psutil
+import requests
+import ssl
+import socket
 import GPUtil
 import functools
 from jinja2 import Environment, FileSystemLoader
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
+from functools import lru_cache
 
 from src.logger import logger
 from src.models import GeneralSettings
@@ -22,6 +26,7 @@ CACHE_EXPIRATION = 3600
 DIVIDE_BY_1024 = False
 CONVERSION_FACTOR_MB = (1024 ** 2) if DIVIDE_BY_1024 else (1000 ** 2)
 CONVERSION_FACTOR_GB = (1024 ** 3) if DIVIDE_BY_1024 else (1000 ** 3)
+domain_name = "google.com"
 
 def format_uptime(uptime_seconds):
     """Convert uptime from seconds to a human-readable format."""
@@ -308,7 +313,45 @@ def get_running_daemons():
     except Exception as e:
         logger.error(f"Error collecting running daemons: {e}")
         return []
+
+@lru_cache(maxsize=1)
+def get_region():
+    try:
+        # Step 1: Get a token for IMDSv2
+        token_response = requests.put(
+            "http://169.254.169.254/latest/api/token",
+            headers={"X-aws-ec2-metadata-token-ttl-seconds": "21600"},  # 6 hours
+            timeout=2
+        )
+        token_response.raise_for_status()
+        token = token_response.text
+        
+        # Step 2: Use the token to get the availability zone
+        headers = {"X-aws-ec2-metadata-token": token}
+        response = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=headers, timeout=2)
+        response.raise_for_status()
+        
+        availability_zone = response.text
+        return availability_zone[:-1]
     
+    except requests.RequestException as e:
+        print(f"Error accessing metadata: {e}")
+        return 'N/A'
+
+@lru_cache(maxsize=1)
+def check_ssl_status(domain_name):
+    print("Checking SSL status")
+    try:
+        context = ssl.create_default_context()
+        with socket.create_connection((domain_name, 443)) as sock:
+            with context.wrap_socket(sock, server_hostname=domain_name) as ssock:
+                ssock.getpeercert()
+                return True
+    except ssl.SSLError:
+        return False
+    except Exception as e:
+        return False
+
 def _collect_metrics():
     """Optimized system information collection using parallel processing"""
     try:
@@ -331,6 +374,7 @@ def _collect_metrics():
 
         results['timestamp'] = datetime.datetime.now()
         results['process_count'] = len(psutil.pids())
+    
         return results
 
     except Exception as e:
@@ -355,7 +399,9 @@ def fetch_system_metrics():
         'swap_memory': psutil.swap_memory().percent,
         'ipv4_connections': ipv4_address,
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
-        'os_info': os_info
+        'os_info': os_info,
+        'region_name': get_region(),
+        'ssl_status': check_ssl_status(domain_name),
     }
     info.update(_collect_metrics())
 

@@ -161,3 +161,24 @@ const navigationController = new NavigationController();
 function hideWarning() {
     navigationController.hideWarning();
 }
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('hidden');
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function (event) {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    if (window.innerWidth < 1024 &&
+        !sidebar.contains(event.target) &&
+        !event.target.closest('button')) {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+    }
+});

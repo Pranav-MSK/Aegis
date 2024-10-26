@@ -164,8 +164,11 @@ def global_middleware():
 @app.after_request
 def after_request(response: Response) -> Response:
     """Process response and record metrics"""
-    if request.endpoint not in BYPASS_ROUTES:
-        metrics_middleware.record_request_metrics(response, request.start_time)
+    try:
+        if request.endpoint not in BYPASS_ROUTES:
+            metrics_middleware.record_request_metrics(response, request.start_time)
+    except Exception as e:
+        logger.error(f"Error processing response: {e}")
     
     return response
 

@@ -1,212 +1,307 @@
 {% extends 'base/base.html' %}
 {% block title %}Chart Configurations{% endblock %}
-{% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/chart_configurations.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
-{% endblock %}
+
 {% block content %}
-<h1>Chart Configurations</h1>
-{% include 'ext/message.html' %}
-
-{% if configs|length >= max_number_of_graphs | int %}
-<div class="alert alert-warning">
-    <i class="fas fa-exclamation-triangle"></i>
-    <p>Maximum number of charts ({{ max_number_of_graphs | int }}) reached. Please delete existing charts before adding new ones.</p>
-</div>
-<button id="addConfigBtn" class="btn btn-primary" disabled title="Maximum number of charts reached">
-    <i class="fas fa-chart-line"></i> Add New Configuration
-</button>
-{% else %}
-<button id="addConfigBtn" class="btn btn-primary">
-    <i class="fas fa-chart-line"></i> Add New Configuration 
-    ({{ configs|length }}/{{ max_number_of_graphs | int }})
-</button>
-{% endif %}
-
-<table class="table table-striped mt-4">
-    <thead>
-        <tr>
-            <th>Metric Name</th>
-            <th>Title</th>
-            <th>X-Axis</th>
-            <th>Y-Axis</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for config in configs %}
-        <tr>
-            <td>{{ config.metric_name }}</td>
-            <td>{{ config.title }}</td>
-            <td>{{ config.xlabel }}</td>
-            <td>{{ config.ylabel }}</td>
-            <td>
-                <div class="toggle-group">
-                    <label class="toggle">
-                        <input type="checkbox" class="is-active" data-id="{{ config.id }}" 
-                               {{ 'checked' if config.is_active else '' }}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </td>
-            <td>
-                <button class="btn-edit" data-id="{{ config.id }}" 
-                        data-metric-name="{{ config.metric_name }}"
-                        data-title="{{ config.title }}" 
-                        data-xlabel="{{ config.xlabel }}" 
-                        data-ylabel="{{ config.ylabel }}"
-                        data-tension="{{ config.tension }}" 
-                        data-point-radius="{{ config.point_radius }}"
-                        data-point-hover-radius="{{ config.point_hover_radius }}" 
-                        data-chart-type="{{ config.chart_type }}">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn-delete" data-id="{{ config.id }}">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<!-- Modal for Editing Chart Configuration -->
-<div class="modal" id="editModal">
-    <div class="modal-content">
-        <span class="close" onclick="document.getElementById('editModal').style.display='none'">&times;</span>
-        <h2>Edit Chart Configuration</h2>
-        <form id="chartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" id="configId" name="config_id" value="">
-
-            <div class="form-group">
-                <label for="metricName">Metric Name</label>
-                <input type="text" name="metric_name" required id="metricName" placeholder="Metric Name">
-            </div>
-
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" name="title" required id="title" placeholder="Title">
-            </div>
-
-            <div class="form-group">
-                <label for="xlabel">X-Axis Label</label>
-                <input type="text" name="xlabel" required id="xlabel" placeholder="X-Axis Label">
-            </div>
-
-            <div class="form-group">
-                <label for="ylabel">Y-Axis Label</label>
-                <input type="text" name="ylabel" required id="ylabel" placeholder="Y-Axis Label">
-            </div>
-
-            <div class="form-group">
-                <label for="tension">Tension</label>
-                <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4" 
-                       oninput="this.nextElementSibling.value = this.value">
-                <output>0.4</output>
-            </div>
-            
-            <div class="form-group">
-                <label for="pointRadius">Point Radius</label>
-                <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0" 
-                       oninput="this.nextElementSibling.value = this.value">
-                <output>0</output>
-            </div>
-            
-            <div class="form-group">
-                <label for="pointHoverRadius">Point Hover Radius</label>
-                <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6" 
-                       oninput="this.nextElementSibling.value = this.value">
-                <output>6</output>
-            </div>            
-
-            <input type="hidden" name="formtype" value="edit">
-
-            <div class="form-group">
-                <label for="chartType">Chart Type</label>
-                <select name="chart_type" id="chartType">
-                    <option value="line">Line</option>
-                    <option value="bar">Bar</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Update Configuration</button>
-        </form>
-    </div>
-</div>
-
-<!-- Modal for Adding New Chart Configuration -->
-<div class="modal" id="addModal">
-    <div class="modal-content">
-        <span class="close" onclick="document.getElementById('addModal').style.display='none'">&times;</span>
-        <h2>Add New Chart Configuration</h2>
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Chart Configurations</h1>
         {% if configs|length >= max_number_of_graphs | int %}
-        <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>Maximum number of charts reached. Please delete existing charts before adding new ones.</p>
-        </div>
+        <button id="addConfigBtn" class="inline-flex items-center px-4 py-2 bg-gray-400 text-white rounded-lg opacity-50 cursor-not-allowed" disabled title="Maximum number of charts reached">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Add New Configuration
+        </button>
         {% else %}
-        <form id="newChartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-            <div class="form-group">
-                <label for="newMetricName">Metric Name</label>
-                <input type="text" name="metric_name" required id="newMetricName" placeholder="Metric Name">
-            </div>
-
-            <div class="form-group">
-                <label for="newTitle">Title</label>
-                <input type="text" name="title" required id="newTitle" placeholder="Title">
-            </div>
-
-            <div class="form-group">
-                <label for="newXlabel">X-Axis Label</label>
-                <input type="text" name="xlabel" required id="newXlabel" placeholder="X-Axis Label">
-            </div>
-
-            <div class="form-group">
-                <label for="newYlabel">Y-Axis Label</label>
-                <input type="text" name="ylabel" required id="newYlabel" placeholder="Y-Axis Label">
-            </div>
-
-            <div class="form-group">
-                <label for="tension">Tension</label>
-                <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4" 
-                       oninput="this.nextElementSibling.value = this.value">
-                <output>0.4</output>
-            </div>
-            
-            <div class="form-group">
-                <label for="pointRadius">Point Radius</label>
-                <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0" 
-                       oninput="this.nextElementSibling.value = this.value">
-                <output>0</output>
-            </div>
-            
-            <div class="form-group">
-                <label for="pointHoverRadius">Point Hover Radius</label>
-                <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6" 
-                       oninput="this.nextElementSibling.value = this.value">
-                <output>6</output>
-            </div>
-
-            <div class="form-group">
-                <label for="newChartType">Chart Type</label>
-                <select name="chart_type" id="newChartType">
-                    <option value="line">Line</option>
-                    <option value="bar">Bar</option>
-                </select>
-            </div>
-
-            <input type="hidden" name="formtype" value="add">
-
-            <button type="submit" class="btn-submit"><i class="fas fa-plus"></i> Create Configuration</button>
-        </form>
+        <button id="addConfigBtn" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Add New Configuration ({{ configs|length }}/{{ max_number_of_graphs | int }})
+        </button>
         {% endif %}
     </div>
-</div>
+
+    {% include 'ext/message.html' %}
+
+    {% if configs|length >= max_number_of_graphs | int %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div class="flex items-center">
+            <svg class="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <p class="text-sm text-yellow-700">Maximum number of charts ({{ max_number_of_graphs | int }}) reached. Please delete existing charts before adding new ones.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">X-Axis</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Y-Axis</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for config in configs %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ config.metric_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ config.title }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ config.xlabel }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ config.ylabel }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" 
+                                       class="is-active hidden" 
+                                       data-id="{{ config.id }}" 
+                                       {{ 'checked' if config.is_active else '' }}>
+                                <div class="relative w-10 h-6 bg-gray-200 rounded-full transition duration-200 ease-in">
+                                    <span class="dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ease-in-out transform" 
+                                          :class="{ 'translate-x-4': checked }"></span>
+                                </div>
+                            </label>
+                        </td>
+
+                        <!-- Add this CSS to your stylesheet or in a style tag -->
+                        <style>
+                            input:checked + div .dot {
+                                transform: translateX(100%);
+                            }
+                            input:checked + div {
+                                background-color: #2b62d8;
+                                color: #2b62d8;
+                            }
+                        </style>
+                        
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <button class="btn-edit inline-flex items-center px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded transition-colors duration-200" 
+                                data-id="{{ config.id }}"
+                                data-metric-name="{{ config.metric_name }}"
+                                data-title="{{ config.title }}"
+                                data-xlabel="{{ config.xlabel }}"
+                                data-ylabel="{{ config.ylabel }}"
+                                data-tension="{{ config.tension }}"
+                                data-point-radius="{{ config.point_radius }}"
+                                data-point-hover-radius="{{ config.point_hover_radius }}"
+                                data-chart-type="{{ config.chart_type }}">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Edit
+                            </button>
+                            <button class="btn-delete inline-flex items-center px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors duration-200" data-id="{{ config.id }}">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Modal -->
+    <div id="addModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">Add New Chart Configuration</h2>
+                <button onclick="document.getElementById('addModal').style.display='none'" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="chartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="space-y-4">
+                    <div>
+                        <label for="metricName" class="block text-sm font-medium text-gray-700">Metric Name</label>
+                        <input type="text" name="metric_name" required id="metricName" placeholder="Metric Name"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" name="title" required id="title" placeholder="Title"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="xlabel" class="block text-sm font-medium text-gray-700">X-Axis Label</label>
+                            <input type="text" name="xlabel" required id="xlabel" placeholder="X-Axis Label"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="ylabel" class="block text-sm font-medium text-gray-700">Y-Axis Label</label>
+                            <input type="text" name="ylabel" required id="ylabel" placeholder="Y-Axis Label"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="tension" class="block text-sm font-medium text-gray-700">Tension</label>
+                        <div class="flex items center gap-4">
+                            <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="this.nextElementSibling.value = this.value">
+                            <output class="text-sm text-gray-600 min-w-[3ch]">0.4</output>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="pointRadius" class="block text-sm font-medium text-gray-700">Point Radius</label>
+                        <div class="flex items center gap-4">
+                            <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="this.nextElementSibling.value = this.value">
+                            <output class="text-sm text-gray-600 min-w-[3ch]">0</output>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="pointHoverRadius" class="block text-sm font-medium text-gray-700">Point Hover Radius</label>
+                        <div class="flex items center gap-4">
+                            <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="this.nextElementSibling.value = this.value">
+                            <output class="text-sm text-gray-600 min-w-[3ch]">6</output>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="chartType" class="block text-sm font-medium text-gray-700">Chart Type</label>
+                        <select name="chart_type" id="chartType"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="line">Line</option>
+                            <option value="bar">Bar</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" name="formtype" value="add">
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="document.getElementById('addModal').style.display='none'"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
+                        Add Configuration
+                    </button>
+                </div>
+
+
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">Edit Chart Configuration</h2>
+                <button onclick="document.getElementById('editModal').style.display='none'" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="chartConfigForm" action="{{ url_for('chart_configurations') }}" method="POST" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" id="configId" name="config_id" value="">
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="metricName" class="block text-sm font-medium text-gray-700">Metric Name</label>
+                        <input type="text" name="metric_name" required id="metricName" placeholder="Metric Name"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" name="title" required id="title" placeholder="Title"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="xlabel" class="block text-sm font-medium text-gray-700">X-Axis Label</label>
+                            <input type="text" name="xlabel" required id="xlabel" placeholder="X-Axis Label"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="ylabel" class="block text-sm font-medium text-gray-700">Y-Axis Label</label>
+                            <input type="text" name="ylabel" required id="ylabel" placeholder="Y-Axis Label"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="tension" class="block text-sm font-medium text-gray-700">Tension</label>
+                        <div class="flex items-center gap-4">
+                            <input type="range" name="tension" id="tension" min="0" max="1" step="0.1" value="0.4"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="this.nextElementSibling.value = this.value">
+                            <output class="text-sm text-gray-600 min-w-[3ch]">0.4</output>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="pointRadius" class="block text-sm font-medium text-gray-700">Point Radius</label>
+                        <div class="flex items-center gap-4">
+                            <input type="range" name="point_radius" id="pointRadius" min="0" max="20" step="1" value="0"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="this.nextElementSibling.value = this.value">
+                            <output class="text-sm text-gray-600 min-w-[3ch]">0</output>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="pointHoverRadius" class="block text-sm font-medium text-gray-700">Point Hover Radius</label>
+                        <div class="flex items-center gap-4">
+                            <input type="range" name="point_hover_radius" id="pointHoverRadius" min="0" max="20" step="1" value="6"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                oninput="this.nextElementSibling.value = this.value">
+                            <output class="text-sm text-gray-600 min-w-[3ch]">6</output>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="chartType" class="block text-sm font-medium text-gray-700">Chart Type</label>
+                        <select name="chart_type" id="chartType"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="line">Line</option>
+                            <option value="bar">Bar</option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" name="formtype" value="edit">
+
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="document.getElementById('editModal').style.display='none'"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}
 {% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/chartConfig.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/chartConfig.js') }}"></script>
 {% endblock %}
