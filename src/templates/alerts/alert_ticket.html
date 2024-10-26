@@ -1,505 +1,3 @@
-<!-- 
-<div class="row">
-    <div class="col-md-6">
-        {% if current_user.user_level == 'admin' %}
-        <div class="text-right mb-3">
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="critical_ticket">
-                <input type="hidden" name="severity" value="critical">
-                <input type="hidden" name="investigation_notes" value="Marking the ticket as critical severity.">
-                <button type="submit" class="btn btn-danger">Mark Critical Severity <i
-                        class="fas fa-exclamation-triangle"></i></button>
-            </form>
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="warning_ticket">
-                <input type="hidden" name="severity" value="warning">
-                <input type="hidden" name="investigation_notes" value="Marking the ticket as warning severity.">
-                <button type="submit" class="btn btn-warning">Mark Warning Severity <i
-                        class="fas fa-exclamation-triangle"></i></button>
-            </form>
-
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="info_ticket">
-                <input type="hidden" name="severity" value="info">
-                <input type="hidden" name="investigation_notes" value="Marking the ticket as info severity.">
-                <button type="submit" class="btn btn-info">Mark Info Severity <i
-                        class="fas fa-info-circle"></i></button>
-            </form>
-
-            {% if alert.assigned_user_id is none %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="assign_me">
-                <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
-                <button type="submit" class="btn btn-primary">Assign to Yourself <i class="fas fa-user"></i></button>
-            </form>
-            {% endif %}
-        </div>
-        {% endif %}
-        <div class="alert-metadata">
-            <h2 class="section-title"><i class="fas fa-info-circle"></i> Alert Information</h2>
-            <table class="table table-bordered">
-                <tbody>
-                    <tr>
-                        <th>Alert Name</th>
-                        <td>{{ alert.alert_name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Instance</th>
-                        <td>{{ alert.instance }}</td>
-                    </tr>
-                    <tr>
-                        <th>System Username</th>
-                        <td>{{ alert.system_username }}</td>
-                    </tr>
-                    <tr>
-                        <th>System Hostname</th>
-                        <td>{{ alert.system_hostname }}</td>
-                    </tr>
-                    <tr>
-                        <th>Fingerprint</th>
-                        <td>{{ alert.fingerprint }}</td>
-                    </tr>
-                    <tr>
-                        <th>Runbook URL</th>
-                        <td>
-                            {% if alert.runbook_url %}
-                            <a href="{{ alert.runbook_url }}" target="_blank">{{ alert.runbook_url }}</a>
-                            {% else %}
-                            N/A
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Description</th>
-                        <td>
-                            {{ alert.description }}
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editDescription')" style="cursor: pointer;"></i>
-                            <div id="editDescription" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="edit_description">
-                                    <div class="form-group">
-                                        <label for="description">Edit Description:</label>
-                                        <textarea class="form-control" name="description"
-                                            rows="4">{{ alert.description }}</textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Update Description</button>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Summary</th>
-                        <td>
-                            {{ alert.summary }}
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editSummary')" style="cursor: pointer;"></i>
-                            <div id="editSummary" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="edit_summary">
-                                    <div class="form-group">
-                                        <label for="summary">Edit Summary:</label>
-                                        <textarea class="form-control" name="summary"
-                                            rows="4">{{ alert.summary }}</textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Update Summary</button>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="col-md-6">
-        {% if current_user.user_level == 'admin' %}
-        <div class="text-right mb-3">
-            {% if alert.ticket_status not in ['Closed'] %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="close_ticket">
-                <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
-                <input type="hidden" name="ticket_status" value="Resolved">
-                <input type="hidden" name="investigation_notes" value="Closing the ticket now as solved.">
-                <button type="submit" class="btn btn-success">Close Ticket <i class="fas fa-check"></i></button>
-            </form>
-            {% endif %}
-
-            {% if alert.ticket_status in ['Closed'] %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="reopen_ticket">
-                <input type="hidden" name="ticket_status" value="Open">
-                <input type="hidden" name="investigation_notes" value="Reopening the ticket for further investigation.">
-                <button type="submit" class="btn btn-warning">Reopen Ticket <i
-                        class="fas fa-exclamation-triangle"></i></button>
-            </form>
-            {% endif %}
-
-            {% if alert.ticket_status not in ['In Progress', 'Closed'] %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="progress_ticket">
-                <input type="hidden" name="ticket_status" value="In Progress">
-                <input type="hidden" name="investigation_notes" value="Marking the ticket as in progress.">
-                <button type="submit" class="btn btn-info">Mark as In Progress <i class="fas fa-spinner"></i></button>
-            </form>
-            {% endif %}
-
-            {% if alert.ticket_status == 'In Progress' %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="resolve_ticket">
-                <input type="hidden" name="ticket_status" value="Resolved">
-                <input type="hidden" name="investigation_notes" value="Marking the ticket as resolved.">
-                <button type="submit" class="btn btn-success">Mark as Resolved <i class="fas fa-check"></i></button>
-            </form>
-            {% endif %}
-
-            <a href="{{ url_for('alert_history') }}" class="btn btn-secondary">All Tickets <i
-                    class="fas fa-list"></i></a> 
-        </div>
-        {% endif %}
-
-        <div class="alert-metadata">
-            <h2 class="section-title"><i class="fas fa-info-circle"></i> Alert Current Status</h2>
-            <table class="table table-bordered mt-4">
-                <tbody>
-                    <tr>
-                        <th>Alert Status (Prometheus)</th>
-                        <td>
-                            <span
-                                class="badge badge-{% if alert.alert_status == 'firing' %}danger{% elif alert.alert_status == 'resolved' %}info{% else %}warning{% endif %}"
-                                data-toggle="tooltip"
-                                title="The current status of the alert. 'Firing' means the alert is active, 'Resolved' means the alert has been backed off. (Prometheus)">
-                                {{ alert.alert_status }}
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Severity</th>
-                        <td>
-                            <span class="badge badge-{{ alert.severity }}">{{ alert.severity }}</span>
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editSeverity')" style="cursor: pointer;"></i>
-                            <div id="editSeverity" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="edit_severity">
-                                    <select name="severity" class="form-control mb-2">
-                                        <option value="info" {% if alert.severity=='info' %}selected{% endif %}>
-                                            Info</option>
-                                        <option value="warning" {% if alert.severity=='warning' %}selected{% endif %}>
-                                            Warning</option>
-                                        <option value="critical" {% if alert.severity=='critical' %}selected{% endif %}>
-                                            Critical</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">Update Severity</button>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Ticket Status</th>
-                        <td>
-                            <span
-                                class="badge badge-{% if alert.ticket_status == 'In Progress' %}warning{% else %}{{ alert.ticket_status | lower }}{% endif %}">
-                                {{ alert.ticket_status }}
-                            </span>
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editStatus')" style="cursor: pointer;"></i>
-                            <div id="editStatus" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="edit_status">
-                                    <select name="ticket_status" class="form-control mb-2">
-                                        <option value="Open" {% if alert.ticket_status=='Open' %}selected{% endif %}>
-                                            Open</option>
-                                        <option value="In Progress" {% if alert.ticket_status=='In Progress'
-                                            %}selected{% endif %}>In Progress</option>
-                                        <option value="Resolved" {% if alert.ticket_status=='Resolved' %}selected{%
-                                            endif %}>Resolved</option>
-                                        <option value="Closed" {% if alert.ticket_status=='Closed' %}selected{% endif
-                                            %}>Closed</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">Update Status</button>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Assigned Investigator</th>
-                        <td>
-                            {{ alert.assigned_user.username if alert.assigned_user else 'Unassigned' }}
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editInvestigator')"
-                                style="cursor: pointer;"></i>
-                            <div id="editInvestigator" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="assign_user">
-                                    <label for="assigned_user">Assign Investigator:</label>
-                                    <select name="assigned_user_id" class="form-control" onchange="this.form.submit()">
-                                        <option value="">Unassigned</option>
-                                        {% for user in users %}
-                                        <option value="{{ user.id }}" {% if user.id==alert.assigned_user_id %}selected{%
-                                            endif %}>{{ user.username }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Assigned Supervisor</th>
-                        <td>
-                            {{ alert.assigned_supervisor.username if alert.assigned_supervisor else 'Unassigned'
-                            }}
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editSupervisor')" style="cursor: pointer;"></i>
-                            <div id="editSupervisor" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="assign_supervisor">
-                                    <label for="assigned_supervisor">Assign Supervisor:</label>
-                                    <select name="assigned_supervisor_id" class="form-control"
-                                        onchange="this.form.submit()">
-                                        <option value="">Unassigned</option>
-                                        {% for user in admin_users %}
-                                        <option value="{{ user.id }}" {% if user.id==alert.assigned_supervisor_id
-                                            %}selected{% endif %}>{{
-                                            user.username }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Created At</th>
-                        <td>{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Last Updated At</th>
-                        <td>{{ alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if alert.updated_at else 'N/A' }}
-                        </td>
-                    </tr>
-                    {% for customfield in alert.customfields %}
-                    <tr>
-                        <th>{{ customfield.field_name }}</th>
-                        <td>
-                            {{ customfield.field_value }}
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editCustomField{{ customfield.id }}')"
-                                style="cursor: pointer;"></i>
-                            <i class="fas fa-trash"
-                                onclick="document.getElementById('deleteCustomField{{ customfield.id }}').submit();"
-                                style="cursor: pointer;"></i>
-                            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post"
-                                id="deleteCustomField{{ customfield.id }}" style="display: none;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="form_type" value="delete_customfield">
-                                <input type="hidden" name="customfield_id" value="{{ customfield.id }}">
-                            </form>
-                            <div id="editCustomField{{ customfield.id }}" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                </form>
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="form_type" value="edit_customfield">
-                                <input type="hidden" name="customfield_id" value="{{ customfield.id }}">
-                                <div class="form-group">
-                                    <label for="field_name">Field Name:</label>
-                                    <input type="text" name="field_name" class="form-control"
-                                        value="{{ customfield.field_name }}" required>
-                                    <label for="field_value">Field Value:</label>
-                                    <input type="text" name="field_value" class="form-control"
-                                        value="{{ customfield.field_value }}" required>
-                                    <button type="submit" class="btn btn-primary mt-2">Update Custom
-                                        Field</button>
-                                </div>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% if current_user.user_level == 'admin' %}
-                    <tr>
-                        <th>Add Custom Field</th>
-                        <td>
-                            <i class="fas fa-plus" onclick="toggleEdit('addCustomField')" style="cursor: pointer;"></i>
-                            <div id="addCustomField" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="add_customfield">
-                                    <div class="form-group">
-                                        <label for="field_name">Field Name:</label>
-                                        <input type="text" name="field_name" class="form-control" required>
-                                        <label for="field_value">Field Value:</label>
-                                        <input type="text" name="field_value" class="form-control" required>
-                                        <button type="submit" class="btn btn-primary mt-2">Add Custom
-                                            Field</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-{% if current_user.id == alert.assigned_user_id %}
-<div class="notes-section">
-    <h2 class="section-title"><i class="fas fa-comment"></i> Investigation Notes</h2>
-    <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="notes-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="form_type" value="add_comment">
-        <div class="form-group">
-            <label for="investigation_notes">Add Investigation Notes:</label>
-            <textarea id="investigation_notes" class="form-control" name="investigation_notes" rows="4"
-                placeholder="Type your notes here..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Notes</button>
-    </form>
-</div>
-{% endif %}
-
-{% if alert.assigned_supervisor_id and current_user.id == alert.assigned_supervisor_id %}
-<div class="notes-section">
-    <h2 class="section-title"><i class="fas fa-file-alt"></i> Supervisor Report</h2>
-    <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="notes-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="form_type" value="add_comment">
-        <div class="form-group">
-            <label for="supervisor_report_notes">Add Supervisor Report:</label>
-            <textarea id="supervisor_report_notes" class="form-control" name="investigation_notes" rows="4"
-                placeholder="Type your report here..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Report</button>
-    </form>
-</div>
-{% endif %}
-
-
-<div class="row">
-    <div class="col-md-6">
-        <div class="notes-section">
-            <h2 class="section-title"><i class="fas fa-history"></i> Report and Investigation
-                Notes
-            </h2>
-            <div class="list-group">
-                {% for note in investigation_notes.items %}
-                <div class="list-group-item">
-                    <p class="mb-1 d-flex justify-content-between">
-                        <span>
-                            {% if note.user.first_name %}
-                            <strong>{{ note.user.first_name }} {{ note.user.last_name }}</strong>
-                            {% else %}
-                            <strong>{{ note.user.username }}</strong>
-                            {% endif %}
-                            : {{ note.note }}
-                        </span>
-                        <small class="text-muted">{{ note.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-                    </p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        <nav aria-label="Investigation Notes Pagination">
-            <ul class="pagination justify-content-center">
-                {% if investigation_notes.has_prev %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.prev_num, logs_page=request.args.get('logs_page', 1), logs_per_page=request.args.get('logs_per_page', 10)) }}"
-                        aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% endif %}
-                {% for page_num in range(1, investigation_notes.pages + 1) %}
-                <li class="page-item {% if page_num == investigation_notes.page %}active{% endif %}">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=page_num, logs_page=request.args.get('logs_page', 1), logs_per_page=request.args.get('logs_per_page', 10)) }}">{{
-                        page_num }}</a>
-                </li>
-                {% endfor %}
-                {% if investigation_notes.has_next %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.next_num, logs_page=request.args.get('logs_page', 1), logs_per_page=request.args.get('logs_per_page', 10)) }}"
-                        aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-    <div class="col-md-6">
-        <div class="logs-section">
-            <h2 class="section-title"><i class="fas fa-history"></i> Alert Logs</h2>
-            <div class="list-group"></div>
-            {% for log in alert_logs.items %}
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <p class="mb-1">{{ log.log }}</p>
-                    <small class="text-muted">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <nav aria-label="Alert Logs Pagination">
-            <ul class="pagination justify-content-center">
-                {% if alert_logs.has_prev %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.prev_num, notes_page=request.args.get('notes_page', 1), notes_per_page=request.args.get('notes_per_page', 10)) }}"
-                        aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% endif %}
-                {% for page_num in range(1, alert_logs.pages + 1) %}
-                <li class="page-item {% if page_num == alert_logs.page %}active{% endif %}">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=page_num, notes_page=request.args.get('notes_page', 1), notes_per_page=request.args.get('notes_per_page', 10)) }}">{{
-                        page_num }}</a>
-                </li>
-                {% endfor %}
-                {% if alert_logs.has_next %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.next_num, notes_page=request.args.get('notes_page', 1), notes_per_page=request.args.get('notes_per_page', 10)) }}"
-                        aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-</div>
-
-</div>
- -->
-
-
 {% extends 'base/base.html' %}
 {% block title %}Alert Ticket: {{ alert.alert_name }}{% endblock %}
 
@@ -581,32 +79,10 @@
                 </button>
             </form>
             {% endif %}
+        </div>
+        <div class="flex flex-wrap gap-2 mb-6">
 
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="close_ticket">
-                <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
-                <input type="hidden" name="ticket_status" value="Resolved">
-                <input type="hidden" name="investigation_notes" value="Closing the ticket now as solved.">
-                <button type="submit"
-                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                    <i class="fas fa-check mr-2"></i>
-                    Close Ticket
-                </button>
-            </form>
-
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="reopen_ticket">
-                <input type="hidden" name="ticket_status" value="Open">
-                <input type="hidden" name="investigation_notes" value="Reopening the ticket for further investigation.">
-                <button type="submit"
-                    class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    Reopen Ticket
-                </button>
-            </form>
-
+            {% if alert.ticket_status == 'Open' %}
             <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="progress_ticket">
@@ -621,6 +97,53 @@
 
             <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="form_type" value="close_ticket">
+                <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
+                <input type="hidden" name="ticket_status" value="Resolved">
+                <input type="hidden" name="investigation_notes" value="Closing the ticket now as solved.">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-check mr-2"></i>
+                    Close Ticket
+                </button>
+            </form>
+
+            
+            {% endif %}
+
+            {% if alert.ticket_status == 'Closed' %}
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="form_type" value="reopen_ticket">
+                <input type="hidden" name="ticket_status" value="Open">
+                <input type="hidden" name="investigation_notes" value="Reopening the ticket for further investigation.">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Reopen Ticket
+                </button>
+            </form>
+            {% endif %}
+
+            {% if alert.ticket_status == 'Resolved' %}
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="form_type" value="close_ticket">
+                <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
+                <input type="hidden" name="ticket_status" value="Resolved">
+                <input type="hidden" name="investigation_notes" value="Closing the ticket now as solved.">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-check mr-2"></i>
+                    Close Ticket
+                </button>
+            </form>
+            {% endif %}
+
+
+            {% if alert.ticket_status == 'In Progress' %}
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="resolve_ticket">
                 <input type="hidden" name="ticket_status" value="Resolved">
                 <input type="hidden" name="investigation_notes" value="Marking the ticket as resolved.">
@@ -631,11 +154,19 @@
                 </button>
             </form>
 
-            <a href="{{ url_for('alert_history') }}"
-                class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                <i class="fas fa-list mr-2"></i>
-                All Tickets
-            </a>
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="form_type" value="close_ticket">
+                <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
+                <input type="hidden" name="ticket_status" value="Resolved">
+                <input type="hidden" name="investigation_notes" value="Closing the ticket now as solved.">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-check mr-2"></i>
+                    Close Ticket
+                </button>
+            </form>
+            {% endif %}
 
         </div>
         {% endif %}

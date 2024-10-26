@@ -26,7 +26,8 @@ def view_profile():
     This route displays the user's profile information.
     """
     user = current_user  # Get the currently logged-in user
-    user.profile_picture_url = get_gravatar_url(user.email)
+    user.profile_picture_url = current_user.get_profile_picture_url()
+    print(user.profile_picture_url)
     user_assigned_tickets = AlertTicket.query.filter_by(assigned_user_id=user.id).all()
     ticket_stats = {}
     ticket_count = len(user_assigned_tickets)

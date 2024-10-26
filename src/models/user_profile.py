@@ -1,5 +1,6 @@
 # cython: language_level=3
 from datetime import datetime
+import hashlib
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash
 
@@ -65,3 +66,9 @@ class UserProfile(BaseModel, UserMixin):
     # check_hashed_password
     def check_password(self, password):
         return check_password_hash(self.password, password)
+    
+
+    def get_profile_picture_url(self, size=200):
+        # Create an MD5 hash of the email address
+        email_hash = hashlib.md5(self.email.strip().lower().encode('utf-8')).hexdigest()
+        return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
