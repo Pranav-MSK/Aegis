@@ -1,0 +1,139 @@
+<!--- Sidebar --->
+<aside id="sidebar"
+class="fixed top-0 left-0 z-40 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white border-r border-gray-200">
+<!-- Logo -->
+<div class="flex items-center justify-between px-4 py-5 border-b">
+    <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-xl">S</span>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="text-xl font-semibold text-gray-900">{{ title }}</a>
+    </div>
+    <!-- Close button for mobile -->
+    <button type="button"
+        class="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none"
+        onclick="toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+</div>
+
+<!-- Navigation Links -->
+<nav class="px-4 py-4">
+    <div class="space-y-2">
+        <a href="{{ url_for('dashboard') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'dashboard' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-tachometer-alt mr-4 h-6 w-6"></i>
+            HomePage
+        </a>
+
+        <a href="{{ url_for('historical_system_metrics') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'historical_system_metrics' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-chart-line mr-4 h-6 w-6"></i>
+            Historical System Metrics
+        </a>
+
+        <a href="{{ url_for('get_summary_metrics') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'get_summary_metrics' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-chart-line mr-4 h-6 w-6"></i>
+            Summary Metrics
+        </a>
+
+        
+        <a href="{{ url_for('configure_targets') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'configure_targets' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-cog mr-4 h-6 w-6"></i>
+            Configure Targets
+        </a>
+        
+        <a href="{{ url_for('dashboard_network') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'dashboard_network' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group border-t">
+            <i class="fas fa-network-wired mr-4 h-6 w-6"></i>
+            Active Target
+        </a>
+
+        <a href="{{ url_for('process') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'process' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-tasks mr-4 h-6 w-6"></i>
+            System Process
+        </a>
+
+        <a href="{{ url_for('firewall') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'firewall' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group border-t">
+            <i class="fas fa-shield-alt mr-4 h-6 w-6"></i>
+            Firewall
+        </a>
+
+        <a href="{{ url_for('perform_security_analysis') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'perform_security_analysis' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-shield-alt mr-4 h-6 w-6"></i>
+            Security Analysis
+        </a>
+
+        <a href="{{ url_for('alert_history') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'alert_history' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-bell mr-4 h-6 w-6"></i>
+            Alert Tracker
+        </a>
+
+        <a href="{{ url_for('settings') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'settings' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group border-t">
+            <i class="fas fa-cogs mr-4 h-6 w-6"></i>
+            Control Panel
+        </a>
+
+        <a href="{{ url_for('general_settings') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'general_settings' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-cogs mr-4 h-6 w-6"></i>
+            General Settings
+        </a>
+
+        <a href="{{ url_for('user_settings') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'user_settings' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-user-cog mr-4 h-6 w-6"></i>
+            User Settings
+        </a>
+
+        <a href="{{ url_for('view_users') }}"
+            class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'view_users' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+            <i class="fas fa-users mr-4 h-6 w-6"></i>
+            User Management
+        </a>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="mt-8">
+
+        <div class="mt-2 space-y-1">
+            <a href="{{ url_for('settings') }}"
+                class="flex items-center px-2 py-2 text-base font-medium rounded-md {% if request.endpoint == 'settings' %}bg-indigo-50 text-indigo-600{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group">
+                <i class="fas fa-cog mr-4 h-6 w-6"></i>
+                Settings
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- User Profile -->
+{% if current_user.is_authenticated %}
+<div class="flex items-center px-4 py-3 mt-auto border-t">
+    <!-- <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+        <i class="fas fa-user text-gray-600"></i>
+    </div> -->
+    <img src="{{ profile_picture_url }}" alt="Profile Image" class="w-10 h-10 rounded-full">
+    <div class="ml-3">
+        <p class="text-sm font-medium text-gray-700">{{ current_user.first_name | capitalize }} {{ current_user.last_name | capitalize }}</p>
+        <a href="{{ url_for('view_profile') }}"
+            class="text-xs font-medium text-gray-500 hover:text-indigo-600">View Profile</a>
+    </div>
+</div>
+{% endif %}
+</aside>
+
+
+ <!--- Sidebar Overlay --->
+ <div class="fixed inset-0 z-30 bg-gray-600 bg-opacity-75 lg:hidden hidden" id="sidebar-overlay"
+ onclick="toggleSidebar()"></div>

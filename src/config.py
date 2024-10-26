@@ -1,5 +1,6 @@
 # cython: language_level=3
 import os
+import hashlib
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,11 +8,18 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_caching import Cache
+from flask_login import current_user
 
 from src.helper import get_system_node_name, get_ip_address, load_secret_key
 from src.activator import get_plan_details
 
 app = Flask(__name__)
+
+def get_current_use_profile_picture(size=200):
+    # Create an MD5 hash of the email address
+    current_user_email = current_user.email if current_user and current_user.is_authenticated else ""
+    email_hash = hashlib.md5(current_user_email.strip().lower().encode('utf-8')).hexdigest()
+    return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
 
 # Application Metadata
 APP_NAME = "SystemGuard"
@@ -81,7 +89,8 @@ app.jinja_env.globals.update(
     max_alert_rules=plan_details.get('max_alert_rules'),
     max_number_of_graphs=plan_details.get('max_number_of_graphs'),
     monthly_alert_tickets_limit=plan_details.get('monthly_alert_tickets_limit'),
-    max_users_allowed=plan_details.get('max_users_allowed')
+    max_users_allowed=plan_details.get('max_users_allowed'),
+    profile_picture_url=get_current_use_profile_picture(),
 
 )
 

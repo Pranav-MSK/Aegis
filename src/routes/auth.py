@@ -91,8 +91,9 @@ def login():
 
 @app.route("/logout")
 def logout():
-    logout_user()
     logger.info(f"user {current_user.username} logged out")
+    logout_user()
+
     return redirect(url_for("login"))
 
 @app.route("/signup", methods=["GET", "POST"])

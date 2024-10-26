@@ -289,7 +289,7 @@ def get_top_processes(number=5, combined=False):
 
     return processes
 
-def get_process_metrics(num_processes=8):
+def get_process_metrics(num_processes=12):
     """Collect process metrics with optimized collection"""
     try:
         return {'top_processes': get_top_processes(number=num_processes, combined=True)}
