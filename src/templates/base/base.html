@@ -98,9 +98,6 @@
                                     <div
                                         class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full blur opacity-50">
                                     </div>
-                                    <img class="relative h-10 w-10 rounded-full ring-2 ring-white"
-                                        src="{{ current_user.avatar_url or url_for('static', filename='images/default-avatar.png') }}"
-                                        alt="User avatar">
                                 </div>
                                 <div class="hidden sm:flex sm:flex-col sm:items-start">
                                     <span class="text-sm font-semibold text-gray-900">{{ current_user.first_name }} {{
@@ -125,7 +122,9 @@
                                 <a href="{{ url_for('logout') }}"
                                     class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign out</a>
                             </div>
+
                         </div>
+                        
                     </div>
                     {% endif %}
                 </div>
@@ -133,18 +132,6 @@
 
             <!-- Main Content -->
             <main class="flex-1 pb-8">
-                <!-- Page header -->
-                <!-- <div class="bg-white shadow-sm">
-                    <div class="px-4 sm:px-6 lg:max-w-7xl lg:mx-auto lg:px-8">
-                        <div class="py-6 md:flex md:items-center md:justify-between">
-                            <div class="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-                                {% block page_actions %}
-                                {% endblock %}
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
                 <!-- Page content -->
                 <div class="mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="space-y-8 py-8">
