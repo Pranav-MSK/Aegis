@@ -10,6 +10,7 @@ from src.activator import (
 )
 from src.helper import load_secret_key
 from src.routes.helper.activation_helper import generate_license_pdf
+from src.activator import get_plan_details
 from src.routes.helper.notification_helper import generate_system_notification
 
 activation_bp = Blueprint('activation', __name__)
@@ -18,6 +19,22 @@ internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', '
 @app.route('/activation', methods=['GET', 'POST'])
 @login_required
 def activation():
+    plan_details = get_plan_details()
+    app.jinja_env.globals.update(
+        is_plan_not_expired=plan_details.get('is_plan_not_expired'),
+        remaining_plan_days=plan_details.get('remaining_plan_days'),
+        plan_type=plan_details.get('plan_type'),
+        is_trial=plan_details.get('is_trial'),
+        license_key=plan_details.get('license_key'),
+        activation_code=plan_details.get('activation_code'),
+        systemguard_unique_id=plan_details.get('systemguard_unique_id'),
+        max_scrap_target=plan_details.get('max_scrap_target'),
+        max_alert_rules=plan_details.get('max_alert_rules'),
+        max_number_of_graphs=plan_details.get('max_number_of_graphs'),
+        monthly_alert_tickets_limit=plan_details.get('monthly_alert_tickets_limit'),
+        max_users_allowed=plan_details.get('max_users_allowed')
+    )
+
     systemguard_unique_id = calculate_unique_system_id()
 
     license_key = None
