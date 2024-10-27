@@ -6,47 +6,175 @@
 {% block title %}{{ title }} | {{ system_info.nodename }} {% endblock %}
 {% block content %}
 <div class="content">
-
     <header class="bg-white mb-3">
         <!-- Top status strip with advanced metrics -->
         <div class="bg-gradient-to-r from-gray-50 via-white to-gray-50 border-b border-gray-200">
             <div class="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-2">
                 <div class="flex items-center justify-between">
                     <!-- Left Side -->
-                    <div class="flex-shrink-0 flex items-center space-x-6">
-                        <!-- System Status Pills -->
-                        <div class="flex items-center space-x-3">
-                            <!-- Health Status -->
-                            <div
-                                class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm hover:bg-green-100 transition-colors group cursor-pointer">
-                                <div class="h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse"></div>
-                                <span class="ml-2 text-sm font-medium text-green-700 group-hover:text-green-800">All
-                                    Systems Operational</span>
-                            </div>
-                            <!-- Uptime Status -->
-                            <div class="hidden sm:flex items-center px-3 py-1.5 bg-blue-50 rounded-full shadow-sm">
-                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                </svg>
-                                <span class="ml-2 text-sm font-medium text-blue-700">99.9% Uptime</span>
-                            </div>
+                    <div class="flex items-center space-x-3">
+                        <!-- Health Status -->
+                        <div
+                            class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm hover:bg-green-100 transition-colors group cursor-pointer">
+                            <div class="h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse"></div>
+                            <span class="ml-2 text-sm font-medium tex   t-green-700 group-hover:text-green-800">All
+                                Systems Operational</span>
                         </div>
+                        <!-- Uptime Status -->
+                        <div class="hidden sm:flex items-center px-3 py-1.5 bg-blue-50 rounded-full shadow-sm">
+                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            <span class="ml-2 text-sm font-medium text-blue-700">99.9% Uptime</span>
+                        </div>
+                        <!-- Performance Status -->
+                        <!-- <div class="hidden sm:flex items-center px-3 py-1.5 bg-yellow-50 rounded-full shadow-sm">
+                            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 14l9-5-9-5-9 5 9 5z" />
+                            </svg>
+                            <span class="ml-2 text-sm font-medium text-yellow-700">Performance: 99%</span>
+                        </div>   -->
+                        <!-- Security Status -->
+                        <!-- <div class="hidden sm:flex items-center px-3 py-1.5 bg-red-50 rounded-full shadow-sm">
+                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 14l9-5-9-5-9 5 9 5z" />
+                            </svg>
+                            <span class="ml-2 text-sm font-medium text-red-700">Security: 99%</span>
+                        </div> -->
+                        <!-- Compliance Status -->
+                        <!-- <div class="hidden sm:flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
+                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 14l9-5-9-5-9 5 9 5z" />
+                            </svg>
+                            <span class="ml-2 text-sm font-medium text-green-700">Compliance: 99%</span>
+                        </div> -->
                     </div>
 
                     <!-- Right Side -->
+
                     <div class="flex items-center space-x-2 sm:space-x-4">
-                        <!-- Notifications -->
-                        <button
-                            class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all">
-                            <span
-                                class="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                        </button>
+                        <!-- Notification Button with Dropdown -->
+                        {% set is_alert = False %}
+                        <div class="relative" x-data="{ isOpen: false }">
+                            <!-- Notification Button -->
+                            <button @click="isOpen = !isOpen"
+                                class="relative p-2.5 text-slate-500 hover:text-slate-700 bg-white hover:bg-slate-100 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                :aria-expanded="isOpen" aria-haspopup="true">
+                                {% if is_alert %}
+                                <span class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span
+                                        class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 ring-2 ring-white"></span>
+                                </span>
+                                {% endif %}
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                            </button>
+
+                            <!-- Notification Dropdown -->
+                            <div x-show="isOpen" @click.away="isOpen = false"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 translate-y-1"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 translate-y-1"
+                                class="absolute right-0 mt-3 w-80 origin-top-right">
+                                <div
+                                    class="rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+                                    <!-- Header -->
+                                    <div
+                                        class="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/80">
+                                        <h3 class="text-sm font-semibold text-slate-900">Notifications</h3>
+                                        {% if notifications %}
+                                        <a href="#" class="text-xs font-medium text-blue-600 hover:text-blue-700">Mark
+                                            all as read</a>
+                                        {% endif %}
+                                    </div>
+
+                                    {% set notifications = [
+                                    {
+                                    'type': 'warning',
+                                    'icon': 'exclamation-triangle',
+                                    'title': 'Warning',
+                                    'message': 'Alert is coming soon in future updates.',
+                                    'time': '2 hours ago',
+                                    'unread': True
+                                    }]
+
+                                    %}
+                                    <!-- Notifications List -->
+                                    <div class="max-h-96 overflow-y-auto">
+                                        {% if notifications %}
+                                        <div class="divide-y divide-slate-100">
+                                            {% for notification in notifications %}
+                                            <div
+                                                class="relative flex p-4 space-x-3 hover:bg-slate-50 transition-colors duration-150 {% if notification.unread %}bg-blue-50/40{% endif %}">
+                                                <!-- Notification Icon -->
+                                                <div class="flex-shrink-0">
+                                                    <span class="inline-flex items-center justify-center h-10 w-10 rounded-full 
+                                {% if notification.type == 'warning' %}bg-amber-100 text-amber-600
+                                {% elif notification.type == 'error' %}bg-red-100 text-red-600
+                                {% elif notification.type == 'success' %}bg-emerald-100 text-emerald-600
+                                {% else %}bg-blue-100 text-blue-600{% endif %}">
+                                                        <i class="fas fa-{{ notification.icon }} w-5 h-5"></i>
+                                                    </span>
+                                                </div>
+
+                                                <!-- Notification Content -->
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-slate-900">
+                                                        {{ notification.title }}
+                                                    </p>
+                                                    <p class="text-sm text-slate-500 line-clamp-2">
+                                                        {{ notification.message }}
+                                                    </p>
+                                                    <p class="mt-1 text-xs text-slate-400">
+                                                        {{ notification.time }}
+                                                    </p>
+                                                </div>
+
+                                                <!-- Unread Indicator -->
+                                                {% if notification.unread %}
+                                                <div class="absolute right-4 top-4 h-2 w-2 rounded-full bg-blue-500">
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% else %}
+                                        <div class="p-8 text-center">
+                                            <div
+                                                class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-4">
+                                                <i class="fas fa-bell text-slate-400 w-6 h-6"></i>
+                                            </div>
+                                            <p class="text-sm font-medium text-slate-900">No new notifications</p>
+                                            <p class="mt-1 text-sm text-slate-500">We'll notify you when something
+                                                arrives.</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Footer -->
+                                    {% if notifications %}
+                                    <div class="border-t border-slate-100 bg-slate-50/80">
+                                        <a href="#"
+                                            class="block px-4 py-3 text-sm font-medium text-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors duration-150">
+                                            View all notifications
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
 
                         <!-- Documentation -->
                         <a href="https://systemguard.readthedocs.io/en/latest/"
@@ -82,7 +210,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Main header content -->
         <div class="mx-auto">
             <div class="px-4 sm:px-6 lg:px-8 py-6">
@@ -92,44 +220,71 @@
                         <!-- Primary Server Info -->
                         <div class="flex items-center">
                             <div class="relative">
-                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg transform transition-transform duration-200 hover:scale-105">
                                     <i class="fas fa-server text-white text-2xl"></i>
                                 </div>
-                                <div class="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-green-100 border-2 border-white flex items-center justify-center ring-2 ring-green-50">
+                                <div
+                                    class="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-green-100 border-2 border-white flex items-center justify-center ring-2 ring-green-50">
                                     <div class="h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse"></div>
                                 </div>
                             </div>
                             <div class="ml-5">
                                 <div class="flex items-center space-x-3">
                                     <h2 class="text-xl font-bold text-gray-900">{{ system_info.nodename }}</h2>
-                                    <span class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full border border-blue-200">Primary</span>
+                                    <span
+                                        class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full border border-blue-200">Primary</span>
                                 </div>
-                                <p class="text-sm text-gray-600 mt-0.5 font-medium">{{ system_info.ipv4_connections }}</p>
+                                <p class="text-sm text-gray-600 mt-0.5 font-medium">{{ system_info.ipv4_connections }}
+                                </p>
                             </div>
                         </div>
-        
+
                         <!-- Server Metrics Quick View -->
-                        <div class="flex items-center space-x-4 p-3 bg-gray-50/80 backdrop-blur-sm rounded-xl border border-gray-100">
-                            <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                                <i class="fas fa-shield-alt text-indigo-500 mr-2.5 text-lg"></i>
-                                {% if system_info.ssl_status %}
-                                    <span class="text-sm font-semibold text-gray-700">SSL Secured</span>
-                                {% else %}
-                                    <span class="text-sm font-semibold text-red-600">No SSL</span>
-                                {% endif %}
-                            </div>
-                            <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                                <i class="fas fa-hdd text-indigo-500 mr-2.5 text-lg"></i>
-                                <span class="text-sm font-semibold text-gray-700">Region: {{ system_info.region_name }}</span>
-                            </div>
+
+                        <div
+                            class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
+                            <i class="fas fa-shield-alt text-indigo-500 mr-2.5 text-lg"></i>
+                            {% if system_info.ssl_status %}
+                            <span class="text-sm font-semibold text-gray-700">SSL Secured</span>
+                            {% else %}
+                            <span class="text-sm font-semibold text-red-600">No SSL</span>
+                            {% endif %}
                         </div>
+                        <div
+                            class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
+                            <i class="fas fa-hdd text-indigo-500 mr-2.5 text-lg"></i>
+                            <span class="text-sm font-semibold text-gray-700">Region: {{ system_info.region_name
+                                }}</span>
+                        </div>
+                        <!-- <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
+                            <i class="fas fa-cloud text-indigo-500 mr-2.5 text-lg"></i>
+                            <span class="text-sm font-semibold text-gray-700">Instance Type: {{ instance_type }}</span>
+                        </div>
+                        <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
+                            <i class="fas fa-map-marker-alt text-indigo-500 mr-2.5 text-lg"></i>
+                            <span class="text-sm font-semibold text-gray-700">Availability Zone: {{ availability_zone }}</span>
+                        </div>
+                        <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
+                            <i class="fas fa-clock text-indigo-500 mr-2.5 text-lg"></i>
+                            <span class="text-sm font-semibold text-gray-700">Launch Time: {{ launch_time }}</span>
+                        </div>
+                        <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
+                            <i class="fas fa-network-wired text-indigo-500 mr-2.5 text-lg"></i>
+                            <span class="text-sm font-semibold text-gray-700">VPC ID: {{ vpc_id }}</span>
+                        </div>
+                        <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
+                            <i class="fas fa-server text-indigo-500 mr-2.5 text-lg"></i>
+                            <span class="text-sm font-semibold text-gray-700">Instance ID: {{ instance_id }}</span>
+                        </div> -->
                     </div>
-        
+
                     <!-- Time and Actions Section -->
                     <div class="flex items-center justify-between sm:justify-end gap-4">
                         <!-- Action Buttons -->
                         <div class="flex items-center space-x-3">
-                            <button class="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:shadow-md">
+                            <button
+                                class="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:shadow-md">
                                 <a href="{{ url_for('settings')}}" class="text-sm font-medium">
                                     <i class="fas fa-cog text-lg"></i>
                                 </a>
@@ -228,49 +383,40 @@
         {% endfor %}
     </div>
 
-    <div class="details-grid mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- System Information -->
+    <div class="details-grid">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- System Information Card -->
             <div
-                class="bg-white backdrop-blur-sm bg-opacity-95 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <div class="flex justify-between items-center px-8 py-6 border-b border-gray-100/60">
-                    <div class="flex items-center space-x-3">
-                        <div class="p-2 bg-blue-50 rounded-lg">
-                            <i class="fas fa-microchip text-blue-500"></i>
+                class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+                <div class="flex items-center justify-between p-4 border-b border-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="p-1.5 bg-blue-50 rounded-lg">
+                            <i class="fas fa-microchip text-blue-500 text-sm"></i>
                         </div>
-                        <h3
-                            class="text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                            System Information
-                        </h3>
+                        <h3 class="text-lg font-medium text-gray-800">System Information</h3>
                     </div>
-                    <button class="p-2 hover:bg-gray-50 rounded-lg transition-colors group">
-                        <i class="fas fa-sync-alt text-gray-400 group-hover:text-gray-600 transition-colors"></i>
-                    </button>
+                    <span class="refresh-indicator"></span>
                 </div>
-                <div class="p-8">
-                    <div class="space-y-5">
+
+                <div class="p-4">
+                    <div class="space-y-3">
                         {% for label, value, class in [
                         ("OS", system_info.os_info.os_full_name, 'system-info'),
                         ("Processor Name", system_info.processor_name, 'processor-name'),
                         ("Boot Time", system_info.boot_time, 'boot-time'),
                         ("Process Count", system_info.process_count, 'process-count'),
-                        ("Kernel Version", system_info.os_info.kernel_version, 'kernel-version')]
-                        %}
-                        <div class="group">
-                            <div
-                                class="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div
-                                        class="w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-sm group-hover:shadow transition-all">
-                                        <i
-                                            class="fas fa-desktop text-blue-500/80 group-hover:text-blue-600 transition-colors"></i>
+                        ("Kernel Version", system_info.os_info.kernel_version, 'kernel-version')
+                        ] %}
+                        <div
+                            class="group bg-gray-50 rounded-lg p-3 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-100/50 transition-all duration-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 flex items-center justify-center rounded-md bg-white shadow-sm">
+                                        <i class="fas fa-desktop text-blue-500/70 text-xs"></i>
                                     </div>
-                                    <span class="text-sm font-medium text-gray-500">{{ label }}</span>
+                                    <span class="text-sm text-gray-600">{{ label }}</span>
                                 </div>
-                                <div class="flex-1 text-right">
-                                    <span class="text-sm font-bold text-gray-700 {{ class }} font-mono">{{ value
-                                        }}</span>
-                                </div>
+                                <span class="text-sm font-medium text-gray-700 {{ class }} font-mono">{{ value }}</span>
                             </div>
                         </div>
                         {% endfor %}
@@ -278,46 +424,38 @@
                 </div>
             </div>
 
-            <!-- Product Information -->
+            <!-- Product Information Card -->
             <div
-                class="bg-white backdrop-blur-sm bg-opacity-95 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <div class="flex justify-between items-center px-8 py-6 border-b border-gray-100/60">
-                    <div class="flex items-center space-x-3">
-                        <div class="p-2 bg-purple-50 rounded-lg">
-                            <i class="fas fa-cube text-purple-500"></i>
+                class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+                <div class="flex items-center justify-between p-4 border-b border-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="p-1.5 bg-purple-50 rounded-lg">
+                            <i class="fas fa-cube text-purple-500 text-sm"></i>
                         </div>
-                        <h3
-                            class="text-xl font-semibold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                            Product Information
-                        </h3>
+                        <h3 class="text-lg font-medium text-gray-800">Product Information</h3>
                     </div>
-                    <button class="p-2 hover:bg-gray-50 rounded-lg transition-colors group">
-                        <i class="fas fa-sync-alt text-gray-400 group-hover:text-gray-600 transition-colors"></i>
-                    </button>
+                    <span class="refresh-indicator"></span>
                 </div>
-                <div class="p-8">
-                    <div class="space-y-5">
+
+                <div class="p-4">
+                    <div class="space-y-3">
                         {% for label, value in [
                         ("Product Name", plan_type),
                         ("Product Version", version),
                         ("SystemGuard Unique ID", systemguard_unique_id),
                         ("Remaining Days", remaining_plan_days),
-                        ("Username", system_info.system_username)]
-                        %}
-                        <div class="group">
-                            <div
-                                class="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-all duration-300">
-                                <div class="flex items-center space-x-3">
-                                    <div
-                                        class="w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-sm group-hover:shadow transition-all">
-                                        <i
-                                            class="fas fa-tag text-purple-500/80 group-hover:text-purple-600 transition-colors"></i>
+                        ("Username", system_info.system_username)
+                        ] %}
+                        <div
+                            class="group bg-gray-50 rounded-lg p-3 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-purple-100/50 transition-all duration-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 flex items-center justify-center rounded-md bg-white shadow-sm">
+                                        <i class="fas fa-tag text-purple-500/70 text-xs"></i>
                                     </div>
-                                    <span class="text-sm font-medium text-gray-500">{{ label }}</span>
+                                    <span class="text-sm text-gray-600">{{ label }}</span>
                                 </div>
-                                <div class="flex-1 text-right">
-                                    <span class="text-sm font-bold text-gray-700 font-mono">{{ value }}</span>
-                                </div>
+                                <span class="text-sm font-medium text-gray-700 font-mono">{{ value }}</span>
                             </div>
                         </div>
                         {% endfor %}
@@ -794,7 +932,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-100">
                         <div class="flex items-center gap-3">
                             <svg class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

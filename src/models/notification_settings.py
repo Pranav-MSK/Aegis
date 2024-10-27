@@ -1,4 +1,5 @@
 # cython: language_level=3
+from datetime import datetime
 from src.models.base_model import BaseModel
 from src.config import db
 
@@ -48,11 +49,42 @@ class NotificationSettings(BaseModel):
     @staticmethod
     def get_teams_webhook_url():
         return NotificationSettings.query.first().teams_webhook_url
-    
+
     @staticmethod
     def get_google_chat_webhook_url():
         return NotificationSettings.query.first().google_chat_webhook_url
-    
+
     @staticmethod
     def get_telegram_webhook_url():
         return NotificationSettings.query.first().telegram_webhook_url
+
+
+# Notification model
+class Notification(BaseModel):
+    __tablename__ = 'notifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(50), nullable=False)
+    icon = db.Column(db.String(50), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    time = db.Column(db.DateTime, default=datetime.utcnow)
+    is_global = db.Column(db.Boolean, default=False)  # True for global notifications
+
+    users = db.relationship('UserNotification', back_populates='notification')
+
+    def __repr__(self):
+        return f'<Notification {self.title}>'
+
+# UserNotification association model
+class UserNotification(BaseModel):
+    __tablename__ = 'user_notifications'
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    notification_id = db.Column(db.Integer, db.ForeignKey('notifications.id'), primary_key=True)
+    unread = db.Column(db.Boolean, default=True)
+    user = db.relationship('User', back_populates='notifications')
+    notification = db.relationship('Notification', back_populates='users')
+
+    def __repr__(self):
+        return f'<UserNotification user_id={self.user_id}, notification_id={self.notification_id}>'

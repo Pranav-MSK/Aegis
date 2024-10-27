@@ -11,7 +11,7 @@ from src.models.system_information import SystemInformation
 from src.models.user_profile import UserProfile
 from src.models.monitored_website import MonitoredWebsite
 from src.models.prometheus_model import ExternalMonitornig
-from src.models.notification_settings import NotificationSettings
+from src.models.notification_settings import NotificationSettings, Notification, UserNotification
 from src.models.alert_data_models import AlertTicket, InvestigationNote, Report, AlertLog, CustomFields
 from src.models.graph_config import ChartConfiguration
 from flask_login import current_user

@@ -158,7 +158,6 @@ def global_middleware():
                 
     except Exception as e:
         logger.error(f"Error in global middleware: {e}")
-        metrics['ERROR_MIDDLEWARE_COUNTER'].inc()
         return "Internal server error", 500
 
 @app.after_request

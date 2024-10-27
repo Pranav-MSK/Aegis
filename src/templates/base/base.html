@@ -150,30 +150,7 @@
     <!-- Custom Scripts -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
-
-    <script>
-        // Toast notification function
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
-
-            toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-lg transition-opacity duration-300`;
-            toast.innerHTML = message;
-
-            document.getElementById('toast-container').appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // Mobile sidebar toggle
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.lg\\:hidden');
-            sidebar.classList.toggle('hidden');
-        }
-    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     {% block extra_scripts %}{% endblock %}
 </body>

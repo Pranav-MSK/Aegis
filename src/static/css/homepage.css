@@ -633,11 +633,12 @@ temp-alert-badge {
 }
 
 .refresh-indicator {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background-color: var(--success-500);
-    animation: pulse 2s infinite;
+    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Loading States */
