@@ -7,6 +7,7 @@ from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import login_required, current_user
 from src.models import AlertTicket
 from werkzeug.security import generate_password_hash, check_password_hash
+from src.routes.helper.notification_helper import generate_system_notification
 
 from src.config import app
 
@@ -78,6 +79,15 @@ def change_password():
         current_user.last_updated = datetime.utcnow()
         current_user.password_last_changed = datetime.utcnow()
         current_user.save()
+
+        notification_data = {
+            "type": "info",
+            "icon": "info-circle",
+            "title": "Password Changed",
+            "message": f"Your password was changed successfully.",
+            "is_global": False
+        }
+        generate_system_notification(notification_data)
 
         flash('Password changed successfully!', 'success')
         return redirect(url_for('view_profile'))

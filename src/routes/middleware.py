@@ -1,14 +1,12 @@
 # cython: language_level=3
 import time
 import datetime
-from typing import Optional, Dict, Any
-from functools import wraps
 
 from flask import blueprints, request, redirect, url_for, flash, Response
 from flask_login import current_user
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from prometheus_client import Histogram, Counter, Gauge
+from prometheus_client import Counter
 
 from src.config import app
 from src.logger import logger

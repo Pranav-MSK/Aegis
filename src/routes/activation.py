@@ -10,7 +10,7 @@ from src.activator import (
 )
 from src.helper import load_secret_key
 from src.routes.helper.activation_helper import generate_license_pdf
-from src.routes.helper.notification_helper import create_notification
+from src.routes.helper.notification_helper import generate_system_notification
 
 activation_bp = Blueprint('activation', __name__)
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
@@ -40,7 +40,7 @@ def activation():
                     "message": "Product activation successful.",
                     "is_global": True
                 }
-                create_notification(notification_data)
+                generate_system_notification(notification_data)
                     
                 return redirect(url_for('activation'))
             except IOError as e:

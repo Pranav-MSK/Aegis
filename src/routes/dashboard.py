@@ -6,7 +6,7 @@ from sqlalchemy import func, case
 from sqlalchemy.orm import joinedload
 
 from src.config import app, csrf, get_app_info
-from src.models import UserProfile, AlertTicket, ChartConfiguration, UserNotification, Notification
+from src.models import UserProfile, AlertTicket, ChartConfiguration
 from src.utils import fetch_system_metrics
 from src.routes.helper.prometheus_helper import (
     count_of_targets, 

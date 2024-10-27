@@ -126,6 +126,15 @@ def process_alert(alert):
             logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
             return
 
+    Notification_data = {
+        "type": severity,
+        "icon": "info-circle",  # Font Awesome icon
+        "title": alert_name,
+        "message": description,
+        "is_global": True
+    }
+    generate_system_notification(Notification_data)
+
     log_alert(severity, alert_name, instance, description, summary)
     create_alert_ticket(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)
     notify_alert(alert_name, instance, severity, description, summary)
@@ -414,9 +423,7 @@ def generate_alert_ticket_pdf(alert, investigation_notes, alert_logs):
 
     return pdf_file_path
 
-def create_notification(notification_data):
-    user_id = current_user.id
-
+def generate_system_notification(notification_data):
     new_notification = Notification(
         type=notification_data.get('type', 'info'),
         icon=notification_data.get('icon', 'info-circle'),
@@ -427,14 +434,7 @@ def create_notification(notification_data):
     new_notification.save()
 
     if new_notification.is_global:
-        # If it's a global notification, associate it with all users
-        users = UserProfile.query.all()
-        for user in users:
-            user_notification = UserNotification(user_id=user.id, notification_id=new_notification.id)
-            db.session.add(user_notification)
+        user_notification = UserNotification(user_id=current_user.id, notification_id=new_notification.id)
     else:
-        # If it's user-specific, create the association for that user
-        user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
-        db.session.add(user_notification)
-
-    db.session.commit()
+        user_notification = UserNotification(user_id=current_user.id, notification_id=new_notification.id)
+    user_notification.save()
