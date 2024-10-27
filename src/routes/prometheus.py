@@ -363,6 +363,9 @@ def view_rules():
         action = request.form.get("action")
         group_name = request.form.get("group_name")
 
+        print("Delete rule action:", action)
+        print("Group name:", group_name)
+
         if action == "add":
             max_alert_rules = get_app_info().get("max_alert_rules")
             if total_rules >= max_alert_rules:
@@ -438,6 +441,7 @@ def view_rules():
 
         elif action == "delete":
             index = int(request.form.get("index"))
+            
 
             # Find the group and delete the specified rule
             for group in rules["groups"]:

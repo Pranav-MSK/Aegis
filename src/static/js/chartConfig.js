@@ -47,9 +47,12 @@ document.querySelectorAll('.btn-edit').forEach(button => {
 });
 
 
-document.querySelector('.close').onclick = function () {
-    document.getElementById('editModal').style.display = 'none';
-};
+const closeButton = document.querySelector('.close');
+if (closeButton) {
+    closeButton.onclick = function () {
+        document.getElementById('editModal').style.display = 'none';
+    };
+}
 
 document.querySelectorAll('.is-active').forEach(checkbox => {
     checkbox.addEventListener('change', function () {

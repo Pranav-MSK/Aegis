@@ -2,8 +2,6 @@
 {% block title %}Alert Ticket: {{ alert.alert_name }}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/alert_ticket.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
 <script>
     function toggleEdit(id) {
         const element = document.getElementById(id);
@@ -13,268 +11,389 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="text-center m-4">
-    <span class=""><i class="logo fas fa-shield-alt"></i> {{ title }}</span>
-    <span class="">Alert Ticket</span>
-    <a href="{{ url_for('alert_history') }}" class="btn btn-secondary ml-3">Go Back to Alerts <i class="fas fa-arrow-left"></i></a>
-</h1>
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <i class="fas fa-shield-alt text-indigo-600"></i>
+                <span>{{ title }} Alert Ticket</span>
+            </h1>
+            <a href="{{ url_for('alert_history') }}"
+                class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Alerts
+            </a>
+        </div>
 
+        {% include 'ext/message.html' %}
 
-{% include 'ext/message.html' %}
-
-<div class="row">
-    <div class="col-md-6">
+        <!-- Admin Actions -->
         {% if current_user.user_level == 'admin' %}
-        <div class="text-right mb-3">
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+        <div class="flex flex-wrap gap-2 mb-6">
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="critical_ticket">
                 <input type="hidden" name="severity" value="critical">
                 <input type="hidden" name="investigation_notes" value="Marking the ticket as critical severity.">
-                <button type="submit" class="btn btn-danger">Mark Critical Severity <i
-                        class="fas fa-exclamation-triangle"></i></button>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Mark Critical
+                </button>
             </form>
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="warning_ticket">
                 <input type="hidden" name="severity" value="warning">
                 <input type="hidden" name="investigation_notes" value="Marking the ticket as warning severity.">
-                <button type="submit" class="btn btn-warning">Mark Warning Severity <i
-                        class="fas fa-exclamation-triangle"></i></button>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Mark Warning
+                </button>
             </form>
 
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="info_ticket">
                 <input type="hidden" name="severity" value="info">
                 <input type="hidden" name="investigation_notes" value="Marking the ticket as info severity.">
-                <button type="submit" class="btn btn-info">Mark Info Severity <i
-                        class="fas fa-info-circle"></i></button>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Mark Info
+                </button>
             </form>
 
             {% if alert.assigned_user_id is none %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="assign_me">
                 <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
-                <button type="submit" class="btn btn-primary">Assign to Yourself <i class="fas fa-user"></i></button>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-user mr-2"></i>
+                    Assign to Yourself
+                </button>
             </form>
             {% endif %}
         </div>
-        {% endif %}
-        <!-- Alert Metadata -->
-        <div class="alert-metadata">
-            <h2 class="section-title"><i class="fas fa-info-circle"></i> Alert Information</h2>
-            <table class="table table-bordered">
-                <tbody>
-                    <tr>
-                        <th>Alert Name</th>
-                        <td>{{ alert.alert_name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Instance</th>
-                        <td>{{ alert.instance }}</td>
-                    </tr>
-                    <tr>
-                        <th>System Username</th>
-                        <td>{{ alert.system_username }}</td>
-                    </tr>
-                    <tr>
-                        <th>System Hostname</th>
-                        <td>{{ alert.system_hostname }}</td>
-                    </tr>
-                    <tr>
-                        <th>Fingerprint</th>
-                        <td>{{ alert.fingerprint }}</td>
-                    </tr>
-                    <tr>
-                        <th>Runbook URL</th>
-                        <td>
-                            {% if alert.runbook_url %}
-                            <a href="{{ alert.runbook_url }}" target="_blank">{{ alert.runbook_url }}</a>
-                            {% else %}
-                            N/A
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Description</th>
-                        <td>
-                            {{ alert.description }}
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editDescription')" style="cursor: pointer;"></i>
-                            <div id="editDescription" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="edit_description">
-                                    <div class="form-group">
-                                        <label for="description">Edit Description:</label>
-                                        <textarea class="form-control" name="description"
-                                            rows="4">{{ alert.description }}</textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Update Description</button>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
+        <div class="flex flex-wrap gap-2 mb-6">
 
-                    <tr>
-                        <th>Summary</th>
-                        <td>
-                            {{ alert.summary }}
-                            {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editSummary')" style="cursor: pointer;"></i>
-                            <div id="editSummary" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="edit_summary">
-                                    <div class="form-group">
-                                        <label for="summary">Edit Summary:</label>
-                                        <textarea class="form-control" name="summary"
-                                            rows="4">{{ alert.summary }}</textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Update Summary</button>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="col-md-6">
-        {% if current_user.user_level == 'admin' %}
-        <div class="text-right mb-3">
-            {% if alert.ticket_status not in ['Closed'] %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+            {% if alert.ticket_status == 'Open' %}
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="form_type" value="progress_ticket">
+                <input type="hidden" name="ticket_status" value="In Progress">
+                <input type="hidden" name="investigation_notes" value="Marking the ticket as in progress.">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-spinner mr-2"></i>
+                    Mark as In Progress
+                </button>
+            </form>
+
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="close_ticket">
                 <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
                 <input type="hidden" name="ticket_status" value="Resolved">
                 <input type="hidden" name="investigation_notes" value="Closing the ticket now as solved.">
-                <button type="submit" class="btn btn-success">Close Ticket <i class="fas fa-check"></i></button>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-check mr-2"></i>
+                    Close Ticket
+                </button>
             </form>
             {% endif %}
 
-            {% if alert.ticket_status in ['Closed'] %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+            {% if alert.ticket_status == 'Closed' %}
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="reopen_ticket">
                 <input type="hidden" name="ticket_status" value="Open">
                 <input type="hidden" name="investigation_notes" value="Reopening the ticket for further investigation.">
-                <button type="submit" class="btn btn-warning">Reopen Ticket <i
-                        class="fas fa-exclamation-triangle"></i></button>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Reopen Ticket
+                </button>
             </form>
             {% endif %}
 
-            {% if alert.ticket_status not in ['In Progress', 'Closed'] %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+            {% if alert.ticket_status == 'Resolved' %}
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="form_type" value="progress_ticket">
-                <input type="hidden" name="ticket_status" value="In Progress">
-                <input type="hidden" name="investigation_notes" value="Marking the ticket as in progress.">
-                <button type="submit" class="btn btn-info">Mark as In Progress <i class="fas fa-spinner"></i></button>
+                <input type="hidden" name="form_type" value="close_ticket">
+                <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
+                <input type="hidden" name="ticket_status" value="Resolved">
+                <input type="hidden" name="investigation_notes" value="Closing the ticket now as solved.">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-check mr-2"></i>
+                    Close Ticket
+                </button>
             </form>
             {% endif %}
+
 
             {% if alert.ticket_status == 'In Progress' %}
-            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" style="display: inline;">
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="form_type" value="resolve_ticket">
                 <input type="hidden" name="ticket_status" value="Resolved">
                 <input type="hidden" name="investigation_notes" value="Marking the ticket as resolved.">
-                <button type="submit" class="btn btn-success">Mark as Resolved <i class="fas fa-check"></i></button>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-check mr-2"></i>
+                    Mark as Resolved
+                </button>
+            </form>
+
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="form_type" value="close_ticket">
+                <input type="hidden" name="assigned_user_id" value="{{ current_user.id }}">
+                <input type="hidden" name="ticket_status" value="Resolved">
+                <input type="hidden" name="investigation_notes" value="Closing the ticket now as solved.">
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-check mr-2"></i>
+                    Close Ticket
+                </button>
             </form>
             {% endif %}
 
-            <!-- <a href="{{ url_for('alert_history') }}" class="btn btn-secondary">All Tickets <i
-                    class="fas fa-list"></i></a> -->
         </div>
         {% endif %}
 
-        <div class="alert-metadata">
-            <h2 class="section-title"><i class="fas fa-info-circle"></i> Alert Current Status</h2>
-            <table class="table table-bordered mt-4">
-                <tbody>
-                    <tr>
-                        <th>Alert Status (Prometheus)</th>
-                        <td>
-                            <span
-                                class="badge badge-{% if alert.alert_status == 'firing' %}danger{% elif alert.alert_status == 'resolved' %}info{% else %}warning{% endif %}"
-                                data-toggle="tooltip"
-                                title="The current status of the alert. 'Firing' means the alert is active, 'Resolved' means the alert has been backed off. (Prometheus)">
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Alert Information -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-info-circle text-indigo-600 mr-2"></i>
+                    Alert Information
+                </h2>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Alert Name</span>
+                        <span class="col-span-2 text-gray-900">{{ alert.alert_name }}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Instance</span>
+                        <span class="col-span-2 text-gray-900">{{ alert.instance }}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">System Username</span>
+                        <span class="col-span-2 text-gray-900">{{ alert.system_username }}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">System Hostname</span>
+                        <span class="col-span-2 text-gray-900">{{ alert.system_hostname }}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Fingerprint</span>
+                        <span class="col-span-2 text-gray-900">{{ alert.fingerprint }}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Runbook URL</span>
+                        <span class="col-span-2 text-gray-900">
+                            {% if alert.runbook_url %}
+                            <a href="{{ alert.runbook_url }}" target="_blank">{{ alert.runbook_url }}</a>
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Description</span>
+                        <span class="col-span-2 text-gray-900">
+                            {{ alert.description }}
+                            {% if current_user.user_level == 'admin' %}
+                            <i class="fas fa-edit cursor-pointer text-indigo-600 ml-2"
+                                onclick="toggleEdit('editDescription')"></i>
+                            <div id="editDescription" class="mt-4" style="display: none;">
+                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="form_type" value="edit_description">
+                                    <div class="space-y-4">
+                                        <label for="description" class="block text-sm font-medium text-gray-700">Edit
+                                            Description:</label>
+                                        <textarea name="description" rows="4"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ alert.description }}</textarea>
+                                        <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                            Update Description
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Summary</span>
+                        <span class="col-span-2 text-gray-900">
+                            {{ alert.summary }}
+                            {% if current_user.user_level == 'admin' %}
+                            <i class="fas fa-edit cursor-pointer text-indigo-600 ml-2"
+                                onclick="toggleEdit('editSummary')"></i>
+                            <div id="editSummary" class="mt-4" style="display: none;">
+                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="form_type" value="edit_summary">
+                                    <div class="space-y-4">
+                                        <label for="summary" class="block text-sm font-medium text-gray-700">Edit
+                                            Summary:</label>
+                                        <textarea name="summary" rows="4"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ alert.summary }}</textarea>
+                                        <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                            Update Summary
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Alert Status -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-info-circle text-indigo-600 mr-2"></i>
+                    Alert Current Status
+                </h2>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Alert Status</span>
+                        <span class="col-span-2">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium
+                                {% if alert.alert_status == 'firing' %}
+                                    bg-red-100 text-red-800
+                                {% elif alert.alert_status == 'resolved' %}
+                                    bg-green-100 text-green-800
+                                {% else %}
+                                    bg-yellow-100 text-yellow-800
+                                {% endif %}">
                                 {{ alert.alert_status }}
                             </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Severity</th>
-                        <td>
-                            <span class="badge badge-{{ alert.severity }}">{{ alert.severity }}</span>
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Severity</span>
+                        <span class="col-span-2">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium
+                                {% if alert.severity == 'info' %}
+                                    bg-blue-100 text-blue-800
+                                {% elif alert.severity == 'warning' %}
+                                    bg-yellow-100 text-yellow-800
+                                {% else %}
+                                    bg-red-100 text-red-800
+                                {% endif %}">
+                                {{ alert.severity }}
+                            </span>
                             {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editSeverity')" style="cursor: pointer;"></i>
-                            <div id="editSeverity" style="display: none;">
+                            <i class="fas fa-edit cursor-pointer text-indigo-600 ml-2"
+                                onclick="toggleEdit('editSeverity')"></i>
+                            <div id="editSeverity" class="mt-4" style="display: none;">
                                 <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="form_type" value="edit_severity">
-                                    <select name="severity" class="form-control mb-2">
-                                        <option value="info" {% if alert.severity=='info' %}selected{% endif %}>
-                                            Info</option>
-                                        <option value="warning" {% if alert.severity=='warning' %}selected{% endif %}>
-                                            Warning</option>
-                                        <option value="critical" {% if alert.severity=='critical' %}selected{% endif %}>
-                                            Critical</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">Update Severity</button>
+                                    <div class="space-y-4">
+                                        <label for="severity" class="block text-sm font-medium text-gray-700">Edit
+                                            Severity:</label>
+                                        <select name="severity"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            <option value="info" {% if alert.severity=='info' %}selected{% endif %}>Info
+                                            </option>
+                                            <option value="warning" {% if alert.severity=='warning' %}selected{% endif
+                                                %}>Warning</option>
+                                            <option value="critical" {% if alert.severity=='critical' %}selected{% endif
+                                                %}>Critical</option>
+                                        </select>
+                                        <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                            Update Severity
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                             {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Ticket Status</th>
-                        <td>
-                            <span
-                                class="badge badge-{% if alert.ticket_status == 'In Progress' %}warning{% else %}{{ alert.ticket_status | lower }}{% endif %}">
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Ticket Status</span>
+                        <span class="col-span-2">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium
+                                {% if alert.ticket_status == 'Open' %}
+                                    bg-blue-100 text-blue-800
+                                {% elif alert.ticket_status == 'In Progress' %}
+                                    bg-yellow-100 text-yellow-800
+                                {% elif alert.ticket_status == 'Resolved' %}
+                                    bg-green-100 text-green-800
+                                {% else %}
+                                    bg-gray-100 text-gray-800
+                                {% endif %}">
                                 {{ alert.ticket_status }}
                             </span>
                             {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editStatus')" style="cursor: pointer;"></i>
-                            <div id="editStatus" style="display: none;">
+                            <i class="fas fa-edit cursor-pointer text-indigo-600 ml-2"
+                                onclick="toggleEdit('editStatus')"></i>
+                            <div id="editStatus" class="mt-4" style="display: none;">
                                 <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="form_type" value="edit_status">
-                                    <select name="ticket_status" class="form-control mb-2">
-                                        <option value="Open" {% if alert.ticket_status=='Open' %}selected{% endif %}>
-                                            Open</option>
-                                        <option value="In Progress" {% if alert.ticket_status=='In Progress'
-                                            %}selected{% endif %}>In Progress</option>
-                                        <option value="Resolved" {% if alert.ticket_status=='Resolved' %}selected{%
-                                            endif %}>Resolved</option>
-                                        <option value="Closed" {% if alert.ticket_status=='Closed' %}selected{% endif
-                                            %}>Closed</option>
-                                    </select>
-                                    <button type="submit" class="btn btn-primary">Update Status</button>
+                                    <div class="space-y-4">
+                                        <label for="ticket_status" class="block text-sm font-medium text-gray-700">Edit
+                                            Ticket Status:</label>
+                                        <select name="ticket_status"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            <option value="Open" {% if alert.ticket_status=='Open' %}selected{% endif
+                                                %}>Open</option>
+                                            <option value="In Progress" {% if alert.ticket_status=='In Progress'
+                                                %}selected{% endif %}>In Progress</option>
+                                            <option value="Resolved" {% if alert.ticket_status=='Resolved' %}selected{%
+                                                endif %}>Resolved</option>
+                                            <option value="Closed" {% if alert.ticket_status=='Closed' %}selected{%
+                                                endif %}>Closed</option>
+                                        </select>
+                                        <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                            Update Status
+                                        </button>
+                                    </div>
                                 </form>
                             </div>
                             {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Assigned Investigator</th>
-                        <td>
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Assigned Investigator</span>
+                        <span class="col-span-2">
                             {{ alert.assigned_user.username if alert.assigned_user else 'Unassigned' }}
                             {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editInvestigator')"
-                                style="cursor: pointer;"></i>
-                            <div id="editInvestigator" style="display: none;">
+                            <i class="fas fa-edit cursor-pointer text-indigo-600 ml-2"
+                                onclick="toggleEdit('editInvestigator')"></i>
+                            <div id="editInvestigator" class="mt-4" style="display: none;">
                                 <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="form_type" value="assign_user">
                                     <label for="assigned_user">Assign Investigator:</label>
-                                    <select name="assigned_user_id" class="form-control" onchange="this.form.submit()">
+                                    <select name="assigned_user_id"
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        onchange="this.form.submit()">
                                         <option value="">Unassigned</option>
                                         {% for user in users %}
                                         <option value="{{ user.id }}" {% if user.id==alert.assigned_user_id %}selected{%
@@ -284,248 +403,441 @@
                                 </form>
                             </div>
                             {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Assigned Supervisor</th>
-                        <td>
-                            {{ alert.assigned_supervisor.username if alert.assigned_supervisor else 'Unassigned'
-                            }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Assigned Supervisor</span>
+                        <span class="col-span-2">
+                            {{ alert.assigned_supervisor.username if alert.assigned_supervisor else 'Unassigned' }}
                             {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editSupervisor')" style="cursor: pointer;"></i>
-                            <div id="editSupervisor" style="display: none;">
+                            <i class="fas fa-edit cursor-pointer text-indigo-600 ml-2"
+                                onclick="toggleEdit('editSupervisor')"></i>
+                            <div id="editSupervisor" class="mt-4" style="display: none;">
                                 <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="form_type" value="assign_supervisor">
                                     <label for="assigned_supervisor">Assign Supervisor:</label>
-                                    <select name="assigned_supervisor_id" class="form-control"
+                                    <select name="assigned_supervisor_id"
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         onchange="this.form.submit()">
                                         <option value="">Unassigned</option>
                                         {% for user in admin_users %}
                                         <option value="{{ user.id }}" {% if user.id==alert.assigned_supervisor_id
-                                            %}selected{% endif %}>{{
-                                            user.username }}</option>
+                                            %}selected{% endif %}>{{ user.username }}</option>
                                         {% endfor %}
                                     </select>
                                 </form>
                             </div>
                             {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Created At</th>
-                        <td>{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    </tr>
-                    <tr>
-                        <th>Last Updated At</th>
-                        <td>{{ alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if alert.updated_at else 'N/A' }}
-                        </td>
-                    </tr>
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Created At</span>
+                        <span class="col-span-2 text-gray-900">{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                            }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Last Updated At</span>
+                        <span class="col-span-2 text-gray-900">{{ alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if
+                            alert.updated_at else 'N/A' }}</span>
+                    </div>
+
                     {% for customfield in alert.customfields %}
-                    <tr>
-                        <th>{{ customfield.field_name }}</th>
-                        <td>
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">{{ customfield.field_name }}</span>
+                        <span class="col-span-2 text-gray-900">
                             {{ customfield.field_value }}
                             {% if current_user.user_level == 'admin' %}
-                            <i class="fas fa-edit" onclick="toggleEdit('editCustomField{{ customfield.id }}')"
-                                style="cursor: pointer;"></i>
-                            <i class="fas fa-trash"
-                                onclick="document.getElementById('deleteCustomField{{ customfield.id }}').submit();"
-                                style="cursor: pointer;"></i>
+                            <i class="fas fa-edit cursor-pointer text-indigo-600 ml-2"
+                                onclick="toggleEdit('editCustomField{{ customfield.id }}')"></i>
+                            <i class="fas fa-trash cursor-pointer text-red-600 ml-2"
+                                onclick="document.getElementById('deleteCustomField{{ customfield.id }}').submit();"></i>
                             <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post"
                                 id="deleteCustomField{{ customfield.id }}" style="display: none;">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="form_type" value="delete_customfield">
                                 <input type="hidden" name="customfield_id" value="{{ customfield.id }}">
                             </form>
-                            <div id="editCustomField{{ customfield.id }}" style="display: none;">
-                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
-                                </form>
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="form_type" value="edit_customfield">
-                                <input type="hidden" name="customfield_id" value="{{ customfield.id }}">
-                                <div class="form-group">
-                                    <label for="field_name">Field Name:</label>
-                                    <input type="text" name="field_name" class="form-control"
-                                        value="{{ customfield.field_name }}" required>
-                                    <label for="field_value">Field Value:</label>
-                                    <input type="text" name="field_value" class="form-control"
-                                        value="{{ customfield.field_value }}" required>
-                                    <button type="submit" class="btn btn-primary mt-2">Update Custom
-                                        Field</button>
-                                </div>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    {% if current_user.user_level == 'admin' %}
-                    <tr>
-                        <th>Add Custom Field</th>
-                        <td>
-                            <i class="fas fa-plus" onclick="toggleEdit('addCustomField')" style="cursor: pointer;"></i>
-                            <div id="addCustomField" style="display: none;">
+                            <div id="editCustomField{{ customfield.id }}" class="mt-4" style="display: none;">
                                 <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="form_type" value="add_customfield">
-                                    <div class="form-group">
-                                        <label for="field_name">Field Name:</label>
-                                        <input type="text" name="field_name" class="form-control" required>
-                                        <label for="field_value">Field Value:</label>
-                                        <input type="text" name="field_value" class="form-control" required>
-                                        <button type="submit" class="btn btn-primary mt-2">Add Custom
-                                            Field</button>
+                                    <input type="hidden" name="form_type" value="edit_customfield">
+                                    <input type="hidden" name="customfield_id" value="{{ customfield.id }}">
+                                    <div class="space-y-4">
+                                        <label for="field_name" class="block text-sm font-medium text-gray-700">Field
+                                            Name:</label>
+                                        <input type="text" name="field_name"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            value="{{ customfield.field_name }}" required>
+                                        <label for="field_value" class="block text-sm font-medium text-gray-700">Field
+                                            Value:</label>
+                                        <input type="text" name="field_value"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            value="{{ customfield.field_value }}" required>
+                                        <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                            Update Custom Field
+                                        </button>
                                     </div>
                                 </form>
                             </div>
-                        </td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<!-- Investigation Notes -->
-{% if current_user.id == alert.assigned_user_id %}
-<div class="notes-section">
-    <h2 class="section-title"><i class="fas fa-comment"></i> Investigation Notes</h2>
-    <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="notes-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="form_type" value="add_comment">
-        <div class="form-group">
-            <label for="investigation_notes">Add Investigation Notes:</label>
-            <textarea id="investigation_notes" class="form-control" name="investigation_notes" rows="4"
-                placeholder="Type your notes here..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Notes</button>
-    </form>
-</div>
-{% endif %}
-
-<!-- Supervisor Report -->
-{% if alert.assigned_supervisor_id and current_user.id == alert.assigned_supervisor_id %}
-<div class="notes-section">
-    <h2 class="section-title"><i class="fas fa-file-alt"></i> Supervisor Report</h2>
-    <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="notes-form">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="form_type" value="add_comment">
-        <div class="form-group">
-            <label for="supervisor_report_notes">Add Supervisor Report:</label>
-            <textarea id="supervisor_report_notes" class="form-control" name="investigation_notes" rows="4"
-                placeholder="Type your report here..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Report</button>
-    </form>
-</div>
-{% endif %}
-
-
-<!-- Report and Investigation Notes -->
-<div class="row">
-    <div class="col-md-6">
-        <div class="notes-section">
-            <h2 class="section-title"><i class="fas fa-history"></i> Report and Investigation
-                Notes
-            </h2>
-            <div class="list-group">
-                {% for note in investigation_notes.items %}
-                <div class="list-group-item">
-                    <p class="mb-1 d-flex justify-content-between">
-                        <span>
-                            {% if note.user.first_name %}
-                            <strong>{{ note.user.first_name }} {{ note.user.last_name }}</strong>
-                            {% else %}
-                            <strong>{{ note.user.username }}</strong>
                             {% endif %}
-                            : {{ note.note }}
                         </span>
-                        <small class="text-muted">{{ note.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-                    </p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        <!-- Pagination for Investigation Notes -->
-        <nav aria-label="Investigation Notes Pagination">
-            <ul class="pagination justify-content-center">
-                {% if investigation_notes.has_prev %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.prev_num, logs_page=request.args.get('logs_page', 1), logs_per_page=request.args.get('logs_per_page', 10)) }}"
-                        aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% endif %}
-                {% for page_num in range(1, investigation_notes.pages + 1) %}
-                <li class="page-item {% if page_num == investigation_notes.page %}active{% endif %}">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=page_num, logs_page=request.args.get('logs_page', 1), logs_per_page=request.args.get('logs_per_page', 10)) }}">{{
-                        page_num }}</a>
-                </li>
-                {% endfor %}
-                {% if investigation_notes.has_next %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.next_num, logs_page=request.args.get('logs_page', 1), logs_per_page=request.args.get('logs_per_page', 10)) }}"
-                        aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-    <!-- Alert Logs -->
-    <div class="col-md-6">
-        <div class="logs-section">
-            <h2 class="section-title"><i class="fas fa-history"></i> Alert Logs</h2>
-            <div class="list-group"></div>
-            {% for log in alert_logs.items %}
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <p class="mb-1">{{ log.log }}</p>
-                    <small class="text-muted">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    </div>
+                    {% endfor %}
+                    {% if current_user.user_level == 'admin' %}
+                    <div class="grid grid-cols-3 gap-4 items-center">
+                        <span class="text-gray-600 font-medium">Add Custom Field</span>
+                        <span class="col-span-2">
+                            <i class="fas fa-plus cursor-pointer text-indigo-600"
+                                onclick="toggleEdit('addCustomField')"></i>
+                            <div id="addCustomField" class="mt-4" style="display: none;">
+                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="form_type" value="add_customfield">
+                                    <div class="space-y-4">
+                                        <label for="field_name" class="block text-sm font-medium text-gray-700">Field
+                                            Name:</label>
+                                        <input type="text" name="field_name"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            placeholder="Custom Field Name" required>
+                                        <label for="field_value" class="block text-sm font-medium text-gray-700">Field
+                                            Value:</label>
+                                        <input type="text" name="field_value"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            placeholder="Custom Field Value" required>
+                                        <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                            Add Custom Field
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </span>
+                    </div>
+                    {% endif %}
+
                 </div>
             </div>
-            {% endfor %}
         </div>
 
-        <!-- Pagination for Alert Logs -->
-        <nav aria-label="Alert Logs Pagination">
-            <ul class="pagination justify-content-center">
-                {% if alert_logs.has_prev %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.prev_num, notes_page=request.args.get('notes_page', 1), notes_per_page=request.args.get('notes_per_page', 10)) }}"
-                        aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% endif %}
-                {% for page_num in range(1, alert_logs.pages + 1) %}
-                <li class="page-item {% if page_num == alert_logs.page %}active{% endif %}">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=page_num, notes_page=request.args.get('notes_page', 1), notes_per_page=request.args.get('notes_per_page', 10)) }}">{{
-                        page_num }}</a>
-                </li>
-                {% endfor %}
-                {% if alert_logs.has_next %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.next_num, notes_page=request.args.get('notes_page', 1), notes_per_page=request.args.get('notes_per_page', 10)) }}"
-                        aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
+        <!-- Investigation Notes Section -->
+        {% if current_user.id == alert.assigned_user_id %}
+        <div class="mt-8 bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                <i class="fas fa-comment text-indigo-600 mr-2"></i>
+                Investigation Notes
+            </h2>
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="form_type" value="add_comment">
+                <div class="space-y-4">
+                    <textarea name="investigation_notes" rows="4"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        placeholder="Type your notes here..."></textarea>
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                        Submit Notes
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Supervisor report section -->
+        {% if current_user.id == alert.assigned_supervisor_id %}
+        <div class="mt-8 bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                <i class="fas fa-comment text-indigo-600 mr-2"></i>
+                Supervisor Report
+            </h2>
+            <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="form_type" value="add_comment">
+                <div class="space-y-4">
+                    <textarea name="investigation_notes" rows="4"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        placeholder="Type your report here..."></textarea>
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Notes and Logs Grid -->
+        <div class="container mx-auto px-4 py-8">
+            <!-- Notes and Logs Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Investigation Notes Timeline -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-clipboard-list text-indigo-600 mr-2"></i>
+                        Report and Investigation Notes
+                    </h2>
+                    <div class="flow-root">
+                        <ul role="list" class="-mb-8">
+                            {% for note in investigation_notes.items %}
+                            <li>
+                                <div class="relative pb-8">
+                                    {% if not loop.last %}
+                                    <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
+                                        aria-hidden="true"></span>
+                                    {% endif %}
+                                    <div class="relative flex items-start space-x-3">
+                                        <div class="relative">
+                                            <span
+                                                class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-white ring-8 ring-white">
+                                                {{ note.user.first_name[0] if note.user.first_name else note.user.username[0] }}
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow min-w-0">
+                                            <div class="bg-gray-50 rounded-lg px-4 py-3">
+                                                <div class="flex justify-between items-start">
+                                                    <div>
+                                                        <span class="font-medium text-gray-900">
+                                                            {% if note.user.first_name %}
+                                                            {{ note.user.first_name }} {{ note.user.last_name }}
+                                                            {% else %}
+                                                            {{ note.user.username }}
+                                                            {% endif %}
+                                                        </span>
+                                                        <p class="mt-1 text-gray-600">{{ note.note }}</p>
+                                                    </div>
+                                                    <span class="text-sm text-gray-500 whitespace-nowrap ml-4">
+                                                        {{ note.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+        
+                    <!-- Pagination -->
+                    <nav class="mt-6 flex justify-center" aria-label="Pagination">
+                        <ul class="flex items-center -space-x-px">
+                            {% if investigation_notes.has_prev %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.prev_num) }}"
+                                   class="flex items-center justify-center px-4 h-10 rounded-l-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    <span class="sr-only">Previous</span>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                </a>
+                            </li>
+                            {% endif %}
+                    
+                            {% if investigation_notes.page > 2 %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=1) }}"
+                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    1
+                                </a>
+                            </li>
+                            {% if investigation_notes.page > 3 %}
+                            <li>
+                                <span class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
+                                    ...
+                                </span>
+                            </li>
+                            {% endif %}
+                            {% endif %}
+                    
+                            {% if investigation_notes.page > 1 %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.page-1) }}"
+                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    {{ investigation_notes.page - 1 }}
+                                </a>
+                            </li>
+                            {% endif %}
+                    
+                            <!-- Current Page -->
+                            <li>
+                                <span class="flex items-center justify-center px-4 h-10 border border-indigo-500 bg-indigo-50 text-indigo-600 font-medium">
+                                    {{ investigation_notes.page }}
+                                </span>
+                            </li>
+                    
+                            {% if investigation_notes.has_next %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.page+1) }}"
+                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    {{ investigation_notes.page + 1 }}
+                                </a>
+                            </li>
+                            {% endif %}
+                    
+                            {% if investigation_notes.page < investigation_notes.pages - 1 %}
+                            {% if investigation_notes.page < investigation_notes.pages - 2 %}
+                            <li>
+                                <span class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
+                                    ...
+                                </span>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.pages) }}"
+                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    {{ investigation_notes.pages }}
+                                </a>
+                            </li>
+                            {% endif %}
+                    
+                            {% if investigation_notes.has_next %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.next_num) }}"
+                                   class="flex items-center justify-center px-4 h-10 rounded-r-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    <span class="sr-only">Next</span>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+        
+                <!-- Alert Logs Timeline -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                        <i class="fas fa-history text-indigo-600 mr-2"></i>
+                        Alert Logs
+                    </h2>
+                    <div class="flow-root">
+                        <ul role="list" class="-mb-8">
+                            {% for log in alert_logs.items %}
+                            <li>
+                                <div class="relative pb-8">
+                                    {% if not loop.last %}
+                                    <span class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200"
+                                        aria-hidden="true"></span>
+                                    {% endif %}
+                                    <div class="relative flex items-start space-x-3">
+                                        <div class="relative">
+                                            <div
+                                                class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center ring-8 ring-white">
+                                                <i class="fas fa-bell text-gray-500"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow min-w-0">
+                                            <div class="bg-gray-50 rounded-lg px-4 py-3">
+                                                <div class="flex justify-between items-start">
+                                                    <p class="text-gray-600">{{ log.log }}</p>
+                                                    <span class="text-sm text-gray-500 whitespace-nowrap ml-4">
+                                                        {{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+        
+                    <!-- Pagination -->
+                    <nav class="mt-6 flex justify-center" aria-label="Pagination">
+                        <ul class="flex items-center -space-x-px">
+                            {% if alert_logs.has_prev %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.prev_num) }}"
+                                   class="flex items-center justify-center px-4 h-10 rounded-l-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    <span class="sr-only">Previous</span>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                </a>
+                            </li>
+                            {% endif %}
+                    
+                            {% if alert_logs.page > 2 %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=1) }}"
+                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    1
+                                </a>
+                            </li>
+                            {% if alert_logs.page > 3 %}
+                            <li>
+                                <span class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
+                                    ...
+                                </span>
+                            </li>
+                            {% endif %}
+                            {% endif %}
+                    
+                            {% if alert_logs.page > 1 %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.page-1) }}"
+                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    {{ alert_logs.page - 1 }}
+                                </a>
+                            </li>
+                            {% endif %}
+                    
+                            <!-- Current Page -->
+                            <li>
+                                <span class="flex items-center justify-center px-4 h-10 border border-indigo-500 bg-indigo-50 text-indigo-600 font-medium">
+                                    {{ alert_logs.page }}
+                                </span>
+                            </li>
+                    
+                            {% if alert_logs.has_next %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.page+1) }}"
+                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    {{ alert_logs.page + 1 }}
+                                </a>
+                            </li>
+                            {% endif %}
+                    
+                            {% if alert_logs.page < alert_logs.pages - 1 %}
+                            {% if alert_logs.page < alert_logs.pages - 2 %}
+                            <li>
+                                <span class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
+                                    ...
+                                </span>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.pages) }}"
+                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    {{ alert_logs.pages }}
+                                </a>
+                            </li>
+                            {% endif %}
+                    
+                            {% if alert_logs.has_next %}
+                            <li>
+                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.next_num) }}"
+                                   class="flex items-center justify-center px-4 h-10 rounded-r-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    <span class="sr-only">Next</span>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+        
     </div>
 </div>
-
-</div>
-
 {% endblock %}

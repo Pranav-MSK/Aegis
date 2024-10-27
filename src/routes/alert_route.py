@@ -1,6 +1,7 @@
 # cython: language_level=3
 from http import HTTPStatus
 from datetime import datetime
+from sqlalchemy.orm import joinedload
 from flask import (
     request,
     jsonify,
@@ -22,7 +23,10 @@ from src.models import (
     InvestigationNote,
     AlertLog,
     CustomFields,
+    Notification,
+    UserNotification
 )
+
 from src.routes.helper.access_decorators import (
     systemguard_enterprise,
     community_edition,
@@ -568,3 +572,40 @@ def alert_ticket(alert_id):
         alert_logs=alert_logs,
         investigation_notes=investigation_notes,
     )
+
+@app.route('/api/v1/mark_notification/<int:notification_id>', methods=['POST'])
+@csrf.exempt
+def mark_notification(notification_id):
+    user_id = current_user.id
+    user_notification = UserNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()
+    if user_notification:
+        user_notification.unread = False  # Mark as read
+        db.session.commit()
+        # flash("Notification marked as read!", "success")
+        return jsonify({'message': 'Notification marked as read!'}), 200
+    else:
+        return jsonify({'message': 'Notification not found for user.'}), 404
+
+
+@app.route('/api/v1/notifications/', methods=['GET'])
+def show_all_notifications():
+    # Query for unread notifications
+    notifications = UserNotification.query.filter_by(user_id=current_user.id, unread=True).options(
+        joinedload(UserNotification.notification)  # Correct usage
+    ).all()
+    list_of_notifications_id = [notification.notification_id for notification in notifications]
+
+    notifications = Notification.query.filter(Notification.id.in_(list_of_notifications_id)).order_by(Notification.time.desc()).all()
+
+    return jsonify([notification.to_dict() for notification in notifications]), 200
+
+
+@app.route('/api/v1/notifications/<int:notification_id>', methods=['GET'])
+def get_notification(notification_id):
+    user_id = current_user.id
+    user_notification = UserNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()
+    if user_notification:
+        return jsonify(user_notification.notification.to_dict()), 200
+    else:
+        return jsonify({'message': 'Notification not found for user.'}), 404
+    

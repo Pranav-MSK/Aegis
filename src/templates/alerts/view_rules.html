@@ -1,124 +1,259 @@
 {% extends 'base/base.html' %}
 {% block title %}Manage Alert Rules{% endblock %}
+
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/view_rules.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.3/cdn.min.js" defer></script>
 {% endblock %}
+
 {% block content %}
-<div class="container" x-data="{ editingRule: null }">
-    <h1 class="title">Manage Alert Rules</h1>
+<div class="mx-auto px-4 py-6" x-data="{ editingRule: null, showAddForm: false }">
+    <!-- Header Section -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Manage Alert Rules</h1>
+        <button @click="showAddForm = !showAddForm"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+            {% if total_rules>= max_alert_rules | int %}disabled class="opacity-50 cursor-not-allowed"{% endif %}
+            >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add New Rule
+        </button>
+    </div>
 
     {% include 'ext/message.html' %}
 
     {% if total_rules >= max_alert_rules | int %}
-        <div class="alert alert-warning">
-            Maximum number of alert rules ({{ max_alert_rules | int }}) reached. Please delete existing rules before adding new ones.
+    <div class="mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+        <div class="flex items-center">
+            <svg class="h-5 w-5 text-amber-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="text-sm text-amber-700">Maximum number of alert rules ({{ max_alert_rules | int }}) reached.
+                Please delete existing rules before adding new ones.</p>
         </div>
+    </div>
     {% endif %}
 
-    <div class="rules-container">
+    <!-- Add Rule Form (Slide Down) -->
+    <div x-show="showAddForm" x-cloak x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 transform -translate-y-4"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        class="mb-8 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-4 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Add New Rule</h2>
+        </div>
+        <form method="POST" action="{{ url_for('view_rules') }}" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6" {% if
+            total_rules>= max_alert_rules | int %}onsubmit="return false;"{% endif %}>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="group_name" value="SystemGuard's alert rules">
+
+            <!-- Form Grid Layout -->
+            <div class="space-y-4">
+                <div>
+                    <label for="alert_name" class="block text-sm font-medium text-gray-700">Alert Name</label>
+                    <input type="text" id="alert_name" name="alert_name" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        {% if total_rules>= max_alert_rules | int %}disabled{% endif %}>
+                </div>
+                <div>
+                    <label for="new_expr" class="block text-sm font-medium text-gray-700">Expression</label>
+                    <input type="text" id="new_expr" name="expr" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        {% if total_rules>= max_alert_rules | int %}disabled{% endif %}>
+                </div>
+                <div>
+                    <label for="new_for" class="block text-sm font-medium text-gray-700">For</label>
+                    <input type="text" id="new_for" name="for" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        {% if total_rules>= max_alert_rules | int %}disabled{% endif %}>
+                </div>
+                <div>
+                    <label for="new_severity" class="block text-sm font-medium text-gray-700">Severity</label>
+                    <select id="new_severity" name="severity" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        {% if total_rules>= max_alert_rules | int %}disabled{% endif %}>
+                        <option value="info">Info</option>
+                        <option value="warning">Warning</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="new_description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <input type="text" id="new_description" name="description" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        {% if total_rules>= max_alert_rules | int %}disabled{% endif %}>
+                </div>
+                <div>
+                    <label for="new_summary" class="block text-sm font-medium text-gray-700">Summary</label>
+                    <input type="text" id="new_summary" name="summary" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        {% if total_rules>= max_alert_rules | int %}disabled{% endif %}>
+                </div>
+                <div>
+                    <label for="new_runbook_url" class="block text-sm font-medium text-gray-700">Runbook URL</label>
+                    <input type="text" id="new_runbook_url" name="runbook_url" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        {% if total_rules>= max_alert_rules | int %}disabled{% endif %}>
+                </div>
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        {% if total_rules>= max_alert_rules | int %}disabled class="opacity-50 cursor-not-allowed"{%
+                        endif %}>
+                        Add Rule
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Rules List -->
+    <div class="space-y-6 p-6 max-w-7xl mx-auto" x-data="{ 
+        groupStates: JSON.parse(localStorage.getItem('groupStates')) || {},
+        toggleGroup(groupName) {
+            this.groupStates[groupName] = !this.groupStates[groupName];
+            localStorage.setItem('groupStates', JSON.stringify(this.groupStates));
+        },
+        isGroupExpanded(groupName) {
+            return this.groupStates[groupName] ?? false;
+        }
+    }">
         {% for group in rules.groups %}
-            <div class="group">
-                <h2 class="group-name">{{ group.name }}</h2>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-200 ease-in-out">
+            <!-- Group Header -->
+            <div class="group cursor-pointer" @click="toggleGroup('{{ group.name }}')">
+                <div class="p-4 bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between">
+                    <h2 class="text-lg font-medium text-gray-900">{{ group.name }}</h2>
+                    <svg class="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-transform duration-200"
+                        :class="{ 'transform rotate-180': isGroupExpanded('{{ group.name }}') }"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+    
+            <!-- Group Content -->
+            <div x-show="isGroupExpanded('{{ group.name }}')"
+                 x-transition:enter="transition-all ease-out duration-300"
+                 x-transition:enter-start="opacity-0 max-h-0"
+                 x-transition:enter-end="opacity-100 max-h-[5000px]"
+                 x-transition:leave="transition-all ease-in duration-200"
+                 x-transition:leave-start="opacity-100 max-h-[5000px]"
+                 x-transition:leave-end="opacity-0 max-h-0"
+                 class="divide-y divide-gray-200">
                 {% for rule in group.rules %}
-                <div class="rule" :class="{ 'editing': editingRule === '{{ group.name }}-{{ loop.index0 }}' }">
-                    <div class="rule-header" @click="editingRule = editingRule === '{{ group.name }}-{{ loop.index0 }}' ? null : '{{ group.name }}-{{ loop.index0 }}'">
-                        <span class="rule-name">{{ rule.alert }}</span>
-                        <span class="rule-severity {{ rule.labels.severity }}">{{ rule.labels.severity }}</span>
+                <div class="group hover:bg-gray-50 transition-colors duration-200"
+                    :class="{ 'bg-blue-50': editingRule === '{{ group.name }}-{{ loop.index0 }}' }">
+                    <!-- Rule Header -->
+                    <div class="p-4 flex items-center justify-between cursor-pointer space-x-4"
+                        @click="editingRule = editingRule === '{{ group.name }}-{{ loop.index0 }}' ? null : '{{ group.name }}-{{ loop.index0 }}'">
+                        <div class="flex items-center space-x-3 flex-grow">
+                            <span class="text-sm font-medium text-gray-900 truncate">{{ rule.alert }}</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0
+                                {% if rule.labels.severity == 'critical' %}bg-red-100 text-red-800
+                                {% elif rule.labels.severity == 'warning' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ rule.labels.severity }}
+                            </span>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-500 transition-transform duration-200 shrink-0"
+                            :class="{ 'transform rotate-180': editingRule === '{{ group.name }}-{{ loop.index0 }}' }"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
-                    <div class="rule-details" x-show="editingRule === '{{ group.name }}-{{ loop.index0 }}'" x-cloak>
-                        <form method="POST" action="{{ url_for('view_rules') }}" class="edit-form">
+    
+                    <!-- Rule Details -->
+                    <div x-show="editingRule === '{{ group.name }}-{{ loop.index0 }}'" x-cloak
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform -translate-y-2"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        class="px-4 pb-4 bg-white">
+                        <form method="POST" action="{{ url_for('view_rules') }}"
+                            class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="action" value="edit">
                             <input type="hidden" name="index" value="{{ loop.index0 }}">
                             <input type="hidden" name="group_name" value="{{ group.name }}">
-                            <div class="form-group">
-                                <label for="expr">Expression:</label>
-                                <input type="text" id="expr" name="expr" value="{{ rule.expr }}" required>
+    
+                            <!-- Left Column -->
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="expr" class="block text-sm font-medium text-gray-700">Expression</label>
+                                    <input type="text" id="expr" name="expr" value="{{ rule.expr }}" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="for" class="block text-sm font-medium text-gray-700">For</label>
+                                    <input type="text" id="for" name="for" value="{{ rule.for }}" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="severity" class="block text-sm font-medium text-gray-700">Severity</label>
+                                    <select id="severity" name="severity" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                        <option value="info" {% if rule.labels.severity=='info' %}selected{% endif %}>Info</option>
+                                        <option value="warning" {% if rule.labels.severity=='warning' %}selected{% endif %}>Warning</option>
+                                        <option value="critical" {% if rule.labels.severity=='critical' %}selected{% endif %}>Critical</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="for">For:</label>
-                                <input type="text" id="for" name="for" value="{{ rule.for }}" required>
+    
+                            <!-- Right Column -->
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                                    <input type="text" id="description" name="description" value="{{ rule.annotations.description }}" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="summary" class="block text-sm font-medium text-gray-700">Summary</label>
+                                    <input type="text" id="summary" name="summary" value="{{ rule.annotations.summary }}" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="runbook_url" class="block text-sm font-medium text-gray-700">Runbook URL</label>
+                                    <input type="text" id="runbook_url" name="runbook_url" value="{{ rule.annotations.runbook_url }}" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="severity">Severity:</label>
-                                <select id="severity" name="severity" required>
-                                    <option value="info" {% if rule.labels.severity == 'info' %}selected{% endif %}>Info</option>
-                                    <option value="warning" {% if rule.labels.severity == 'warning' %}selected{% endif %}>Warning</option>
-                                    <option value="critical" {% if rule.labels.severity == 'critical' %}selected{% endif %}>Critical</option>
-                                </select>
+    
+                            <!-- Actions -->
+                            <div class="col-span-2 flex items-center justify-between pt-4 border-t border-gray-200">
+                                <div class="flex space-x-3">
+                                    <button type="submit"
+                                        class="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                                        Update Rule
+                                    </button>
+                                    <button type="button" @click="editingRule = null"
+                                        class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                                        Cancel
+                                    </button>
+                                </div>
+                                <form method="POST" action="{{ url_for('view_rules') }}" class="inline-block">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+                                    <input type="hidden" name="group_name" value="{{ group.name }}">
+                                    <button type="submit"
+                                        class="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                                        Delete Rule
+                                    </button>
+                                </form>
                             </div>
-                            <div class="form-group">
-                                <label for="description">Description:</label>
-                                <input type="text" id="description" name="description" value="{{ rule.annotations.description }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="summary">Summary:</label>
-                                <input type="text" id="summary" name="summary" value="{{ rule.annotations.summary }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="runbook_url">Runbook URL:</label>
-                                <input type="text" id="runbook_url" name="runbook_url" value="{{ rule.annotations.runbook_url }}" required>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">Update Rule</button>
-                                <button type="button" class="btn btn-secondary" @click="editingRule = null">Cancel</button>
-                            </div>
-                        </form>
-                        <form method="POST" action="{{ url_for('view_rules') }}" class="delete-form" method="DELETE">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="hidden" name="index" value="{{ loop.index0 }}">
-                            <input type="hidden" name="group_name" value="{{ group.name }}">
-                            <button type="submit" class="btn btn-danger">Delete Rule</button>
                         </form>
                     </div>
                 </div>
                 {% endfor %}
             </div>
+        </div>
         {% endfor %}
-    </div>
-
-    <div class="add-rule-container">
-        <h2 class="subtitle">Add New Rule</h2>
-        <form method="POST" action="{{ url_for('view_rules') }}" class="add-form" {% if total_rules >= max_alert_rules | int %}onsubmit="return false;"{% endif %}>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="action" value="add">
-            <input type="hidden" name="group_name" value="SystemGuard's alert rules">
-            <div class="form-group">
-                <label for="alert_name">Alert Name:</label>
-                <input type="text" id="alert_name" name="alert_name" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label for="new_expr">Expression:</label>
-                <input type="text" id="new_expr" name="expr" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label for="new_for">For:</label>
-                <input type="text" id="new_for" name="for" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label for="new_severity">Severity:</label>
-                <select id="new_severity" name="severity" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
-                    <option value="info">Info</option>
-                    <option value="warning">Warning</option>
-                    <option value="critical">Critical</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="new_description">Description:</label>
-                <input type="text" id="new_description" name="description" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label for="new_summary">Summary:</label>
-                <input type="text" id="new_summary" name="summary" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
-            </div>
-            <div class="form-group">
-                <label for="new_runbook_url">Runbook URL:</label>
-                <input type="text" id="new_runbook_url" name="runbook_url" required {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>
-            </div>
-            <button type="submit" class="btn btn-success" {% if total_rules >= max_alert_rules | int %}disabled{% endif %}>Add Rule</button>
-        </form>
     </div>
 </div>
 {% endblock %}

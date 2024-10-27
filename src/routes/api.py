@@ -465,7 +465,7 @@ def get_chart_configurations():
     return jsonify([config.serialize() for config in chart_configurations])
 
 
-@app.route("/api/v1labels", methods=["GET"])
+@app.route("/api/v1/labels", methods=["GET"])
 def retrieve_labels():
     response = requests.get("http://localhost:9090/api/v1/label/__name__/values")
     data = response.json().get("data", [])

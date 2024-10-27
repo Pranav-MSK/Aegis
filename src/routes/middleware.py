@@ -1,14 +1,12 @@
 # cython: language_level=3
 import time
 import datetime
-from typing import Optional, Dict, Any
-from functools import wraps
 
 from flask import blueprints, request, redirect, url_for, flash, Response
 from flask_login import current_user
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from prometheus_client import Histogram, Counter, Gauge
+from prometheus_client import Counter
 
 from src.config import app
 from src.logger import logger
@@ -158,14 +156,16 @@ def global_middleware():
                 
     except Exception as e:
         logger.error(f"Error in global middleware: {e}")
-        metrics['ERROR_MIDDLEWARE_COUNTER'].inc()
         return "Internal server error", 500
 
 @app.after_request
 def after_request(response: Response) -> Response:
     """Process response and record metrics"""
-    if request.endpoint not in BYPASS_ROUTES:
-        metrics_middleware.record_request_metrics(response, request.start_time)
+    try:
+        if request.endpoint not in BYPASS_ROUTES:
+            metrics_middleware.record_request_metrics(response, request.start_time)
+    except Exception as e:
+        logger.error(f"Error processing response: {e}")
     
     return response
 

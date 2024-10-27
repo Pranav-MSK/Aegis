@@ -1,74 +1,126 @@
 {% extends 'base/base.html' %}
 {% block title %}{{ title }} Activation{% endblock %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/activation.css') }}">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
-{% endblock %}
-
 {% block content %}
-<div class="activation-container">
-    <div class="header">
-        <h1 class="title">{{ title }} Activation</h1>
-        <p class="subtitle">Activate your SystemGuard and start protecting your system now!</p>
-    </div>
-
-    {% include 'ext/message.html' %}
-
-    {% if is_plan_not_expired %}
-    <div class="info-section success">
-        <h5 class="section-title">Product Activated</h5>
-        <p class="lead">Your product is already activated. Enjoy uninterrupted service!</p>
-    </div>
-    {% endif %}
-
-    {% if systemguard_unique_id %}
-    <div class="info-section">
-        <h5 class="section-title">SystemGuard Unique ID</h5>
-        <p class="lead">{{ systemguard_unique_id }}</p>
-    </div>
-    {% endif %}
-
-    {% if is_plan_not_expired %}
-    <div class="info-section">
-        <h4 class="section-title">Download License File</h4>
-        <a href="{{ url_for('download_license') }}" class="btn btn-primary">Download License</a>
-    </div>
-    {% endif %}
-
-    <div class="info-section">
-        <h4 class="section-title">License Information</h4>
-        {% if remaining_plan_days %}
-        <p>Remaining Days: <strong>{{ remaining_plan_days }}</strong></p>
-        {% endif %}
-
-        {% if plan_type %}
-        <p>Plan Type: <strong>{{ plan_type }}</strong>
-            {% if is_trial == 'true' %}
-            <span class="badge bg-warning"><i class="fas fa-exclamation-triangle me-1"></i>Trial</span>
-            {% else %}
-            {% if is_plan_not_expired %}
-            <span class="badge bg-success">Full</span>
-            {% endif %}
-            {% endif %}
-        </p>
-        {% endif %}
-    </div>
-
-    <form method="POST" class="activation-form needs-validation" novalidate>
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="form-group">
-            <label for="activation_code">Activation Code</label>
-            <input type="text" class="form-control" id="activation_code" name="activation_code" placeholder="Enter your activation code" required>
-            <div class="invalid-feedback">Please enter your activation code.</div>
+<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-3">{{ title }} Activation</h1>
+            <p class="text-xl text-gray-600">Activate your SystemGuard and start protecting your system now!</p>
         </div>
-        <button type="submit" class="btn btn-primary">Activate</button>
-    </form>
 
-    <div class="footer">
-        <p class="footer-text">&copy; 2024 SystemGuard. All rights reserved.</p>
-        <a href="{{ url_for('terms') }}" class="footer-link">Terms & Conditions</a>
-        <a href="{{ url_for('privacy') }}" class="footer-link">Privacy Policy</a>
+        {% include 'ext/message.html' %}
+
+        <div class="space-y-8 bg-white rounded-2xl shadow-lg p-8">
+            <!-- Already Activated Message -->
+            {% if is_plan_not_expired %}
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h5 class="text-lg font-medium text-green-800">Product Activated</h5>
+                        <p class="text-green-700">Your product is already activated. Enjoy uninterrupted service!</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- SystemGuard ID Section -->
+            {% if systemguard_unique_id %}
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <h5 class="text-lg font-medium text-gray-900 mb-2">SystemGuard Unique ID</h5>
+                <p class="text-gray-700 font-mono bg-white p-3 rounded border border-gray-200">{{ systemguard_unique_id }}</p>
+            </div>
+            {% endif %}
+
+            <!-- License Download Section -->
+            {% if is_plan_not_expired %}
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Download License File</h4>
+                <a href="{{ url_for('download_license') }}" 
+                   class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                    <i class="fas fa-download mr-2"></i>
+                    Download License
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- License Information Section -->
+            <div class="border-t border-gray-200 pt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">License Information</h4>
+                <div class="space-y-3">
+                    {% if remaining_plan_days %}
+                    <div class="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg">
+                        <span class="text-gray-700">Remaining Days</span>
+                        <span class="font-semibold text-gray-900">{{ remaining_plan_days }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if plan_type %}
+                    <div class="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg">
+                        <span class="text-gray-700">Plan Type</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-semibold text-gray-900">{{ plan_type }}</span>
+                            {% if is_trial == 'true' %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                Trial
+                            </span>
+                            {% else %}
+                                {% if is_plan_not_expired %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Full
+                                </span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Activation Form -->
+            <div class="border-t border-gray-200 pt-6">
+                <form method="POST" class="space-y-6 needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div>
+                        <label for="activation_code" class="block text-sm font-medium text-gray-700">
+                            Activation Code
+                        </label>
+                        <div class="mt-1">
+                            <input 
+                                type="text" 
+                                id="activation_code" 
+                                name="activation_code" 
+                                placeholder="Enter your activation code"
+                                required
+                                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                            <div class="mt-1 text-sm text-red-600 hidden">Please enter your activation code.</div>
+                        </div>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                    >
+                        Activate
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center">
+            <p class="text-gray-600">&copy; 2024 SystemGuard. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="{{ url_for('terms') }}" class="text-indigo-600 hover:text-indigo-500 text-sm">Terms & Conditions</a>
+                <a href="{{ url_for('privacy') }}" class="text-indigo-600 hover:text-indigo-500 text-sm">Privacy Policy</a>
+            </div>
+        </footer>
     </div>
 </div>
 {% endblock %}

@@ -1,0 +1,119 @@
+<aside id="sidebar" class="fixed top-0 left-0 z-40 h-screen w-80 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out bg-gradient-to-b from-gray-50 to-white border-r border-gray-100 shadow-sm flex flex-col">
+    <!-- Logo Section -->
+    <div class="flex items-center justify-between px-8 py-8 border-b border-gray-100/50 bg-white/80 backdrop-blur-sm">
+        <div class="flex items-center space-x-3">
+            <div class="relative group">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-200"></div>
+                <div class="relative w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-xl">
+                    <span class="text-white font-bold text-2xl">S</span>
+                </div>
+            </div>
+            <a href="{{ url_for('dashboard') }}" class="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-700 bg-clip-text text-transparent tracking-tight">{{ title }}</a>
+        </div>
+        <button type="button" class="lg:hidden p-2.5 rounded-xl text-gray-500 hover:text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2" onclick="toggleSidebar()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto px-6 py-8">
+        <!-- Main Navigation -->
+        <div class="space-y-8">
+            <!-- Dashboard Section -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Main</p>
+                <a href="{{ url_for('dashboard') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'dashboard' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                    <i class="fas fa-tachometer-alt w-5 h-5 mr-4 {% if request.endpoint == 'dashboard' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i> Homepage
+                </a>
+            </div>
+
+            <!-- Metrics Section -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Metrics</p>
+                <div class="space-y-1.5">
+                    <a href="{{ url_for('historical_system_metrics') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'historical_system_metrics' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-chart-line w-5 h-5 mr-3 {% if request.endpoint == 'historical_system_metrics' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        Historical Metrics
+                    </a>
+                    <a href="{{ url_for('get_summary_metrics') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'get_summary_metrics' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-chart-bar w-5 h-5 mr-3 {% if request.endpoint == 'get_summary_metrics' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        Summary Metrics
+                    </a>
+                </div>
+            </div>
+
+            <!-- System Section -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">System</p>
+                <div class="space-y-1.5">
+                    <a href="{{ url_for('dashboard_network') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'dashboard_network' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-network-wired w-5 h-5 mr-3 {% if request.endpoint == 'dashboard_network' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>Active Target
+                    </a>
+                    <a href="{{ url_for('process') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'process' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-tasks w-5 h-5 mr-3 {% if request.endpoint == 'process' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        System Process
+                    </a>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Security</p>
+                <div class="space-y-1.5">
+                    <a href="{{ url_for('firewall') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'firewall' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-shield-alt w-5 h-5 mr-3 {% if request.endpoint == 'firewall' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        Firewall
+                    </a>
+                    <a href="{{ url_for('perform_security_analysis') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'perform_security_analysis' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-search w-5 h-5 mr-3 {% if request.endpoint == 'perform_security_analysis' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        Security Analysis
+                    </a>
+                    <a href="{{ url_for('alert_history') }}" class="relative group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'alert_history' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-bell w-5 h-5 mr-3 {% if request.endpoint == 'alert_history' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        Alert Tracker
+                        <!-- <span class="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-red-100 text-xs font-medium text-red-600">3</span> -->
+                    </a>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Settings</p>
+                <div class="space-y-1.5">
+                    <a href="{{ url_for('general_settings') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'general_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-cogs w-5 h-5 mr-3 {% if request.endpoint == 'general_settings' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        General Settings
+                    </a>
+                    <a href="{{ url_for('user_settings') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'user_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-user-cog w-5 h-5 mr-3 {% if request.endpoint == 'user_settings' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        User Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- User Profile -->
+    {% if current_user.is_authenticated %}
+    <div class="border-t border-gray-100/50 bg-white/80 backdrop-blur-sm p-6">
+        <div class="flex items-center space-x-4">
+            <div class="relative">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full blur opacity-50"></div>
+                <img src="{{ current_user.get_profile_picture_url() }}" alt="Profile Image" class="relative w-12 h-12 rounded-full ring-2 ring-white">
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-700 truncate">{{ current_user.first_name | capitalize }} {{ current_user.last_name | capitalize }}</p>
+                <a href="{{ url_for('view_profile') }}" class="text-xs bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-medium hover:from-indigo-700 hover:to-purple-700">View Profile</a>
+            </div>
+            <button class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                <i class="fas fa-ellipsis-v w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</aside>
+
+<!-- Sidebar Overlay -->
+<div class="fixed inset-0 z-30 bg-gray-600/60 backdrop-blur-sm lg:hidden hidden" id="sidebar-overlay" onclick="toggleSidebar()"></div>

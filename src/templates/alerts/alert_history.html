@@ -1,188 +1,218 @@
 {% extends 'base/base.html' %}
 {% block title %}{{ title }} Alert Ticket{% endblock %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/alert_ticket.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
-{% endblock %}
-
 {% block content %}
-<div class="content mt-4">
-    <h1 class="text-center m-4">
-        <span class=""><i class="logo fas fa-shield-alt"></i> {{ title }}</span>
-        <span class="">Alert Ticket</span>
-    </h1>
-    <hr>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="flex items-center justify-center space-x-3 text-3xl font-bold text-gray-900">
+            <i class="fas fa-shield-alt text-indigo-600"></i>
+            <span>{{ title }} Alert Ticket</span>
+        </h1>
+        <div class="mt-2 h-1 w-24 bg-indigo-600 mx-auto"></div>
+    </div>
 
     {% include 'ext/message.html' %}
 
-    <!-- Ticket Summary Table -->
+    <!-- Admin Dashboard -->
     {% if current_user.user_level == 'admin' %}
-    <div class="row">
-        <div class="col-md-6">
-            <h3 class="text-info text-center">Ticket Summary</h3>
-            <table class="table table-bordered table-light text-center mb-4">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Status</th>
-                        <th>Number of Tickets</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status, count in [
-                    ('Unassigned', unassigned_count),
-                    ('Open', open_count),
-                    ('In Progress', in_progress_count),
-                    ('Resolved', resolved_count),
-                    ('Closed', closed_count)] %}
-                    <tr>
-                        <td>{{ status }}</td>
-                        <td>{{ count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-md-6">
-            <h3 class="text-info text-center">Ticket Summary</h3>
-            <table class="table table-bordered table-light text-center mb-4">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Severity</th>
-                        <th>Number of Tickets</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for severity, count in [
-                    ('Critical', critical_count),
-                    ('Warning', warning_count),
-                    ('Info', info_count)] %}
-                    <tr>
-                        <td>{{ severity }}</td>
-                        <td>{{ count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Search Form -->
-    <form class="form-inline mb-4" method="get" action="{{ url_for('alert_history') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="input-group">
-            <input class="form-control" type="search" placeholder="Search Alerts..." aria-label="Search" name="search"
-                value="{{ request.args.get('search', '') }}">
-            <div class="input-group-append">
-                <button class="btn btn-outline-primary" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <!-- Status Summary -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Status Summary</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for status, count in [
+                        ('Unassigned', unassigned_count),
+                        ('Open', open_count),
+                        ('In Progress', in_progress_count),
+                        ('Resolved', resolved_count),
+                        ('Closed', closed_count)] %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ status }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-    </form>
 
-    {% if not (unassigned_alerts.items or open_alerts.items or in_progress_alerts.items or resolved_alerts.items or
-    closed_alerts.items) %}
-    <div class="alert alert-warning text-center" role="alert">
-        No alerts found.
+        <!-- Severity Summary -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Severity Summary</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for severity, count in [
+                        ('Critical', critical_count),
+                        ('Warning', warning_count),
+                        ('Info', info_count)] %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ severity }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     {% endif %}
 
+    <!-- Search Bar -->
+    <div class="mb-8">
+        <form method="get" action="{{ url_for('alert_history') }}" class="max-w-2xl mx-auto">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="relative">
+                <input 
+                    type="search" 
+                    name="search" 
+                    value="{{ request.args.get('search', '') }}"
+                    class="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Search alerts..."
+                >
+                <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2">
+                    <i class="fas fa-search text-gray-400"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if not (unassigned_alerts.items or open_alerts.items or in_progress_alerts.items or resolved_alerts.items or closed_alerts.items) %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-yellow-700">No alerts found.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Alert Tables -->
     {% for alert_type, alerts, title, color in [
-    ('Unassigned', unassigned_alerts, 'Unassigned Alerts', 'danger'),
-    ('Open', open_alerts, 'Open Alerts', 'success'),
-    ('In Progress', in_progress_alerts, 'In Progress Alerts', 'warning'),
-    ('Resolved', resolved_alerts, 'Resolved Alerts', 'secondary'),
-    ('Closed', closed_alerts, 'Closed Alerts', 'dark')] %}
+    ('Unassigned', unassigned_alerts, 'Unassigned Alerts', 'red'),
+    ('Open', open_alerts, 'Open Alerts', 'green'),
+    ('In Progress', in_progress_alerts, 'In Progress Alerts', 'yellow'),
+    ('Resolved', resolved_alerts, 'Resolved Alerts', 'gray'),
+    ('Closed', closed_alerts, 'Closed Alerts', 'slate')] %}
+    
+    <div class="mb-8">
+        <h3 class="text-xl font-semibold text-{{ color }}-600 mb-4">{{ title }}</h3>
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alert Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instance</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Supervisor</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for alert in alerts.items|reverse if alert.assigned_user or alert_type == 'Unassigned' %}
+                        {% if current_user.user_level == 'admin' or alert.assigned_user.id == current_user.id %}
+                        <tr class="{% if alert.severity == 'critical' %}bg-red-50{% elif alert.severity == 'warning' %}bg-yellow-50{% else %}bg-blue-50{% endif %}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alert.alert_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alert.instance }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if alert.severity == 'critical' %}
+                                        bg-red-100 text-red-800
+                                    {% elif alert.severity == 'warning' %}
+                                        bg-yellow-100 text-yellow-800
+                                    {% else %}
+                                        bg-blue-100 text-blue-800
+                                    {% endif %}">
+                                    {{ alert.severity }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900">
+                                <div class="max-w-xs truncate">{{ alert.description }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alert.assigned_user.username if alert.assigned_user else 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alert.assigned_supervisor.username if alert.assigned_supervisor else 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="get">
+                                    <button type="submit" class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        <i class="fas fa-info-circle mr-1"></i> Details
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <h3 class="text-{{ color }}">{{ title }}</h3>
-    <table class="table table-striped mb-4">
-        <thead class="thead-dark">
-            <tr>
-                <th>Alert Name</th>
-                <th>Created At</th>
-                <th>Instance</th>
-                <th>Severity</th>
-                <th>Description</th>
-                <th>Assigned User</th>
-                <th>Assigned Supervisor</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for alert in alerts.items|reverse if alert.assigned_user or alert_type == 'Unassigned' %}
-            {% if current_user.user_level == 'admin' or alert.assigned_user.id == current_user.id %}
-            <tr class="table-{% if alert.severity == 'critical' %}danger{% else %}{{ alert.severity }}{% endif %}">
-                <td>{{ alert.alert_name }}</td>
-                <td>{{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                <td>{{ alert.instance }}</td>
-                <td>{{ alert.severity }}</td>
-                <td>{{ alert.description[:50] }}{% if alert.description|length > 50 %}...{% endif %}</td>
-                <td>{{ alert.assigned_user.username if alert.assigned_user else 'N/A' }}</td>
-                <td>{{ alert.assigned_supervisor.username if alert.assigned_supervisor else 'N/A' }}</td>
-                <td>
-                    <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="get">
-                        <button type="submit" class="btn btn-info btn-sm">
-                            <i class="fas fa-info-circle"></i> Details
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- Pagination -->
-    <div class="text-center">
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                {% if alerts.has_prev %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': 1, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
-                        aria-label="First">
-                        <span aria-hidden="true">&laquo;&laquo;</span>
+        <!-- Pagination -->
+        {% if alerts.pages > 1 %}
+        <div class="mt-4 flex items-center justify-between">
+            <div class="flex-1 flex justify-center">
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    {% if alerts.has_prev %}
+                    <a href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': 1, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">First</span>
+                        <i class="fas fa-angle-double-left"></i>
                     </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.prev_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
-                        aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
+                    <a href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.prev_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-angle-left"></i>
                     </a>
-                </li>
-                {% endif %}
+                    {% endif %}
 
-                {% for page_num in range(1, alerts.pages + 1) %}
-                <li class="page-item {% if page_num == alerts.page %}active{% endif %}">
-                    <a class="page-link"
-                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': page_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}">
+                    {% for page_num in range(max(1, alerts.page - 2), min(alerts.pages + 1, alerts.page + 3)) %}
+                    <a href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': page_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium {% if page_num == alerts.page %}text-indigo-600 bg-indigo-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                         {{ page_num }}
                     </a>
-                </li>
-                {% endfor %}
+                    {% endfor %}
 
-                {% if alerts.has_next %}
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.next_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
-                        aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
+                    {% if alerts.has_next %}
+                    <a href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.next_num, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-angle-right"></i>
                     </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link"
-                        href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.pages, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
-                        aria-label="Last">
-                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    <a href="{{ url_for('alert_history', **{alert_type|lower ~ '_page': alerts.pages, 'search': request.args.get('search'), 'per_page': request.args.get('per_page', 10)}) }}"
+                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">Last</span>
+                        <i class="fas fa-angle-double-right"></i>
                     </a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
-        <span>Page {{ alerts.page }} of {{ alerts.pages }}</span>
+                    {% endif %}
+                </nav>
+            </div>
+            <div class="text-sm text-gray-700">
+                Page {{ alerts.page }} of {{ alerts.pages }}
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% endfor %}
 </div>

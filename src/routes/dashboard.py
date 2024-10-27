@@ -13,7 +13,6 @@ from src.routes.helper.prometheus_helper import (
     calculate_total_rules, 
     retrieve_active_alertmanagers
 )
-
 dashboard_bp = Blueprint("dashboard", __name__)
 
 def fetch_statistics(user_id):
@@ -64,7 +63,7 @@ def dashboard():
     system_info["total_targets"] = count_of_targets()
     system_info["total_rules"] = calculate_total_rules()
     system_info["active_alertmanagers"] = retrieve_active_alertmanagers()
-
+    
     return render_template("dashboard/homepage.html", system_info=system_info, current_user=current_user)
 
 @app.route("/api/v1/dashboard/stats", methods=["GET"])
@@ -74,7 +73,7 @@ def api_dashboard_stats():
     user_stats, ticket_stats, chart_stats, top_alert_tickets = fetch_statistics(current_user.id)
 
     app_info = get_app_info()
-    
+
     # Prepare the response data
     response_data = {
         "user_stats": user_stats._asdict(),
@@ -88,7 +87,7 @@ def api_dashboard_stats():
         "max_number_of_graphs": app_info.get('max_number_of_graphs'),
         "monthly_alert_tickets_limit": app_info.get('monthly_alert_tickets_limit'),
         "max_users_allowed": app_info.get('max_users_allowed'),
-        "top_alert_tickets": [ticket.to_dict() for ticket in top_alert_tickets]
+        "top_alert_tickets": [ticket.to_dict() for ticket in top_alert_tickets],
     }
 
     return jsonify(response_data)

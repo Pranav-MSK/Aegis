@@ -5,7 +5,9 @@ import json
 import time
 import fpdf
 from datetime import datetime
+from flask_login import current_user
 
+from src.config import db
 from src.logger import logger
 from src.alert_manager import (
     send_slack_alert,
@@ -14,7 +16,7 @@ from src.alert_manager import (
     send_teams_alert,
     send_google_chat_alert,
 )
-from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog
+from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog, Notification, UserNotification
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper.alert_helper import can_create_alert
@@ -123,6 +125,15 @@ def process_alert(alert):
         elif existing_alert and existing_alert.alert_status == "resolved" and alert_status == "firing":
             logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
             return
+
+    Notification_data = {
+        "type": severity,
+        "icon": "info-circle",  # Font Awesome icon
+        "title": alert_name,
+        "message": description,
+        "is_global": True
+    }
+    generate_system_notification(Notification_data)
 
     log_alert(severity, alert_name, instance, description, summary)
     create_alert_ticket(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)
@@ -412,3 +423,18 @@ def generate_alert_ticket_pdf(alert, investigation_notes, alert_logs):
 
     return pdf_file_path
 
+def generate_system_notification(notification_data):
+    new_notification = Notification(
+        type=notification_data.get('type', 'info'),
+        icon=notification_data.get('icon', 'info-circle'),
+        title=notification_data['title'],
+        message=notification_data['message'],
+        is_global=notification_data.get('is_global', False)
+    )
+    new_notification.save()
+
+    if new_notification.is_global:
+        user_notification = UserNotification(user_id=current_user.id, notification_id=new_notification.id)
+    else:
+        user_notification = UserNotification(user_id=current_user.id, notification_id=new_notification.id)
+    user_notification.save()

@@ -2,208 +2,427 @@
 {% block title %}Control Panel{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/control_panel.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js"></script>
 {% endblock %}
 {% block content %}
 
-    <div class="settings-container container-fluid p-4">
-        <h1 class="settings-title text-center my-4">
-            <span class="text-primary">{{ title }}</span> Control Panel
-            <i class="fas fa-cogs"></i>
-        </h1>
-        {% include 'ext/message.html' %}
 
-        <div class="row">
-            <div class="col-md-3">
-                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
-                    <button class="nav-link" id="v-pills-users-tab" data-bs-toggle="pill" data-bs-target="#v-pills-users" type="button" role="tab" aria-controls="v-pills-users" aria-selected="false">
-                        <i class="fas fa-users"></i> Users
-                    </button>
-                    <button class="nav-link" id="v-pills-systemguard-tab" data-bs-toggle="pill" data-bs-target="#v-pills-systemguard" type="button" role="tab" aria-controls="v-pills-systemguard" aria-selected="false">
-                        <i class="fa-brands fa-centercode"></i> SystemGuard Central
-                    </button>
-                    <button class="nav-link" id="v-pills-alerts-tab" data-bs-toggle="pill" data-bs-target="#v-pills-alerts" type="button" role="tab" aria-controls="v-pills-alerts" aria-selected="false">
-                        <i class="fas fa-bell"></i> Alerts & Notifications
-                    </button>
-                    <button class="nav-link" id="v-pills-utilities-tab" data-bs-toggle="pill" data-bs-target="#v-pills-utilities" type="button" role="tab" aria-controls="v-pills-utilities" aria-selected="false">
-                        <i class="fas fa-tools"></i> Utilities
-                    </button>
-                    <button class="nav-link" id="v-pills-security-tab" data-bs-toggle="pill" data-bs-target="#v-pills-security" type="button" role="tab" aria-controls="v-pills-security" aria-selected="false">
-                        <i class="fas fa-shield-alt"></i> Security Tools
-                    </button>
-                    <button class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false">
-                        <i class="fas fa-cogs"></i> General
-                    </button>
-                    {% endif %}
-                    <button class="nav-link" id="v-pills-system-tab" data-bs-toggle="pill" data-bs-target="#v-pills-system" type="button" role="tab" aria-controls="v-pills-system" aria-selected="false">
-                        <i class="fas fa-info-circle"></i> System Info
-                    </button>
-                    <button class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="true">
-                        <i class="fas fa-user"></i> Profile
-                    </button>
+<div class="min-h-screen p-4 md:p-8" x-data="{ activeTab: 'profile' }">
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto mb-8">
+        <h1 class="text-center">
+            <span
+                class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                {{ title }} Control Panel
+            </span>
+            <i class="fas fa-cogs ml-3 text-indigo-600"></i>
+        </h1>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Sidebar Navigation -->
+            <div class="lg:w-1/4">
+                <div class="bg-white rounded-2xl shadow-lg p-4">
+                    <nav class="space-y-2">
+                        {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
+                        <button @click="activeTab = 'users'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'users',
+                                    'hover:bg-slate-50': activeTab !== 'users'}"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
+                            <i class="fas fa-users w-5"></i>
+                            <span class="font-medium">Users</span>
+                        </button>
+
+                        <button @click="activeTab = 'systemguard'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'systemguard',
+                                    'hover:bg-slate-50': activeTab !== 'systemguard'}"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
+                            <i class="fa-brands fa-centercode w-5"></i>
+                            <span class="font-medium">SystemGuard Central</span>
+                        </button>
+
+                        <button @click="activeTab = 'alerts'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'alerts',
+                                    'hover:bg-slate-50': activeTab !== 'alerts'}"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
+                            <i class="fas fa-bell w-5"></i>
+                            <span class="font-medium">Alerts & Notifications</span>
+                        </button>
+
+                        <button @click="activeTab = 'utilities'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'utilities',
+                                    'hover:bg-slate-50': activeTab !== 'utilities'}"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
+                            <i class="fas fa-tools w-5"></i>
+                            <span class="font-medium">Utilities</span>
+                        </button>
+
+                        <button @click="activeTab = 'security'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'security',
+                                    'hover:bg-slate-50': activeTab !== 'security'}"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
+                            <i class="fas fa-shield-alt w-5"></i>
+                            <span class="font-medium">Security Tools</span>
+                        </button>
+
+                        <button @click="activeTab = 'settings'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'settings',
+                                    'hover:bg-slate-50': activeTab !== 'settings'}"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
+                            <i class="fas fa-cogs w-5"></i>
+                            <span class="font-medium">General</span>
+                        </button>
+                        {% endif %}
+
+                        <button @click="activeTab = 'system'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'system',
+                                    'hover:bg-slate-50': activeTab !== 'system'}"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
+                            <i class="fas fa-info-circle w-5"></i>
+                            <span class="font-medium">System Info</span>
+                        </button>
+
+                        <button @click="activeTab = 'profile'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'profile',
+                                    'hover:bg-slate-50': activeTab !== 'profile'}"
+                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
+                            <i class="fas fa-user w-5"></i>
+                            <span class="font-medium">Profile</span>
+                        </button>
+                    </nav>
                 </div>
             </div>
-            <div class="col-md-9">
-                <div class="tab-content" id="v-pills-tabContent">
-                    <!-- User Management Section -->
-                    <div class="tab-pane fade" id="v-pills-users" role="tabpanel" aria-labelledby="v-pills-users-tab">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fas fa-users"></i> User Management</h5>
-                                <a href="{{ url_for('view_users') }}" class="btn btn-primary">
-                                    <i class="fas fa-users"></i> Manage Users
-                                </a>
-                                <a href="{{ url_for('create_user') }}" class="btn btn-success">
-                                    <i class="fas fa-user-plus"></i> Create New User
-                                </a>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- SystemGuard Central Section -->
-                    <div class="tab-pane fade" id="v-pills-systemguard" role="tabpanel" aria-labelledby="v-pills-systemguard-tab">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fa-brands fa-centercode"></i> SystemGuard Central</h5>
-                                <a href="{{ url_for('configure_targets') }}" class="btn btn-primary">
-                                    <i class="fas fa-cogs"></i> Configure Targets
-                                </a>
-                                <a href="{{ url_for('chart_configurations') }}" class="btn btn-primary">
-                                    <i class="fas fa-chart-line"></i> Chart Configurations
-                                </a>
+            <!-- <div class="flex flex-wrap gap-4">
+                <a href="{{ url_for('view_users') }}"
+                    class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors">
+                    <i class="fas fa-users"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="{{ url_for('create_user') }}"
+                    class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Create New User</span>
+                </a>
+            </div>
+             -->
+            <!-- Content Area -->
+            <div class="lg:w-3/4">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    
+                    <!-- Users Section -->
+                    <div x-show="activeTab === 'users'" class="space-y-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-indigo-100 rounded-xl">
+                                <i class="fas fa-users text-indigo-600 text-xl"></i>
                             </div>
+                            <h2 class="text-2xl font-bold text-gray-800">User Management</h2>
                         </div>
-                    </div>
-
-                    <!-- Alerts Section -->
-                    <div class="tab-pane fade" id="v-pills-alerts" role="tabpanel" aria-labelledby="v-pills-alerts-tab">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fas fa-bell"></i> Alerts & Notifications</h5>
-                                <a href="{{ url_for('active_alerts') }}" class="btn btn-primary">
-                                    <i class="fas fa-bell"></i> Active Alerts
-                                </a>
-                                <a href="{{ url_for('view_rules') }}" class="btn btn-primary">
-                                    <i class="fas fa-list"></i> View Rules
-                                </a>
-                                <a href="{{ url_for('alertmanager_status') }}" class="btn btn-primary">
-                                    <i class="fas fa-tachometer-alt"></i> Alertmanager Status
-                                </a>
-                                <a href="{{ url_for('alert_history') }}" class="btn btn-primary">
-                                    <i class="fas fa-history"></i> Alert Ticket Tracker
-                                </a>
-                                <a href="{{ url_for('smtp_config') }}" class="btn btn-secondary">
-                                    <i class="fas fa-envelope"></i> SMTP Configuration
-                                </a>
-                                <a href="{{ url_for('update_webhooks') }}" class="btn btn-secondary">
-                                    <i class="fas fa-plug"></i> Notification Webhooks
-                                </a>
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{{ url_for('view_users') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-indigo-200 hover:bg-indigo-50 transition-all group">
+                                <div class="p-3 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors">
+                                    <i class="fas fa-users text-indigo-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-indigo-700">Manage Users</span>
+                            </a>
                         </div>
-                    </div>
-
-                    <!-- Utilities Section -->
-                    <div class="tab-pane fade" id="v-pills-utilities" role="tabpanel" aria-labelledby="v-pills-utilities-tab">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fas fa-tools"></i> Utilities</h5>
-                                <a href="{{ url_for('terminal') }}" class="btn btn-primary">
-                                    <i class="fas fa-terminal"></i> Terminal
-                                </a>
-                                <a href="{{ url_for('utility_control') }}" class="btn btn-primary">
-                                    <i class="fas fa-power-off"></i> Shutdown/Reboot
-                                </a>
-                                <a href="{{ url_for('send_email_page') }}" class="btn btn-primary">
-                                    <i class="fas fa-envelope"></i> Send Email
-                                </a>
-                                <a href="{{ url_for('speedtest') }}" class="btn btn-primary">
-                                    <i class="fas fa-tachometer-alt"></i> Speedtest
-                                </a>
-                                <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary">
-                                    <i class="fas fa-globe"></i> Ping Website
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Security Tools Section -->
-                    <div class="tab-pane fade" id="v-pills-security" role="tabpanel" aria-labelledby="v-pills-security-tab">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fas fa-shield-alt"></i> Security Tools</h5>
-                                <a href="{{ url_for('firewall') }}" class="btn btn-primary">
-                                    <i class="fas fa-fire"></i> Firewall
-                                </a>
-                                <a href="{{ url_for('perform_security_analysis') }}" class="btn btn-primary">
-                                    <i class="fas fa-search"></i> Security Analysis
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Settings Section -->
-                    <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fas fa-cogs"></i> General Settings</h5>
-                                <a href="{{ url_for('general_settings') }}" class="btn btn-primary">
-                                    <i class="fas fa-sliders-h"></i> General Settings
-                                </a>
-                                <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary">
-                                    <i class="fas fa-toggle-on"></i> Page Toggles
-                                </a>
-                                <a href="{{ url_for('card_toggles') }}" class="btn btn-primary">
-                                    <i class="fas fa-th-large"></i> Card Toggles
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- System Info Section -->
-                    <div class="tab-pane fade" id="v-pills-system" role="tabpanel" aria-labelledby="v-pills-system-tab">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fas fa-info-circle"></i> System Info</h5>
-                                <a href="{{ url_for('show_os_info') }}" class="btn btn-primary">
-                                    <i class="fas fa-desktop"></i> Show OS Info
-                                </a>
-                                <a href="{{ url_for('about') }}" class="btn btn-primary">
-                                    <i class="fas fa-info-circle"></i> About {{ title }}
-                                </a>
-                                {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
-                                <a href="{{ url_for('activation') }}" class="btn btn-primary">
-                                    <i class="fas fa-key"></i> SystemGuard Activation
-                                </a>
-                                {% endif %}
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{{ url_for('create_user') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-indigo-200 hover:bg-indigo-50 transition-all group">
+                                <div class="p-3 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors">
+                                    <i class="fas fa-user-plus text-indigo-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-indigo-700">Create New User</span>
+                            </a>
                         </div>
                     </div>
 
                     <!-- Profile Section -->
-                    <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fas fa-user"></i> Profile</h5>
-                                <a href="{{ url_for('view_profile') }}" class="btn btn-primary">
-                                    <i class="fas fa-user-circle"></i> My Profile
-                                </a>
-                                <a href="{{ url_for('change_password') }}" class="btn btn-primary">
-                                    <i class="fas fa-key"></i> Change Password
-                                </a>
-                                <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
-                                    <i class="fas fa-user-edit"></i> Edit Profile
-                                </a>
-                                <a href="{{ url_for('user_settings') }}" class="btn btn-primary">
-                                    <i class="fas fa-user-cog"></i> User Settings
-                                </a>
+                    <div x-show="activeTab === 'profile'" class="space-y-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-purple-100 rounded-xl">
+                                <i class="fas fa-user text-purple-600 text-xl"></i>
                             </div>
+                            <h2 class="text-2xl font-bold text-gray-800">Profile Settings</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{{ url_for('view_profile') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-200 hover:bg-purple-50 transition-all group">
+                                <div class="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                                    <i class="fas fa-user-circle text-purple-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-purple-700">My Profile</span>
+                            </a>
+
+                            <a href="{{ url_for('change_password') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-200 hover:bg-purple-50 transition-all group">
+                                <div class="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                                    <i class="fas fa-key text-purple-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-purple-700">Change
+                                    Password</span>
+                            </a>
+
+                            <a href="{{ url_for('edit_profile') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-200 hover:bg-purple-50 transition-all group">
+                                <div class="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                                    <i class="fas fa-user-edit text-purple-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-purple-700">Edit Profile</span>
+                            </a>
+
+                            <a href="{{ url_for('user_settings') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-200 hover:bg-purple-50 transition-all group">
+                                <div class="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
+                                    <i class="fas fa-user-cog text-purple-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-purple-700">User Settings</span>
+                            </a>
                         </div>
                     </div>
+
+                    <!-- SystemGuard Section -->
+                    <div x-show="activeTab === 'systemguard'" class="space-y-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-blue-100 rounded-xl">
+                                <i class="fa-brands fa-centercode text-blue-600 text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-800">SystemGuard Central</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{{ url_for('configure_targets') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-200 hover:bg-blue-50 transition-all group">
+                                <div class="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                                    <i class="fas fa-cogs text-blue-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-blue-700">Configure
+                                    Targets</span>
+                            </a>
+
+                            <a href="{{ url_for('chart_configurations') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-200 hover:bg-blue-50 transition-all group">
+                                <div class="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                                    <i class="fas fa-chart-line text-blue-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-blue-700">Chart
+                                    Configurations</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Alerts Section -->
+                    <div x-show="activeTab === 'alerts'" class="space-y-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-amber-100 rounded-xl">
+                                <i class="fas fa-bell text-amber-600 text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-800">Alerts & Notifications</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <a href="{{ url_for('active_alerts') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-amber-200 hover:bg-amber-50 transition-all group">
+                                <div class="p-3 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                                    <i class="fas fa-bell text-amber-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-amber-700">Active Alerts</span>
+                            </a>
+
+                            <a href="{{ url_for('view_rules') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-amber-200 hover:bg-amber-50 transition-all group">
+                                <div class="p-3 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                                    <i class="fas fa-list text-amber-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-amber-700">View Rules</span>
+                            </a>
+
+                            <a href="{{ url_for('alertmanager_status') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-amber-200 hover:bg-amber-50 transition-all group">
+                                <div class="p-3 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                                    <i class="fas fa-tachometer-alt text-amber-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-amber-700">Alertmanager
+                                    Status</span>
+                            </a>
+
+                            <a href="{{ url_for('alert_history') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-amber-200 hover:bg-amber-50 transition-all group">
+                                <div class="p-3 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                                    <i class="fas fa-history text-amber-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-amber-700">Alert History</span>
+                            </a>
+
+                            <a href="{{ url_for('smtp_config') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-amber-200 hover:bg-amber-50 transition-all group">
+                                <div class="p-3 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                                    <i class="fas fa-envelope text-amber-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-amber-700">SMTP
+                                    Configuration</span>
+                            </a>
+
+                            <a href="{{ url_for('update_webhooks') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-amber-200 hover:bg-amber-50 transition-all group">
+                                <div class="p-3 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
+                                    <i class="fas fa-plug text-amber-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-amber-700">Notification
+                                    Webhooks</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Utilities Section -->
+                    <div x-show="activeTab === 'utilities'" class="space-y-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-emerald-100 rounded-xl">
+                                <i class="fas fa-tools text-emerald-600 text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-800">Utilities</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <a href="{{ url_for('terminal') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
+                                <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-terminal text-emerald-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-emerald-700">Terminal</span>
+                            </a>
+
+                            <a href="{{ url_for('utility_control') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
+                                <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-power-off text-emerald-600"></i>
+                                </div>
+                                <span
+                                    class="font-medium text-gray-700 group-hover:text-emerald-700">Shutdown/Reboot</span>
+                            </a>
+
+                            <a href="{{ url_for('send_email_page') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
+                                <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-envelope text-emerald-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-emerald-700">Send Email</span>
+                            </a>
+
+                            <a href="{{ url_for('speedtest') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
+                                <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-tachometer-alt text-emerald-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-emerald-700">Speedtest</span>
+                            </a>
+
+                            <a href="{{ url_for('monitor_websites') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
+                                <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                                    <i class="fas fa-globe text-emerald-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-emerald-700">Ping Website</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Security Tools Section -->
+                    <div x-show="activeTab === 'security'" class="space-y-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-red-100 rounded-xl">
+                                <i class="fas fa-shield-alt text-red-600 text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-800">Security Tools</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{{ url_for('firewall') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-red-200 hover:bg-red-50 transition-all group">
+                                <div class="p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+                                    <i class="fas fa-fire text-red-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-red-700">Firewall</span>
+                            </a>
+
+                            <a href="{{ url_for('perform_security_analysis') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-red-200 hover:bg-red-50 transition-all group">
+                                <div class="p-3 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors">
+                                    <i class="fas fa-search text-red-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-red-700">Security
+                                    Analysis</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Settings Section -->
+                    <div x-show="activeTab === 'settings'" class="space-y-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-violet-100 rounded-xl">
+                                <i class="fas fa-cogs text-violet-600 text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-800">General Settings</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{{ url_for('general_settings') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all group">
+                                <div class="p-3 bg-violet-100 rounded-lg group-hover:bg-violet-200 transition-colors">
+                                    <i class="fas fa-sliders-h text-violet-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-violet-700">General
+                                    Settings</span>
+                            </a>
+
+                            <a href="{{ url_for('feature_toggles') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all group">
+                                <div class="p-3 bg-violet-100 rounded-lg group-hover:bg-violet-200 transition-colors">
+                                    <i class="fas fa-toggle-on text-violet-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-violet-700">Page Toggles</span>
+                            </a>
+
+                            <a href="{{ url_for('card_toggles') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all group">
+                                <div class="p-3 bg-violet-100 rounded-lg group-hover:bg-violet-200 transition-colors">
+                                    <i class="fas fa-th-large text-violet-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-violet-700">Card Toggles</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- System Info Section -->
+                    <div x-show="activeTab === 'system'" class="space-y-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 bg-gray-100 rounded-xl">
+                                <i class="fas fa-info-circle text-gray-600 text-xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-800">System Info</h2>
+                        </div> 
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{{ url_for('show_os_info') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-200 hover:bg-gray-50 transition-all group">
+                                <div class="p-3 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-desktop text-gray-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-gray-700">Show OS Info</span>
+                            </a>
+
+                            <a href="{{ url_for('about') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-200 hover:bg-gray-50 transition-all group">
+                                <div class="p-3 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-info-circle text-gray-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-gray-700">About {{ title }}</span>
+                            </a>
+
+                            {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
+                            <a href="{{ url_for('activation') }}"
+                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-200 hover:bg-gray-50 transition-all group">
+                                <div class="p-3 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-key text-gray-600"></i>
+                                </div>
+                                <span class="font-medium text-gray-700 group-hover:text-gray-700">SystemGuard Activation</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
+</div>
 {% endblock %}

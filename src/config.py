@@ -1,6 +1,6 @@
 # cython: language_level=3
 import os
-from flask import Flask, render_template
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
@@ -81,8 +81,7 @@ app.jinja_env.globals.update(
     max_alert_rules=plan_details.get('max_alert_rules'),
     max_number_of_graphs=plan_details.get('max_number_of_graphs'),
     monthly_alert_tickets_limit=plan_details.get('monthly_alert_tickets_limit'),
-    max_users_allowed=plan_details.get('max_users_allowed')
-
+    max_users_allowed=plan_details.get('max_users_allowed'),
 )
 
 def safe_int_conversion(value, default=0):
