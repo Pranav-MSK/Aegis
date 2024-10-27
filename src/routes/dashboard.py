@@ -8,6 +8,7 @@ from sqlalchemy.orm import joinedload
 from src.config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration
 from src.utils import fetch_system_metrics
+from src.activator import get_plan_details
 from src.routes.helper.prometheus_helper import (
     count_of_targets, 
     calculate_total_rules, 
@@ -49,6 +50,22 @@ def fetch_statistics(user_id):
 @app.route("/", methods=["GET"])
 @login_required
 def dashboard():
+    plan_details = get_plan_details()
+    app.jinja_env.globals.update(
+        is_plan_not_expired=plan_details.get('is_plan_not_expired'),
+        remaining_plan_days=plan_details.get('remaining_plan_days'),
+        plan_type=plan_details.get('plan_type'),
+        is_trial=plan_details.get('is_trial'),
+        license_key=plan_details.get('license_key'),
+        activation_code=plan_details.get('activation_code'),
+        systemguard_unique_id=plan_details.get('systemguard_unique_id'),
+        max_scrap_target=plan_details.get('max_scrap_target'),
+        max_alert_rules=plan_details.get('max_alert_rules'),
+        max_number_of_graphs=plan_details.get('max_number_of_graphs'),
+        monthly_alert_tickets_limit=plan_details.get('monthly_alert_tickets_limit'),
+        max_users_allowed=plan_details.get('max_users_allowed')
+    )
+
     system_info = fetch_system_metrics()
 
     user_stats, ticket_stats, chart_stats, top_alert_tickets = fetch_statistics(current_user.id)
