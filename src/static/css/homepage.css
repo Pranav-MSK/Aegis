@@ -1401,3 +1401,8 @@ temp-alert-badge {
     text-align: center;
     color: var(--text-secondary);
 }
+
+.notification {
+    transition: opacity 0.3s ease;
+  }
+  

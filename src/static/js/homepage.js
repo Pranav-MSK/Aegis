@@ -641,29 +641,140 @@ document.addEventListener('DOMContentLoaded', () => {
   apiMetrics.initialize();
 });
 
-function markAsRead(notificationId) {
-  fetch(`/api/v1/mark_notification/${notificationId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then(response => {
-      if (response.ok) {
-        // Update UI to reflect that the notification is read
-        console.log(`Notification ${notificationId} marked as read.`);
-        // show some UI feedback using flask message, tailwind
-        // ther is already a ext/message html file in the project
-        // so we can use that to show the message
 
-        // show success message
-        show_message('Notification marked as read', 'success');
-
-      } else {
-        console.error('Failed to mark notification as read');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
+async function markAsRead(notificationId) {
+  try {
+    const response = await fetch(`/api/v1/mark_notification/${notificationId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (response.ok) {
+      // Find and remove the notification from the UI
+      const notificationElement = document.getElementById(`notification-${notificationId}`);
+      if (notificationElement) {
+        notificationElement.classList.add('opacity-50'); // Fade out effect
+        setTimeout(() => {
+          notificationElement.remove(); // Remove from DOM after fading out
+        }, 300); // Match with CSS transition duration
+      }
+      // Show success message
+      showMessage('Notification marked as read.', 'success');
+    } else {
+      console.error('Failed to mark notification as read');
+      showMessage('Failed to mark notification as read. Please try again.', 'error');
+    }
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    showMessage('An error occurred. Please try again.', 'error');
+  }
 }
+
+function showMessage(message, type) {
+  const messageContainer = document.getElementById('message-container');
+  
+  // Clear any existing messages
+  messageContainer.innerHTML = '';
+
+  // Create a new message element
+  const messageElement = document.createElement('div');
+  messageElement.className = `p-4 mb-4 text-sm text-${type === 'success' ? 'green' : 'red'}-700 bg-${type === 'success' ? 'green' : 'red'}-100 rounded-lg`;
+  messageElement.innerText = message;
+
+  // Append the message element to the message container
+  messageContainer.appendChild(messageElement);
+
+  // Remove the message after a few seconds
+  setTimeout(() => {
+    messageContainer.innerHTML = '';
+  }, 3000);
+}
+
+
+async function fetchNotifications() {
+  try {
+    const response = await fetch('/api/v1/notifications/');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const notifications = await response.json();
+
+    const container = document.getElementById('notification-container');
+    container.innerHTML = ''; // Clear previous notifications
+
+    if (notifications.length > 0) {
+      notifications.forEach(notification => {
+        const notificationElement = document.createElement('div');
+        notificationElement.id = `notification-${notification.id}`; // Unique ID
+        notificationElement.className = `relative flex p-4 space-x-3 hover:bg-slate-50 transition-colors duration-150 ${notification.unread ? 'bg-blue-50/40' : ''}`;
+        notificationElement.innerHTML = `
+          <div class="flex-shrink-0">
+              <span class="inline-flex items-center justify-center h-10 w-10 rounded-full ${getNotificationClass(notification.type)}">
+                  <i class="fas fa-${notification.icon} w-5 h-5"></i>
+              </span>
+          </div>
+          <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-slate-900">${notification.title}</p>
+              <p class="text-sm text-slate-500 line-clamp-2">${notification.message}</p>
+              <p class="mt-1 text-xs text-slate-400">${notification.time}</p>
+          </div>
+          <button class="absolute right-0 top-4 text-gray-400 hover:text-gray-600" onclick="markAsRead(${notification.id})" aria-label="Mark as read">
+              <i class="fas fa-times"></i>
+          </button>
+        `;
+        container.appendChild(notificationElement);
+      });
+    } else {
+      container.innerHTML = `
+        <div class="p-8 text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-4">
+                <i class="fas fa-bell text-slate-400 w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-medium text-slate-900">No new notifications</p>
+            <p class="mt-1 text-sm text-slate-500">We'll notify you when something arrives.</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error);
+  }
+}
+
+
+function getNotificationClass(type) {
+  switch (type) {
+    case 'warning':
+      return 'bg-amber-100 text-amber-600';
+    case 'error':
+      return 'bg-red-100 text-red-600';
+    case 'success':
+      return 'bg-emerald-100 text-emerald-600';
+    default:
+      return 'bg-blue-100 text-blue-600';
+  }
+}
+
+async function markAsRead(notificationId) {
+  try {
+    const response = await fetch(`/api/v1/mark_notification/${notificationId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      // Remove the notification from the UI or update its state
+      fetchNotifications(); // Refresh notifications after marking as read
+    } else {
+      console.error('Failed to mark notification as read');
+    }
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+  }
+}
+
+// Fetch notifications on page load
+document.addEventListener('DOMContentLoaded', fetchNotifications);
