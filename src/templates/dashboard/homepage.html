@@ -7,6 +7,7 @@
 {% block content %}
 <div class="content">
     <header class="bg-white mb-3">
+        {% include 'ext/message.html' %}
         <!-- Top status strip with advanced metrics -->
         <div class="bg-gradient-to-r from-gray-50 via-white to-gray-50 border-b border-gray-200">
             <div class="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-2">
@@ -58,13 +59,12 @@
 
                     <div class="flex items-center space-x-2 sm:space-x-4">
                         <!-- Notification Button with Dropdown -->
-                        {% set is_alert = False %}
                         <div class="relative" x-data="{ isOpen: false }">
                             <!-- Notification Button -->
                             <button @click="isOpen = !isOpen"
                                 class="relative p-2.5 text-slate-500 hover:text-slate-700 bg-white hover:bg-slate-100 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                 :aria-expanded="isOpen" aria-haspopup="true">
-                                {% if is_alert %}
+                                {% if notifications %}
                                 <span class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
                                     <span
                                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -98,18 +98,6 @@
                                             all as read</a>
                                         {% endif %}
                                     </div>
-
-                                    {% set notifications = [
-                                    {
-                                    'type': 'warning',
-                                    'icon': 'exclamation-triangle',
-                                    'title': 'Warning',
-                                    'message': 'Alert is coming soon in future updates.',
-                                    'time': '2 hours ago',
-                                    'unread': True
-                                    }]
-
-                                    %}
                                     <!-- Notifications List -->
                                     <div class="max-h-96 overflow-y-auto">
                                         {% if notifications %}
@@ -142,10 +130,16 @@
                                                 </div>
 
                                                 <!-- Unread Indicator -->
-                                                {% if notification.unread %}
+                                                <!-- {% if notification.unread %}
                                                 <div class="absolute right-4 top-4 h-2 w-2 rounded-full bg-blue-500">
                                                 </div>
-                                                {% endif %}
+                                                {% endif %} -->
+
+                                                <button class="absolute right-0 top-4 text-gray-400 hover:text-gray-600"
+                                                    @click.prevent="markAsRead({{ notification.id }})"
+                                                    aria-label="Mark as read">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
                                             {% endfor %}
                                         </div>
@@ -174,7 +168,6 @@
                                 </div>
                             </div>
                         </div>
-
 
                         <!-- Documentation -->
                         <a href="https://systemguard.readthedocs.io/en/latest/"

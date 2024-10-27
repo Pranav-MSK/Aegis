@@ -5,7 +5,9 @@ import json
 import time
 import fpdf
 from datetime import datetime
+from flask_login import current_user
 
+from src.config import db
 from src.logger import logger
 from src.alert_manager import (
     send_slack_alert,
@@ -14,7 +16,7 @@ from src.alert_manager import (
     send_teams_alert,
     send_google_chat_alert,
 )
-from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog
+from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog, Notification, UserNotification
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper.alert_helper import can_create_alert
@@ -412,3 +414,27 @@ def generate_alert_ticket_pdf(alert, investigation_notes, alert_logs):
 
     return pdf_file_path
 
+def create_notification(notification_data):
+    user_id = current_user.id
+
+    new_notification = Notification(
+        type=notification_data.get('type', 'info'),
+        icon=notification_data.get('icon', 'info-circle'),
+        title=notification_data['title'],
+        message=notification_data['message'],
+        is_global=notification_data.get('is_global', False)
+    )
+    new_notification.save()
+
+    if new_notification.is_global:
+        # If it's a global notification, associate it with all users
+        users = UserProfile.query.all()
+        for user in users:
+            user_notification = UserNotification(user_id=user.id, notification_id=new_notification.id)
+            db.session.add(user_notification)
+    else:
+        # If it's user-specific, create the association for that user
+        user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
+        db.session.add(user_notification)
+
+    db.session.commit()

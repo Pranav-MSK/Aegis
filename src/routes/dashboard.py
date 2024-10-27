@@ -6,13 +6,14 @@ from sqlalchemy import func, case
 from sqlalchemy.orm import joinedload
 
 from src.config import app, csrf, get_app_info
-from src.models import UserProfile, AlertTicket, ChartConfiguration
+from src.models import UserProfile, AlertTicket, ChartConfiguration, UserNotification, Notification
 from src.utils import fetch_system_metrics
 from src.routes.helper.prometheus_helper import (
     count_of_targets, 
     calculate_total_rules, 
     retrieve_active_alertmanagers
 )
+from src.routes.helper.notification_helper import create_notification
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -65,7 +66,31 @@ def dashboard():
     system_info["total_rules"] = calculate_total_rules()
     system_info["active_alertmanagers"] = retrieve_active_alertmanagers()
 
-    return render_template("dashboard/homepage.html", system_info=system_info, current_user=current_user)
+    #  type=notification_data.get('type', 'info'),
+    #     icon=notification_data.get('icon', 'info-circle'),
+    #     title=notification_data['title'],
+    #     message=notification_data['message'],
+    #     is_global=notification_data.get('is_global', False)
+    
+    notification_data = {
+        "type": "info",
+        "icon": "info-circle",
+        "title": "Welcome to Alerta",
+        "message": "Alerta is an open-source alert management tool that integrates with popular monitoring systems like Prometheus, Grafana, and more.",
+        "is_global": True
+    }
+    create_notification(notification_data)
+
+    # Query for unread notifications
+    notifications = UserNotification.query.filter_by(user_id=current_user.id, unread=True).options(
+        joinedload(UserNotification.notification)  # Correct usage
+    ).all()
+    list_of_notifications_id = [notification.notification_id for notification in notifications]
+
+    notifications = Notification.query.filter(Notification.id.in_(list_of_notifications_id)).all()
+
+    return render_template("dashboard/homepage.html", system_info=system_info, current_user=current_user, 
+                            notifications=notifications)
 
 @app.route("/api/v1/dashboard/stats", methods=["GET"])
 @login_required
@@ -74,7 +99,7 @@ def api_dashboard_stats():
     user_stats, ticket_stats, chart_stats, top_alert_tickets = fetch_statistics(current_user.id)
 
     app_info = get_app_info()
-    
+
     # Prepare the response data
     response_data = {
         "user_stats": user_stats._asdict(),
@@ -88,7 +113,7 @@ def api_dashboard_stats():
         "max_number_of_graphs": app_info.get('max_number_of_graphs'),
         "monthly_alert_tickets_limit": app_info.get('monthly_alert_tickets_limit'),
         "max_users_allowed": app_info.get('max_users_allowed'),
-        "top_alert_tickets": [ticket.to_dict() for ticket in top_alert_tickets]
+        "top_alert_tickets": [ticket.to_dict() for ticket in top_alert_tickets],
     }
 
     return jsonify(response_data)

@@ -400,8 +400,8 @@ def fetch_system_metrics():
         'ipv4_connections': ipv4_address,
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
         'os_info': os_info,
-        'region_name': get_region(),
-        'ssl_status': check_ssl_status(domain_name),
+        'region_name': "N/A",
+        'ssl_status': True
     }
     info.update(_collect_metrics())
 

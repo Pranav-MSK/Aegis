@@ -573,126 +573,47 @@ def alert_ticket(alert_id):
     )
 
 
-# alert notification show on home page
+# @app.route('/add_notification', methods=['POST'])
+# def add_notification_route():
+#     # db.session.commit()
+#     notification_data = {
+#         'type': 'info',
+#         'icon': 'info-circle',
+#         'title': 'Welcome to Alerta!',
+#         'message': 'This is a sample notification',
+#         'is_global': False
+#     }
 
-@app.route('/add_notification', methods=['POST'])
-def add_notification():
-    user_id = current_user.id
-
-    data = request.json
-    new_notification = Notification(
-        type=data.get('type', 'info'),
-        icon=data.get('icon', 'info-circle'),
-        title=data['title'],
-        message=data['message'],
-        is_global=data.get('is_global', False)
-    )
-    new_notification.save()
+#     add_notification(notification_data)
     
-    if new_notification.is_global:
-        # If it's a global notification, associate it with all users
-        users = UserProfile.query.all()
-        for user in users:
-            user_notification = UserNotification(user_id=user.id, notification_id=new_notification.id)
-            db.session.add(user_notification)
-    else:
-        # If it's user-specific, create the association for that user
-        user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
-        db.session.add(user_notification)
+#     return jsonify({'message': 'Notification added!'}), 201
 
-    db.session.commit()
-    
-    return jsonify({'message': 'Notification added!'}), 201
+# #  fetch(`/api/v1/mark_notification/${notificationId}`, {
+# #                                     method: 'POST',
+# #                                     headers: {
+# #                                         'Content-Type': 'application/json',
+# #                                     },
+# #                                 })
 
-
-@app.route('/mark_notification/<int:notification_id>', methods=['POST'])
+@app.route('/api/v1/mark_notification/<int:notification_id>', methods=['POST'])
+@csrf.exempt
 def mark_notification(notification_id):
     user_id = current_user.id
     user_notification = UserNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()
     if user_notification:
         user_notification.unread = False  # Mark as read
         db.session.commit()
+        # flash("Notification marked as read!", "success")
         return jsonify({'message': 'Notification marked as read!'}), 200
     else:
         return jsonify({'message': 'Notification not found for user.'}), 404
 
 
-@app.route('/get_notifications/', methods=['GET'])
+@app.route('/api/v1/notifications/', methods=['GET'])
 def show_all_notifications():
-    user_id = current_user.id
-    # Fetch global notifications
-    global_notifications = Notification.query.filter_by(is_global=True).all()
-    
-    # Fetch user-specific notifications
-    user_notifications = UserNotification.query.filter_by(user_id=user_id).all()
-    
-    # Create a dictionary to avoid duplicates
-    unique_notifications = {}
-    
-    # Add global notifications to the unique list
-    for notification in global_notifications:
-        unique_notifications[notification.id] = {
-            'id': notification.id,
-            'type': notification.type,
-            'icon': notification.icon,
-            'title': notification.title,
-            'message': notification.message,
-            'time': notification.time,
-            'unread': True  # Treat global notifications as unread by default
-        }
+    pass
 
-    # Add user-specific notifications to the unique list
-    for user_notification in user_notifications:
-        notification = user_notification.notification
-        unique_notifications[notification.id] = {
-            'id': notification.id,
-            'type': notification.type,
-            'icon': notification.icon,
-            'title': notification.title,
-            'message': notification.message,
-            'time': notification.time,
-            'unread': user_notification.unread
-        }
-
-    # Convert the unique notifications dictionary to a list
-    notifications = list(unique_notifications.values())
-
-    # Sort notifications by time (newest first)
-    notifications.sort(key=lambda x: x['time'], reverse=True)
-
-    return jsonify(notifications), 200
-
-@app.route('/get_notifications/<int:notification_id>', methods=['GET'])
+@app.route('/api/v1/notifications/<int:notification_id>', methods=['GET'])
 def get_notification(notification_id):
     user_id = current_user.id
-    
-    # Attempt to retrieve user-specific notification
-    user_notification = UserNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()
-    
-    if user_notification:
-        notification = user_notification.notification
-        return jsonify({
-            'id': notification.id,
-            'type': notification.type,
-            'icon': notification.icon,
-            'title': notification.title,
-            'message': notification.message,
-            'time': notification.time,
-            'unread': user_notification.unread
-        }), 200
-    
-    # If no user-specific notification, check for global notification
-    notification = Notification.query.filter_by(id=notification_id, is_global=True).first()
-    if notification:
-        return jsonify({
-            'id': notification.id,
-            'type': notification.type,
-            'icon': notification.icon,
-            'title': notification.title,
-            'message': notification.message,
-            'time': notification.time,
-            'unread': True  # Treat global notifications as unread by default
-        }), 200
-
-    # If notification not found
-    return jsonify({'message': 'Notification not found.'}), 404
+    pass

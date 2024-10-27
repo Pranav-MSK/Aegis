@@ -2,6 +2,7 @@
 from datetime import datetime
 from src.models.base_model import BaseModel
 from src.config import db
+from sqlalchemy.orm import relationship
 
 class NotificationSettings(BaseModel):
     """
@@ -71,10 +72,21 @@ class Notification(BaseModel):
     time = db.Column(db.DateTime, default=datetime.utcnow)
     is_global = db.Column(db.Boolean, default=False)  # True for global notifications
 
-    users = db.relationship('UserNotification', back_populates='notification')
+    user_notifications = relationship('UserNotification', back_populates='notification')
 
     def __repr__(self):
         return f'<Notification {self.title}>'
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "type": self.type,
+            "icon": self.icon,
+            "title": self.title,
+            "message": self.message,
+            "time": self.time,
+            "is_global": self.is_global
+        }
 
 # UserNotification association model
 class UserNotification(BaseModel):
@@ -83,8 +95,8 @@ class UserNotification(BaseModel):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     notification_id = db.Column(db.Integer, db.ForeignKey('notifications.id'), primary_key=True)
     unread = db.Column(db.Boolean, default=True)
-    user = db.relationship('User', back_populates='notifications')
-    notification = db.relationship('Notification', back_populates='users')
+
+    notification = relationship('Notification', back_populates='user_notifications')
 
     def __repr__(self):
         return f'<UserNotification user_id={self.user_id}, notification_id={self.notification_id}>'

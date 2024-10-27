@@ -176,15 +176,15 @@ class DashboardController {
     if (!containerGrid) return;
 
     if (containers.length === 0) {
-        containerGrid.innerHTML = '<div class="no-containers">No Docker containers are currently running.</div>';
-        return;
+      containerGrid.innerHTML = '<div class="no-containers">No Docker containers are currently running.</div>';
+      return;
     }
 
     const fragment = document.createDocumentFragment();
     containers.forEach(container => {
-        const item = document.createElement('div');
-        item.className = 'container-item';
-        item.innerHTML = `
+      const item = document.createElement('div');
+      item.className = 'container-item';
+      item.innerHTML = `
             <div class="container-header">
                 <span class="container-name">${this.sanitizeHTML(container.name)}</span>
                 <span class="container-status ${container.status === 'running' ? 'running' : 'stopped'}">
@@ -218,12 +218,12 @@ class DashboardController {
                 </div>
             </div>
         `;
-        fragment.appendChild(item);
+      fragment.appendChild(item);
     });
 
     containerGrid.innerHTML = '';
     containerGrid.appendChild(fragment);
-}
+  }
 
 
   async fetchData(endpoint) {
@@ -640,3 +640,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const apiMetrics = new APIMetricsManager();
   apiMetrics.initialize();
 });
+
+function markAsRead(notificationId) {
+  fetch(`/api/v1/mark_notification/${notificationId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => {
+      if (response.ok) {
+        // Update UI to reflect that the notification is read
+        console.log(`Notification ${notificationId} marked as read.`);
+        // show some UI feedback using flask message, tailwind
+        // ther is already a ext/message html file in the project
+        // so we can use that to show the message
+
+        // show success message
+        show_message('Notification marked as read', 'success');
+
+      } else {
+        console.error('Failed to mark notification as read');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+}
