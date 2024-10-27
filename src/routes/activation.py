@@ -10,6 +10,7 @@ from src.activator import (
 )
 from src.helper import load_secret_key
 from src.routes.helper.activation_helper import generate_license_pdf
+from src.routes.helper.notification_helper import create_notification
 
 activation_bp = Blueprint('activation', __name__)
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
@@ -32,6 +33,15 @@ def activation():
                 with open(internal_license_key_path, 'w') as f:
                     f.write(f"Don't modify this file. It contains the SystemGuard license information.\nlicense_key:{new_license_key}\nactivation_code:{activation_code}\nsystemguard_unique_id:{systemguard_unique_id}")
                 flash('Activation successful', 'success')
+                notification_data = {
+                    "type": "info",
+                    "icon": "info-circle",  # Font Awesome icon
+                    "title": "Product Activation",
+                    "message": "Product activation successful.",
+                    "is_global": True
+                }
+                create_notification(notification_data)
+                    
                 return redirect(url_for('activation'))
             except IOError as e:
                 flash(f"Error writing to the license file: {str(e)}", 'danger')

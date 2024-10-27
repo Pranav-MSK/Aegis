@@ -641,140 +641,268 @@ document.addEventListener('DOMContentLoaded', () => {
   apiMetrics.initialize();
 });
 
-
-async function markAsRead(notificationId) {
-  try {
-    const response = await fetch(`/api/v1/mark_notification/${notificationId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.ok) {
-      // Find and remove the notification from the UI
-      const notificationElement = document.getElementById(`notification-${notificationId}`);
-      if (notificationElement) {
-        notificationElement.classList.add('opacity-50'); // Fade out effect
-        setTimeout(() => {
-          notificationElement.remove(); // Remove from DOM after fading out
-        }, 300); // Match with CSS transition duration
-      }
-      // Show success message
-      showMessage('Notification marked as read.', 'success');
-    } else {
-      console.error('Failed to mark notification as read');
-      showMessage('Failed to mark notification as read. Please try again.', 'error');
-    }
-  } catch (error) {
-    console.error('Error marking notification as read:', error);
-    showMessage('An error occurred. Please try again.', 'error');
-  }
-}
-
-function showMessage(message, type) {
-  const messageContainer = document.getElementById('message-container');
+// Notification System State Management
+const NotificationSystem = {
+  count: 0,
+  observers: new Set(),
   
-  // Clear any existing messages
-  messageContainer.innerHTML = '';
+  updateCount(newCount) {
+    this.count = newCount;
+    this.notifyObservers();
+  },
 
-  // Create a new message element
-  const messageElement = document.createElement('div');
-  messageElement.className = `p-4 mb-4 text-sm text-${type === 'success' ? 'green' : 'red'}-700 bg-${type === 'success' ? 'green' : 'red'}-100 rounded-lg`;
-  messageElement.innerText = message;
+  addObserver(callback) {
+    this.observers.add(callback);
+  },
 
-  // Append the message element to the message container
-  messageContainer.appendChild(messageElement);
+  removeObserver(callback) {
+    this.observers.delete(callback);
+  },
 
-  // Remove the message after a few seconds
-  setTimeout(() => {
-    messageContainer.innerHTML = '';
-  }, 3000);
-}
+  notifyObservers() {
+    this.observers.forEach(callback => callback(this.count));
+  }
+};
 
+// Handle notification badge updates
+class NotificationBadge {
+  constructor() {
+    this.badges = document.getElementsByClassName('alert-badge');
+    this.setupBadgeObserver();
+  }
 
-async function fetchNotifications() {
-  try {
-    const response = await fetch('/api/v1/notifications/');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const notifications = await response.json();
+  setupBadgeObserver() {
+    NotificationSystem.addObserver((count) => this.updateBadges(count));
+  }
 
-    const container = document.getElementById('notification-container');
-    container.innerHTML = ''; // Clear previous notifications
+  updateBadges(count) {
+    const badgeHTML = count > 0 ? this.createBadgeElement() : '';
+    Array.from(this.badges).forEach(badge => {
+      badge.innerHTML = badgeHTML;
+      // Add animation class when adding badge
+      if (count > 0) {
+        badge.classList.add('notification-badge-enter');
+        setTimeout(() => badge.classList.remove('notification-badge-enter'), 300);
+      }
+    });
+  }
 
-    if (notifications.length > 0) {
-      notifications.forEach(notification => {
-        const notificationElement = document.createElement('div');
-        notificationElement.id = `notification-${notification.id}`; // Unique ID
-        notificationElement.className = `relative flex p-4 space-x-3 hover:bg-slate-50 transition-colors duration-150 ${notification.unread ? 'bg-blue-50/40' : ''}`;
-        notificationElement.innerHTML = `
-          <div class="flex-shrink-0">
-              <span class="inline-flex items-center justify-center h-10 w-10 rounded-full ${getNotificationClass(notification.type)}">
-                  <i class="fas fa-${notification.icon} w-5 h-5"></i>
-              </span>
-          </div>
-          <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-slate-900">${notification.title}</p>
-              <p class="text-sm text-slate-500 line-clamp-2">${notification.message}</p>
-              <p class="mt-1 text-xs text-slate-400">${notification.time}</p>
-          </div>
-          <button class="absolute right-0 top-4 text-gray-400 hover:text-gray-600" onclick="markAsRead(${notification.id})" aria-label="Mark as read">
-              <i class="fas fa-times"></i>
-          </button>
-        `;
-        container.appendChild(notificationElement);
-      });
-    } else {
-      container.innerHTML = `
-        <div class="p-8 text-center">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-4">
-                <i class="fas fa-bell text-slate-400 w-6 h-6"></i>
-            </div>
-            <p class="text-sm font-medium text-slate-900">No new notifications</p>
-            <p class="mt-1 text-sm text-slate-500">We'll notify you when something arrives.</p>
-        </div>
-      `;
-    }
-  } catch (error) {
-    console.error('Failed to fetch notifications:', error);
+  createBadgeElement() {
+    return `
+      <span class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 ring-2 ring-white"></span>
+      </span>
+    `;
   }
 }
 
-
-function getNotificationClass(type) {
-  switch (type) {
-    case 'warning':
-      return 'bg-amber-100 text-amber-600';
-    case 'error':
-      return 'bg-red-100 text-red-600';
-    case 'success':
-      return 'bg-emerald-100 text-emerald-600';
-    default:
-      return 'bg-blue-100 text-blue-600';
+// Toast Message Handler
+class ToastMessage {
+  constructor() {
+    this.container = document.getElementById('message-container');
+    this.activeToasts = new Set();
   }
-}
 
-async function markAsRead(notificationId) {
-  try {
-    const response = await fetch(`/api/v1/mark_notification/${notificationId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  show(message, type = 'success', duration = 3000) {
+    const toast = this.createToastElement(message, type);
+    this.container.appendChild(toast);
+    
+    // Add entrance animation
+    requestAnimationFrame(() => {
+      toast.classList.add('toast-enter');
     });
 
-    if (response.ok) {
-      // Remove the notification from the UI or update its state
-      fetchNotifications(); // Refresh notifications after marking as read
-    } else {
-      console.error('Failed to mark notification as read');
-    }
-  } catch (error) {
-    console.error('Error marking notification as read:', error);
+    const toastId = setTimeout(() => {
+      this.removeToast(toast);
+    }, duration);
+
+    this.activeToasts.add({ element: toast, timeoutId: toastId });
+  }
+
+  removeToast(toast) {
+    toast.classList.add('toast-exit');
+    toast.addEventListener('transitionend', () => {
+      if (this.container.contains(toast)) {
+        this.container.removeChild(toast);
+      }
+      this.activeToasts.delete(toast);
+    });
+  }
+
+  createToastElement(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `
+      p-4 mb-4 text-sm rounded-lg transform translate-y-2 opacity-0 transition-all duration-300
+      ${type === 'success' 
+        ? 'text-green-700 bg-green-100' 
+        : 'text-red-700 bg-red-100'}
+    `;
+    toast.innerText = message;
+    return toast;
+  }
+
+  clearAll() {
+    this.activeToasts.forEach(({ element, timeoutId }) => {
+      clearTimeout(timeoutId);
+      this.removeToast(element);
+    });
+    this.activeToasts.clear();
   }
 }
 
-// Fetch notifications on page load
-document.addEventListener('DOMContentLoaded', fetchNotifications);
+// Notification Handler
+class NotificationHandler {
+  constructor() {
+    this.container = document.getElementById('notification-container');
+    this.toast = new ToastMessage();
+    this.badge = new NotificationBadge();
+  }
+
+  async fetchNotifications() {
+    try {
+      const response = await fetch('/api/v1/notifications/');
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const notifications = await response.json();
+      NotificationSystem.updateCount(notifications.length);
+      this.renderNotifications(notifications);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+      this.toast.show('Failed to load notifications', 'error');
+    }
+  }
+
+  renderNotifications(notifications) {
+    this.container.innerHTML = '';
+
+    if (notifications.length === 0) {
+      this.renderEmptyState();
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    notifications.forEach(notification => {
+      fragment.appendChild(this.createNotificationElement(notification));
+    });
+    this.container.appendChild(fragment);
+  }
+
+  createNotificationElement(notification) {
+    const element = document.createElement('div');
+    element.id = `notification-${notification.id}`;
+    element.className = `
+      relative flex p-4 space-x-3 hover:bg-slate-50 
+      transition-all duration-300 ease-in-out
+      ${notification.unread ? 'bg-blue-50/40' : ''}
+    `;
+
+    element.innerHTML = `
+      <div class="flex-shrink-0">
+        <span class="inline-flex items-center justify-center h-10 w-10 rounded-full ${this.getNotificationClass(notification.type)}">
+          <i class="fas fa-${notification.icon} w-5 h-5"></i>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-slate-900">${notification.title}</p>
+        <p class="text-sm text-slate-500 line-clamp-2">${notification.message}</p>
+        <p class="mt-1 text-xs text-slate-400">${notification.time}</p>
+      </div>
+      <button 
+        class="absolute right-0 top-4 text-gray-400 hover:text-gray-600 transition-colors duration-200" 
+        onclick="notificationHandler.markAsRead(${notification.id})" 
+        aria-label="Mark as read">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+
+    return element;
+  }
+
+  renderEmptyState() {
+    this.container.innerHTML = `
+      <div class="p-8 text-center">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-4">
+          <i class="fas fa-bell text-slate-400 w-6 h-6"></i>
+        </div>
+        <p class="text-sm font-medium text-slate-900">No new notifications</p>
+        <p class="mt-1 text-sm text-slate-500">We'll notify you when something arrives.</p>
+      </div>
+    `;
+  }
+
+  getNotificationClass(type) {
+    const classes = {
+      warning: 'bg-amber-100 text-amber-600',
+      error: 'bg-red-100 text-red-600',
+      success: 'bg-emerald-100 text-emerald-600',
+      default: 'bg-blue-100 text-blue-600'
+    };
+    return classes[type] || classes.default;
+  }
+
+  async markAsRead(notificationId) {
+    try {
+      const response = await fetch(`/api/v1/mark_notification/${notificationId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) throw new Error('Failed to mark notification as read');
+
+      const element = document.getElementById(`notification-${notificationId}`);
+      if (element) {
+        element.classList.add('opacity-0', 'transform', 'translate-x-2');
+        setTimeout(() => {
+          element.remove();
+          NotificationSystem.updateCount(NotificationSystem.count - 1);
+          if (this.container.children.length === 0) {
+            this.renderEmptyState();
+          }
+        }, 300);
+      }
+
+      this.toast.show('Notification marked as read', 'success');
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      this.toast.show('Failed to mark notification as read', 'error');
+    }
+  }
+}
+
+// CSS styles to add to your stylesheet
+const styles = `
+.notification-badge-enter {
+  animation: badge-pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+.toast-enter {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-exit {
+  transform: translateY(-1rem);
+  opacity: 0;
+}
+`;
+
+// Initialize the notification system
+const notificationHandler = new NotificationHandler();
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  notificationHandler.fetchNotifications();
+  
+  // Optional: Set up polling for new notifications
+  setInterval(() => {
+    notificationHandler.fetchNotifications();
+  }, 30000); // Poll every 30 seconds
+});

@@ -13,8 +13,6 @@ from src.routes.helper.prometheus_helper import (
     calculate_total_rules, 
     retrieve_active_alertmanagers
 )
-from src.routes.helper.notification_helper import create_notification
-
 dashboard_bp = Blueprint("dashboard", __name__)
 
 def fetch_statistics(user_id):
@@ -65,32 +63,8 @@ def dashboard():
     system_info["total_targets"] = count_of_targets()
     system_info["total_rules"] = calculate_total_rules()
     system_info["active_alertmanagers"] = retrieve_active_alertmanagers()
-
-    #  type=notification_data.get('type', 'info'),
-    #     icon=notification_data.get('icon', 'info-circle'),
-    #     title=notification_data['title'],
-    #     message=notification_data['message'],
-    #     is_global=notification_data.get('is_global', False)
     
-    notification_data = {
-        "type": "info",
-        "icon": "info-circle",
-        "title": "Welcome to Alerta",
-        "message": "Alerta is an open-source alert management tool that integrates with popular monitoring systems like Prometheus, Grafana, and more.",
-        "is_global": True
-    }
-    create_notification(notification_data)
-
-    # Query for unread notifications
-    notifications = UserNotification.query.filter_by(user_id=current_user.id, unread=True).options(
-        joinedload(UserNotification.notification)  # Correct usage
-    ).all()
-    list_of_notifications_id = [notification.notification_id for notification in notifications]
-
-    notifications = Notification.query.filter(Notification.id.in_(list_of_notifications_id)).all()
-
-    return render_template("dashboard/homepage.html", system_info=system_info, current_user=current_user, 
-                            notifications=notifications)
+    return render_template("dashboard/homepage.html", system_info=system_info, current_user=current_user)
 
 @app.route("/api/v1/dashboard/stats", methods=["GET"])
 @login_required
