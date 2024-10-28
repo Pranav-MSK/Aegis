@@ -22,12 +22,12 @@
         <!-- Main Navigation -->
         <div class="space-y-8">
             <!-- Dashboard Section -->
-            <div>
+            <!-- <div>
                 <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Main</p>
                 <a href="{{ url_for('dashboard') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'dashboard' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
                     <i class="fas fa-tachometer-alt w-5 h-5 mr-4 {% if request.endpoint == 'dashboard' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i> Homepage
                 </a>
-            </div>
+            </div> -->
 
             <!-- Metrics Section -->
             <div>
@@ -51,14 +51,17 @@
                     <a href="{{ url_for('dashboard_network') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'dashboard_network' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
                         <i class="fas fa-network-wired w-5 h-5 mr-3 {% if request.endpoint == 'dashboard_network' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>Active Target
                     </a>
-                    <a href="{{ url_for('process') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'process' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                    {% if current_user.user_level == 'admin' %}
+                    <a href="{{ url_for('show_system_services') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'process' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
                         <i class="fas fa-tasks w-5 h-5 mr-3 {% if request.endpoint == 'process' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
                         System Process
                     </a>
+                    {% endif %}
                 </div>
             </div>
 
             <!-- Security Section -->
+            {% if current_user.user_level == 'admin' %}
             <div>
                 <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Security</p>
                 <div class="space-y-1.5">
@@ -77,6 +80,7 @@
                     </a>
                 </div>
             </div>
+            {% endif %}
 
             <!-- Settings Section -->
             <div>
@@ -89,6 +93,10 @@
                     <a href="{{ url_for('user_settings') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'user_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
                         <i class="fas fa-user-cog w-5 h-5 mr-3 {% if request.endpoint == 'user_settings' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
                         User Settings
+                    </a>
+                    <a href="{{ url_for('settings') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'user_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50/50 hover:text-gray-900{% endif %}">
+                        <i class="fas fa-user-cog w-5 h-5 mr-3 {% if request.endpoint == 'user_settings' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        Control Panel
                     </a>
                 </div>
             </div>

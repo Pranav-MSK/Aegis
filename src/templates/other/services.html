@@ -7,12 +7,43 @@
 {% endblock %}
 {% block content %}
 <div class="dashboard-container">
+    <!-- Modal for kill confirmation -->
+    <div id="killConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold mb-4">Confirm Process Termination</h3>
+            <p class="mb-4">Are you sure you want to terminate this process?</p>
+            <div class="mb-4">
+                <p><strong>Process Name:</strong> <span id="killProcessName"></span></p>
+                <p><strong>PID:</strong> <span id="killProcessPid"></span></p>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button id="cancelKill" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+                    Cancel
+                </button>
+                <button id="confirmKill" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                    Terminate Process
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="hidden fixed top-4 right-4 z-50 max-w-md bg-white shadow-lg rounded-lg p-4">
+        <div id="toastContent" class="flex items-center">
+            <div id="toastIcon" class="flex-shrink-0 w-6 h-6 mr-3"></div>
+            <div>
+                <p id="toastMessage" class="text-sm font-medium"></p>
+            </div>
+        </div>
+    </div>
+
     <header class="dashboard-header">
         <h1 class="dashboard-title">Service Monitor Dashboard</h1>
     </header>
 
     {% include 'ext/message.html' %}
 
+    <!-- Rest of your existing HTML remains the same until the table -->
     <div class="controls-section">
         <div class="filter-group">
             <select id="categoryFilter" class="category-select">
@@ -67,7 +98,8 @@
         pageSize: parseInt(localStorage.getItem('processPageSize')) || 15,
         serviceData: {},
         filteredServices: [],
-        category: 'all'
+        category: 'all',
+        isKilling: false
     };
 
     // Initialize UI elements
@@ -79,11 +111,51 @@
         nextButton: document.getElementById('nextPage'),
         startRange: document.getElementById('startRange'),
         endRange: document.getElementById('endRange'),
-        totalItems: document.getElementById('totalItems')
+        totalItems: document.getElementById('totalItems'),
+        killConfirmModal: document.getElementById('killConfirmModal'),
+        killProcessName: document.getElementById('killProcessName'),
+        killProcessPid: document.getElementById('killProcessPid'),
+        confirmKillBtn: document.getElementById('confirmKill'),
+        cancelKillBtn: document.getElementById('cancelKill'),
+        toast: document.getElementById('toast'),
+        toastMessage: document.getElementById('toastMessage'),
+        toastIcon: document.getElementById('toastIcon')
     };
 
     // Set initial page size from localStorage
     elements.pageSizeSelect.value = state.pageSize;
+
+    function showToast(message, type = 'success') {
+        const toast = elements.toast;
+        const toastMessage = elements.toastMessage;
+        const toastIcon = elements.toastIcon;
+
+        // Set message
+        toastMessage.textContent = message;
+
+        // Set icon based on type
+        if (type === 'success') {
+            toastIcon.innerHTML = `
+                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>`;
+        } else {
+            toastIcon.innerHTML = `
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>`;
+        }
+
+        // Show toast
+        toast.classList.remove('hidden');
+        toast.classList.add('flex');
+
+        // Hide toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('hidden');
+            toast.classList.remove('flex');
+        }, 3000);
+    }
 
     function getStatusBadgeClass(status) {
         return status.toLowerCase() === 'running' ? 'status-running' : 'status-stopped';
@@ -120,7 +192,8 @@
                 <td>${service.cmd}</td>
                 {% if session.get('sudo_password') %}
                 <td>
-                    <button onclick="killProcess(${service.pid}, '${service.name}')" class="kill-button">
+                    <button onclick="showKillConfirmation(${service.pid}, '${service.name}')" 
+                            class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200">
                         Kill Process
                     </button>
                 </td>
@@ -131,18 +204,75 @@
         updatePagination();
     }
 
+    function showKillConfirmation(pid, processName) {
+        elements.killProcessName.textContent = processName;
+        elements.killProcessPid.textContent = pid;
+        elements.killConfirmModal.classList.remove('hidden');
+
+        // Store current process info for the confirmation handler
+        elements.confirmKillBtn.onclick = () => killProcess(pid, processName);
+        elements.cancelKillBtn.onclick = hideKillConfirmation;
+    }
+
+    function hideKillConfirmation() {
+        elements.killConfirmModal.classList.add('hidden');
+    }
+
+    async function killProcess(pid, processName) {
+        if (state.isKilling) return;
+        
+        state.isKilling = true;
+        elements.confirmKillBtn.disabled = true;
+        elements.confirmKillBtn.innerHTML = `
+            <svg class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Terminating...
+        `;
+
+        try {
+            const response = await fetch('/kill_process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    kill_pid: pid,
+                    process_name: processName
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showToast(`Successfully terminated process: ${processName}`, 'success');
+                await fetchServices(); // Refresh the service list
+            } else {
+                showToast(data.error || 'Failed to terminate process', 'error');
+            }
+        } catch (error) {
+            console.error('Error killing process:', error);
+            showToast('Network error while trying to terminate process', 'error');
+        } finally {
+            state.isKilling = false;
+            hideKillConfirmation();
+            elements.confirmKillBtn.disabled = false;
+            elements.confirmKillBtn.textContent = 'Terminate Process';
+        }
+    }
+
     async function fetchCategories() {
         try {
-            const response = await fetch('/api/v1/services/categories');  // Updated endpoint
+            const response = await fetch('/api/v1/services/categories');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            populateCategoryFilter(data.categories);  // Updated to use 'categories' from response
+            populateCategoryFilter(data.categories);
         } catch (error) {
             console.error('Error fetching categories:', error);
-            const errorText = await response.text(); // Read the response body
-            console.error('Response body:', errorText); // Log the response body
+            showToast('Failed to fetch categories', 'error');
         }
     }
 
@@ -160,13 +290,17 @@
         try {
             const url = state.category === 'all' ? '/api/v1/services' : `/api/v1/services/${state.category}`;
             const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             state.serviceData = await response.json();
-            state.filteredServices = state.category === 'all' 
-                ? Object.values(state.serviceData.services).flat() 
+            state.filteredServices = state.category === 'all'
+                ? Object.values(state.serviceData.services).flat()
                 : state.serviceData.processes;
             displayServices();
         } catch (error) {
             console.error('Error fetching services:', error);
+            showToast('Failed to fetch services', 'error');
         }
     }
 
@@ -196,6 +330,13 @@
         if (state.currentPage < totalPages) {
             state.currentPage++;
             displayServices();
+        }
+    });
+
+    // Close modal when clicking outside
+    elements.killConfirmModal.addEventListener('click', (e) => {
+        if (e.target === elements.killConfirmModal) {
+            hideKillConfirmation();
         }
     });
 
