@@ -20,6 +20,13 @@
             Add New Configuration ({{ configs|length }}/{{ max_number_of_graphs | int }})
         </button>
         {% endif %}
+        <!-- Go back to charts button -->
+        <a href="{{ url_for('historical_system_metrics') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Go back to Charts
+        </a>
     </div>
 
     {% include 'ext/message.html' %}

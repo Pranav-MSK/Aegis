@@ -141,15 +141,15 @@ class ChartManager {
                 },
             },
             tooltip: this.getTooltipOptions(),
-            title: {
-                display: true,
-                text: config.title,
-                font: {
-                    size: 20,
-                    weight: 'bold',
-                    color: textColor,
-                },
-            },
+            // title: {
+            //     display: true,
+            //     text: config.title,
+            //     font: {
+            //         size: 20,
+            //         weight: 'bold',
+            //         color: textColor,
+            //     },
+            // },
         };
     }
 
@@ -228,77 +228,6 @@ class ChartManager {
         });
     }
 
-    async exportCharts(format) {
-        const zip = new JSZip();
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
-        try {
-            switch (format) {
-                case 'png':
-                    await this.exportAsPNG(zip);
-                    break;
-                case 'csv':
-                    this.exportAsCSV(zip);
-                    break;
-                case 'json':
-                    this.exportAsJSON(zip);
-                    break;
-            }
-
-            const content = await zip.generateAsync({ type: "blob" });
-            this.downloadFile(content, `charts-export-${timestamp}-${format}.zip`);
-        } catch (error) {
-            console.error('Export failed:', error);
-            alert('Export failed. Please try again.');
-        }
-    }
-
-    async exportAsPNG(zip) {
-        const promises = Array.from(this.charts.entries()).map(async ([title, chart]) => {
-            const canvas = chart.canvas;
-            const blob = await new Promise(resolve => canvas.toBlob(resolve));
-            zip.file(`${title}.png`, blob);
-        });
-        await Promise.all(promises);
-    }
-
-    exportAsCSV(zip) {
-        this.charts.forEach((chart, title) => {
-            const labels = chart.data.labels;
-            const datasets = chart.data.datasets;
-
-            let csv = 'Time,' + datasets.map(ds => ds.label).join(',') + '\n';
-            labels.forEach((label, i) => {
-                csv += label + ',' + datasets.map(ds => ds.data[i]).join(',') + '\n';
-            });
-
-            zip.file(`${title}.csv`, csv);
-        });
-    }
-
-    exportAsJSON(zip) {
-        this.charts.forEach((chart, title) => {
-            const data = {
-                title,
-                labels: chart.data.labels,
-                datasets: chart.data.datasets.map(ds => ({
-                    label: ds.label,
-                    data: ds.data
-                }))
-            };
-            zip.file(`${title}.json`, JSON.stringify(data, null, 2));
-        });
-    }
-
-    downloadFile(content, fileName) {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(content);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-    }
 }
 
 class ChartUI {
@@ -382,23 +311,24 @@ class ChartUI {
 
     createChartContainer(config) {
         const chartDiv = document.createElement('div');
-        chartDiv.className = 'chart-container';
+        chartDiv.className = 'chart-container p-4';
 
         const metricCard = document.createElement('div');
-        metricCard.className = 'metric-card';
+        metricCard.className = 'metric-card bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden';
 
         const cardHeader = document.createElement('div');
-        cardHeader.className = 'card-header';
+        cardHeader.className = 'card-header bg-gray-100 dark:bg-gray-700 p-4 border-b border-gray-200 dark:border-gray-600';
 
         const heading = document.createElement('h3');
+        heading.className = 'text-lg font-semibold text-gray-900 dark:text-gray-100';
         heading.textContent = config.title;
         cardHeader.appendChild(heading);
 
         const cardContent = document.createElement('div');
-        cardContent.className = 'card-content';
+        cardContent.className = 'card-content p-4';
 
         const canvas = document.createElement('canvas');
-        canvas.className = 'graph';
+        canvas.className = 'graph w-full h-96';
         canvas.id = config.metric_name;
 
         cardContent.appendChild(canvas);

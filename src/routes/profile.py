@@ -124,6 +124,15 @@ def edit_profile():
 
         user.save()
 
+        notification_data = {
+            "type": "info",
+            "icon": "info-circle",
+            "title": "Profile Updated",
+            "message": f"Your profile was updated successfully.",
+            "is_global": False
+        }
+        generate_system_notification(notification_data)
+
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('view_profile'))
 

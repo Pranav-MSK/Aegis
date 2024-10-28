@@ -1,39 +1,224 @@
 {% extends 'base/base.html' %}
-{% block title %}Active Alerts{% endblock %}
-
+{% block title %}Histogram Metrics{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/active_alerts.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
-    <h1>Active Alerts</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Alert Name</th>
-                <th>Instance</th>
-                <th>Severity</th>
-                <th>Description</th>
-                <th>Summary</th>
-                <th>Status</th>
-                <th>Active Since</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for alert in alerts %}
-            <tr class="{{ alert.labels.severity | lower }}">
-                <td>{{ alert.labels.alertname }}</td>
-                <td>{{ alert.labels.instance }}</td>
-                <td>{{ alert.labels.severity }}</td>
-                <td>{{ alert.annotations.description }}</td>
-                <td>{{ alert.annotations.summary }}</td>
-                <td>{{ alert.state }}</td>
-                <td>{{ alert.activeAt }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="7">No active alerts</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="min-h-screen p-6">
+    <!-- Header Section -->
+    <header class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Active Alerts(In Development)</h1>
+        <p class="text-gray-600 mt-2">Monitor and manage system alerts in real-time</p>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-red-100">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-sm font-medium text-gray-600">Critical Alerts</h2>
+                    <p class="text-2xl font-semibold text-gray-800" id="criticalCount">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-sm font-medium text-gray-600">Warning Alerts</h2>
+                    <p class="text-2xl font-semibold text-gray-800" id="warningCount">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-sm font-medium text-gray-600">Info Alerts</h2>
+                    <p class="text-2xl font-semibold text-gray-800" id="infoCount">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-sm font-medium text-gray-600">Resolved Today</h2>
+                    <p class="text-2xl font-semibold text-gray-800" id="resolvedCount">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Distribution Chart -->
+    <!-- <div class="bg-white rounded-lg shadow mb-8 p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Alert Distribution</h2>
+        <canvas id="alertChart" height="100"></canvas>
+    </div> -->
+
+    <!-- Alert Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">Active Alerts</h2>
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Search alerts..."
+                        class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alert
+                            Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Instance</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Severity</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Active Since</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200" id="alertsTableBody">
+                    <!-- Table rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <div id="noAlerts" class="hidden p-8 text-center text-gray-500">
+            No active alerts at this time
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sample data - replace with your actual data
+    const alerts = [
+        {
+            labels: {
+                alertname: "High CPU Usage",
+                instance: "server-001",
+                severity: "critical"
+            },
+            annotations: {
+                description: "CPU usage above 90% for 5 minutes",
+                summary: "High CPU load detected"
+            },
+            state: "firing",
+            activeAt: "2024-10-28T10:00:00Z"
+        },
+        // Add more sample alerts as needed
+    ];
+
+    function updateTable() {
+        const tableBody = document.getElementById('alertsTableBody');
+        const noAlerts = document.getElementById('noAlerts');
+
+        if (alerts.length === 0) {
+            tableBody.innerHTML = '';
+            noAlerts.classList.remove('hidden');
+            return;
+        }
+
+        noAlerts.classList.add('hidden');
+        tableBody.innerHTML = alerts.map(alert => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${alert.labels.alertname}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${alert.labels.instance}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            ${getSeverityClass(alert.labels.severity)}">
+                            ${alert.labels.severity}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${alert.annotations.description}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            ${getStatusClass(alert.state)}">
+                            ${alert.state}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${moment(alert.activeAt).fromNow()}
+                    </td>
+                </tr>
+            `).join('');
+    }
+
+    function getSeverityClass(severity) {
+        const classes = {
+            critical: 'bg-red-100 text-red-800',
+            warning: 'bg-yellow-100 text-yellow-800',
+            info: 'bg-blue-100 text-blue-800'
+        };
+        return classes[severity] || 'bg-gray-100 text-gray-800';
+    }
+
+    function getStatusClass(status) {
+        return status === 'firing'
+            ? 'bg-red-100 text-red-800'
+            : 'bg-green-100 text-green-800';
+    }
+
+    function updateStats() {
+        document.getElementById('criticalCount').textContent =
+            alerts.filter(a => a.labels.severity === 'critical').length;
+        document.getElementById('warningCount').textContent =
+            alerts.filter(a => a.labels.severity === 'warning').length;
+        document.getElementById('infoCount').textContent =
+            alerts.filter(a => a.labels.severity === 'info').length;
+        document.getElementById('resolvedCount').textContent =
+            alerts.filter(a => a.state === 'resolved').length;
+    }
+
+
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', () => {
+        updateTable();
+        updateStats();
+
+        // Setup search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = alerts.filter(alert =>
+                alert.labels.alertname.toLowerCase().includes(searchTerm) ||
+                alert.labels.instance.toLowerCase().includes(searchTerm) ||
+                alert.annotations.description.toLowerCase().includes(searchTerm)
+            );
+            // Update table with filtered results
+            // You'll need to modify the updateTable function to accept a filtered array
+        });
+    });
+</script>
 {% endblock %}

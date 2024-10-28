@@ -60,7 +60,7 @@
     </header>
 
     <!-- Main Content -->
-    <br>
+     <br>
     <!-- Info Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-all hover:shadow-md">
@@ -159,14 +159,36 @@
         </div>
     </div>
 
+
     <div id="chartsContainer" class="charts-grid">
         <!-- Charts will be dynamically inserted here -->
     </div>
-</div>
-{% endblock %}
 
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Export Data</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <button class="btn btn-primary" data-format="png">
+                        <i class="fas fa-image"></i> Export as PNG
+                    </button>
+                    <button class="btn btn-primary" data-format="csv">
+                        <i class="fas fa-file-csv"></i> Export as CSV
+                    </button>
+                    <button class="btn btn-primary" data-format="json">
+                        <i class="fas fa-file-code"></i> Export as JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
 
-{% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/graphs.js')}}"></script>
-<script src="{{ url_for('static', filename='js/bootTime.js')}}"></script>
-{% endblock %}
+    {% block extra_scripts %}
+    <script src="{{ url_for('static', filename='js/graphs.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/bootTime.js')}}"></script>
+    {% endblock %}

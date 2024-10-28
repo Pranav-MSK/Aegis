@@ -328,6 +328,13 @@ def active_alerts():
         alerts = []
     return render_template("alerts/active_alerts.html", alerts=alerts)
 
+@app.route("/api/v1/alerts/active", methods=["GET"])
+def api_active_alerts():
+    try:
+        alerts = retrieve_active_alerts()
+        return jsonify(alerts)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # alertmanager alerts
 @app.route("/show_alerts")
@@ -473,3 +480,13 @@ def alertmanager_status():
         )
 
     return jsonify({"error": "Unable to fetch Alertmanager status"}), 500
+
+
+@app.route('/api/v1/alertmanagers', methods=['GET'])
+def api_alertmanagers():
+    try:
+        url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"
+        response = requests.get(url)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

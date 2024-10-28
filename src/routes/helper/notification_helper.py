@@ -126,14 +126,14 @@ def process_alert(alert):
             logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
             return
 
-    # notification_data = {
-    #     "type": severity,
-    #     "icon": "info-circle",  # Font Awesome icon
-    #     "title": alert_name,
-    #     "message": description,
-    #     "is_global": True
-    # }
-    # generate_system_notification(Notification_data)
+    notification_data = {
+        "type": severity,
+        "icon": "info-circle",  # Font Awesome icon
+        "title": alert_name,
+        "message": description,
+        "is_global": True
+    }
+    generate_system_notification(notification_data)
 
     log_alert(severity, alert_name, instance, description, summary)
     create_alert_ticket(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)
@@ -432,14 +432,14 @@ def generate_system_notification(notification_data, user_id=None):
         is_global=notification_data.get('is_global', False)
     )
     new_notification.save()
-    if not user_id:
-        user_id = current_user.id
-
+    
     if new_notification.is_global:
         # user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
         for user in UserProfile.query.all():
             user_notification = UserNotification(user_id=user.id, notification_id=new_notification.id)
             user_notification.save()
     else:
+        if not user_id:
+            user_id = current_user.id
         user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
     user_notification.save()

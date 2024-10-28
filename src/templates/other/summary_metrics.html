@@ -1,44 +1,73 @@
 {% extends 'base/base.html' %}
-{% block title %}Histogram Metrics{% endblock %}
-{% block extra_head %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/summary_metrics.css') }}">
-{% endblock %}
+{% block title %}Summary Metrics - {{ title }} {% endblock %}
 {% block content %}
-<div class="container">
-    <div class="card">
-        <h1 class="card-title">Metrics Dashboard</h1>
 
-        <div class="select-container">
-            <label for="metricSelect">Select Metric</label>
-            <select id="metricSelect">
-                <option value="">Choose a metric</option>
-            </select>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Metrics Dashboard</h1>
+        <p class="mt-2 text-sm text-gray-600">Monitor your application performance and metrics</p>
+    </div>
 
-            <label for="endpointSelect">Select Endpoint (Optional)</label>
-            <select id="endpointSelect">
-                <option value="">All endpoints</option>
-            </select>
-        </div>
-
-        <div id="error" class="error" style="display: none;"></div>
-        <div id="loading" class="loading" style="display: none;">Loading...</div>
-
-        <div id="dashboard" style="display: none;">
-            <div class="grid">
-                <div class="card">
-                    <h2 class="card-title">Total Requests</h2>
-                    <div id="totalRequests"></div>
-                </div>
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+                <label for="metricSelect" class="block text-sm font-medium text-gray-700">Select Metric</label>
+                <select id="metricSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md">
+                    <option value="">Choose a metric</option>
+                </select>
             </div>
-<!-- 
-            <div class="card">
-                <h2 class="card-title">Request Rate</h2>
-                <div class="chart-container">
-                    <canvas id="rateChart"></canvas>
-                </div>
-            </div> -->
+            <div class="space-y-2">
+                <label for="endpointSelect" class="block text-sm font-medium text-gray-700">Select Endpoint (Optional)</label>
+                <select id="endpointSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md">
+                    <option value="">All endpoints</option>
+                </select>
+            </div>
         </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="error" class="hidden rounded-md bg-red-50 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium text-red-800"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="hidden">
+        <div class="flex justify-center items-center py-12">
+            <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboard" class="hidden space-y-6">
+        <!-- Metrics Grid -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Total Requests</h2>
+            </div>
+            <div class="p-6" id="totalRequests"></div>
+        </div>
+
+        <!-- Chart Section -->
+        <!-- <div class="bg-white rounded-lg shadow-sm p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Request Rate</h2>
+            <div class="h-96">
+                <canvas id="rateChart"></canvas>
+            </div>
+        </div> -->
     </div>
 </div>
 
