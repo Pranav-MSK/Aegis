@@ -65,7 +65,7 @@
                             <button @click="isOpen = !isOpen"
                                 class="relative p-2.5 text-slate-500 hover:text-slate-700 bg-white hover:bg-slate-100 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                 :aria-expanded="isOpen" aria-haspopup="true">
-                          
+
                                 <div class="alert-badge"></div>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
@@ -785,15 +785,29 @@
     </div>
 
     <div class="details-grid">
-        <!-- Enterprise Dashboard -->
+        <!-- ticket statistics -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <!-- Header -->
+            {% if plan_type != "SystemGuard Enterprise" %}
             <div class="border-b border-gray-200 p-6">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-semibold text-gray-900">All Tickets Information</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">Enterprise Dashboard</h3>
+                    <span class="animate-pulse h-2 w-2 bg-red-500 rounded-full"></span>
+                </div>
+                <div class="p-4 bg-red-50 rounded-lg mt-4">
+                    <p class="text-sm font-medium text-red-700">SystemGuard Enterprise is required to access this page.
+                    </p>
+                    <a href="{{ url_for('activation') }}" class="text-blue-600 hover:text-blue-800">Upgrade to
+                        Enterprise</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="border-b border-gray-200 p-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900">Tickets Statistics</h3>
                     <span class="animate-pulse h-2 w-2 bg-green-500 rounded-full"></span>
                 </div>
             </div>
+
 
             <!-- Content -->
             <div class="p-6">
@@ -897,53 +911,108 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
-
-        <!-- Enterprise Only Message -->
-        {% if plan_type != 'SystemGuard Enterprise' %}
-        <div class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-center text-gray-900 mb-3">Alert Tickets Information</h3>
-            <p class="text-center text-gray-500">
-                Alert Tickets Information is only available for SystemGuard Enterprise. Upgrade to SystemGuard
-                Enterprise to access detailed alert ticket information, including open, closed, in-progress, resolved,
-                critical, warning, and informational tickets. This feature helps in better monitoring and managing
-                system alerts efficiently.
-            </p>
-        </div>
-        {% endif %}
     </div>
 
 
-    <div class="details-grid">
-        <div class="metric-card">
-            {% if system_info.top_alert_tickets %}
-            <div class="card-header">
-                <h3>Alert Tickets Dashboard</h3>
-                <a href="{{ url_for('alert_history') }}" class="view-all">
-                    View All Tickets
-                </a>
-            </div>
-            <div class="card-content">
-                <div class="alert-grid">
-                    {% for alert in system_info.top_alert_tickets %}
-                    <div class="alert-item severity-{{ alert.severity }}">
-                        <span class="alert-severity">{{ alert.severity | capitalize }}</span>
-                        <span class="alert-name">{{ alert.alert_name }}</span>
-                        <span class="alert-instance">{{ alert.instance }}</span>
-                        <span class="alert-created-at">{{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
-                        <a href="{{ url_for('alert_ticket', alert_id=alert.id) }}" class="alert-link">
-                            <i class="fas fa-info-circle"></i> View Details
+    {# Enterprise Dashboard Template #}
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {% if plan_type != "SystemGuard Enterprise" %}
+        {# Upgrade Notice Card #}
+        <div class="col-span-full bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Enterprise Dashboard</h3>
+                    <span class="relative flex h-3 w-3">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                    <div class="flex flex-col space-y-2">
+                        <p class="text-sm font-medium text-red-700">
+                            SystemGuard Enterprise is required to access this page.
+                        </p>
+                        <a href="{{ url_for('activation') }}"
+                            class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                            Upgrade to Enterprise
+                            <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+                            </svg>
                         </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        {# Alert Tickets Section #}
+        <div class="col-span-full bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="border-b border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">Latest Tickets</h3>
+                    <a href="{{ url_for('alert_history') }}"
+                        class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                        View All Tickets
+                    </a>
+                </div>
+            </div>
+
+            <div class="p-6">
+                {% if system_info.top_alert_tickets %}
+                <div class="space-y-4">
+                    {% for alert in system_info.top_alert_tickets %}
+                    <div
+                        class="flex items-center p-4 rounded-lg {% if alert.severity == 'critical' %}bg-red-50{% elif alert.severity == 'warning' %}bg-yellow-50{% else %}bg-blue-50{% endif %}">
+                        {# Severity Badge #}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if alert.severity == 'critical' %}
+                                        bg-red-100 text-red-800
+                                    {% elif alert.severity == 'warning' %}
+                                        bg-yellow-100 text-yellow-800
+                                    {% else %}
+                                        bg-blue-100 text-blue-800
+                                    {% endif %}">
+                            {{ alert.severity | capitalize }}
+                        </span>
+
+                        {# Alert Details #}
+                        <div class="ml-4 flex-grow">
+                            <p class="text-sm font-medium text-gray-900">{{ alert.alert_name }}</p>
+                            <p class="text-sm text-gray-500">{{ alert.instance }}</p>
+                        </div>
+
+                        {# Time and Action #}
+                        <div class="ml-4 flex items-center space-x-4">
+                            <span class="text-sm text-gray-500">
+                                {{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            </span>
+                            <a href="{{ url_for('alert_ticket', alert_id=alert.id) }}"
+                                class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                                View Details
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p class="mt-2 text-sm font-medium text-gray-500">No alert tickets found</p>
+                </div>
+                {% endif %}
             </div>
-            {% else %}
-            <div class="card-content">
-                <p class="text-center text-gray-500">No alert tickets found</p>
-            </div>
-            {% endif %}
         </div>
+        {% endif %}
     </div>
 
 

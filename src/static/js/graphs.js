@@ -639,7 +639,11 @@ class App {
             const retentionDays = await DataFetcher.fetchRetentionDays();
             const retentionElement = document.getElementById('dataretation');
             if (retentionElement) {
-                retentionElement.textContent = `${retentionDays} days`;
+                if (typeof retentionDays === 'number') {
+                    retentionElement.textContent = `${retentionDays} days`;
+                } else {
+                    retentionElement.textContent = retentionDays;
+                }
             }
         } catch (error) {
             console.error('Error updating retention days:', error);

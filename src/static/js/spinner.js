@@ -115,21 +115,21 @@ class NavigationController {
         // Prevent the navigation
         history.pushState(null, '', window.location.href);
         // Show warning
-        this.showWarning();
+        // this.showWarning();
     }
 
     handleKeyboardNavigation(event) {
         // Prevent Alt + Left/Right (browser back/forward)
         if (event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
             event.preventDefault();
-            this.showWarning();
+            // this.showWarning();
         }
 
         // Prevent Backspace navigation when not in an input field
         if (event.key === 'Backspace' && 
             !event.target.matches('input, textarea, [contenteditable]')) {
             event.preventDefault();
-            this.showWarning();
+            // this.showWarning();
         }
     }
 
@@ -182,25 +182,3 @@ document.addEventListener('click', function (event) {
         overlay.classList.add('hidden');
     }
 });
-
-// Toast notification function
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
-
-    toast.className = `${bgColor} text-white px-6 py-4 rounded-lg shadow-lg transition-opacity duration-300`;
-    toast.innerHTML = message;
-
-    document.getElementById('toast-container').appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-// Mobile sidebar toggle
-function toggleSidebar() {
-    const sidebar = document.querySelector('.lg\\:hidden');
-    sidebar.classList.toggle('hidden');
-}

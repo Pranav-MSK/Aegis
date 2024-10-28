@@ -146,12 +146,9 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-    <!-- Custom Scripts -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    <!-- Custom Scripts -->
+    <script src="{{ url_for('static', filename='js/spinner.js') }}"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 
