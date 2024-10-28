@@ -2,6 +2,7 @@
 from http import HTTPStatus
 from datetime import datetime
 from sqlalchemy.orm import joinedload
+from typing import List, Dict, Any
 from flask import (
     request,
     jsonify,
@@ -32,6 +33,7 @@ from src.routes.helper.access_decorators import (
     community_edition,
 )
 from src.routes.helper.alert_helper import user_has_access_to_alert, user_id_to_username
+from src.routes.helper.notification_helper import generate_system_notification
 
 alert_bp = Blueprint("alert", __name__)
 
@@ -291,6 +293,16 @@ def alert_ticket(alert_id):
                     alert.assigned_user_id = assigned_user_id
                     log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
                     flash("User assigned successfully!", "success")
+            
+                    notification_data = {
+                        "type": "info",
+                        "icon": "info-circle",  # Font Awesome icon
+                        "title": "Alert Ticket Assignment",
+                        "message": f"Alert ticket assigned to you by {current_user.username}",
+                        "is_global": False,
+                    }
+                    generate_system_notification(notification_data, assigned_user_id)
+
                 else:
                     alert.assigned_supervisor_id = assigned_user_id
                     log_message = f"Supervisor {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
@@ -577,7 +589,10 @@ def alert_ticket(alert_id):
 @csrf.exempt
 def mark_notification(notification_id):
     user_id = current_user.id
-    user_notification = UserNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()
+   
+    user_notification = UserNotification.query.filter_by(
+        user_id=user_id,
+        notification_id=notification_id).first()
     if user_notification:
         user_notification.unread = False  # Mark as read
         db.session.commit()
@@ -586,19 +601,79 @@ def mark_notification(notification_id):
     else:
         return jsonify({'message': 'Notification not found for user.'}), 404
 
+def get_user_notifications(
+    user_id: int,
+    unread_only: bool = True,
+    limit: int = 50,
+    offset: int = 0
+) -> List[Dict[str, Any]]:
+    """
+    Get notifications for a specific user with optional filtering and pagination.
+    
+    Args:
+        user_id: The ID of the user
+        unread_only: If True, only return unread notifications
+        limit: Maximum number of notifications to return
+        offset: Number of notifications to skip
+        
+    Returns:
+        List of notification dictionaries
+    """
+    query = (
+        db.session.query(Notification)
+        .join(UserNotification)
+        .filter(UserNotification.user_id == user_id)
+    )
+
+    if unread_only:
+        query = query.filter(UserNotification.unread == True)
+
+    # Add global notifications that aren't already associated with the user
+    global_notifications = (
+        query.union(
+            db.session.query(Notification)
+            .filter(
+                Notification.is_global == True,
+                ~Notification.id.in_(
+                    db.session.query(UserNotification.notification_id)
+                    .filter(UserNotification.user_id == user_id)
+                )
+            )
+        )
+    )
+
+    notifications = (
+        global_notifications
+        .order_by(Notification.time.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    return [notification.to_dict() for notification in notifications]
 
 @app.route('/api/v1/notifications/', methods=['GET'])
 def show_all_notifications():
-    # Query for unread notifications
-    notifications = UserNotification.query.filter_by(user_id=current_user.id, unread=True).options(
-        joinedload(UserNotification.notification)  # Correct usage
-    ).all()
-    list_of_notifications_id = [notification.notification_id for notification in notifications]
+    """API endpoint to retrieve user notifications with optional query parameters."""
+    try:
+        unread_only = request.args.get('unread_only', 'true').lower() == 'true'
+        limit = min(int(request.args.get('limit', 50)), 100)  # Cap at 100
+        offset = max(int(request.args.get('offset', 0)), 0)   # Ensure non-negative
+        
+        notifications = get_user_notifications(
+            user_id=current_user.id,
+            unread_only=unread_only,
+            limit=limit,
+            offset=offset
+        )
 
-    notifications = Notification.query.filter(Notification.id.in_(list_of_notifications_id)).order_by(Notification.time.desc()).all()
-
-    return jsonify([notification.to_dict() for notification in notifications]), 200
-
+        print(notifications)
+        
+        return jsonify(notifications), 200
+    except Exception as e:
+        return jsonify({
+            'error': 'Failed to retrieve notifications',
+            'message': str(e)
+        }), 500
 
 @app.route('/api/v1/notifications/<int:notification_id>', methods=['GET'])
 def get_notification(notification_id):

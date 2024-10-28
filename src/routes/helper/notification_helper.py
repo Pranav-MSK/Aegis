@@ -423,7 +423,7 @@ def generate_alert_ticket_pdf(alert, investigation_notes, alert_logs):
 
     return pdf_file_path
 
-def generate_system_notification(notification_data):
+def generate_system_notification(notification_data, user_id=None):
     new_notification = Notification(
         type=notification_data.get('type', 'info'),
         icon=notification_data.get('icon', 'info-circle'),
@@ -432,9 +432,14 @@ def generate_system_notification(notification_data):
         is_global=notification_data.get('is_global', False)
     )
     new_notification.save()
+    if not user_id:
+        user_id = current_user.id
 
     if new_notification.is_global:
-        user_notification = UserNotification(user_id=current_user.id, notification_id=new_notification.id)
+        # user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
+        for user in UserProfile.query.all():
+            user_notification = UserNotification(user_id=user.id, notification_id=new_notification.id)
+            user_notification.save()
     else:
-        user_notification = UserNotification(user_id=current_user.id, notification_id=new_notification.id)
+        user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
     user_notification.save()
