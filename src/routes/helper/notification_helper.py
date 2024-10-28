@@ -126,14 +126,14 @@ def process_alert(alert):
             logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
             return
 
-    Notification_data = {
-        "type": severity,
-        "icon": "info-circle",  # Font Awesome icon
-        "title": alert_name,
-        "message": description,
-        "is_global": True
-    }
-    generate_system_notification(Notification_data)
+    # notification_data = {
+    #     "type": severity,
+    #     "icon": "info-circle",  # Font Awesome icon
+    #     "title": alert_name,
+    #     "message": description,
+    #     "is_global": True
+    # }
+    # generate_system_notification(Notification_data)
 
     log_alert(severity, alert_name, instance, description, summary)
     create_alert_ticket(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)

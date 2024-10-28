@@ -206,5 +206,4 @@ def after_cursor_execute(conn, cursor, statement, parameters, context, executema
                 logger.warning(f"Slow query detected ({query_time:.2f}s): {statement[:200]}...")
                 
     except Exception as e:
-        logger.error(f"Error monitoring database query: {e}")
-        metrics['ERROR_QUERY_COUNTER'].inc()
+        pass

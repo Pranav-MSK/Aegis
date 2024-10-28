@@ -75,7 +75,6 @@ def update_prometheus_metrics(system_info):
             'battery_percentage_metric': system_info['battery_percent'],
             'dashboard_memory_usage_metric': system_info['dashboard_memory_usage']
         }
-        logger.info(f"Updating Prometheus metrics: {metrics_mapping}")
         # Batch update metrics
         for metric_name, value in metrics_mapping.items():
             metrics[metric_name].set(value)
