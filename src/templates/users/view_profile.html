@@ -29,10 +29,10 @@
                         <i class="fas fa-star text-yellow-400"></i>
                         <span id="activityScore">0</span> points
                     </span>
-                    <span class="text-sm text-gray-500" title="Contribution Streak">
+                    <!-- <span class="text-sm text-gray-500" title="Contribution Streak">
                         <i class="fas fa-fire text-red-400"></i>
                         <span id="streak">0</span> day streak
-                    </span>
+                    </span> -->
                 </div>
             </div>
 
@@ -60,6 +60,14 @@
                 </h2>
                 <div id="activityFeed" class="space-y-4">
                     <!-- Activity items will be populated by JavaScript -->
+                </div>
+                <!-- pagination -->
+                <div class="pagination flex justify-center items-center space-x-1 mt-2" id="pagination">
+                    <button
+                        class="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors">Prev</button>
+                    <span class="px-2 py-1 bg-indigo-600 text-white rounded">1</span>
+                    <button
+                        class="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors">Next</button>
                 </div>
             </section>
 
@@ -176,8 +184,7 @@
                             </div>
                         </div>
                     </div>
-            <!-- Add more quick stats -->
-            </div>
+                </div>
             </section>
 
             <!-- Existing Actions section with enhancements -->

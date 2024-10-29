@@ -8,7 +8,7 @@ from src.models.application_general_settings import GeneralSettings
 from src.models.smtp_configuration import SMTPSettings
 from src.models.network_speed_test_result import NetworkSpeedTestResult
 from src.models.system_information import SystemInformation
-from src.models.user_profile import UserProfile
+from src.models.user_profile import UserProfile, Activity
 from src.models.monitored_website import MonitoredWebsite
 from src.models.prometheus_model import ExternalMonitornig
 from src.models.notification_settings import NotificationSettings, Notification, UserNotification
