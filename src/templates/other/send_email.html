@@ -4,80 +4,58 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/send_email.css') }}">
 {% endblock %}
 {% block content %}
-<div class="email-container">
-    <h2><i class="fas fa-envelope"></i> Send Email</h2>
+<div class="bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="bg-gray-800 py-6 px-8">
+      <h2 class="text-2xl font-bold text-white"><i class="fas fa-envelope"></i> Send Email</h2>
+    </div>
     {% include 'ext/message.html' %}
-
     {% if not enable_alerts %}
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> Alerts are currently disabled.
+    <div class="bg-blue-100 border-t-4 border-blue-500 rounded-b text-blue-900 px-4 py-3 shadow-md">
+      <div class="flex">
+        <div class="py-1"><i class="fas fa-info-circle"></i></div>
+        <div class="ml-4">
+          <p class="font-bold">Alerts are currently disabled.</p>
         </div>
-        <form method="POST" enctype="multipart/form-data" style="pointer-events: none; opacity: 0.5;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="form-group">
-                <label for="subject">Subject:</label>
-                <input type="text" id="subject" name="subject" placeholder="Enter the email subject" required>
-            </div>
-            <div class="form-group">
-                <label for="body">Body:</label>
-                <textarea id="body" name="body" rows="6" placeholder="Write your message here" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="attachment">Attachment:</label>
-                <input type="file" id="attachment" name="attachment">
-            </div>
-            <div class="form-group">
-                <label for="recipient">Recipient:</label>
-                <select id="recipient" name="recipient" required>
-                    <option value="admin">Admin</option>
-                    <option value="all_users">All Users</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="priority">Priority:</label>
-                <select id="priority" name="priority" required>
-                    <option value="low">Low</option>
-                    <option value="high">High</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-paper-plane"></i> Send Email
-            </button>
-        </form>
+      </div>
+    </div>
+    <form method="POST" enctype="multipart/form-data" class="pointer-events-none opacity-50 px-8 py-6 space-y-6">
     {% else %}
-        <form method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="form-group">
-                <label for="subject">Subject:</label>
-                <input type="text" id="subject" name="subject" placeholder="Enter the email subject" required>
-            </div>
-            <div class="form-group">
-                <label for="body">Body:</label>
-                <textarea id="body" name="body" rows="6" placeholder="Write your message here" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="attachment">Attachment:</label>
-                <input type="file" id="attachment" name="attachment">
-            </div>
-            <div class="form-group">
-                <label for="recipient">Recipient:</label>
-                <select id="recipient" name="recipient" required>
-                    <option value="admin_users">Admin</option>
-                    <option value="all_users">All Users</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="priority">Priority:</label>
-                <select id="priority" name="priority" required>
-                    <option value="low">Low</option>
-                    <option value="high">High</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-paper-plane"></i> Send Email
-            </button>
-        </form>
+    <form method="POST" enctype="multipart/form-data" class="px-8 py-6 space-y-6">
     {% endif %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div>
+        <label for="subject" class="block text-gray-700 font-bold mb-2">Subject:</label>
+        <input type="text" id="subject" name="subject" placeholder="Enter the email subject" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+      </div>
+      <div>
+        <label for="body" class="block text-gray-700 font-bold mb-2">Body:</label>
+        <textarea id="body" name="body" rows="6" placeholder="Write your message here" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required></textarea>
+      </div>
+      <div>
+        <label for="attachment" class="block text-gray-700 font-bold mb-2">Attachment:</label>
+        <input type="file" id="attachment" name="attachment" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+      </div>
+      <div>
+        <label for="recipient" class="block text-gray-700 font-bold mb-2">Recipient:</label>
+        <select id="recipient" name="recipient" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+          <option value="admin_users">Admin</option>
+          <option value="all_users">All Users</option>
+        </select>
+      </div>
+      <div>
+        <label for="priority" class="block text-gray-700 font-bold mb-2">Priority:</label>
+        <select id="priority" name="priority" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+          <option value="low">Low</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          <i class="fas fa-paper-plane"></i> Send Email
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
-    

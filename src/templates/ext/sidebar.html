@@ -89,6 +89,25 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Help Section -->
+            <div>
+                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">About</p>
+                <div class="space-y-1.5">
+                    <a href="{{ url_for('about') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'about' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <i class="fas fa-info-circle w-5 h-5 mr-2 {% if request.endpoint == 'about' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        <span class="ml-2">About SystemGuard</span>
+                    </a>
+                </div>
+                
+                <div class="space-y-1.5">
+                    <a href="{{ url_for('privacy') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'privacy_policy' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <i class="fas fa-lock w-5 h-5 mr-2 {% if request.endpoint == 'privacy_policy' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        <span class="ml-2">Privacy Policy</span>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </nav>
 
