@@ -8,6 +8,7 @@ from flask_login import login_required, current_user
 from src.models import AlertTicket
 from werkzeug.security import generate_password_hash, check_password_hash
 from src.routes.helper.notification_helper import generate_system_notification
+from src.routes.helper.common_helper import log_activity
 
 from src.config import app
 
@@ -89,6 +90,8 @@ def change_password():
         }
         generate_system_notification(notification_data)
 
+        log_activity('update', 'Password changed')
+
         flash('Password changed successfully!', 'success')
         return redirect(url_for('view_profile'))
 
@@ -132,6 +135,7 @@ def edit_profile():
             "is_global": False
         }
         generate_system_notification(notification_data)
+        log_activity('update', 'Profile updated')
 
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('view_profile'))

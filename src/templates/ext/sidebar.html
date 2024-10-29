@@ -62,10 +62,6 @@
                         <i class="fas fa-shield-alt w-5 h-5 mr-2 {% if request.endpoint == 'firewall' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
                         <span class="ml-2">Firewall</span>
                     </a>
-                    <a href="{{ url_for('perform_security_analysis') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'perform_security_analysis' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i class="fas fa-search w-5 h-5 mr-2 {% if request.endpoint == 'perform_security_analysis' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
-                        <span class="ml-2">Security Analysis</span>
-                    </a>
                     <a href="{{ url_for('alert_history') }}" class="relative group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'alert_history' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <i class="fas fa-bell w-5 h-5 mr-2 {% if request.endpoint == 'alert_history' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
                         <span class="ml-2">Alert Tracker</span>

@@ -4,19 +4,43 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Profile Header -->
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-32"></div>
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-32 relative">
+            <div class="absolute bottom-4 right-4 text-white">
+                <span class="bg-black/30 px-3 py-1 rounded-full text-sm">
+                    Online for: <span id="timeOnline" class="font-semibold"></span>
+                </span>
+            </div>
+        </div>
         <div class="px-6 py-4 sm:px-8 sm:py-6 relative">
             <img src="{{ user.profile_picture_url }}" alt="Profile Image"
-                class="w-24 h-24 rounded-full border-4 border-white absolute -mt-16 shadow-lg">
+                class="w-24 h-24 rounded-full border-4 border-white absolute -mt-16 shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                onclick="showAchievements()">
 
             <div class="ml-32 pt-2">
-                <h1 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h1>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h1>
+                    <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">User Level {{
+                        user.user_level }}</span>
+                </div>
                 <p class="text-gray-600">{{ user.email }}</p>
                 <p class="text-indigo-600 font-medium">@{{ user.username }}</p>
+                <div class="flex gap-4 mt-2">
+                    <span class="text-sm text-gray-500" title="Activity Score">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <span id="activityScore">0</span> points
+                    </span>
+                    <span class="text-sm text-gray-500" title="Contribution Streak">
+                        <i class="fas fa-fire text-red-400"></i>
+                        <span id="streak">0</span> day streak
+                    </span>
+                </div>
             </div>
 
-            <div class="mt-4 p-4 bg-indigo-50 rounded-lg text-indigo-700 italic">
-                <span id="quote" class="text-sm">Loading quote...</span>
+            <div class="mt-4 p-4 bg-indigo-50 rounded-lg text-indigo-700 relative group cursor-pointer"
+                onclick="refreshQuote()">
+                <span id="quote" class="text-sm italic"></span>
+                <span class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 text-xs text-indigo-400">Click to
+                    refresh</span>
             </div>
         </div>
     </div>
@@ -24,6 +48,21 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Content -->
         <div class="lg:col-span-2 space-y-6">
+            <!-- Activity Feed -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Recent Activity
+                </h2>
+                <div id="activityFeed" class="space-y-4">
+                    <!-- Activity items will be populated by JavaScript -->
+                </div>
+            </section>
+
             <!-- User Details -->
             <section class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
@@ -121,17 +160,29 @@
             {% endif %}
         </div>
 
-        <!-- Actions Sidebar -->
-        <div class="lg:col-span-1">
+        <!-- Enhanced Actions Sidebar -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Quick Stats -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Stats</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="text-sm text-gray-600">Profile Completion</div>
+                        <div class="mt-2 relative pt-1">
+                            <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
+                                <div id="profileCompletion" style="width:100%"
+                                    class="transition-all duration-1000 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            <!-- Add more quick stats -->
+            </div>
+            </section>
+
+            <!-- Existing Actions section with enhancements -->
             <section class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                    </svg>
-                    Actions
-                </h2>
+                <!-- Your existing actions content -->
                 <div class="space-y-3">
                     <a href="{{ url_for('edit_profile') }}"
                         class="block w-full px-4 py-2 bg-indigo-600 text-white rounded-lg text-center font-medium hover:bg-indigo-700 transition-colors">
@@ -145,11 +196,6 @@
                         class="block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-center font-medium hover:bg-gray-200 transition-colors">
                         Logout
                     </a>
-                    <a href="{{ url_for('delete_user_self') }}"
-                        class="block w-full px-4 py-2 bg-red-500 text-white rounded-lg text-center font-medium hover:bg-red-600 transition-colors">
-                        Delete Profile
-                    </a>
-
                     {% if current_user.user_level == 'admin' %}
                     <div class="border-t border-gray-100 pt-4 mt-4">
                         <form action="/superadmin" method="POST" class="space-y-3">
@@ -178,98 +224,7 @@
         </div>
     </div>
 </div>
-
-<script>
-    const quotes = [
-        "The only way to do great work is to love what you do.",
-        "Success is not the key to happiness. Happiness is the key to success.",
-        "The only limit to our realization of tomorrow will be our doubts of today.",
-        "The only thing we have to fear is fear itself.",
-        "The only source of knowledge is experience.",
-        "The only true wisdom is in knowing you know nothing.",
-        "Believe you can and you're halfway there.",
-        "Your limitation—it's only your imagination.",
-        "Push yourself, because no one else is going to do it for you.",
-        "Great things never come from comfort zones.",
-        "Dream it. Wish it. Do it.",
-        "Success doesn’t just find you. You have to go out and get it.",
-        "The harder you work for something, the greater you’ll feel when you achieve it.",
-        "Dream bigger. Do bigger.",
-        "Don’t stop when you’re tired. Stop when you’re done.",
-        "Wake up with determination. Go to bed with satisfaction.",
-        "Do something today that your future self will thank you for.",
-        "Little things make big days.",
-        "It’s going to be hard, but hard does not mean impossible.",
-        "Don’t wait for opportunity. Create it.",
-        "Sometimes we’re tested not to show our weaknesses, but to discover our strengths.",
-        "The key to success is to start before you are ready.",
-        "Dream it. Believe it. Build it.",
-        "The future belongs to those who believe in the beauty of their dreams.",
-        "It’s not whether you get knocked down, it’s whether you get up.",
-        "If you want to achieve greatness stop asking for permission.",
-        "You are never too old to set another goal or to dream a new dream.",
-        "The only place where success comes before work is in the dictionary.",
-        "Don’t be pushed around by the fears in your mind. Be led by the dreams in your heart.",
-        "Everything you’ve ever wanted is on the other side of fear.",
-        "Opportunities don’t happen. You create them.",
-        "Dream bigger than your fears.",
-        "Your only limit is you.",
-        "Sometimes we’re tested not to show our weaknesses, but to discover our strengths.",
-        "Don’t watch the clock; do what it does. Keep going.",
-        "Success is what happens after you have survived all your mistakes.",
-        "What lies behind us and what lies before us are tiny matters compared to what lies within us.",
-        "Act as if what you do makes a difference. It does.",
-        "Success usually comes to those who are too busy to be looking for it.",
-        "The only way to do great work is to love what you do.",
-        "If you can dream it, you can achieve it.",
-        "The future depends on what you do today.",
-        "Everything you can imagine is real.",
-        "Success is not how high you have climbed, but how you make a positive difference to the world.",
-        "Believe in yourself and all that you are.",
-        "It does not matter how slowly you go as long as you do not stop.",
-        "Failure is simply the opportunity to begin again, this time more intelligently.",
-        "What we fear doing most is usually what we most need to do.",
-        "Don’t count the days, make the days count.",
-        "Your time is limited, don’t waste it living someone else’s life.",
-        "If you want to lift yourself up, lift up someone else.",
-        "You don’t have to be great to start, but you have to start to be great.",
-        "It always seems impossible until it’s done.",
-        "What we think, we become.",
-        "You are never too old to set another goal or to dream a new dream.",
-        "Success is not in what you have, but who you are.",
-        "Everything has beauty, but not everyone sees it.",
-        "Don’t be afraid to give up the good to go for the great.",
-        "Believe you can and you’re halfway there.",
-        "To be the best, you must be able to handle the worst.",
-        "Hardships often prepare ordinary people for an extraordinary destiny.",
-        "Keep your face always toward the sunshine—and shadows will fall behind you.",
-        "You miss 100% of the shots you don’t take.",
-        "The only way to achieve the impossible is to believe it is possible.",
-        "Success is walking from failure to failure with no loss of enthusiasm.",
-        "What you get by achieving your goals is not as important as what you become by achieving your goals.",
-        "The man who moves a mountain begins by carrying away small stones.",
-        "Do not wait to strike till the iron is hot, but make it hot by striking.",
-        "Success is not just about what you accomplish in your life, it's about what you inspire others to do.",
-        "You don’t have to be great to start, but you have to start to be great.",
-        "Success is the sum of small efforts, repeated day in and day out.",
-        "Don’t be pushed around by the fears in your mind. Be led by the dreams in your heart.",
-        "Hardships often prepare ordinary people for an extraordinary destiny.",
-        "Keep your face always toward the sunshine—and shadows will fall behind you.",
-        "The best way to predict your future is to create it.",
-        "Dream big and dare to fail.",
-        "Start where you are. Use what you have. Do what you can.",
-        "The only limit to our realization of tomorrow is our doubts of today.",
-        "What you get by achieving your goals is not as important as what you become by achieving your goals.",
-        "Your time is limited, so don’t waste it living someone else’s life.",
-        "If you are not willing to risk the usual, you will have to settle for the ordinary.",
-        "The only way to do great work is to love what you do.",
-        "Success usually comes to those who are too busy to be looking for it.",
-        "Believe you can and you're halfway there.",
-        "Don’t be afraid to give up the good to go for the great.",
-        "What we fear doing most is usually what we most need to do.",
-        "If you can dream it, you can achieve it."
-    ];
-
-    document.getElementById('quote').innerHTML = quotes[Math.floor(Math.random() * quotes.length)];
-</script>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/viewProfile.js') }}" defer></script>
 {% endblock %}

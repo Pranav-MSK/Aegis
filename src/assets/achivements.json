@@ -1,0 +1,37 @@
+[
+    {
+        "name": "First Login",
+        "description": "Completed first login",
+        "criteria": {
+            "login_count": 1
+        }
+    },
+    {
+        "name": "Profile Master",
+        "description": "Completed profile 100%",
+        "criteria": {
+            "profile_completion": 100
+        }
+    },
+    {
+        "name": "Quick Resolver",
+        "description": "Resolved 10 tickets",
+        "criteria": {
+            "resolved_tickets": 10
+        }
+    },
+    {
+        "name": "Streak Master",
+        "description": "Maintained a 7-day login streak",
+        "criteria": {
+            "login_streak": 7
+        }
+    },
+    {
+        "name": "Team Player",
+        "description": "Collaborated on 5 tickets",
+        "criteria": {
+            "collaborated_tickets": 5
+        }
+    }
+]

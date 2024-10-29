@@ -3,7 +3,7 @@ from datetime import datetime
 import hashlib
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash
-
+from humanize import naturaltime
 
 from src.config import db
 from src.models.base_model import BaseModel
@@ -72,3 +72,18 @@ class UserProfile(BaseModel, UserMixin):
         # Create an MD5 hash of the email address
         email_hash = hashlib.md5(self.email.strip().lower().encode('utf-8')).hexdigest()
         return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
+    
+class Activity(BaseModel):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # 'ticket', 'badge', 'update'
+    text = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'type': self.type,
+            'text': self.text,
+            'time': naturaltime(datetime.utcnow() - self.created_at)
+        }

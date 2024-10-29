@@ -46,3 +46,4 @@ pyyaml==6.0.2               # Reads and writes YAML configuration files
 aiohttp==3.10.7             # Async HTTP client for non-blocking requests
 
 fpdf==1.7.2                 # PDF generation library
+humanize==4.11.0            # Humanizes data (e.g., file sizes, timestamps)

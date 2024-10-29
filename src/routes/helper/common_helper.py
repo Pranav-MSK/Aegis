@@ -1,13 +1,12 @@
 # cython: language_level=3
-from src.models import UserProfile, PageToggleSettings
-from src.config import app
-from flask_login import current_user
-from functools import wraps
-from flask import flash, redirect, url_for, render_template, request, session
-import subprocess
 import os
-from src.utils import ROOT_DIR
+import subprocess
+from functools import wraps
+from flask_login import current_user
+from flask import flash, redirect, url_for, render_template, request, session
 
+from src.models import UserProfile, PageToggleSettings, Activity
+from src.config import app
 
 
 def get_email_addresses(user_level=None, receive_email_alerts=True, fetch_all_users=False):
@@ -119,3 +118,12 @@ def handle_sudo_password(redirect_url):
         return decorated_function
     return decorator
 
+def log_activity(activity_type, text):
+    """Helper function to log user activities"""
+    activity = Activity(
+        user_id=current_user.id,
+        type=activity_type,
+        text=text
+    )
+    activity.save()
+    return activity
