@@ -30,30 +30,6 @@
                             </svg>
                             <span class="ml-2 text-sm font-medium text-blue-700">99.9% Uptime</span>
                         </div>
-                        <!-- Performance Status -->
-                        <!-- <div class="hidden sm:flex items-center px-3 py-1.5 bg-yellow-50 rounded-full shadow-sm">
-                            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 14l9-5-9-5-9 5 9 5z" />
-                            </svg>
-                            <span class="ml-2 text-sm font-medium text-yellow-700">Performance: 99%</span>
-                        </div>   -->
-                        <!-- Security Status -->
-                        <!-- <div class="hidden sm:flex items-center px-3 py-1.5 bg-red-50 rounded-full shadow-sm">
-                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 14l9-5-9-5-9 5 9 5z" />
-                            </svg>
-                            <span class="ml-2 text-sm font-medium text-red-700">Security: 99%</span>
-                        </div> -->
-                        <!-- Compliance Status -->
-                        <!-- <div class="hidden sm:flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
-                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 14l9-5-9-5-9 5 9 5z" />
-                            </svg>
-                            <span class="ml-2 text-sm font-medium text-green-700">Compliance: 99%</span>
-                        </div> -->
                     </div>
 
                     <!-- Right Side -->
@@ -132,17 +108,6 @@
                             </svg>
                             <span>Support</span>
                         </button>
-
-                        <!-- Profile/Settings Dropdown Trigger -->
-                        <!-- <button
-                            class="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </button> -->
                     </div>
                 </div>
             </div>
@@ -172,28 +137,31 @@
                                     <span
                                         class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full border border-blue-200">Primary</span>
                                 </div>
+                                {% if system_info.instance_metadata['public_ipv4'] %}
+                                <p class="text-sm text-gray-600 mt-0.5 font-medium">{{
+                                    system_info.instance_metadata['public_ipv4'] }}
+                                    {% else %}
                                 <p class="text-sm text-gray-600 mt-0.5 font-medium">{{ system_info.ipv4_connections }}
+                                    {% endif %}
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Server Metrics Quick View -->
-
-                        <div
-                            class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                            <i class="fas fa-shield-alt text-indigo-500 mr-2.5 text-lg"></i>
-                            {% if system_info.ssl_status %}
-                            <span class="text-sm font-semibold text-gray-700">SSL Secured</span>
-                            {% else %}
-                            <span class="text-sm font-semibold text-red-600">No SSL</span>
-                            {% endif %}
-                        </div>
+                        {% if system_info.instance_metadata['region_name'] %}
                         <div
                             class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
                             <i class="fas fa-hdd text-indigo-500 mr-2.5 text-lg"></i>
-                            <span class="text-sm font-semibold text-gray-700">Server Region: {{ system_info.region_name
-                                }}</span>
+                            <span class="text-sm font-semibold text-gray-700">Server Region: {{
+                                system_info.instance_metadata['region_name'] }}</span>
                         </div>
+                        <!-- instance_type -->
+                        <div
+                            class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
+                            <i class="fas fa-cloud text-indigo-500 mr-2.5 text-lg"></i>
+                            <span class="text-sm font-semibold text-gray-700">Instance Type: {{
+                                system_info.instance_metadata['instance_type'] }}</span>
+                        </div>
+                        {% endif %}
                         <!-- <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
                             <i class="fas fa-cloud text-indigo-500 mr-2.5 text-lg"></i>
                             <span class="text-sm font-semibold text-gray-700">Instance Type: {{ instance_type }}</span>
@@ -942,7 +910,7 @@
         </div>
     </div>
 
-    
+
 </div>
 
 {% endblock %}

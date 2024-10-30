@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+{% block title %}Ec2 Metatad {{ title }}{% endblock %}
+
+{% block content %}
+  <div class="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold mb-6">Instance Metadata</h1>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <table class="w-full table-auto">
+        <thead>
+          <tr class="bg-gray-200 text-gray-700 font-bold">
+            <th class="px-4 py-3 text-left">Key</th>
+            <th class="px-4 py-3 text-left">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for key, value in instance_metadata.items() %}
+          <tr class="border-b border-gray-200">
+            <td class="px-4 py-3 text-left font-medium">{{ key }}</td>
+            <td class="px-4 py-3 text-left">{{ value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

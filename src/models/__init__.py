@@ -14,12 +14,14 @@ from src.models.prometheus_model import ExternalMonitornig
 from src.models.notification_settings import NotificationSettings, Notification, UserNotification
 from src.models.alert_data_models import AlertTicket, InvestigationNote, Report, AlertLog, CustomFields
 from src.models.graph_config import ChartConfiguration
+from src.models.instance_metadata import InstanceMetadata
 from flask_login import current_user
 from src.logger import logger
 from werkzeug.security import generate_password_hash
 import json
 import os
 
+from src.utils import get_instance_metadata
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Context processor for injecting settings into templates
@@ -55,6 +57,39 @@ def inject_settings():
 if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
     with app.app_context():
         # Check if tables already exist
+        if db.inspect(db.engine).has_table('users'):  # Use an important table to check existence
+            instance_metadata = get_instance_metadata()
+            if not InstanceMetadata.query.first():
+                instance_metadata = InstanceMetadata(
+                    ami_id=instance_metadata.get("ami-id"),
+                    ami_launch_index=instance_metadata.get("ami-launch-index"),
+                    ami_manifest_path=instance_metadata.get("ami-manifest-path"),
+                    block_device_mapping=instance_metadata.get("block-device-mapping/"),
+                    events=instance_metadata.get("events/"),
+                    hostname=instance_metadata.get("hostname"),
+                    identity_credentials=instance_metadata.get("identity-credentials/"),
+                    instance_action=instance_metadata.get("instance-action"),
+                    instance_id=instance_metadata.get("instance-id"),
+                    instance_life_cycle=instance_metadata.get("instance-life-cycle"),
+                    instance_type=instance_metadata.get("instance-type"),
+                    local_hostname=instance_metadata.get("local-hostname"),
+                    local_ipv4=instance_metadata.get("local-ipv4"),
+                    mac=instance_metadata.get("mac"),
+                    metrics=instance_metadata.get("metrics/"),
+                    network=instance_metadata.get("network/"),
+                    placement=instance_metadata.get("placement/"),
+                    profile=instance_metadata.get("profile"),
+                    public_hostname=instance_metadata.get("public-hostname"),
+                    public_ipv4=instance_metadata.get("public-ipv4"),
+                    public_keys=instance_metadata.get("public-keys/"),
+                    region_name=instance_metadata.get("public-hostname").split(".")[1],
+                    reservation_id=instance_metadata.get("reservation-id"),
+                    security_groups=instance_metadata.get("security-groups"),
+                    services=instance_metadata.get("services/"),
+                    system=instance_metadata.get("system"),
+                )
+                instance_metadata.save()
+
         if not db.inspect(db.engine).has_table('users'):  # Use an important table to check existence
             logger.info("Creating tables")
             db.create_all()
@@ -74,8 +109,6 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                         activity_description=activity['activity_description']
                     )
                     new_activity.save()
-
-                
 
             # Load predefined users from JSON file and add them to the database if not already present
             pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")
@@ -142,6 +175,8 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                 db.session.add(GeneralSettings())
                 db.session.commit()
                 logger.info("General settings initialized.")
+
+            
         else:
             logger.info("Tables already exist. Skipping creation.")
 

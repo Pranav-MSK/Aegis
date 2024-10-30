@@ -6,7 +6,7 @@ from sqlalchemy import func, case
 from sqlalchemy.orm import joinedload
 
 from src.config import app, csrf, get_app_info
-from src.models import UserProfile, AlertTicket, ChartConfiguration
+from src.models import UserProfile, AlertTicket, ChartConfiguration, InstanceMetadata
 from src.utils import fetch_system_metrics
 from src.activator import get_plan_details
 from src.routes.helper.prometheus_helper import (
@@ -80,6 +80,9 @@ def dashboard():
     system_info["total_targets"] = count_of_targets()
     system_info["total_rules"] = calculate_total_rules()
     system_info["active_alertmanagers"] = retrieve_active_alertmanagers()
+    instance_metadata = InstanceMetadata.to_dict(InstanceMetadata.query.first())
+    print("Instance Metadata: ", instance_metadata)
+    system_info['instance_metadata'] = instance_metadata
     
     return render_template("dashboard/homepage.html", system_info=system_info, current_user=current_user)
 

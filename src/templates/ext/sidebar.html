@@ -55,15 +55,15 @@
                 <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">System</p>
                 <div class="space-y-1.5">
                     <a href="{{ url_for('configure_targets') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'dashboard_network' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'configure_targets' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <i
-                            class="fas fa-network-wired w-5 h-5 mr-2 {% if request.endpoint == 'dashboard_network' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                            class="fas fa-network-wired w-5 h-5 mr-2 {% if request.endpoint == 'configure_targets' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
                         <span class="ml-2">Configure Target</span>
                     </a>
                     <a href="{{ url_for('show_system_services') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'process' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'show_system_services' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <i
-                            class="fas fa-tasks w-5 h-5 mr-2 {% if request.endpoint == 'process' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                            class="fas fa-tasks w-5 h-5 mr-2 {% if request.endpoint == 'show_system_services' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
                         <span class="ml-2">System Process</span>
                     </a>
                     <!-- {{ url_for('prometheus_rules') }} -->

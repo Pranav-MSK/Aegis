@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import blueprints
 from src.config import app
 

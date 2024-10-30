@@ -1,4 +1,5 @@
 # cython: language_level=3
+import os
 import time
 import datetime
 
@@ -143,9 +144,10 @@ def global_middleware():
                 flash(f"Your password will expire in {remaining_days} days. Please change it soon.", "warning")
             
             # Default password check
-            if current_user.check_password("admin"):
-                flash("Security Alert: Please change the default password for your security.", "danger")
-                return redirect(url_for('change_password'))
+            if os.getenv('FLASK_ENV') == 'production':
+                if current_user.check_password("admin"):
+                    flash("Security Alert: Please change the default password for your security.", "danger")
+                    return redirect(url_for('change_password'))
                     
         # Plan-related checks for specific endpoints
         if request.endpoint in ['activation', 'download_license', '/']:

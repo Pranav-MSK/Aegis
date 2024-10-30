@@ -293,42 +293,72 @@ def get_running_daemons():
         return []
 
 @lru_cache(maxsize=1)
-def get_region():
+def get_instance_metadata():
+    """
+    Retrieve all available metadata about the current EC2 instance.
+    
+    Returns:
+        dict: A dictionary containing all instance metadata.
+    """
+    base_url = "http://169.254.169.254/latest/meta-data/"
+    metadata = {}
+
     try:
-        # Step 1: Get a token for IMDSv2
+        print("Fetching instance metadata...")
+        # Get a session token for IMDSv2
         token_response = requests.put(
             "http://169.254.169.254/latest/api/token",
-            headers={"X-aws-ec2-metadata-token-ttl-seconds": "21600"},  # 6 hours
-            timeout=2
+            headers={"X-aws-ec2-metadata-token-ttl-seconds": "21600"}  # Token valid for 6 hours
         )
         token_response.raise_for_status()
         token = token_response.text
+
+        # Get all metadata categories
+        response = requests.get(base_url, headers={"X-aws-ec2-metadata-token": token})
+        response.raise_for_status()  # Raise an error for bad responses
+
+        # List all metadata keys
+        keys = response.text.splitlines()
+
+        for key in keys:
+            # Fetch each piece of metadata
+            full_url = f"{base_url}{key}"
+            value_response = requests.get(full_url, headers={"X-aws-ec2-metadata-token": token})
+            metadata[key] = value_response.text
         
-        # Step 2: Use the token to get the availability zone
-        headers = {"X-aws-ec2-metadata-token": token}
-        response = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=headers, timeout=2)
-        response.raise_for_status()
-        
-        availability_zone = response.text
-        return availability_zone[:-1]
+        return metadata
     
     except requests.RequestException as e:
-        print(f"Error accessing metadata: {e}")
-        return 'N/A'
-
-@lru_cache(maxsize=1)
-def check_ssl_status(domain_name):
-    print("Checking SSL status")
-    try:
-        context = ssl.create_default_context()
-        with socket.create_connection((domain_name, 443)) as sock:
-            with context.wrap_socket(sock, server_hostname=domain_name) as ssock:
-                ssock.getpeercert()
-                return True
-    except ssl.SSLError:
-        return False
-    except Exception as e:
-        return False
+        print(f"Error fetching instance metadata: {e}")
+        return {}
+   
+#     return {
+#     "ami-id": "ami-0dee22c13ea7a9a67",
+#     "ami-launch-index": "0",
+#     "ami-manifest-path": "(unknown)",
+#     "block-device-mapping/": "ami\nephemeral0\nephemeral1\nroot",
+#     "events/": "maintenance/",
+#     "hostname": "ip-172-31-8-110.ap-south-1.compute.internal",
+#     "identity-credentials/": "ec2/",
+#     "instance-action": "none",
+#     "instance-id": "i-0e507e5d61d61e934",
+#     "instance-life-cycle": "on-demand",
+#     "instance-type": "t2.micro",
+#     "local-hostname": "ip-172-31-8-110.ap-south-1.compute.internal",
+#     "local-ipv4": "172.31.8.110",
+#     "mac": "0a:5e:96:cf:af:03",
+#     "metrics/": "vhostmd",
+#     "network/": "interfaces/",
+#     "placement/": "availability-zone\navailability-zone-id\nregion",
+#     "profile": "default-hvm",
+#     "public-hostname": "ec2-3-109-200-174.ap-south-1.compute.amazonaws.com",
+#     "public-ipv4": "3.109.200.174",
+#     "public-keys/": "0=sec_key_south",
+#     "reservation-id": "r-0c3490ac8ce97f43a",
+#     "security-groups": "launch-wizard-1",
+#     "services/": "domain\npartition",
+#     "system": "xen-on-nitro"
+# }
 
 def _collect_metrics():
     """Optimized system information collection using parallel processing"""
@@ -378,8 +408,7 @@ def fetch_system_metrics():
         'ipv4_connections': ipv4_address,
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
         'os_info': os_info,
-        'region_name': get_region(),
-        'ssl_status': check_ssl_status(domain_name),
+        'instance_metadata': "",
     }
     info.update(_collect_metrics())
 
