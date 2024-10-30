@@ -38,12 +38,12 @@ async function postRefreshInterval(newInterval) {
         });
         const data = await response.json();
         if (data.success) {
-            console.log('Updated interval:', data.refresh_interval);
+            //
         } else {
-            console.error('Failed to update interval:', data.error);
+            //
         }
     } catch (error) {
-        console.error('Error updating interval:', error);
+        //
     }
 }
 

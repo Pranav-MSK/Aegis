@@ -8,6 +8,7 @@ from typing import Dict, List, Any, Union
 import docker
 import traceback
 from src.utils import ROOT_DIR
+from src.logger import logger
 
 # Type aliases
 ContainerMetrics = Dict[str, Any]
@@ -24,7 +25,7 @@ class ServiceMonitor:
             with open(filename, "r") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"Error loading service patterns: {e}")
+            logger.error(f"Error loading service patterns: {e}")
             return {}
 
     def get_process_info(self, proc: psutil.Process) -> Dict[str, Any]:
@@ -230,7 +231,7 @@ def format_container_creation_time(created_str):
         else:
             return f"{int(seconds)} second{'s' if seconds > 1 else ''} ago"
     except ValueError as e:
-        print(f"Error formatting container creation time: {e}")
+        logger.error(f"Error formatting container creation time: {e}")
         return "Unknown"
 
 
@@ -302,13 +303,12 @@ def get_running_docker_containers() -> List[ContainerMetrics]:
                     }
                 )
             except Exception as e:
-                tb = traceback.format_exc()
-                print(
-                    f"Error collecting metrics for container {container.name} at line {tb.splitlines()[-3].strip()}: {e}"
+                logger.error(
+                    f"Error collecting metrics for container {container.name}: {e}"
                 )
                 continue
 
         return containers
     except Exception as e:
-        print(f"Error connecting to Docker: {e}")
+        logger.error(f"Error connecting to Docker: {e}")
         return []

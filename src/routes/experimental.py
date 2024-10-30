@@ -1,10 +1,12 @@
 # cython: language_level=3
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request, render_template, flash
 from sqlalchemy import desc
-from src.models.user_profile import UserActivity, UserProfile, ActivityTable
+
 from functools import wraps
 from flask_login import current_user, login_required
 from src.config import app, db, csrf
+from src.models.user_profile import UserActivity, UserProfile, ActivityTable
+from src.routes.helper.common_helper import admin_required
 
 experimental_bp = Blueprint('experimental', __name__)
 
@@ -34,7 +36,8 @@ def get_activities():
 @app.route('/manage_activities', methods=['GET', 'POST'])
 @app.route('/manage_activities/<int:activity_id>', methods=['GET', 'PUT', 'DELETE'])
 @csrf.exempt
-def user_activity(activity_id=None):
+@admin_required
+def manage_activities(activity_id=None):
     try:
         if request.method == 'GET':
             if activity_id:
@@ -58,8 +61,7 @@ def user_activity(activity_id=None):
                 activity_point=data['activity_point'],
                 activity_description=data['activity_description']
             )
-            db.session.add(new_activity)
-            db.session.commit()
+            new_activity.save()
             return jsonify({"message": "Activity added successfully!", "success": True}), 201
 
         elif request.method == 'PUT':
@@ -69,14 +71,12 @@ def user_activity(activity_id=None):
             activity.activity_name = data['activity_name']
             activity.activity_point = data['activity_point']
             activity.activity_description = data['activity_description']
-            
-            db.session.commit()
+            activity.save()
             return jsonify({"message": "Activity updated successfully!", "success": True})
 
         elif request.method == 'DELETE':
             activity = ActivityTable.query.get_or_404(activity_id)
-            db.session.delete(activity)
-            db.session.commit()
+            activity.delete()
             return jsonify({"message": "Activity deleted successfully!", "success": True})
 
     except Exception as e:

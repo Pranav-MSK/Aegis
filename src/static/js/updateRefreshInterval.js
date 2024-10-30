@@ -6,9 +6,9 @@ fetch('/api/v1/refresh-interval')
     .then(data => {
         if (data.success) {
             refreshInterval = data.refresh_interval * 1000; // Multiply by 1000 to convert to milliseconds
-            console.log('Refresh interval fetched successfully:', data.refresh_interval);
+            // Start refreshing after fetching the interval
         } else {
-            console.error('Failed to fetch refresh interval:', data.error);
+            // Handle error
         }
     })
     .catch(error => console.error('Error:', error));
@@ -39,9 +39,9 @@ document.getElementById('refresh-interval').addEventListener('change', function 
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Refresh interval updated successfully:', data.refresh_interval);
+                // Refresh interval updated successfully
             } else {
-                console.error('Failed to update refresh interval:', data.error);
+                // Handle error
             }
         })
         .catch(error => console.error('Error:', error));

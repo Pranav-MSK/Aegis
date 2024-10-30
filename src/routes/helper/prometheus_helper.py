@@ -6,6 +6,7 @@ from collections import OrderedDict
 import requests
 
 from src.utils import ROOT_DIR
+from src.logger import logger
 
 prometheus_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/prometheus.yml')
 alert_manager_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/alertmanager.yml')
@@ -67,7 +68,7 @@ def save_prometheus_config(config):
 
 def update_prometheus_config():
     """Update the first target with the machine's IP address."""
-    print("Updating Prometheus config...")
+    logger.info("Updating Prometheus config...")
     
     # Get the machine's IP address
     try:
@@ -81,7 +82,7 @@ def update_prometheus_config():
     try:
         config = load_yaml(prometheus_yml_path)
     except Exception as e:
-        print(f"Error loading YAML config: {e}")
+        logger.error(f"Error loading YAML config: {e}")
         return False
     
     if 'alerting' in config:
@@ -119,13 +120,13 @@ def update_prometheus_config():
         # Save the updated config
         try:
             save_yaml(config, prometheus_yml_path)
-            print("Prometheus config updated successfully.")
+            logger.info("Prometheus config updated successfully.")
             return True
         except Exception as e:
-            print(f"Error saving YAML config: {e}")
+            logger.error(f"Error saving YAML config: {e}")
             return False
     
-    print("No 'localhost' job found in Prometheus config.")
+    logger.error("No 'localhost' job found in Prometheus config.")
     return False
 
 def save_updated_alert_manager_config():
@@ -133,7 +134,7 @@ def save_updated_alert_manager_config():
     try:
         alert_manager_config = load_yaml(alert_manager_yml_path)
     except Exception as e:
-        print(f"Error loading alertmanager YAML config: {e}")
+        logger.error(f"Error loading alertmanager YAML config: {e}")
         return False
 
     # Get the IP address of the machine
@@ -142,14 +143,14 @@ def save_updated_alert_manager_config():
             ['hostname', '-I'], capture_output=True, text=True, check=True
         ).stdout.split()[0]
     except subprocess.CalledProcessError as e:
-        print(f"Error getting IP address: {e}")
+        logger.error(f"Error getting IP address: {e}")
         return False
 
     # Update the URL in the alertmanager.yml file
     try:
         alert_manager_config['receivers'][0]['webhook_configs'][0]['url'] = f'http://{ipv4_address}:5050/alerts'
     except KeyError as e:
-        print(f"Error updating URL in alertmanager config: {e}")
+        logger.error(f"Error updating URL in alertmanager config: {e}")
         return False
    
     for index, receiver in enumerate(alert_manager_config['receivers']):
@@ -162,10 +163,10 @@ def save_updated_alert_manager_config():
     # Save the updated alertmanager.yml file
     try:
         save_yaml(alert_manager_config, alert_manager_yml_path)
-        print("Alertmanager config updated successfully.")
+        logger.info("Alertmanager config updated successfully.")
         return True
     except Exception as e:
-        print(f"Error saving alertmanager YAML config: {e}")
+        logger.error(f"Error saving alertmanager YAML config: {e}")
         return False
 
 def show_targets():
@@ -186,15 +187,9 @@ def show_targets():
 def update_prometheus_container():
     """Update the Prometheus container."""
     try:
-        result = subprocess.run(['bash', update_prometheus_path], check=True, text=True, capture_output=True)
-        print("Output:")
-        print(result.stdout)
-        
-        if result.stderr:
-            print("Errors:")
-            print(result.stderr)
+        subprocess.run(['bash', update_prometheus_path], check=True, text=True, capture_output=True)        
     except subprocess.CalledProcessError as e:
-        print(f"An error occurred while updating Prometheus container: {e}")
+        logger.error(f"An error occurred while updating Prometheus container: {e}")
 
 def calculate_total_rules():
     """Return the total number of rules."""

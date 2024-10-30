@@ -48,9 +48,9 @@ document.getElementById('refresh-interval').addEventListener('change', function 
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Refresh interval updated successfully:', data.refresh_interval);
+                // Refresh interval updated successfully
             } else {
-                console.error('Failed to update refresh interval:', data.error);
+                // Handle error
             }
         })
         .catch(error => console.error('Error:', error));
