@@ -8,7 +8,7 @@ from src.models.application_general_settings import GeneralSettings
 from src.models.smtp_configuration import SMTPSettings
 from src.models.network_speed_test_result import NetworkSpeedTestResult
 from src.models.system_information import SystemInformation
-from src.models.user_profile import UserProfile, Activity
+from src.models.user_profile import UserProfile, UserActivity, ActivityTable
 from src.models.monitored_website import MonitoredWebsite
 from src.models.prometheus_model import ExternalMonitornig
 from src.models.notification_settings import NotificationSettings, Notification, UserNotification
@@ -62,6 +62,20 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
             # create NotificationSettings
             if not NotificationSettings.query.first():
                 NotificationSettings().save()
+
+            activity_table_json = os.path.join(ROOT_DIR, "src/assets/activity_table.json")
+            with open(activity_table_json, "r") as file:
+                activity_table = json.load(file)
+                for activity in activity_table:
+                    
+                    new_activity = ActivityTable(
+                        activity_name=activity['activity_name'],
+                        activity_point=activity['activity_point'],
+                        activity_description=activity['activity_description']
+                    )
+                    new_activity.save()
+
+                
 
             # Load predefined users from JSON file and add them to the database if not already present
             pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")

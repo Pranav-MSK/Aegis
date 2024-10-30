@@ -1,7 +1,6 @@
 # cython: language_level=3
 from http import HTTPStatus
 from datetime import datetime
-from sqlalchemy.orm import joinedload
 from typing import List, Dict, Any
 from flask import (
     request,
@@ -292,6 +291,7 @@ def alert_ticket(alert_id):
             if assigned_user_id:
                 if form_type == "assign_user":
                     alert.assigned_user_id = assigned_user_id
+                    alert.ticket_status = "In Progress"
                     log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
                     flash("User assigned successfully!", "success")
             
@@ -338,6 +338,10 @@ def alert_ticket(alert_id):
                     else "description" if form_type == "edit_description" else "summary"
                 )
             )
+
+            if new_value in ["Closed", "Resolved"]:
+                award_points(new_value.lower(), user_id=alert.assigned_user_id)
+
             if form_type == "edit_status":
                 alert.ticket_status = new_value
                 log_message = f"Status changed to '{alert.ticket_status}' by {current_user.username}"
@@ -425,8 +429,8 @@ def alert_ticket(alert_id):
         ]:
             if form_type == "close_ticket":
                 alert.ticket_status = "Closed"
-                alert.assigned_user_id = current_user.id
                 note_content = request.form.get("investigation_notes")
+                award_points('closed', user_id=alert.assigned_user_id)
                 if note_content:
                     InvestigationNote(
                         alert_ticket_id=alert.id,
@@ -472,6 +476,7 @@ def alert_ticket(alert_id):
             elif form_type == "resolve_ticket":
                 alert.ticket_status = "Resolved"
                 note_content = request.form.get("investigation_notes")
+                award_points('resolved', user_id=alert.assigned_user_id)
                 if note_content:
                     InvestigationNote(
                         alert_ticket_id=alert.id,
@@ -543,6 +548,7 @@ def alert_ticket(alert_id):
                 assigned_user_id = request.form.get("assigned_user_id")
                 if assigned_user_id:
                     alert.assigned_user_id = assigned_user_id
+                    alert.ticket_status = "In Progress"
                     log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
                     flash("User assigned successfully!", "success")
                 else:

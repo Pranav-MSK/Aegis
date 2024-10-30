@@ -1,10 +1,10 @@
 # cython: language_level=3
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from sqlalchemy import desc
-from src.models.user_profile import Activity, UserProfile
+from src.models.user_profile import UserActivity, UserProfile, ActivityTable
 from functools import wraps
 from flask_login import current_user, login_required
-from src.config import app
+from src.config import app, db, csrf
 
 experimental_bp = Blueprint('experimental', __name__)
 
@@ -18,8 +18,8 @@ def get_activities():
 
     user_points = UserProfile.query.get(current_user.id).user_points
     
-    activities = Activity.query.filter_by(user_id=current_user.id)\
-        .order_by(desc(Activity.created_at))\
+    activities = UserActivity.query.filter_by(user_id=current_user.id)\
+        .order_by(desc(UserActivity.created_at))\
         .paginate(page=page, per_page=per_page)
 
     return jsonify({
@@ -30,3 +30,55 @@ def get_activities():
         'user_points': user_points
         
     }), 200
+
+@app.route('/manage_activities', methods=['GET', 'POST'])
+@app.route('/manage_activities/<int:activity_id>', methods=['GET', 'PUT', 'DELETE'])
+@csrf.exempt
+def user_activity(activity_id=None):
+    try:
+        if request.method == 'GET':
+            if activity_id:
+                # Get single activity
+                activity = ActivityTable.query.get_or_404(activity_id)
+                return jsonify({
+                    'id': activity.id,
+                    'activity_name': activity.activity_name,
+                    'activity_point': activity.activity_point,
+                    'activity_description': activity.activity_description
+                })
+            else:
+                # Get all activities
+                activities = ActivityTable.query.all()
+                return render_template('users/manage_activities.html', activities=activities)
+
+        elif request.method == 'POST':
+            data = request.get_json()
+            new_activity = ActivityTable(
+                activity_name=data['activity_name'],
+                activity_point=data['activity_point'],
+                activity_description=data['activity_description']
+            )
+            db.session.add(new_activity)
+            db.session.commit()
+            return jsonify({"message": "Activity added successfully!", "success": True}), 201
+
+        elif request.method == 'PUT':
+            activity = ActivityTable.query.get_or_404(activity_id)
+            data = request.get_json()
+            
+            activity.activity_name = data['activity_name']
+            activity.activity_point = data['activity_point']
+            activity.activity_description = data['activity_description']
+            
+            db.session.commit()
+            return jsonify({"message": "Activity updated successfully!", "success": True})
+
+        elif request.method == 'DELETE':
+            activity = ActivityTable.query.get_or_404(activity_id)
+            db.session.delete(activity)
+            db.session.commit()
+            return jsonify({"message": "Activity deleted successfully!", "success": True})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e), "success": False}), 400

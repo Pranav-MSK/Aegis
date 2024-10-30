@@ -100,7 +100,7 @@ function refreshQuote() {
 }
 refreshQuote();
 
-// Activity Score Animation
+// UserActivity Score Animation
 function updateScore(user_points) {
   let currentScore = 0;
   const targetScore = user_points;
@@ -115,7 +115,7 @@ function updateScore(user_points) {
 }
 
 
-// Recent Activity Feed
+// Recent UserActivity Feed
 async function fetchActivities(page = 1, perPage = 10) {
   const response = await fetch(`/api/v1/activities?page=${page}&per_page=${perPage}`);
   const data = await response.json();

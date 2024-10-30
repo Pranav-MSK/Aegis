@@ -5,7 +5,7 @@ from functools import wraps
 from flask_login import current_user
 from flask import flash, redirect, url_for, render_template, request, session
 
-from src.models import UserProfile, PageToggleSettings, Activity
+from src.models import UserProfile, PageToggleSettings, UserActivity, ActivityTable
 from src.config import app
 
 
@@ -120,21 +120,18 @@ def handle_sudo_password(redirect_url):
 
 def award_points(activity_type, reverse=False, user_id=None):
     """Award points to the user based on activity type."""
-    activity_points_dict = {
-        "edit": 1,       # when a user edits their profile
-        "award": 5,      # when a badge is awarded
-        "ticket": 5,     # when a ticket is created and assigned
-        "monitor": 4,    # when a user monitors a ticket
-        "report": 5,     # when a user reports a ticket
-        "resolve": 6,    # when a ticket is resolved     
-        "analyze": 4,    # when a ticket is analyzed
-        "dashboard": 1,  # when a user views the dashboard
-        "review": 2      # when a user reviews a ticket    
-    }
+
+    activity_points_dict = ActivityTable.query.all()
+    activity_points_dict = {activity.activity_name: activity.activity_point for activity in activity_points_dict}
+
+    print(activity_points_dict)
 
     # deduct points if reverse is True
     if reverse:
         activity_points_dict = {k: -v for k, v in activity_points_dict.items()}
+
+    if user_id is None:
+        user_id = current_user.id
 
     points = activity_points_dict.get(activity_type, 1)  # Default to 1 if not found
     user = UserProfile.query.get(user_id)
@@ -143,7 +140,7 @@ def award_points(activity_type, reverse=False, user_id=None):
 
 def log_activity(activity_type, text):
     """Helper function to log user activities."""
-    activity = Activity(
+    activity = UserActivity(
         user_id=current_user.id,
         type=activity_type,
         text=text

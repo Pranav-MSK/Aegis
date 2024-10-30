@@ -74,7 +74,9 @@ class UserProfile(BaseModel, UserMixin):
         email_hash = hashlib.md5(self.email.strip().lower().encode('utf-8')).hexdigest()
         return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
     
-class Activity(BaseModel):
+class UserActivity(BaseModel):
+    __tablename__ = 'user_activity'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     type = db.Column(db.String(50), nullable=False)  # 'ticket', 'badge', 'update'
@@ -88,3 +90,15 @@ class Activity(BaseModel):
             'text': self.text,
             'time': naturaltime(datetime.utcnow() - self.created_at)
         }
+
+
+class ActivityTable(BaseModel):
+    __tablename__ = 'activity_table'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    activity_name = db.Column(db.String(100), nullable=False, unique=True)
+    activity_point = db.Column(db.Integer, nullable=False)
+    activity_description = db.Column(db.String(255), nullable=True)
+
+    def __repr__(self):
+        return f'<Award {self.activity_name}: {self.activity_point} points>'

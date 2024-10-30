@@ -1,0 +1,52 @@
+[
+    {
+        "activity_name": "Edit",
+        "activity_point": 1,
+        "activity_description": "Points awarded when a user edits their profile"
+    },
+    {
+        "activity_name": "Award",
+        "activity_point": 5,
+        "activity_description": "Points awarded when a badge is awarded"
+    },
+    {
+        "activity_name": "Ticket",
+        "activity_point": 5,
+        "activity_description": "Points awarded when a ticket is created and assigned"
+    },
+    {
+        "activity_name": "Monitor",
+        "activity_point": 4,
+        "activity_description": "Points awarded when a user monitors a ticket"
+    },
+    {
+        "activity_name": "Report",
+        "activity_point": 5,
+        "activity_description": "Points awarded when a user reports a ticket"
+    },
+    {
+        "activity_name": "Resolved",
+        "activity_point": 6,
+        "activity_description": "Points awarded when a ticket is resolved"
+    },
+    {
+        "activity_name": "Closed",
+        "activity_point": 3,
+        "activity_description": "Points awarded when a ticket is closed"
+    },
+    {
+        "activity_name": "Analyze",
+        "activity_point": 4,
+        "activity_description": "Points awarded when a ticket is analyzed"
+    },
+    {
+        "activity_name": "Dashboard",
+        "activity_point": 1,
+        "activity_description": "Points awarded when a user views the dashboard"
+    },
+    {
+        "activity_name": "Review",
+        "activity_point": 2,
+        "activity_description": "Points awarded when a user reviews a ticket"
+    }
+]
