@@ -44,7 +44,7 @@
         <div class="p-4 bg-gray-50 border-b border-gray-200">
             <h2 class="text-lg font-medium text-gray-900">Add New Rule</h2>
         </div>
-        <form method="POST" action="{{ url_for('view_rules') }}" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6" {% if
+        <form method="POST" action="{{ url_for('prometheus_rules') }}" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6" {% if
             total_rules>= max_alert_rules | int %}onsubmit="return false;"{% endif %}>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="action" value="add">
@@ -175,7 +175,7 @@
                         x-transition:enter-start="opacity-0 transform -translate-y-2"
                         x-transition:enter-end="opacity-100 transform translate-y-0"
                         class="px-4 pb-4 bg-white">
-                        <form method="POST" action="{{ url_for('view_rules') }}"
+                        <form method="POST" action="{{ url_for('prometheus_rules') }}"
                             class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="action" value="edit">
@@ -236,7 +236,7 @@
                                         Cancel
                                     </button>
                                 </div>
-                                <form method="POST" action="{{ url_for('view_rules') }}" class="inline-block">
+                                <form method="POST" action="{{ url_for('prometheus_rules') }}" class="inline-block">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="index" value="{{ loop.index0 }}">

@@ -19,7 +19,6 @@ def get_gravatar_url(email, size=200):
     email_hash = hashlib.md5(email.strip().lower().encode('utf-8')).hexdigest()
     return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
 
-
 # View Profile Route
 @app.route('/profile', methods=['GET'])
 @login_required
@@ -29,19 +28,26 @@ def view_profile():
     """
     user = current_user  # Get the currently logged-in user
     user.profile_picture_url = current_user.get_profile_picture_url()
-    print(user.profile_picture_url)
+    
     user_assigned_tickets = AlertTicket.query.filter_by(assigned_user_id=user.id).all()
-    ticket_stats = {}
-    ticket_count = len(user_assigned_tickets)
-    open_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'Open'])
-    in_progress_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'In Progress'])
-    resolved_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'Resolved'])
-    closed_tickets = len([t for t in user_assigned_tickets if t.ticket_status == 'Closed'])
-    ticket_stats['total'] = ticket_count
-    ticket_stats['open'] = open_tickets
-    ticket_stats['in_progress'] = in_progress_tickets
-    ticket_stats['resolved'] = resolved_tickets
-    ticket_stats['closed'] = closed_tickets
+    supervisor_assigned_tickets = AlertTicket.query.filter_by(assigned_supervisor_id=user.id).all()
+
+    ticket_stats = {
+        'assigned': {
+            'total': len(user_assigned_tickets),
+            'open': len([t for t in user_assigned_tickets if t.ticket_status == 'Open']),
+            'in_progress': len([t for t in user_assigned_tickets if t.ticket_status == 'In Progress']),
+            'resolved': len([t for t in user_assigned_tickets if t.ticket_status == 'Resolved']),
+            'closed': len([t for t in user_assigned_tickets if t.ticket_status == 'Closed']),
+        },
+        'supervised': {
+            'total': len(supervisor_assigned_tickets),
+            'open': len([t for t in supervisor_assigned_tickets if t.ticket_status == 'Open']),
+            'in_progress': len([t for t in supervisor_assigned_tickets if t.ticket_status == 'In Progress']),
+            'resolved': len([t for t in supervisor_assigned_tickets if t.ticket_status == 'Resolved']),
+            'closed': len([t for t in supervisor_assigned_tickets if t.ticket_status == 'Closed']),
+        }
+    }
 
     return render_template('users/view_profile.html', user=user, ticket_stats=ticket_stats)
 
@@ -90,7 +96,7 @@ def change_password():
         }
         generate_system_notification(notification_data)
 
-        log_activity('update', 'Password changed')
+        log_activity('edit', 'Password changed')
 
         flash('Password changed successfully!', 'success')
         return redirect(url_for('view_profile'))
@@ -135,7 +141,7 @@ def edit_profile():
             "is_global": False
         }
         generate_system_notification(notification_data)
-        log_activity('update', 'Profile updated')
+        log_activity('edit', 'Profile updated')
 
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('view_profile'))

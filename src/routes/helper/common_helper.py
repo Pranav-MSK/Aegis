@@ -118,12 +118,39 @@ def handle_sudo_password(redirect_url):
         return decorated_function
     return decorator
 
+def award_points(activity_type, reverse=False, user_id=None):
+    """Award points to the user based on activity type."""
+    activity_points_dict = {
+        "edit": 1,       # when a user edits their profile
+        "award": 5,      # when a badge is awarded
+        "ticket": 5,     # when a ticket is created and assigned
+        "monitor": 4,    # when a user monitors a ticket
+        "report": 5,     # when a user reports a ticket
+        "resolve": 6,    # when a ticket is resolved     
+        "analyze": 4,    # when a ticket is analyzed
+        "dashboard": 1,  # when a user views the dashboard
+        "review": 2      # when a user reviews a ticket    
+    }
+
+    # deduct points if reverse is True
+    if reverse:
+        activity_points_dict = {k: -v for k, v in activity_points_dict.items()}
+
+    points = activity_points_dict.get(activity_type, 1)  # Default to 1 if not found
+    user = UserProfile.query.get(user_id)
+    user.user_points += points
+    user.save()
+
 def log_activity(activity_type, text):
-    """Helper function to log user activities"""
+    """Helper function to log user activities."""
     activity = Activity(
         user_id=current_user.id,
         type=activity_type,
         text=text
     )
+
+    # Award points based on the activity type
+    award_points(activity_type)
+    
     activity.save()
     return activity

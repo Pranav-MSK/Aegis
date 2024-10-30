@@ -101,9 +101,9 @@ function refreshQuote() {
 refreshQuote();
 
 // Activity Score Animation
-function updateScore(total) {
+function updateScore(user_points) {
   let currentScore = 0;
-  const targetScore = total * 4.2;
+  const targetScore = user_points;
   const animateScore = () => {
     if (currentScore < targetScore) {
       currentScore += 1;
@@ -113,6 +113,7 @@ function updateScore(total) {
   };
   animateScore();
 }
+
 
 // Recent Activity Feed
 async function fetchActivities(page = 1, perPage = 10) {
@@ -130,7 +131,7 @@ function updateActivities(activities) {
     item.className = 'flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors';
     item.innerHTML = `
         <div class="mr-3">
-          <span class="text-indigo-600"><i class="fas fa-${activity.type === 'ticket' ? 'ticket-alt' : activity.type === 'badge' ? 'award' : 'user-edit'}"></i></span>
+          <span class="text-indigo-600"><i class="fas fa-${activity.type}"></i></span>
         </div>
         <div class="flex-1">
           <p class="text-sm text-gray-800">${activity.text}</p>
@@ -146,9 +147,9 @@ let currentPage = 1;
 const perPage = 10;
 
 async function loadPage(page) {
-  const { activities, total, pages, current_page } = await fetchActivities(page, perPage);
+  const { activities, total, pages, current_page, user_points } = await fetchActivities(page, perPage);
   updateActivities(activities);
-  updateScore(total);
+  updateScore(user_points);
   currentPage = current_page;
 
   // Update pagination controls
@@ -201,3 +202,47 @@ if (!localStorage.getItem('sessionStart')) {
 }
 
 setInterval(updateOnlineTime, 1000);
+
+function switchTab(tabName) {
+    // Update button states
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.tab === tabName) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Move highlight
+    const highlighter = document.querySelector('.tab-highlight');
+    const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    const index = Array.from(activeBtn.parentElement.children).indexOf(activeBtn) - 1;
+    highlighter.style.left = `${index * 50 + 2}%`;
+
+    // Update content visibility
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+        content.style.transform = 'translateX(100%)';
+    });
+    const activeContent = document.getElementById(tabName);
+    activeContent.classList.add('active');
+    activeContent.style.transform = 'translateX(0)';
+}
+
+// Initialize the first tab
+document.addEventListener('DOMContentLoaded', () => {
+    switchTab('assigned');
+});
+
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablink");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}

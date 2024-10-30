@@ -34,6 +34,7 @@ from src.routes.helper.access_decorators import (
 )
 from src.routes.helper.alert_helper import user_has_access_to_alert, user_id_to_username
 from src.routes.helper.notification_helper import generate_system_notification
+from src.routes.helper.common_helper import award_points
 
 alert_bp = Blueprint("alert", __name__)
 
@@ -302,7 +303,7 @@ def alert_ticket(alert_id):
                         "is_global": False,
                     }
                     generate_system_notification(notification_data, assigned_user_id)
-
+                    award_points('ticket', user_id=assigned_user_id)
                 else:
                     alert.assigned_supervisor_id = assigned_user_id
                     log_message = f"Supervisor {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
@@ -311,6 +312,7 @@ def alert_ticket(alert_id):
                 if form_type == "assign_user":
                     alert.assigned_user_id = None
                     log_message = f"User {user_id_to_username(previous_user_id)} removed from alert ticket by {current_user.username}"
+                    award_points('ticket', reverse=True, user_id=previous_user_id)
                     flash("User removed successfully!", "success")
                 else:
                     alert.assigned_supervisor_id = None

@@ -357,9 +357,9 @@ def api_rules():
     # Return the rules as JSON
     return jsonify(rules)
 
-@app.route("/view_rules", methods=["GET", "POST"])
+@app.route("/alerts/rules", methods=["GET", "POST"])
 @systemguard_enterprise()
-def view_rules():
+def prometheus_rules():
     # Load existing rules from the YAML file
     with open(RULES_FILE_PATH, "r") as file:
         rules = yaml.safe_load(file)
@@ -383,7 +383,7 @@ def view_rules():
                 logger.error(
                     f"Cannot add more rules. You have reached the maximum limit of {max_alert_rules} rules."
                 )
-                return redirect(url_for("view_rules"))
+                return redirect(url_for("prometheus_rules"))
 
             new_rule = {
                 "alert": request.form.get("alert_name"),
@@ -412,7 +412,7 @@ def view_rules():
             requests.post(PROMETHEUS_RELOAD_URL)
 
             flash("Rule added successfully!", "success")
-            return redirect(url_for("view_rules"))
+            return redirect(url_for("prometheus_rules"))
 
         elif action == "edit":
             index = int(request.form.get("index"))
@@ -444,7 +444,7 @@ def view_rules():
             requests.post(PROMETHEUS_RELOAD_URL)
 
             flash("Rule updated successfully!", "success")
-            return redirect(url_for("view_rules"))
+            return redirect(url_for("prometheus_rules"))
 
         elif action == "delete":
             index = int(request.form.get("index"))
@@ -464,7 +464,7 @@ def view_rules():
             requests.post(PROMETHEUS_RELOAD_URL)
 
             flash("Rule deleted successfully!", "success")
-            return redirect(url_for("view_rules"))
+            return redirect(url_for("prometheus_rules"))
 
     return render_template(
         "alerts/view_rules.html", rules=rules, total_rules=total_rules
