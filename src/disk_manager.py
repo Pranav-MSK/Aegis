@@ -133,7 +133,8 @@ class DiskMetrics:
         except Exception as e:
             self._running = False
             raise DiskMetricsError(f"Error updating metrics: {str(e)}")
-            
+
+    @property 
     def get_metrics(self) -> Dict[str, Union[float, str]]:
         """
         Get current disk metrics.

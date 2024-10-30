@@ -147,7 +147,7 @@ class NetworkMetrics:
             raise NetworkMetricsError(f"Error updating metrics: {str(e)}")
     
     @property
-    def metrics(self) -> Dict[str, Union[float, str]]:
+    def get_metrics(self) -> Dict[str, Union[float, str]]:
         """Get all current network metrics."""
         with self._lock:
             return self._metrics.copy()

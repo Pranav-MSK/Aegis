@@ -475,11 +475,11 @@ def retrieve_labels():
 
 @app.route("/api/v1/disk", methods=["GET"])
 def get_disk_usage():
-    disk_info = disk_metrics.get_metrics()
-    print(disk_info)
+    disk_info = disk_metrics.get_metrics
     return jsonify(disk_info)
+
 
 @app.route("/api/v1/network", methods=["GET"])
 def get_network_metrics():
-    network_data = network_metrics.metrics
+    network_data = network_metrics.get_metrics
     return jsonify(network_data)
