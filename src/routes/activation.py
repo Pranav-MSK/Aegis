@@ -3,7 +3,7 @@ import os
 from flask import render_template, request, Blueprint, flash, redirect, url_for, send_file
 from flask_login import login_required
 
-from src.config import app, limiter
+from src.config import app
 from src.activator import (
     calculate_unique_system_id, 
     verify_activation_code, 
@@ -73,7 +73,6 @@ def activation():
 
 @app.route('/download-license', methods=['GET'])
 @login_required
-@limiter.limit("1 per minute", error_message="Only 1 download per minute is allowed.")
 def download_license():
     try:
         systemguard_unique_id = calculate_unique_system_id()

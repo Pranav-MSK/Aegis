@@ -51,10 +51,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 csrf = CSRFProtect(app)
 
-limiter = Limiter(key_func=get_remote_address, app=app)
-cache = Cache(config={'CACHE_TYPE': 'simple'})
-cache.init_app(app)
-
 # systemgaurd plan details
 plan_details = get_plan_details()
 

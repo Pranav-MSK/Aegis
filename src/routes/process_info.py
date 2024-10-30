@@ -117,8 +117,6 @@ def kill_process():
         pid_to_kill = data.get("kill_pid")
         process_name = data.get("process_name")
 
-        print("PID to kill:", pid_to_kill, "Process name:", process_name)
-
         if pid_to_kill and process_name:
             try:
                 # First, try to kill the process normally

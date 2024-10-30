@@ -673,8 +673,6 @@ def show_all_notifications():
             limit=limit,
             offset=offset
         )
-
-        print(notifications)
         
         return jsonify(notifications), 200
     except Exception as e:

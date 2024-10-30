@@ -124,8 +124,6 @@ def award_points(activity_type, reverse=False, user_id=None):
     activity_points_dict = ActivityTable.query.all()
     activity_points_dict = {activity.activity_name: activity.activity_point for activity in activity_points_dict}
 
-    print(activity_points_dict)
-
     # deduct points if reverse is True
     if reverse:
         activity_points_dict = {k: -v for k, v in activity_points_dict.items()}

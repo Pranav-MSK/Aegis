@@ -256,8 +256,6 @@ def get_battery_metrics():
         logger.error(f"Error collecting battery metrics: {e}")
         return {'battery_percent': 0, 'battery_status': "N/A", 'time_remaining': "N/A", 'battery_health': "N/A"}
 
-
-
 def get_top_processes(number=5, combined=False):
     """Get the top processes by memory usage."""
     if combined:
@@ -400,8 +398,8 @@ def fetch_system_metrics():
         'ipv4_connections': ipv4_address,
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
         'os_info': os_info,
-        'region_name': "N/A",
-        'ssl_status': True
+        'region_name': get_region(),
+        'ssl_status': check_ssl_status(domain_name),
     }
     info.update(_collect_metrics())
 

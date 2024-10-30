@@ -6,7 +6,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash
 
 from src.alert_manager import send_smtp_email
-from src.config import app, db, limiter
+from src.config import app, db
 from src.models import (
     UserProfile,
     UserCardSettings,
@@ -29,7 +29,6 @@ def load_user(user_id):
     return UserProfile.query.get(int(user_id))
 
 @app.route("/login", methods=["GET", "POST"])
-@limiter.limit("10 per minute")
 def login():
     if request.method == "POST":
         username = request.form["username"]
