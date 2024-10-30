@@ -304,7 +304,7 @@ def get_instance_metadata():
     metadata = {}
 
     try:
-        print("Fetching instance metadata...")
+        logger.info("Fetching instance metadata")
         # Get a session token for IMDSv2
         token_response = requests.put(
             "http://169.254.169.254/latest/api/token",

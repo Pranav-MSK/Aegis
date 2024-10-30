@@ -162,6 +162,7 @@
                                 system_info.instance_metadata['instance_type'] }}</span>
                         </div>
                         {% endif %}
+                        
                         <!-- <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
                             <i class="fas fa-cloud text-indigo-500 mr-2.5 text-lg"></i>
                             <span class="text-sm font-semibold text-gray-700">Instance Type: {{ instance_type }}</span>
@@ -194,10 +195,13 @@
                                     <i class="fas fa-cog text-lg"></i>
                                 </a>
                             </button>
-                            <!-- <button class="hidden sm:flex items-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                                <i class="fas fa-terminal mr-2.5 text-lg"></i>
-                                <a href="/terminal" class="text-sm font-semibold">Console</a>
-                            </button> -->
+                            <!-- refresh button which call an get request on /api/v1/ec2_metadata -->
+                            <button
+                                class="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:shadow-md"
+                                onclick="fetch('/api/v1/ec2_metadata').then(response => response.json()).then(data => console.log(data)).catch(error => console.error('Error:', error));"
+                                title="Update EC2 Metadata">
+                                <i class="fas fa-sync text-lg"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
