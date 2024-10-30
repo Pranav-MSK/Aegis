@@ -127,8 +127,7 @@ class DiskMetrics:
                         'disk_write_total': format_speed(io_stats.write_bytes),
                         'disk_read_speed': format_speed(io_stats.read_speed),
                         'disk_write_speed': format_speed(io_stats.write_speed)
-                    }
-                
+                    }                
                 initial_io = final_io
                 
         except Exception as e:

@@ -4,9 +4,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-from flask_caching import Cache
+
+from src.disk_manager import DiskMetrics
+from src.network_manager import NetworkMetrics
+
+disk_metrics = DiskMetrics()
+disk_metrics.start()
+network_metrics = NetworkMetrics()
+network_metrics.start()
 
 from src.helper import get_system_node_name, get_ip_address, load_secret_key
 from src.activator import get_plan_details

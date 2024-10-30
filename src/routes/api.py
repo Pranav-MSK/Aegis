@@ -26,6 +26,7 @@ from src.routes.helper.prometheus_helper import (
     load_alert_rules,
     save_alert_rules,
 )
+from src.config import disk_metrics, network_metrics
 
 api_bp = blueprints.Blueprint("api", __name__)
 
@@ -470,3 +471,15 @@ def retrieve_labels():
     response = requests.get("http://localhost:9090/api/v1/label/__name__/values")
     data = response.json().get("data", [])
     return render_template("graphs/labels.html", labels=data)
+
+
+@app.route("/api/v1/disk", methods=["GET"])
+def get_disk_usage():
+    disk_info = disk_metrics.get_metrics()
+    print(disk_info)
+    return jsonify(disk_info)
+
+@app.route("/api/v1/network", methods=["GET"])
+def get_network_metrics():
+    network_data = network_metrics.metrics
+    return jsonify(network_data)
