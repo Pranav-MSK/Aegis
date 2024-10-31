@@ -108,7 +108,6 @@ def check_monthly_alerts():
 
 
 @app.route("/alerts", methods=["POST"])
-@login_required
 @csrf.exempt
 def receive_alerts():
     """
