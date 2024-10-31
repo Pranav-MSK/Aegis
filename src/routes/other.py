@@ -124,7 +124,6 @@ def about():
 @app.route('/os_info', methods=['GET'])
 @login_required
 def show_os_info():
-    # Fetch OS level information
     os_info = get_os_info()
     os_info.update(get_os_release_info())
     
@@ -140,8 +139,6 @@ def terms():
 def privacy():
     return render_template('other/privacy.html')
 
-
-@app.route('/plan')
-def plan():
-    return render_template('other/plan.html')
-
+# @app.route('/plan')
+# def plan():
+#     return render_template('other/plan.html')

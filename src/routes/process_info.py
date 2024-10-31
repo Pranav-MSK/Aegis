@@ -110,6 +110,7 @@ def process():
 
 @app.route("/kill_process", methods=["POST"])
 @csrf.exempt
+@admin_required
 def kill_process():
     sudo_password = session.get("sudo_password", "")
     if request.method == "POST":

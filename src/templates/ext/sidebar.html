@@ -1,49 +1,80 @@
 <aside id="sidebar"
-    class="fixed top-0 left-0 z-40 h-screen w-80 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out bg-gradient-to-b from-gray-50 to-white border-r border-gray-100 shadow-lg flex flex-col">
+    class="fixed top-0 left-0 z-40 h-screen w-80 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white shadow-xl border-r border-gray-100 flex flex-col">
     <!-- Logo Section -->
-    <div class="flex items-center justify-between px-8 py-6 border-b border-gray-100 bg-white backdrop-blur-md">
-        <div class="flex items-center space-x-3">
-            <div class="relative group">
-                <div
-                    class="absolute -inset-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl blur opacity-50 group-hover:opacity-75 transition duration-200">
+    <div class="p-6 bg-gradient-to-br from-blue-800 to-purple-700 text-white shadow-lg ">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <div
+                        class="flex items-center justify-center h-14 w-14 bg-white/30 backdrop-blur-md rounded-full text-white font-bold text-xl shadow-lg">
+                        SG
+                    </div>
+                    <div
+                        class="absolute -bottom-1 -right-1 h-5 w-5 bg-green-500 border-2 border-white rounded-full animate-pulse">
+                    </div>
                 </div>
-                <div
-                    class="relative w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <span class="text-white font-bold text-2xl">S</span>
+                <div class="flex-1">
+                    <a href="{{ url_for('dashboard') }}" class="block">
+                        <h1 class="text-2xl font-extrabold">{{ title }}</h1>
+                        <p class="text-sm text-white/90">Monitoring, Managing, Mastering Security</p>
+                    </a>
                 </div>
             </div>
-            <a href="{{ url_for('dashboard') }}"
-                class="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-700 bg-clip-text text-transparent tracking-tight">{{
-                title }}</a>
+            <button type="button"
+                class="lg:hidden p-2.5 text-white hover:bg-white/20 rounded-lg transition duration-300"
+                onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
-        <button type="button"
-            class="lg:hidden p-2.5 rounded-xl text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-            onclick="toggleSidebar()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
     </div>
 
+
+    <!-- Stats Preview -->
+    <div class="px-6 py-4 bg-gradient-to-b from-purple-100 to-blue-100">
+        <div
+            class="rounded-xl bg-white p-4 shadow-lg border border-blue-200 transition-transform transform hover:scale-105">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Performance Insights</h3>
+                <span class="text-xs text-blue-600 font-medium">Updated Live</span>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="p-4 rounded-lg bg-blue-50 shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div class="text-3xl font-extrabold text-blue-600">100%</div>
+                    <div class="text-sm text-gray-600">Resource Utilization</div>
+                </div>
+                <div class="p-4 rounded-lg bg-green-50 shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div class="text-3xl font-extrabold text-green-600">100%</div>
+                    <div class="text-sm text-gray-600">Operational Efficiency</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto px-6 py-8">
-        <!-- Main Navigation -->
-        <div class="space-y-8">
+    <nav class="flex-1 overflow-y-auto px-4 py-2 ">
+        <div class="space-y-6">
             <!-- Metrics Section -->
             <div>
-                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Metrics</p>
-                <div class="space-y-1.5">
+                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Metrics</p>
+                <div class="space-y-1">
                     <a href="{{ url_for('historical_system_metrics') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'historical_system_metrics' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-chart-line w-5 h-5 mr-2 {% if request.endpoint == 'historical_system_metrics' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'historical_system_metrics' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'historical_system_metrics' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
                         <span class="ml-2">Historical Metrics</span>
                     </a>
                     <a href="{{ url_for('get_summary_metrics') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'get_summary_metrics' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-chart-bar w-5 h-5 mr-2 {% if request.endpoint == 'get_summary_metrics' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'get_summary_metrics' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'get_summary_metrics' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
                         <span class="ml-2">Summary Metrics</span>
                     </a>
                 </div>
@@ -52,25 +83,30 @@
             <!-- System Section -->
             {% if current_user.user_level == 'admin' %}
             <div>
-                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">System</p>
-                <div class="space-y-1.5">
+                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">System</p>
+                <div class="space-y-1">
                     <a href="{{ url_for('configure_targets') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'configure_targets' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-network-wired w-5 h-5 mr-2 {% if request.endpoint == 'configure_targets' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'configure_targets' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'configure_targets' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
                         <span class="ml-2">Configure Target</span>
                     </a>
                     <a href="{{ url_for('show_system_services') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'show_system_services' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-tasks w-5 h-5 mr-2 {% if request.endpoint == 'show_system_services' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'show_system_services' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'show_system_services' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-tasks"></i>
+                        </div>
                         <span class="ml-2">System Process</span>
                     </a>
-                    <!-- {{ url_for('prometheus_rules') }} -->
                     <a href="{{ url_for('prometheus_rules') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'prometheus_rules' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-bell w-5 h-5 mr-2 {% if request.endpoint == 'prometheus_rules' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'prometheus_rules' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'prometheus_rules' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-bell"></i>
+                        </div>
                         <span class="ml-2">Alert Rules</span>
                     </a>
                 </div>
@@ -80,20 +116,23 @@
             <!-- Security Section -->
             {% if current_user.user_level == 'admin' %}
             <div>
-                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Security</p>
-                <div class="space-y-1.5">
+                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Security</p>
+                <div class="space-y-1">
                     <a href="{{ url_for('firewall') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'firewall' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-shield-alt w-5 h-5 mr-2 {% if request.endpoint == 'firewall' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'firewall' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'firewall' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
                         <span class="ml-2">Firewall</span>
                     </a>
                     <a href="{{ url_for('alert_history') }}"
-                        class="relative group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'alert_history' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-bell w-5 h-5 mr-2 {% if request.endpoint == 'alert_history' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'alert_history' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'alert_history' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-bell"></i>
+                        </div>
                         <span class="ml-2">Alert Tracker</span>
-                        <!-- <span class="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-red-100 text-xs font-medium text-red-600">3</span> -->
                     </a>
                 </div>
             </div>
@@ -101,24 +140,30 @@
 
             <!-- Settings Section -->
             <div>
-                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Settings</p>
-                <div class="space-y-1.5">
+                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Settings</p>
+                <div class="space-y-1">
                     <a href="{{ url_for('general_settings') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'general_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-cogs w-5 h-5 mr-2 {% if request.endpoint == 'general_settings' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'general_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'general_settings' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-cogs"></i>
+                        </div>
                         <span class="ml-2">General Settings</span>
                     </a>
                     <a href="{{ url_for('user_settings') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'user_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-user-cog w-5 h-5 mr-2 {% if request.endpoint == 'user_settings' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'user_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'user_settings' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
                         <span class="ml-2">User Settings</span>
                     </a>
                     <a href="{{ url_for('settings') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <i
-                            class="fas fa-cogs w-5 h-5 mr-2 {% if request.endpoint == 'settings' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'settings' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-cogs"></i>
+                        </div>
                         <span class="ml-2">Control Panel</span>
                     </a>
                 </div>
@@ -126,36 +171,31 @@
 
             <!-- Help Section -->
             <div>
-                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">About</p>
-                <div class="space-y-1.5">
+                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">About</p>
+                <div class="space-y-1">
                     <a href="{{ url_for('about') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'about' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'about' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <i
                             class="fas fa-info-circle w-5 h-5 mr-2 {% if request.endpoint == 'about' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
                         <span class="ml-2">About SystemGuard</span>
                     </a>
-                </div>
-
-                <div class="space-y-1.5">
                     <a href="{{ url_for('privacy') }}"
-                        class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'privacy_policy' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'privacy_policy' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <i
                             class="fas fa-lock w-5 h-5 mr-2 {% if request.endpoint == 'privacy_policy' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
                         <span class="ml-2">Privacy Policy</span>
                     </a>
                 </div>
             </div>
-
         </div>
     </nav>
 
     <!-- User Profile -->
     {% if current_user.is_authenticated %}
-    <!-- Main Container -->
-    <div class="relative bg-white shadow-sm rounded-lg">
+    <div class="relative bg-white shadow-sm rounded-lg mt-4">
         <!-- User Profile Section -->
         <div class="p-4 sm:p-6">
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3">
                 <!-- Avatar Section with Gradient Border -->
                 <div class="relative">
                     <div
@@ -171,25 +211,10 @@
 
                 <!-- User Info -->
                 <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-900 truncate">
-                                {{ current_user.first_name | capitalize }} {{ current_user.last_name | capitalize }}
-                            </h3>
-                            <span class="text-xs text-blue-900 truncate">
-                                {{ current_user.email }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Status Badge -->
-                    <!-- <div class="mt-1">
-                        <span
-                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                            <span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-1.5"></span>
-                            Online
-                        </span>
-                    </div> -->
+                    <h3 class="text-sm font-semibold text-gray-900 truncate">
+                        {{ current_user.first_name | capitalize }} {{ current_user.last_name | capitalize }}
+                    </h3>
+                    <span class="text-xs text-blue-900 truncate">{{ current_user.email }}</span>
                 </div>
 
                 <!-- Menu Button and Dropdown -->
@@ -212,16 +237,15 @@
                         <div class="border-t border-gray-100 my-1"></div>
 
                         <a href="{{ url_for('logout') }}"
-                            class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50">
+                            class="group flex items-center px-4 py-2 text-red-700 hover:bg-red-50">
                             <i class="fas fa-sign-out-alt w-5 h-5 mr-3 text-red-400 group-hover:text-red-500"></i>
                             Logout User
                         </a>
 
-
                         {% if current_user.user_level == 'admin' and session.get('sudo_password') %}
                         <form id="shutdown-form">
                             <button type="button" onclick="submitAction('shutdown')"
-                                class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50 w-full text-left">
+                                class="group flex items-center px-4 py-2 text-red-700 hover:bg-red-50 w-full text-left">
                                 <i class="fas fa-power-off w-5 h-5 mr-3 text-red-400 group-hover:text-red-500"></i>
                                 Shutdown Server
                             </button>
@@ -229,7 +253,7 @@
 
                         <form id="reboot-form">
                             <button type="button" onclick="submitAction('reboot')"
-                                class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50 w-full text-left">
+                                class="group flex items-center px-4 py-2 text-red-700 hover:bg-red-50 w-full text-left">
                                 <i class="fas fa-sync-alt w-5 h-5 mr-3 text-red-400 group-hover:text-red-500"></i>
                                 Reboot Server
                             </button>
@@ -244,7 +268,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     {% endif %}
 </aside>

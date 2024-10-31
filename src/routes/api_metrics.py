@@ -3,6 +3,7 @@ from datetime import datetime
 import requests
 import requests
 from flask import render_template, blueprints, jsonify, request
+from flask_login import login_required
 
 from src.config import app
 from src.routes.helper.service_helper import get_running_docker_containers
@@ -134,6 +135,7 @@ def get_available_summary_metrics():
 
 # only for sum and count, don't include the metrics from the bucket
 @app.route('/api/v1/summary/endpoints')
+@login_required
 def get_metrics_list():
     """Get list of available metrics and their endpoints."""
     try:
@@ -172,6 +174,7 @@ def get_metrics_list():
 
 
 @app.route('/api/v1/summary/data')
+@login_required
 def get_metrics_summary():
     """Get summary metrics for specific metric and optional endpoint."""
     try:
@@ -261,16 +264,19 @@ def get_metrics_summary():
 
 
 @app.route('/system/bucket_metrics')
+@login_required
 def get_bucket_metrics():
     return render_template('other/bucket_metrics.html')
 
 
 @app.route('/system/summary_metrics')
+@login_required
 def get_summary_metrics():
     return render_template('other/summary_metrics.html')
 
 
 @app.route('/api/v1/system/containers')
+@login_required
 def fetch_running_docker_containers():
     """Get all system metrics including running daemons and Docker containers"""
     containers = get_running_docker_containers()

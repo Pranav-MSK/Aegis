@@ -34,21 +34,7 @@
             {% if current_user.is_authenticated %}
             {% include 'ext/sidebar.html' %}
             {% else %}
-            <div class="flex flex-col flex-grow bg-white pt-5 pb-4 overflow-y-auto border-r border-gray-200">
-                <div class="px-4 space-y-4">
-                    <div class="flex items-center">
-                        <img class="h-8 w-auto" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-                        <span class="ml-3 text-xl font-medium text-gray-900">Dashboard</span>
-                    </div>
-                    <div class="flex flex-col space-y-2">
-                        <p class="text-gray-600">Please log in to access the dashboard.</p>
-                        <a href="{{ url_for('login') }}"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Log In
-                        </a>
-                    </div>
-                </div>
-            </div>
+            {% include 'ext/sidebar_unauth.html' %}
             {% endif %}
         </div>
 
@@ -72,7 +58,6 @@
                         </svg>
                     </button>
 
-                   
                     <!-- User Menu -->
                     {% if current_user.is_authenticated %}
                     <div class="flex items-center space-x-4">

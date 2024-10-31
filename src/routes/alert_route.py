@@ -37,8 +37,8 @@ from src.routes.helper.common_helper import award_points
 
 alert_bp = Blueprint("alert", __name__)
 
-
 @app.route("/api/v1/check_monthly_alerts")
+@login_required
 def check_monthly_alerts():
     try:
         # Get the first day of current month at midnight (00:00:00)
@@ -108,6 +108,7 @@ def check_monthly_alerts():
 
 
 @app.route("/alerts", methods=["POST"])
+@login_required
 @csrf.exempt
 def receive_alerts():
     """
@@ -142,6 +143,7 @@ def receive_alerts():
 
 
 @app.route("/alerts/test", methods=["GET"])
+@login_required
 @community_edition()
 def test_alert():
     alertmanager_ip = get_ip_address()
@@ -595,6 +597,7 @@ def alert_ticket(alert_id):
 
 @app.route('/api/v1/mark_notification/<int:notification_id>', methods=['POST'])
 @csrf.exempt
+@login_required
 def mark_notification(notification_id):
     user_id = current_user.id
    
@@ -660,6 +663,7 @@ def get_user_notifications(
     return [notification.to_dict() for notification in notifications]
 
 @app.route('/api/v1/notifications/', methods=['GET'])
+@login_required
 def show_all_notifications():
     """API endpoint to retrieve user notifications with optional query parameters."""
     try:
@@ -682,6 +686,7 @@ def show_all_notifications():
         }), 500
 
 @app.route('/api/v1/notifications/<int:notification_id>', methods=['GET'])
+@login_required
 def get_notification(notification_id):
     user_id = current_user.id
     user_notification = UserNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()

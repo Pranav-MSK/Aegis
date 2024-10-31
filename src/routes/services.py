@@ -1,6 +1,7 @@
 # cython: language_level=3
 from flask import render_template, blueprints, jsonify
 from http.client import HTTPException
+from flask_login import login_required
 
 from src.config import app
 from src.routes.helper.service_helper import ServiceMonitor
@@ -8,8 +9,8 @@ from src.routes.helper.common_helper import admin_required
 
 services_bp = blueprints.Blueprint('services', __name__)
 
-
 @app.get("/api/v1/services")
+@login_required
 def fetch_all_running_services():
     """Get all running services."""
     monitor = ServiceMonitor()
@@ -19,7 +20,7 @@ def fetch_all_running_services():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/v1/services/<category>")
-@admin_required
+@login_required
 def get_services_by_category(category: str):
     """Get services for a specific category."""
     try:
@@ -41,6 +42,7 @@ def get_services_by_category(category: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/v1/services/categories")
+@login_required
 def list_service_categories():
     """Get list of available service categories."""
     monitor = ServiceMonitor()
@@ -51,7 +53,7 @@ def list_service_categories():
 
 
 @app.get("/system/services")
-@admin_required
+@login_required
 def show_system_services():
     return render_template('other/services.html')
 

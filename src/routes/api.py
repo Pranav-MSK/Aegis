@@ -443,6 +443,7 @@ def get_retention():
 
 # alert history api
 @app.route("/api/v1/alerts/history", methods=["GET"])
+@login_required
 def alert_history_api():
     try:
         alert_data = AlertTicket.query.all()
@@ -455,6 +456,7 @@ def alert_history_api():
 
 
 @app.route("/api/v1/chart-configurations")
+@login_required
 def get_chart_configurations():
 
     user_id = current_user.id
@@ -467,6 +469,7 @@ def get_chart_configurations():
 
 
 @app.route("/api/v1/labels", methods=["GET"])
+@login_required
 def retrieve_labels():
     response = requests.get("http://localhost:9090/api/v1/label/__name__/values")
     data = response.json().get("data", [])
@@ -474,25 +477,26 @@ def retrieve_labels():
 
 
 @app.route("/api/v1/disk", methods=["GET"])
+@login_required
 def get_disk_usage():
     disk_info = disk_metrics.get_metrics
     return jsonify(disk_info)
 
 
 @app.route("/api/v1/network", methods=["GET"])
+@login_required
 def get_network_metrics():
     network_data = network_metrics.get_metrics
     return jsonify(network_data)
 
 
 @app.route('/api/v1/status', methods=['GET'])
+@login_required
 def get_status():
-    # select random status
-    import random
-    random_status = random.choice(['good', 'normal', 'critical'])
+    # TODO: Implement the status check logic
     status = {
-        "network_status": random_status,
-        "disk_status": random_status,
+        "network_status": 'good',
+        "disk_status": 'good',
         "system_status": "4/5 Services Running",
     }
     return jsonify(status)
