@@ -16,20 +16,9 @@
                     <!-- Left Side -->
                     <div class="flex items-center space-x-3">
                         <!-- Health Status -->
-                        <div
-                            class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm hover:bg-green-100 transition-colors group cursor-pointer">
-                            <div class="h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse"></div>
-                            <span class="ml-2 text-sm font-medium tex   t-green-700 group-hover:text-green-800">All
-                                Systems Operational</span>
-                        </div>
-                        <!-- Uptime Status -->
-                        <div class="hidden sm:flex items-center px-3 py-1.5 bg-blue-50 rounded-full shadow-sm">
-                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                            </svg>
-                            <span class="ml-2 text-sm font-medium text-blue-700">99.9% Uptime</span>
-                        </div>
+                        <div id="system-status"></div>
+                        <div id="network-status"></div>
+                        <div id="disk-status"></div>
                     </div>
 
                     <!-- Right Side -->
@@ -61,30 +50,28 @@
                                 <div
                                     class="rounded-2xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
                                     <!-- Header -->
-                                    <div
+                                    <!-- <div
                                         class="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/80">
                                         <h3 class="text-sm font-semibold text-slate-900">Notifications</h3>
                                         {% if notifications %}
                                         <a href="#" class="text-xs font-medium text-blue-600 hover:text-blue-700">Mark
                                             all as read</a>
                                         {% endif %}
-                                    </div>
+                                    </div> -->
 
                                     <!-- Notifications List -->
                                     <div class="max-h-96 overflow-y-auto" id="notification-container">
                                         <!-- Notifications will be populated here -->
                                     </div>
 
-                                    <!-- Footer -->
-                                    {% if notifications %}
-                                    <!-- TODO: create all notifications link -->
+                                    <!-- {% if notifications %}
                                     <div class="border-t border-slate-100 bg-slate-50/80">
                                         <a href="#"
                                             class="block px-4 py-3 text-sm font-medium text-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors duration-150">
                                             View all notifications
                                         </a>
                                     </div>
-                                    {% endif %}
+                                    {% endif %} -->
                                 </div>
                             </div>
                         </div>
@@ -133,16 +120,14 @@
                             </div>
                             <div class="ml-5">
                                 <div class="flex items-center space-x-3">
-                                    <h2 class="text-xl font-bold text-gray-900">{{ system_info.nodename }}</h2>
-                                    <span
-                                        class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full border border-blue-200">Primary</span>
-                                </div>
-                                {% if system_info.instance_metadata['public_ipv4'] %}
-                                <p class="text-sm text-gray-600 mt-0.5 font-medium">{{
-                                    system_info.instance_metadata['public_ipv4'] }}
+                                    {% if system_info.instance_metadata['public_ipv4'] %}
+                                        <h2 class="text-xl font-bold text-gray-900">{{ system_info.instance_metadata['public_ipv4'] }}</h2>
                                     {% else %}
-                                <p class="text-sm text-gray-600 mt-0.5 font-medium">{{ system_info.ipv4_connections }}
+                                        <h2 class="text-xl font-bold text-gray-900">{{ system_info.ipv4_connections }}</h2>
                                     {% endif %}
+                                    <span class="px-2.5 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full border border-blue-200">Primary</span>
+                                </div>
+                                    <p class="text-sm text-gray-600 mt-0.5 font-medium">{{ system_info.system_username }}@{{system_info.nodename }}
                                 </p>
                             </div>
                         </div>
@@ -150,7 +135,7 @@
                         {% if system_info.instance_metadata['region_name'] %}
                         <div
                             class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                            <i class="fas fa-hdd text-indigo-500 mr-2.5 text-lg"></i>
+                                <i class="fas fa-hdd text-indigo-500 mr-2.5 text-lg"></i>
                             <span class="text-sm font-semibold text-gray-700">Server Region: {{
                                 system_info.instance_metadata['region_name'] }}</span>
                         </div>
@@ -162,27 +147,6 @@
                                 system_info.instance_metadata['instance_type'] }}</span>
                         </div>
                         {% endif %}
-                        
-                        <!-- <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                            <i class="fas fa-cloud text-indigo-500 mr-2.5 text-lg"></i>
-                            <span class="text-sm font-semibold text-gray-700">Instance Type: {{ instance_type }}</span>
-                        </div>
-                        <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                            <i class="fas fa-map-marker-alt text-indigo-500 mr-2.5 text-lg"></i>
-                            <span class="text-sm font-semibold text-gray-700">Availability Zone: {{ availability_zone }}</span>
-                        </div>
-                        <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                            <i class="fas fa-clock text-indigo-500 mr-2.5 text-lg"></i>
-                            <span class="text-sm font-semibold text-gray-700">Launch Time: {{ launch_time }}</span>
-                        </div>
-                        <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                            <i class="fas fa-network-wired text-indigo-500 mr-2.5 text-lg"></i>
-                            <span class="text-sm font-semibold text-gray-700">VPC ID: {{ vpc_id }}</span>
-                        </div>
-                        <div class="flex items-center px-4 py-2 bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
-                            <i class="fas fa-server text-indigo-500 mr-2.5 text-lg"></i>
-                            <span class="text-sm font-semibold text-gray-700">Instance ID: {{ instance_id }}</span>
-                        </div> -->
                     </div>
 
                     <!-- Time and Actions Section -->

@@ -1,4 +1,3 @@
-// Configuration object for chart settings
 const CONFIG = {
   REFRESH_INTERVAL: 1000,
   MAX_DATA_POINTS: 30,
@@ -11,7 +10,11 @@ const CONFIG = {
   API_ENDPOINTS: {
     SYSTEM_INFO: '/api/v1/system-info',
     DASHBOARD_STATS: '/api/v1/dashboard/stats',
-    CONTAINER_INFO_API: '/api/v1/system/containers'
+    CONTAINER_INFO: '/api/v1/system/containers',
+    SERVICES: '/api/v1/services',
+    SERVICE_CATEGORIES: '/api/v1/services/categories',
+    NOTIFICATIONS: '/api/v1/notifications/',
+    STATUS: '/api/v1/status'
   }
 };
 
@@ -285,8 +288,8 @@ class DashboardController {
       'memory-percent': data.memory_percent,
       'memory-used': data.memory_used,
       'current-temp': data.current_temp,
-      'network-received': `${data.network_received}`,
-      'network-sent': `${data.network_sent}`,
+      'network-received': data.network_received,
+      'network-sent': data.network_sent,
       'disk-percent': data.disk_percent,
       'battery-percent': data.battery_percent,
       'battery-status': data.battery_status,
@@ -375,7 +378,6 @@ class DashboardController {
   }
 
   start() {
-    this.updateDashboard(); // Initial update
     setInterval(() => this.updateSystemInfo(), CONFIG.REFRESH_INTERVAL);
     setInterval(() => this.updateDashboard(), 30000);
     setInterval(() => this.callContainerDataAPI(), 30000);
@@ -412,7 +414,7 @@ function getStatusBadgeClass(status) {
 }
 
 // Fetch categories and populate the filter
-fetch('/api/v1/services/categories')
+fetch(CONFIG.API_ENDPOINTS.SERVICE_CATEGORIES)
   .then(response => response.json())
   .then(data => {
     categories = data.categories;
@@ -426,7 +428,8 @@ fetch('/api/v1/services/categories')
 
 // Fetch and display service data
 function fetchServices(category = 'all') {
-  const url = category === 'all' ? '/api/v1/services' : `/api/v1/services/${category}`;
+  // const url = category === 'all' ? '/api/v1/services' : `/api/v1/services/${category}`;
+  const url = category === 'all' ? CONFIG.API_ENDPOINTS.SERVICES : `${CONFIG.API_ENDPOINTS.SERVICES}/${category}`;
   fetch(url)
     .then(response => response.json())
     .then(data => {
@@ -645,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const NotificationSystem = {
   count: 0,
   observers: new Set(),
-  
+
   updateCount(newCount) {
     this.count = newCount;
     this.notifyObservers();
@@ -707,7 +710,7 @@ class ToastMessage {
   show(message, type = 'success', duration = 3000) {
     const toast = this.createToastElement(message, type);
     this.container.appendChild(toast);
-    
+
     // Add entrance animation
     requestAnimationFrame(() => {
       toast.classList.add('toast-enter');
@@ -734,8 +737,8 @@ class ToastMessage {
     const toast = document.createElement('div');
     toast.className = `
       p-4 mb-4 text-sm rounded-lg transform translate-y-2 opacity-0 transition-all duration-300
-      ${type === 'success' 
-        ? 'text-green-700 bg-green-100' 
+      ${type === 'success'
+        ? 'text-green-700 bg-green-100'
         : 'text-red-700 bg-red-100'}
     `;
     toast.innerText = message;
@@ -761,9 +764,9 @@ class NotificationHandler {
 
   async fetchNotifications() {
     try {
-      const response = await fetch('/api/v1/notifications/');
+      const response = await fetch(CONFIG.API_ENDPOINTS.NOTIFICATIONS);
       if (!response.ok) throw new Error('Network response was not ok');
-      
+
       const notifications = await response.json();
       NotificationSystem.updateCount(notifications.length);
       this.renderNotifications(notifications);
@@ -900,9 +903,101 @@ const notificationHandler = new NotificationHandler();
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
   notificationHandler.fetchNotifications();
-  
+
   // Optional: Set up polling for new notifications
   setInterval(() => {
     notificationHandler.fetchNotifications();
   }, 30000); // Poll every 30 seconds
 });
+
+// header status
+async function fetchStatus() {
+  const response = await fetch(CONFIG.API_ENDPOINTS.STATUS);
+  const data = await response.json();
+  updateStatus(data);
+}
+
+function updateStatus(data) {
+  const systemStatus = document.getElementById('system-status');
+  const networkStatus = document.getElementById('network-status');
+  const diskStatus = document.getElementById('disk-status');
+
+  systemStatus.innerHTML = `
+      <div class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
+        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+        <span class="ml-2 text-sm font-medium text-green-700">${data.system_status}</span>
+      </div>`;
+
+  // Network Status
+  let networkStatusHtml = '';
+  switch (data.network_status) {
+    case "good":
+      networkStatusHtml = `
+        <div class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
+            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+            </svg>
+            <span class="ml-2 text-sm font-medium text-green-700">Network Status: Good</span>
+        </div>`;
+      break;
+    case "normal":
+      networkStatusHtml = `
+        <div class="flex items-center px-3 py-1.5 bg-yellow-50 rounded-full shadow-sm">
+            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+            </svg>
+            <span class="ml-2 text-sm font-medium text-yellow-700">Network Status: Normal</span>
+        </div>`;
+      break;
+    case "critical":
+      networkStatusHtml = `
+        <div class="flex items-center px-3 py-1.5 bg-red-50 rounded-full shadow-sm">
+            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+            </svg>
+            <span class="ml-2 text-sm font-medium text-red-700">Network Status: Critical</span>
+        </div>`;
+      break;
+  }
+
+  // Disk Status
+  let diskStatusHtml = '';
+  switch (data.disk_status) {
+    case "good":
+      diskStatusHtml = `
+        <div class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
+            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+            </svg>
+            <span class="ml-2 text-sm font-medium text-green-700">Disk Status: Good</span>
+        </div>`;
+      break;
+    case "normal":
+      diskStatusHtml = `
+        <div class="flex items-center px-3 py-1.5 bg-yellow-50 rounded-full shadow-sm">
+            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+            </svg>
+            <span class="ml-2 text-sm font-medium text-yellow-700">Disk Status: Normal</span>
+        </div>`;
+      break;
+    case "critical":
+      diskStatusHtml = `
+        <div class="flex items-center px-3 py-1.5 bg-red-50 rounded-full shadow-sm">
+            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+            </svg>
+            <span class="ml-2 text-sm font-medium text-red-700">Disk Status: Critical</span>
+        </div>`;
+      break;
+  }
+
+  // Combine and insert HTML
+  networkStatus.innerHTML = networkStatusHtml;
+  diskStatus.innerHTML = diskStatusHtml;
+}
+
+// TODO: need to complete the backend logic
+window.onload = fetchStatus;

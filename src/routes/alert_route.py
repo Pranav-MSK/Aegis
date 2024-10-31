@@ -299,7 +299,7 @@ def alert_ticket(alert_id):
                         "type": "info",
                         "icon": "info-circle",  # Font Awesome icon
                         "title": "Alert Ticket Assignment",
-                        "message": f"Alert ticket assigned to you by {current_user.username}",
+                        "message": f"Alert ticket assigned to you by {current_user.first_name} {current_user.last_name}",
                         "is_global": False,
                     }
                     generate_system_notification(notification_data, assigned_user_id)

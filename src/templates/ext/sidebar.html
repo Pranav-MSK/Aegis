@@ -165,7 +165,8 @@
                         <img src="{{ current_user.get_profile_picture_url() }}" alt="Profile Image"
                             class="h-full w-full object-cover">
                     </div>
-                    <span class="absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-white bg-green-500"></span>
+                    <span
+                        class="absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-white bg-green-500"></span>
                 </div>
 
                 <!-- User Info -->
@@ -213,10 +214,28 @@
                         <a href="{{ url_for('logout') }}"
                             class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50">
                             <i class="fas fa-sign-out-alt w-5 h-5 mr-3 text-red-400 group-hover:text-red-500"></i>
-                            Logout
+                            Logout User
                         </a>
-                    </div>
 
+
+                        {% if current_user.user_level == 'admin' and session.get('sudo_password') %}
+                        <form id="shutdown-form">
+                            <button type="button" onclick="submitAction('shutdown')"
+                                class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50 w-full text-left">
+                                <i class="fas fa-power-off w-5 h-5 mr-3 text-red-400 group-hover:text-red-500"></i>
+                                Shutdown Server
+                            </button>
+                        </form>
+
+                        <form id="reboot-form">
+                            <button type="button" onclick="submitAction('reboot')"
+                                class="group flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50 w-full text-left">
+                                <i class="fas fa-sync-alt w-5 h-5 mr-3 text-red-400 group-hover:text-red-500"></i>
+                                Reboot Server
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
                     <!-- Menu Button -->
                     <button onclick="toggleDropdown()"
                         class="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -254,6 +273,24 @@
             document.getElementById('dropdownMenu').classList.add('hidden');
         }
     });
+
+    async function submitAction(action) {
+        const response = await fetch("{{ url_for('utility_control_api') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ action: action })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            alert(result.error || "An error occurred");
+        } else {
+            alert(result.message || "Action completed successfully");
+        }
+    }
+
 </script>
 
 <!-- Sidebar Overlay -->

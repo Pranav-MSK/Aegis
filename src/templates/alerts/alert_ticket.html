@@ -12,7 +12,7 @@
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="flex items-center justify-between mb-8">
             <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
@@ -66,7 +66,7 @@
                     Mark Info
                 </button>
             </form>
-            
+
             {% if alert.assigned_user_id is none and alert.assigned_supervisor_id != current_user.id %}
             <form action="{{ url_for('alert_ticket', alert_id=alert.id) }}" method="post" class="inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -273,7 +273,7 @@
                     Alert Current Status
                 </h2>
                 <div class="space-y-4">
-                    <div class="grid grid-cols-3 gap-4 items-center">
+                    <!-- <div class="grid grid-cols-3 gap-4 items-center">
                         <span class="text-gray-600 font-medium">Alert Status</span>
                         <span class="col-span-2">
                             <span class="px-3 py-1 rounded-full text-sm font-medium
@@ -287,7 +287,7 @@
                                 {{ alert.alert_status }}
                             </span>
                         </span>
-                    </div>
+                    </div> -->
 
                     <div class="grid grid-cols-3 gap-4 items-center">
                         <span class="text-gray-600 font-medium">Severity</span>
@@ -490,7 +490,7 @@
                     {% endfor %}
                     {% if current_user.user_level == 'admin' %}
                     <div class="grid grid-cols-3 gap-4 items-center">
-                        <span class="text-gray-600 font-medium">Add Custom Field</span>
+                        <span class="text-gray-600 font-medium">Add Remark</span>
                         <span class="col-span-2">
                             <i class="fas fa-plus cursor-pointer text-indigo-600"
                                 onclick="toggleEdit('addCustomField')"></i>
@@ -499,19 +499,17 @@
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="form_type" value="add_customfield">
                                     <div class="space-y-4">
-                                        <label for="field_name" class="block text-sm font-medium text-gray-700">Field
-                                            Name:</label>
+                                        <label for="field_name" class="block text-sm font-medium text-gray-700">Remark Name:</label>
                                         <input type="text" name="field_name"
                                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            placeholder="Custom Field Name" required>
-                                        <label for="field_value" class="block text-sm font-medium text-gray-700">Field
-                                            Value:</label>
+                                            placeholder="Remark Name" required>
+                                        <label for="field_value" class="block text-sm font-medium text-gray-700">Remark Value :</label>
                                         <input type="text" name="field_value"
                                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            placeholder="Custom Field Value" required>
+                                            placeholder="Add your remark here" required>
                                         <button type="submit"
                                             class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-                                            Add Custom Field
+                                            Add Remark
                                         </button>
                                     </div>
                                 </form>
@@ -586,28 +584,28 @@
                             <li>
                                 <div class="relative pb-8">
                                     {% if not loop.last %}
-                                    <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
+                                    <span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-300"
                                         aria-hidden="true"></span>
                                     {% endif %}
                                     <div class="relative flex items-start space-x-3">
                                         <div class="relative">
-                                            <span
-                                                class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-white ring-8 ring-white">
-                                                {{ note.user.first_name[0] if note.user.first_name else note.user.username[0] }}
-                                            </span>
+                                            <div class="rounded-full h-10 w-10 mt-5 ring-2 ring-white overflow-hidden">
+                                                <img src="{{ note.user.get_profile_picture_url() }}" alt="Profile Image"
+                                                    class="h-full w-full object-cover" loading="lazy">
+                                            </div>
                                         </div>
                                         <div class="flex-grow min-w-0">
-                                            <div class="bg-gray-50 rounded-lg px-4 py-3">
+                                            <div class="bg-white rounded-lg px-4 py-3">
                                                 <div class="flex justify-between items-start">
                                                     <div>
                                                         <span class="font-medium text-gray-900">
                                                             {% if note.user.first_name %}
-                                                            {{ note.user.first_name }} {{ note.user.last_name }}
+                                                                {{ note.user.first_name }} {{ note.user.last_name }}
                                                             {% else %}
-                                                            {{ note.user.username }}
+                                                                {{ note.user.username }}
                                                             {% endif %}
                                                         </span>
-                                                        <p class="mt-1 text-gray-600">{{ note.note }}</p>
+                                                        <p class="mt-1 text-gray-500">{{ note.note }}</p>
                                                     </div>
                                                     <span class="text-sm text-gray-500 whitespace-nowrap ml-4">
                                                         {{ note.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
@@ -621,94 +619,98 @@
                             {% endfor %}
                         </ul>
                     </div>
-        
+
                     <!-- Pagination -->
                     <nav class="mt-6 flex justify-center" aria-label="Pagination">
                         <ul class="flex items-center -space-x-px">
                             {% if investigation_notes.has_prev %}
                             <li>
                                 <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.prev_num) }}"
-                                   class="flex items-center justify-center px-4 h-10 rounded-l-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    class="flex items-center justify-center px-4 h-10 rounded-l-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     <span class="sr-only">Previous</span>
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
                                     </svg>
                                 </a>
                             </li>
                             {% endif %}
-                    
+
                             {% if investigation_notes.page > 2 %}
                             <li>
                                 <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=1) }}"
-                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     1
                                 </a>
                             </li>
                             {% if investigation_notes.page > 3 %}
                             <li>
-                                <span class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
+                                <span
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
                                     ...
                                 </span>
                             </li>
                             {% endif %}
                             {% endif %}
-                    
+
                             {% if investigation_notes.page > 1 %}
                             <li>
                                 <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.page-1) }}"
-                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     {{ investigation_notes.page - 1 }}
                                 </a>
                             </li>
                             {% endif %}
-                    
+
                             <!-- Current Page -->
                             <li>
-                                <span class="flex items-center justify-center px-4 h-10 border border-indigo-500 bg-indigo-50 text-indigo-600 font-medium">
+                                <span
+                                    class="flex items-center justify-center px-4 h-10 border border-indigo-500 bg-indigo-50 text-indigo-600 font-medium">
                                     {{ investigation_notes.page }}
                                 </span>
                             </li>
-                    
+
                             {% if investigation_notes.has_next %}
                             <li>
                                 <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.page+1) }}"
-                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     {{ investigation_notes.page + 1 }}
                                 </a>
                             </li>
                             {% endif %}
-                    
-                            {% if investigation_notes.page < investigation_notes.pages - 1 %}
-                            {% if investigation_notes.page < investigation_notes.pages - 2 %}
-                            <li>
-                                <span class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
+
+                            {% if investigation_notes.page < investigation_notes.pages - 1 %} {% if
+                                investigation_notes.page < investigation_notes.pages - 2 %} <li>
+                                <span
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
                                     ...
                                 </span>
-                            </li>
-                            {% endif %}
-                            <li>
-                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.pages) }}"
-                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                                    {{ investigation_notes.pages }}
-                                </a>
-                            </li>
-                            {% endif %}
-                    
-                            {% if investigation_notes.has_next %}
-                            <li>
-                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.next_num) }}"
-                                   class="flex items-center justify-center px-4 h-10 rounded-r-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                                    <span class="sr-only">Next</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                    </svg>
-                                </a>
-                            </li>
-                            {% endif %}
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.pages) }}"
+                                        class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                        {{ investigation_notes.pages }}
+                                    </a>
+                                </li>
+                                {% endif %}
+
+                                {% if investigation_notes.has_next %}
+                                <li>
+                                    <a href="{{ url_for('alert_ticket', alert_id=alert.id, notes_page=investigation_notes.next_num) }}"
+                                        class="flex items-center justify-center px-4 h-10 rounded-r-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                        <span class="sr-only">Next</span>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                </li>
+                                {% endif %}
                         </ul>
                     </nav>
                 </div>
-        
+
                 <!-- Alert Logs Timeline -->
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -727,14 +729,14 @@
                                     <div class="relative flex items-start space-x-3">
                                         <div class="relative">
                                             <div
-                                                class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center ring-8 ring-white">
-                                                <i class="fas fa-bell text-gray-500"></i>
+                                                class="h-8 w-8 mt-2 rounded-full bg-indigo-100 flex items-center justify-center ring-8 ring-white">
+                                                <i class="fas fa-bell text-indigo-600"></i>
                                             </div>
                                         </div>
                                         <div class="flex-grow min-w-0">
-                                            <div class="bg-gray-50 rounded-lg px-4 py-3">
+                                            <div class="bg-white rounded-lg px-4 py-3">
                                                 <div class="flex justify-between items-start">
-                                                    <p class="text-gray-600">{{ log.log }}</p>
+                                                    <p class="text-gray-800">{{ log.log }}</p>
                                                     <span class="text-sm text-gray-500 whitespace-nowrap ml-4">
                                                         {{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
                                                     </span>
@@ -747,97 +749,101 @@
                             {% endfor %}
                         </ul>
                     </div>
-        
+
                     <!-- Pagination -->
                     <nav class="mt-6 flex justify-center" aria-label="Pagination">
                         <ul class="flex items-center -space-x-px">
                             {% if alert_logs.has_prev %}
                             <li>
                                 <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.prev_num) }}"
-                                   class="flex items-center justify-center px-4 h-10 rounded-l-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    class="flex items-center justify-center px-4 h-10 rounded-l-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     <span class="sr-only">Previous</span>
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
                                     </svg>
                                 </a>
                             </li>
                             {% endif %}
-                    
+
                             {% if alert_logs.page > 2 %}
                             <li>
                                 <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=1) }}"
-                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     1
                                 </a>
                             </li>
                             {% if alert_logs.page > 3 %}
                             <li>
-                                <span class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
+                                <span
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
                                     ...
                                 </span>
                             </li>
                             {% endif %}
                             {% endif %}
-                    
+
                             {% if alert_logs.page > 1 %}
                             <li>
                                 <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.page-1) }}"
-                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     {{ alert_logs.page - 1 }}
                                 </a>
                             </li>
                             {% endif %}
-                    
+
                             <!-- Current Page -->
                             <li>
-                                <span class="flex items-center justify-center px-4 h-10 border border-indigo-500 bg-indigo-50 text-indigo-600 font-medium">
+                                <span
+                                    class="flex items-center justify-center px-4 h-10 border border-indigo-500 bg-indigo-50 text-indigo-600 font-medium">
                                     {{ alert_logs.page }}
                                 </span>
                             </li>
-                    
+
                             {% if alert_logs.has_next %}
                             <li>
                                 <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.page+1) }}"
-                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     {{ alert_logs.page + 1 }}
                                 </a>
                             </li>
                             {% endif %}
-                    
-                            {% if alert_logs.page < alert_logs.pages - 1 %}
-                            {% if alert_logs.page < alert_logs.pages - 2 %}
-                            <li>
-                                <span class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
+
+                            {% if alert_logs.page < alert_logs.pages - 1 %} {% if alert_logs.page < alert_logs.pages - 2
+                                %} <li>
+                                <span
+                                    class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700">
                                     ...
                                 </span>
-                            </li>
-                            {% endif %}
-                            <li>
-                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.pages) }}"
-                                   class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                                    {{ alert_logs.pages }}
-                                </a>
-                            </li>
-                            {% endif %}
-                    
-                            {% if alert_logs.has_next %}
-                            <li>
-                                <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.next_num) }}"
-                                   class="flex items-center justify-center px-4 h-10 rounded-r-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                                    <span class="sr-only">Next</span>
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                    </svg>
-                                </a>
-                            </li>
-                            {% endif %}
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.pages) }}"
+                                        class="flex items-center justify-center px-4 h-10 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                        {{ alert_logs.pages }}
+                                    </a>
+                                </li>
+                                {% endif %}
+
+                                {% if alert_logs.has_next %}
+                                <li>
+                                    <a href="{{ url_for('alert_ticket', alert_id=alert.id, logs_page=alert_logs.next_num) }}"
+                                        class="flex items-center justify-center px-4 h-10 rounded-r-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                        <span class="sr-only">Next</span>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                </li>
+                                {% endif %}
                         </ul>
                     </nav>
-                    
+
                 </div>
             </div>
         </div>
-        
+
     </div>
 </div>
 {% endblock %}

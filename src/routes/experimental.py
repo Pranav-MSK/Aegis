@@ -105,10 +105,11 @@ def manage_activities(activity_id=None):
 
 # ec2_metadata.html
 @app.route("/api/v1/ec2_metadata", methods=["GET"])
+@admin_required
 def ec2_metadata():
     instance_data = get_instance_metadata()
-    if not InstanceMetadata.query.first():
-        print("Instance Metadata does not exist, creating...")
+    instance_metadata = InstanceMetadata.query.first()
+    if not instance_metadata:
         instance_metadata = InstanceMetadata(
             ami_id=instance_data.get("ami-id"),
             ami_launch_index=instance_data.get("ami-launch-index"),
@@ -139,8 +140,6 @@ def ec2_metadata():
         )
         instance_metadata.save()
     else:
-        print("Instance Metadata already exists, updating...")
-        instance_metadata = InstanceMetadata.query.first()
         instance_metadata.ami_id = instance_data.get("ami-id")
         instance_metadata.ami_launch_index = instance_data.get("ami-launch-index")
         instance_metadata.ami_manifest_path = instance_data.get("ami-manifest-path")

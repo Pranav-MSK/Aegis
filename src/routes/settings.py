@@ -5,7 +5,7 @@ import datetime
 import subprocess
 from flask import render_template, request, flash, blueprints, redirect, url_for, session
 
-from src.config import app
+from src.config import app, csrf
 from src.models import UserCardSettings, UserDashboardSettings, GeneralSettings, PageToggleSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
@@ -114,6 +114,36 @@ def card_toggles():
         return redirect(url_for('card_toggles'))
     return render_template('settings/card_toggles.html', card_settings=card_settings)
 
+
+@app.route('/api/v1/utility', methods=['POST'])
+@admin_required
+@csrf.exempt
+def utility_control_api():
+    # Retrieve the saved sudo password from session
+    sudo_password = session.get('sudo_password', '')
+    if not sudo_password:
+        return {"error": "Please enter the sudo password to proceed."}, 400
+
+    # Handle action (shutdown or reboot)
+    action = request.json.get('action')
+    if action == 'shutdown':
+        command = ['sudo', '-S', 'shutdown', '-h', 'now']
+        success_message = "Server is shutting down..."
+        error_message = "Failed to shutdown: {}"
+    elif action == 'reboot':
+        command = ['sudo', '-S', 'reboot']
+        success_message = "Server is rebooting..."
+        error_message = "Failed to reboot: {}"
+    else:
+        return {"error": "Invalid action!"}, 400
+
+    # Execute the command
+    try:
+        result = subprocess.run(command, input=sudo_password + '\n', check=True, capture_output=True, text=True)
+        return {"message": success_message, "success": True}
+    
+    except subprocess.CalledProcessError as e:
+        return {"error": error_message.format(e)}, 400
 
 @app.route('/utility', methods=['GET', 'POST'])
 @admin_required

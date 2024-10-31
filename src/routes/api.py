@@ -483,3 +483,16 @@ def get_disk_usage():
 def get_network_metrics():
     network_data = network_metrics.get_metrics
     return jsonify(network_data)
+
+
+@app.route('/api/v1/status', methods=['GET'])
+def get_status():
+    # select random status
+    import random
+    random_status = random.choice(['good', 'normal', 'critical'])
+    status = {
+        "network_status": random_status,
+        "disk_status": random_status,
+        "system_status": "4/5 Services Running",
+    }
+    return jsonify(status)
