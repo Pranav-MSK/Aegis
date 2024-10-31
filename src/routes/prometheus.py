@@ -16,6 +16,7 @@ import requests
 from collections import OrderedDict
 from werkzeug.security import check_password_hash
 from functools import lru_cache
+from flask_login import login_required
 
 from src.config import app, get_app_info
 from src.models import ExternalMonitornig, UserProfile
@@ -85,59 +86,20 @@ def metrics():
     return Response(output, mimetype="text/plain")
 
 
-@app.route("/metrics_")
-def metrics_():
-    output = generate_latest()
-    output = "\n".join(
-        [
-            line
-            for line in output.decode().split("\n")
-            if not line.startswith("#") and line
-        ]
-    )
-    return Response(output, mimetype="text/plain")
+# @app.route("/metrics_")
+# def metrics_():
+#     output = generate_latest()
+#     output = "\n".join(
+#         [
+#             line
+#             for line in output.decode().split("\n")
+#             if not line.startswith("#") and line
+#         ]
+#     )
+#     return Response(output, mimetype="text/plain")
 
 
-# POST request to manage file paths
-@app.route("/external_monitoring", methods=["GET", "POST"])
-@admin_required
-def external_monitoring():
-    if request.method == "POST":
-        file_path = request.form.get("file_path")
-
-        if not os.path.exists(file_path):
-            flash("File path does not exist", "danger")
-            return redirect(url_for("external_monitoring"))
-
-        # Check file path and validity
-        if not is_valid_file(file_path):
-            flash(
-                "Invalid file format. File should have key-value pairs separated by a colon.",
-                "danger",
-            )
-            return redirect(url_for("external_monitoring"))
-
-        # Save into the ExternalMonitoring table
-        new_task = ExternalMonitornig(file_path=file_path)
-        new_task.save()
-
-        return redirect(url_for("external_monitoring"))
-
-    data = ExternalMonitornig.query.all()
-    return render_template("prometheus/external_monitoring.html", data=data)
-
-
-# POST request to delete file path
-@app.route("/external_monitoring/delete_file_path/<int:id>", methods=["POST"])
-@admin_required
-def delete_file_path(id):
-    file_path = ExternalMonitornig.query.get_or_404(id)
-    file_path.delete()
-    flash("File path deleted successfully!", "success")
-    return redirect(url_for("external_monitoring"))
-
-
-@app.route("/configure_targets", methods=["GET", "POST", "PUT", "DELETE"])
+@app.route("/system/targets", methods=["GET", "POST", "PUT", "DELETE"])
 @systemguard_enterprise()
 @admin_required
 def configure_targets():
@@ -311,7 +273,7 @@ def configure_targets():
     )
 
 
-@app.route("/targets/restart_prometheus")
+@app.route("/system/targets/restart_prometheus")
 @admin_required
 def restart_prometheus():
     update_prometheus_container()
@@ -319,16 +281,9 @@ def restart_prometheus():
     return redirect(url_for("configure_targets"))
 
 
-# prometheus active alerts
-@app.route("/active_alerts")
-def active_alerts():
-    try:
-        alerts = retrieve_active_alerts()
-    except Exception as e:
-        alerts = []
-    return render_template("alerts/active_alerts.html", alerts=alerts)
 
 @app.route("/api/v1/alerts/active", methods=["GET"])
+@login_required
 def api_active_alerts():
     try:
         alerts = retrieve_active_alerts()
@@ -336,8 +291,9 @@ def api_active_alerts():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# alertmanager alerts
-@app.route("/show_alerts")
+# alerts
+@app.route("/system/alerts")
+@login_required
 def show_alerts():
     try:
         response = requests.get(f"{ALERTMANAGER_BASE_URL}/api/v2/alerts")
@@ -347,9 +303,21 @@ def show_alerts():
         return render_template("alerts/show_alerts.html", alerts=alerts)
     except requests.exceptions.RequestException as e:
         return f"Error fetching alerts: {str(e)}", 500
+    
+# prometheus active alerts
+@app.route("/system/alerts/active")
+@login_required
+def active_alerts():
+    try:
+        alerts = retrieve_active_alerts()
+    except Exception as e:
+        alerts = []
+    return render_template("alerts/active_alerts.html", alerts=alerts)
 
-@app.route("/api/v1/rules", methods=["GET"])
-def api_rules():
+
+@app.route("/api/v1/system/alerts/rules", methods=["GET"])
+@login_required
+def prometheus_rules_api():
     # Load existing rules from the YAML file
     with open(RULES_FILE_PATH, "r") as file:
         rules = yaml.safe_load(file)
@@ -357,9 +325,9 @@ def api_rules():
     # Return the rules as JSON
     return jsonify(rules)
 
-@app.route("/alerts/rules", methods=["GET", "POST"])
+@app.route("/system/alerts/rules", methods=["GET", "POST"])
 @systemguard_enterprise()
-def prometheus_rules():
+def manage_rules():
     # Load existing rules from the YAML file
     with open(RULES_FILE_PATH, "r") as file:
         rules = yaml.safe_load(file)
@@ -380,7 +348,7 @@ def prometheus_rules():
                 logger.error(
                     f"Cannot add more rules. You have reached the maximum limit of {max_alert_rules} rules."
                 )
-                return redirect(url_for("prometheus_rules"))
+                return redirect(url_for("manage_rules"))
 
             new_rule = {
                 "alert": request.form.get("alert_name"),
@@ -409,7 +377,7 @@ def prometheus_rules():
             requests.post(PROMETHEUS_RELOAD_URL)
 
             flash("Rule added successfully!", "success")
-            return redirect(url_for("prometheus_rules"))
+            return redirect(url_for("manage_rules"))
 
         elif action == "edit":
             index = int(request.form.get("index"))
@@ -441,7 +409,7 @@ def prometheus_rules():
             requests.post(PROMETHEUS_RELOAD_URL)
 
             flash("Rule updated successfully!", "success")
-            return redirect(url_for("prometheus_rules"))
+            return redirect(url_for("manage_rules"))
 
         elif action == "delete":
             index = int(request.form.get("index"))
@@ -461,14 +429,14 @@ def prometheus_rules():
             requests.post(PROMETHEUS_RELOAD_URL)
 
             flash("Rule deleted successfully!", "success")
-            return redirect(url_for("prometheus_rules"))
+            return redirect(url_for("manage_rules"))
 
     return render_template(
         "alerts/view_rules.html", rules=rules, total_rules=total_rules
     )
 
 
-@app.route("/alertmanager/status")
+@app.route("/system/alertmanager/status")
 def alertmanager_status():
     active_alertmanagers = retrieve_active_alertmanagers()
     if active_alertmanagers:

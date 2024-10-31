@@ -81,18 +81,11 @@
             </div>
 
             <!-- System Section -->
-            {% if current_user.user_level == 'admin' %}
+            
             <div>
                 <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">System</p>
                 <div class="space-y-1">
-                    <a href="{{ url_for('configure_targets') }}"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'configure_targets' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <div
-                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'configure_targets' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
-                            <i class="fas fa-network-wired"></i>
-                        </div>
-                        <span class="ml-2">Configure Target</span>
-                    </a>
+                   
                     <a href="{{ url_for('show_system_services') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'show_system_services' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <div
@@ -101,14 +94,7 @@
                         </div>
                         <span class="ml-2">System Process</span>
                     </a>
-                    <a href="{{ url_for('prometheus_rules') }}"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'prometheus_rules' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                        <div
-                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'prometheus_rules' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <span class="ml-2">Alert Rules</span>
-                    </a>
+                    
                     <a href="{{ url_for('alert_history') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'alert_history' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <div
@@ -119,7 +105,6 @@
                     </a>
                 </div>
             </div>
-            {% endif %}
 
             <!-- Security Section -->
             {% if current_user.user_level == 'admin' %}
@@ -142,22 +127,38 @@
             <div>
                 <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Settings</p>
                 <div class="space-y-1">
-                    <a href="{{ url_for('general_settings') }}"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'general_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                    {% if current_user.user_level == 'admin' %}
+                    <a href="{{ url_for('configure_targets') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'configure_targets' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <div
-                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'general_settings' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
-                            <i class="fas fa-cogs"></i>
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'configure_targets' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-network-wired"></i>
                         </div>
-                        <span class="ml-2">General Settings</span>
+                        <span class="ml-2">Configure Target</span>
                     </a>
-                    <a href="{{ url_for('user_settings') }}"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'user_settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                    {% endif %}
+                    {% if current_user.user_level == 'admin' %}
+                    <a href="{{ url_for('manage_rules') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'manage_rules' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <div
-                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'user_settings' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
-                            <i class="fas fa-user-cog"></i>
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'manage_rules' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-bell"></i>
                         </div>
-                        <span class="ml-2">User Settings</span>
+                        <span class="ml-2">Configure Rules</span>
                     </a>
+                    {% endif %}
+                    <!-- activation -->
+                    {% if current_user.user_level == 'admin' %}
+                    <a href="{{ url_for('activation') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'activation' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                        <div
+                            class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'activation' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                            <i class="fas fa-key w-5 h-5 mr-2 {% if request.endpoint == 'activation' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                        </div>
+                        <span class="ml-2">Product Activation</span>
+                    </a>
+                    {% endif %}
+
                     <a href="{{ url_for('settings') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <div

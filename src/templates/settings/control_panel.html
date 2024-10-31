@@ -62,12 +62,12 @@
                             <span class="font-medium">Security Tools</span>
                         </button>
 
-                        <button @click="activeTab = 'settings'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'settings',
+                        <!-- <button @click="activeTab = 'settings'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'settings',
                                     'hover:bg-slate-50': activeTab !== 'settings'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fas fa-cogs w-5"></i>
                             <span class="font-medium">General</span>
-                        </button>
+                        </button> -->
                         {% endif %}
 
                         <button @click="activeTab = 'system'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'system',
@@ -172,14 +172,14 @@
                                 </div>
                                 <span class="font-medium text-gray-700 group-hover:text-purple-700">Edit Profile</span>
                             </a>
-
+<!-- 
                             <a href="{{ url_for('user_settings') }}"
                                 class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-200 hover:bg-purple-50 transition-all group">
                                 <div class="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
                                     <i class="fas fa-user-cog text-purple-600"></i>
                                 </div>
                                 <span class="font-medium text-gray-700 group-hover:text-purple-700">User Settings</span>
-                            </a>
+                            </a> -->
                         </div>
                     </div>
 
@@ -229,12 +229,12 @@
                                 <span class="font-medium text-gray-700 group-hover:text-amber-700">Active Alerts</span>
                             </a>
 
-                            <a href="{{ url_for('prometheus_rules') }}"
+                            <a href="{{ url_for('manage_rules') }}"
                                 class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-amber-200 hover:bg-amber-50 transition-all group">
                                 <div class="p-3 bg-amber-100 rounded-lg group-hover:bg-amber-200 transition-colors">
                                     <i class="fas fa-list text-amber-600"></i>
                                 </div>
-                                <span class="font-medium text-gray-700 group-hover:text-amber-700">View Rules</span>
+                                <span class="font-medium text-gray-700 group-hover:text-amber-700">Manage Alert Rules</span>
                             </a>
 
                             <a href="{{ url_for('alertmanager_status') }}"
@@ -283,13 +283,13 @@
                             <h2 class="text-2xl font-bold text-gray-800">Utilities</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <a href="{{ url_for('terminal') }}"
+                            <!-- <a href="{{ url_for('terminal') }}"
                                 class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
                                 <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
                                     <i class="fas fa-terminal text-emerald-600"></i>
                                 </div>
                                 <span class="font-medium text-gray-700 group-hover:text-emerald-700">Terminal</span>
-                            </a>
+                            </a> -->
 
                             <a href="{{ url_for('utility_control') }}"
                                 class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
@@ -316,13 +316,13 @@
                                 <span class="font-medium text-gray-700 group-hover:text-emerald-700">Speedtest</span>
                             </a>
 
-                            <a href="{{ url_for('monitor_websites') }}"
+                            <!-- <a href="{{ url_for('monitor_websites') }}"
                                 class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
                                 <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
                                     <i class="fas fa-globe text-emerald-600"></i>
                                 </div>
                                 <span class="font-medium text-gray-700 group-hover:text-emerald-700">Ping Website</span>
-                            </a>
+                            </a> -->
                         </div>
                     </div>
 
@@ -355,7 +355,7 @@
                     </div>
 
                     <!-- Settings Section -->
-                    <div x-show="activeTab === 'settings'" class="space-y-6">
+                    <!-- <div x-show="activeTab === 'settings'" class="space-y-6">
                         <div class="flex items-center gap-3 mb-6">
                             <div class="p-3 bg-violet-100 rounded-xl">
                                 <i class="fas fa-cogs text-violet-600 text-xl"></i>
@@ -372,7 +372,7 @@
                                     Settings</span>
                             </a>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- System Info Section -->
                     <div x-show="activeTab === 'system'" class="space-y-6">

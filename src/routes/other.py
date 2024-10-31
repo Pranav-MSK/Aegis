@@ -81,38 +81,10 @@ def send_email_page():
 
     return render_template("other/send_email.html", enable_alerts=enable_alerts)
 
-def fetch_bashrc_variable(variable_name):
-    """
-    Fetch the value of a given environment variable from the ~/.bashrc file.
-
-    Args:
-        variable_name (str): The name of the environment variable to fetch.
-
-    Returns:
-        str: The value of the environment variable if found, otherwise None.
-    """
-    bashrc_path = os.path.expanduser("~/.bashrc")
-    
-    if not os.path.exists(bashrc_path):
-        raise FileNotFoundError(f"{bashrc_path} does not exist")
-
-    with open(bashrc_path, "r") as file:
-        for line in file:
-            # Look for lines that set the variable
-            if line.strip().startswith(f"{variable_name}="):
-                # Extract the variable value
-                parts = line.strip().split('=', 1)
-                if len(parts) == 2:
-                    return parts[1].strip().strip('"').strip("'")
-    
-    return None
 
 @app.route("/about")
 def about():
     installation_info = check_installation_information()
-    # fetch sg_installation_method from .bashrc file
-    sg_installation_method = fetch_bashrc_variable("sg_installation_method")
-    installation_info["sg_installation_method"] = sg_installation_method
     systemguard_unique_id = calculate_unique_system_id()
     session['systemguard_unique_id'] = systemguard_unique_id
     
@@ -138,7 +110,3 @@ def terms():
 @app.route('/privacy')
 def privacy():
     return render_template('other/privacy.html')
-
-# @app.route('/plan')
-# def plan():
-#     return render_template('other/plan.html')

@@ -119,6 +119,9 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                     db.session.add(PageToggleSettings(user_id=user.id))
                     
                     for config in initial_chart_configurations:
+                        # Skip adding production settings if not in production
+                        if config['production'] == False and os.getenv("FLASK_ENV") == "production":
+                            continue
                         new_chart_config = ChartConfiguration(
                             user_id=user.id,
                             metric_name=config['metric_name'],

@@ -83,7 +83,7 @@ def chart_configurations():
 
 
 @app.route("/chart_configurations/<int:id>", methods=["DELETE"])
-@login_required
+@admin_required
 @csrf.exempt
 def delete_chart_configuration(id):
     config = ChartConfiguration.query.get(id)

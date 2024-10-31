@@ -15,7 +15,7 @@ groups:
       description: CPU usage is above 60% for more than 2 minutes
       runbook_url: https://example.com/runbook/high-cpu-usage
       summary: Instance {{ $labels.instance }} high CPU usage.
-    expr: avg by (instance) (cpu_usage_percentage{mode!="idle"}) > 90
+    expr: avg by (instance) (cpu_usage_percentage{mode!="idle"}) > 95
     for: 1m
     labels:
       severity: warning

@@ -139,10 +139,6 @@ def kill_process():
                         timeout=5
                     )
 
-                #  if (data.success) {
-                # showToast(`Successfully terminated process: ${processName}`, 'success');
-                # await fetchServices(); // Refresh the service list
-                
                 if result.returncode == 0:
                     logger.info(f"Killed process '{process_name}' (PID {pid_to_kill}) successfully by user '{current_user.username}' (IP: {request.remote_addr})")
                     return jsonify({"success": True})
