@@ -41,6 +41,8 @@ class UserProfile(BaseModel, UserMixin):
     user_points = db.Column(db.Integer, default=0)
     assign_tickets = db.Column(db.Boolean, default=False)
 
+    # Backref renamed to avoid conflict
+    dashboard_settings = db.relationship('UserDashboardSettings', backref='user', uselist=False)
 
     def __repr__(self):
         return f"<UserProfile {self.username}>"

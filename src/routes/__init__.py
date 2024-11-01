@@ -48,4 +48,6 @@ __all__ = [
     "activation_bp",
     "services_bp",
     "metrics_bp",
+    "middleware_bp",
+    "cmd_bp",
 ]

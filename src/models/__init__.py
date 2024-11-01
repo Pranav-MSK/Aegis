@@ -1,14 +1,10 @@
 # cython: language_level=3
 from src.config import db, app
-from src.models.dashboard_netowrk import DashboardNetworkSettings
 from src.models.user_dashboard_settings import UserDashboardSettings
 from src.models.application_general_settings import GeneralSettings
 from src.models.smtp_configuration import SMTPSettings
 from src.models.network_speed_test_result import NetworkSpeedTestResult
-from src.models.system_information import SystemInformation
 from src.models.user_profile import UserProfile, UserActivity, ActivityTable
-from src.models.monitored_website import MonitoredWebsite
-from src.models.prometheus_model import ExternalMonitornig
 from src.models.notification_settings import NotificationSettings, Notification, UserNotification
 from src.models.alert_data_models import AlertTicket, InvestigationNote, Report, AlertLog, CustomFields
 from src.models.graph_config import ChartConfiguration
@@ -19,7 +15,6 @@ from werkzeug.security import generate_password_hash
 import json
 import os
 
-from src.utils import get_instance_metadata
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Context processor for injecting settings into templates

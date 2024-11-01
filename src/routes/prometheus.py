@@ -19,7 +19,7 @@ from functools import lru_cache
 from flask_login import login_required
 
 from src.config import app, get_app_info
-from src.models import ExternalMonitornig, UserProfile
+from src.models import UserProfile
 from src.utils import ROOT_DIR
 from src.logger import logger
 from src.routes.helper.common_helper import admin_required
@@ -86,17 +86,17 @@ def metrics():
     return Response(output, mimetype="text/plain")
 
 
-# @app.route("/metrics_")
-# def metrics_():
-#     output = generate_latest()
-#     output = "\n".join(
-#         [
-#             line
-#             for line in output.decode().split("\n")
-#             if not line.startswith("#") and line
-#         ]
-#     )
-#     return Response(output, mimetype="text/plain")
+@app.route("/metrics_")
+def metrics_():
+    output = generate_latest()
+    output = "\n".join(
+        [
+            line
+            for line in output.decode().split("\n")
+            if not line.startswith("#") and line
+        ]
+    )
+    return Response(output, mimetype="text/plain")
 
 @app.route("/system/targets", methods=["GET", "POST", "PUT", "DELETE"])
 @systemguard_enterprise()
@@ -266,7 +266,7 @@ def configure_targets():
             return redirect(url_for("configure_targets"))
 
     return render_template(
-        "prometheus/targets.html",
+        "prometheus/system/targets.html",
         targets_info=targets_info,
         total_targets=total_targets
     )

@@ -81,7 +81,6 @@ def dashboard():
     system_info["total_rules"] = calculate_total_rules()
     system_info["active_alertmanagers"] = retrieve_active_alertmanagers()
     instance_metadata = InstanceMetadata.to_dict(InstanceMetadata.query.first())
-    print("Instance Metadata: ", instance_metadata)
     system_info['instance_metadata'] = instance_metadata
     
     return render_template("dashboard/homepage.html", system_info=system_info, current_user=current_user)

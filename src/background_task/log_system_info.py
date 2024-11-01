@@ -7,7 +7,7 @@ from contextlib import contextmanager
 from src.logger import logger
 from src.config import app, db
 from src.utils import _collect_metrics
-from src.models import GeneralSettings, SystemInformation
+from src.models import GeneralSettings
 from src.background_task.prometheus_metrics import metrics
 
 # Constants
