@@ -5,7 +5,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 {% endblock %}
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center px-4 py-8">
+{% include 'ext/message.html' %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white flex items-center justify-center px-4 py-8">
     <div class="w-full max-w-md">
         <div class="bg-white shadow-2xl rounded-2xl border border-gray-200 overflow-hidden transform transition-all duration-300 hover:scale-[1.02]">
             <div class="p-8">
@@ -16,9 +17,6 @@
                     <h2 class="text-3xl font-extrabold text-gray-900">SystemGuard</h2>
                     <p class="text-sm text-gray-600 mt-2">Secure Monitoring & Visualization Platform</p>
                 </div>
-
-                {% include 'ext/message.html' %}
-
                 <form method="post" class="space-y-6" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     

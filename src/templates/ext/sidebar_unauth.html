@@ -24,17 +24,26 @@
                 <span class="text-xs text-blue-600 font-medium">Live Preview</span>
             </div>
             <div class="grid grid-cols-2 gap-6">
-                <div class="p-4 rounded-lg bg-blue-50 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <div class="text-3xl font-extrabold text-blue-600">99.9%</div>
-                    <div class="text-sm text-gray-600">Uptime</div>
-                </div>
                 <div class="p-4 rounded-lg bg-green-50 shadow-md hover:shadow-lg transition-shadow duration-300">
                     <div class="text-3xl font-extrabold text-green-600">24/7</div>
                     <div class="text-sm text-gray-600">Monitoring</div>
                 </div>
+                <div class="p-4 rounded-lg bg-yellow-50 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="text-3xl font-extrabold text-yellow-600 response-time"></div>
+                    <div class="text-sm text-gray-600">Response Time</div>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // update the response time in the response-time div
+        fetch('/health')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.response-time').textContent = data.response_time + 'ms';
+            });
+    </script>
     
     <!-- Auth Section -->
     <div class="px-6 py-4 space-y-4">

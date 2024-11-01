@@ -15,6 +15,6 @@ def health():
         {
             "status": "ok",
             "version": get_app_info().get("version"),
-            "ping": ping_ms
+            "response_time": ping_ms
         }
     )
