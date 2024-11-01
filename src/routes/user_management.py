@@ -101,7 +101,7 @@ def view_users():
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
 @admin_required
-def change_user_settings(username):
+def update_user_profile(username):
     user = UserProfile.query.filter_by(username=username).first_or_404()
 
     if request.method == 'POST':
@@ -127,7 +127,7 @@ def change_user_settings(username):
         flash('User settings updated successfully!', 'success')
         return redirect(url_for('view_users', username=user.username))
 
-    return render_template('users/change_user.html', user=user)
+    return render_template('users/update_user.html', user=user)
 
 @app.route('/delete_user/<username>', methods=['POST'])
 @admin_required

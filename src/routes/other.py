@@ -15,22 +15,6 @@ from src.activator import calculate_unique_system_id
 
 other_bp = blueprints.Blueprint('other', __name__)
 
-@app.route('/terminal', methods=['GET', 'POST'])
-@admin_required
-def terminal():
-    if request.method == 'POST':
-        command = request.form.get('command')
-        if command:
-            try:
-                # Run the command and capture the output
-                output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
-            except subprocess.CalledProcessError as e:
-                # If the command fails, capture the error output
-                output = e.output
-            return jsonify(output=output)
-    return render_template('other/terminal.html')
-
-
 @app.route("/send_email", methods=["GET", "POST"])
 @admin_required
 def send_email_page():

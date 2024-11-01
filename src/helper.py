@@ -38,17 +38,6 @@ def get_basic_system_information():
     }
     return system_info
 
-def get_system_username():
-    """
-    Get the current system username.
-    ---
-    Parameters:
-    ---
-    Returns:
-        str: System username.
-    """
-    return os.getlogin()
-
 def get_system_node_name():
     """ 
     Get the system node name.

@@ -2,60 +2,138 @@
 {% block title %}Login{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<script src="https://cdn.tailwindcss.com"></script>
 {% endblock %}
-
 {% block content %}
-<div class="login-container">
-  <div class="login-card">
-    <h2 class="login-title">Welcome to <span>{{title}}</span></h2>
-    {% include 'ext/message.html' %}
-    
-    <form method="post" class="login-form">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      
-      <div class="form-group">
-        <label for="username">
-          <i class="fas fa-user"></i>Username or Email
-        </label>
-        <input 
-          type="text" 
-          id="username" 
-          name="username" 
-          placeholder="Enter your username or email"
-          autocomplete="username"
-          required
-        >
-      </div>
-      
-      <div class="form-group">
-        <label for="password">
-          <i class="fas fa-lock"></i>Password
-        </label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          placeholder="Enter your password"
-          autocomplete="current-password"
-          required
-        >
-      </div>
-      
-      <div class="form-check">
-        <input type="checkbox" id="remember_me" name="remember_me">
-        <label for="remember_me">Stay signed in</label>
-      </div>
-      
-      <div class="form-group">
-        <button type="submit" class="btn btn-primary">
-          Sign In
-        </button>
-      </div>
-    </form>
-    
-    <p class="signup-link">
-      New here? <a href="{{ url_for('signup') }}">Create an account</a>
-    </p>
-  </div>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-md">
+        <div class="bg-white shadow-2xl rounded-2xl border border-gray-200 overflow-hidden transform transition-all duration-300 hover:scale-[1.02]">
+            <div class="p-8">
+                <div class="text-center mb-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-blue-600 mb-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                    </svg>
+                    <h2 class="text-3xl font-extrabold text-gray-900">SystemGuard</h2>
+                    <p class="text-sm text-gray-600 mt-2">Secure Monitoring & Visualization Platform</p>
+                </div>
+
+                {% include 'ext/message.html' %}
+
+                <form method="post" class="space-y-6" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                                Username or Email
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    placeholder="Enter your username or email"
+                                    autocomplete="username"
+                                    required
+                                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
+                                >
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                                </svg>
+                                Password
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder="Enter your password"
+                                    autocomplete="current-password"
+                                    required
+                                    class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
+                                >
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <button type="button" id="toggle-password" class="text-gray-400 hover:text-blue-600 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                id="remember_me" 
+                                name="remember_me" 
+                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            >
+                            <label for="remember_me" class="ml-2 block text-sm text-gray-700">
+                                Stay signed in
+                            </label>
+                        </div>
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-blue-600 hover:text-blue-500 transition duration-300">
+                                Forgot password?
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button 
+                            type="submit" 
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-[1.02]"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        New here? 
+                        <a href="{{ url_for('signup') }}" class="font-medium text-blue-600 hover:text-blue-500 transition duration-300">
+                            Create an account
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-500">
+                © {{ current_year }} SystemGuard. All rights reserved.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('toggle-password')?.addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+        });
+    </script>
 </div>
 {% endblock %}
