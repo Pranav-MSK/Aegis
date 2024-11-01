@@ -160,7 +160,6 @@
 }
 
 body {
-    background-color: var(--background);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
 }
@@ -1357,17 +1356,11 @@ temp-alert-badge {
     padding: 20px;
     text-align: center;
     color: #888;
-    /* Light gray color for the text */
     font-size: 1.2em;
-    /* Slightly larger font size */
     border: 1px dashed #ccc;
-    /* Dashed border */
     border-radius: 5px;
-    /* Rounded corners */
     background-color: #f9f9f9;
-    /* Light background color */
     margin: 10px;
-    /* Margin around the message */
 }
 
 .metric-selector {

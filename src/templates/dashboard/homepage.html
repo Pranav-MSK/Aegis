@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1"></script>
 {% endblock %}
 {% block title %}{{ title }} | {{ system_info.nodename }} {% endblock %}
 {% block content %}
@@ -864,21 +864,6 @@
             </div>
         </div>
     </div>
-
-    <!-- cpu_usage_core -->
-    <div class="charts-section">
-        <div class="metric-card">
-            <div class="card-header">
-                <h3>CPU Usage Per Core</h3>
-                <span class="refresh-indicator"></span>
-            </div>
-            <div class="card-content" style="height: 450px;">
-                <canvas id="cpu-usage-core"></canvas>
-            </div>
-        </div>
-    </div>
-
-
 </div>
 
 {% endblock %}

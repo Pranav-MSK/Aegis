@@ -17,14 +17,12 @@ from src.utils import get_top_processes
 from src.logger import logger
 from src.routes.helper.common_helper import (
     admin_required,
-    check_page_toggle,
     handle_sudo_password,
 )
 
 process_bp = blueprints.Blueprint("process", __name__)
 
 @app.route("/process", methods=["GET", "POST"])
-@check_page_toggle("is_process_info_enabled")
 @admin_required
 @handle_sudo_password("process")
 @login_required

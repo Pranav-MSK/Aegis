@@ -9,8 +9,6 @@ from src.alert_manager import send_smtp_email
 from src.config import app, db
 from src.models import (
     UserProfile,
-    UserCardSettings,
-    PageToggleSettings,
     UserDashboardSettings,
 )
 from src.utils import render_template_from_file, ROOT_DIR
@@ -182,8 +180,6 @@ def signup():
 
         new_user.save()
         db.session.add(UserDashboardSettings(user_id=new_user.id))
-        db.session.add(UserCardSettings(user_id=new_user.id))
-        db.session.add(PageToggleSettings(user_id=new_user.id))
         db.session.commit()
         flash("Account created successfully, Contact Admin to activate your account", "success")
         logger.info(f"New user {new_user.username} created")

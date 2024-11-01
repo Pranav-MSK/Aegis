@@ -497,6 +497,6 @@ def get_status():
     status = {
         "network_status": 'good',
         "disk_status": 'good',
-        "system_status": "4/5 Services Running",
+        "system_status": "3/5 Services Running",
     }
     return jsonify(status)

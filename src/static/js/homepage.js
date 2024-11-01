@@ -1,6 +1,6 @@
 const CONFIG = {
   REFRESH_INTERVAL: 1000,
-  MAX_DATA_POINTS: 30,
+  MAX_DATA_POINTS: 50,
   CHART_COLORS: {
     CPU: 'rgba(59, 130, 246, 1)',
     MEMORY: 'rgba(16, 185, 129, 1)',
@@ -11,8 +11,8 @@ const CONFIG = {
     SYSTEM_INFO: '/api/v1/system-info',
     DASHBOARD_STATS: '/api/v1/dashboard/stats',
     CONTAINER_INFO: '/api/v1/system/containers',
-    SERVICES: '/api/v1/services',
-    SERVICE_CATEGORIES: '/api/v1/services/categories',
+    SERVICES: '/api/v1/system/services',
+    SERVICE_CATEGORIES: '/api/v1/system/services/categories',
     NOTIFICATIONS: '/api/v1/notifications/',
     STATUS: '/api/v1/status'
   }
@@ -107,7 +107,7 @@ class DashboardController {
     }
 
     // CPU cores chart (initialized when data is received)
-    this.cpuCoresCtx = this.getContext('cpu-usage-core');
+    // this.cpuCoresCtx = this.getContext('cpu-usage-core');
   }
 
   getContext(id) {
@@ -247,14 +247,14 @@ class DashboardController {
       data.current_temp
     ]);
 
-    // Initialize or update CPU cores chart
-    if (!this.charts.get('cpuCores') && this.cpuCoresCtx) {
-      const datasets = this.createCpuCoreDatasets(data.cpu_usage_core.length);
-      this.charts.set('cpuCores', ChartFactory.createChart(this.cpuCoresCtx, 'CPU Usage Core Over Time', datasets));
-    }
-    if (this.charts.get('cpuCores')) {
-      this.updateChartData(this.charts.get('cpuCores'), timestamp, data.cpu_usage_core);
-    }
+    // // Initialize or update CPU cores chart
+    // if (!this.charts.get('cpuCores') && this.cpuCoresCtx) {
+    //   const datasets = this.createCpuCoreDatasets(data.cpu_usage_core.length);
+    //   this.charts.set('cpuCores', ChartFactory.createChart(this.cpuCoresCtx, 'CPU Usage Core Over Time', datasets));
+    // }
+    // if (this.charts.get('cpuCores')) {
+    //   this.updateChartData(this.charts.get('cpuCores'), timestamp, data.cpu_usage_core);
+    // }
   }
 
   createCpuCoreDatasets(cpuCoreCount) {
@@ -381,7 +381,6 @@ class DashboardController {
     setInterval(() => this.updateSystemInfo(), CONFIG.REFRESH_INTERVAL);
     setInterval(() => this.updateDashboard(), 30000);
     setInterval(() => this.callContainerDataAPI(), 30000);
-
   }
 }
 
@@ -428,7 +427,6 @@ fetch(CONFIG.API_ENDPOINTS.SERVICE_CATEGORIES)
 
 // Fetch and display service data
 function fetchServices(category = 'all') {
-  // const url = category === 'all' ? '/api/v1/services' : `/api/v1/services/${category}`;
   const url = category === 'all' ? CONFIG.API_ENDPOINTS.SERVICES : `${CONFIG.API_ENDPOINTS.SERVICES}/${category}`;
   fetch(url)
     .then(response => response.json())
@@ -999,5 +997,8 @@ function updateStatus(data) {
   diskStatus.innerHTML = diskStatusHtml;
 }
 
-// TODO: need to complete the backend logic
-window.onload = fetchStatus;
+// Call fetchStatus every 2 seconds
+window.onload = () => {
+  fetchStatus();
+  setInterval(fetchStatus, 2000);
+};

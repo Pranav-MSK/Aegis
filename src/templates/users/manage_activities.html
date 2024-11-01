@@ -131,7 +131,7 @@
 
     async function editActivity(id) {
         try {
-            const response = await fetch(`/manage_activities/${id}`);
+            const response = await fetch(`/system/activity_list/${id}`);
             if (!response.ok) throw new Error('Failed to fetch activity');
             const activity = await response.json();
             
@@ -152,7 +152,7 @@
         if (!confirm('Are you sure you want to delete this activity?')) return;
         
         try {
-            const response = await fetch(`/manage_activities/${id}`, {
+            const response = await fetch(`/system/activity_list/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -192,7 +192,7 @@
 
         try {
             const method = activityId ? 'PUT' : 'POST';
-            const url = activityId ? `/manage_activities/${activityId}` : '/manage_activities';
+            const url = activityId ? `/system/activity_list/${activityId}` : '/system/activity_list';
             
             if (activityId) formData.id = activityId;
 

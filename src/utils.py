@@ -6,8 +6,6 @@ import datetime
 import subprocess
 import psutil
 import requests
-import ssl
-import socket
 import GPUtil
 import functools
 from jinja2 import Environment, FileSystemLoader
@@ -17,35 +15,23 @@ from functools import lru_cache
 
 from src.logger import logger
 from src.models import GeneralSettings
-from src.helper import get_system_node_name, get_ip_address, get_system_username
+from src.helper import get_basic_system_information, get_ip_address
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 cache = {}
 CACHE_EXPIRATION = 3600
 DIVIDE_BY_1024 = False
-CONVERSION_FACTOR_MB = (1024 ** 2) if DIVIDE_BY_1024 else (1000 ** 2)
-CONVERSION_FACTOR_GB = (1024 ** 3) if DIVIDE_BY_1024 else (1000 ** 3)
+CONVERSION_FACTOR_MB = (1024**2) if DIVIDE_BY_1024 else (1000**2)
+CONVERSION_FACTOR_GB = (1024**3) if DIVIDE_BY_1024 else (1000**3)
 domain_name = "google.com"
 
-def format_uptime(uptime_seconds):
-    """Convert uptime from seconds to a human-readable format."""
-    uptime_seconds = int(uptime_seconds.total_seconds())
-    days, remainder = divmod(uptime_seconds, 86400)
-    hours, remainder = divmod(remainder, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    
-    return {
-        'uptime_days': days,
-        'uptime_hours': hours,
-        'uptime_minutes': minutes,
-        'uptime_seconds': seconds
-    }
-
 def run_speedtest():
-    """ Run a speed test using speedtest-cli."""
+    """Run a speed test using speedtest-cli."""
     try:
-        result = subprocess.run(['speedtest-cli'], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["speedtest-cli"], capture_output=True, text=True, check=True
+        )
         output_lines = result.stdout.splitlines()
         download_speed = upload_speed = ping = None
 
@@ -57,7 +43,12 @@ def run_speedtest():
             elif "Ping:" in line:
                 ping = line.split("Ping: ")[1]
 
-        return {"download_speed": download_speed, "upload_speed": upload_speed, "ping": ping, "status": "Success"}
+        return {
+            "download_speed": download_speed,
+            "upload_speed": upload_speed,
+            "ping": ping,
+            "status": "Success",
+        }
 
     except subprocess.CalledProcessError as e:
         return {"status": "Error", "message": e.stderr}
@@ -65,11 +56,12 @@ def run_speedtest():
     except Exception as e:
         return {"status": "Error", "message": str(e)}
 
+
 def format_speed(speed):
     """Format the speed in appropriate units."""
     if speed < 1000:
         return f"{speed:.2f} Bytes/s"
-    elif speed < 1000 ** 2:
+    elif speed < 1000**2:
         return f"{speed / 1000:.2f} KB/s"
     else:
         return f"{speed / (1000 ** 2):.2f} MB/s"
@@ -79,40 +71,40 @@ def render_template_from_file(template_file_path, **context):
     """Renders a Jinja template from a file with the given context and returns the rendered HTML content."""
     template_dir = os.path.dirname(template_file_path)
     template_file = os.path.basename(template_file_path)
-    
+
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template(template_file)
-    
+
     return template.render(**context)
+
 
 @functools.lru_cache(maxsize=1)
 def get_os_info():
-    return {
-        "operating_system": platform.system(),
-        "kernel_version": platform.release()
-    }
+    return {"operating_system": platform.system(), "kernel_version": platform.release()}
+
 
 @functools.lru_cache(maxsize=1)
 def get_os_release_info():
     """Reads /etc/os-release and returns a dictionary with distribution information."""
     try:
-        with open('/etc/os-release', 'r') as file:
-            os_info = dict(line.strip().split('=', 1) for line in file if '=' in line)
+        with open("/etc/os-release", "r") as file:
+            os_info = dict(line.strip().split("=", 1) for line in file if "=" in line)
         return {
             "os_name": os_info.get("NAME", "").strip('"'),
             "os_version": os_info.get("VERSION_ID", "").strip('"'),
             "os_codename": os_info.get("VERSION_CODENAME", "").strip('"'),
-            "os_full_name": os_info.get("PRETTY_NAME", "").strip('"')
+            "os_full_name": os_info.get("PRETTY_NAME", "").strip('"'),
         }
     except Exception as e:
         logger.error(f"Error reading os-release: {e}")
         return {}
 
+
 @functools.lru_cache(maxsize=1)
 def get_linux_processor_name():
-    """ Get the processor name from /proc/cpuinfo."""
+    """Get the processor name from /proc/cpuinfo."""
     try:
-        with open('/proc/cpuinfo', 'r') as f:
+        with open("/proc/cpuinfo", "r") as f:
             for line in f:
                 if "model name" in line:
                     return line.split(":")[1].strip()
@@ -120,76 +112,90 @@ def get_linux_processor_name():
         logger.error(f"Error reading processor info: {e}")
         return None
 
+
 def get_cached_value(key, fresh_value_func):
-    """ Get a cached value if available and not expired, otherwise get fresh value."""
+    """Get a cached value if available and not expired, otherwise get fresh value."""
     current_time = time.time()
     if key not in cache:
-        cache[key] = {'value': None, 'timestamp': 0}
-    
+        cache[key] = {"value": None, "timestamp": 0}
+
     general_settings = GeneralSettings.query.first()
     enable_cache = general_settings.enable_cache if general_settings else False
 
-    if enable_cache and cache[key]['value'] is not None and (current_time - cache[key]['timestamp'] < CACHE_EXPIRATION):
-        return cache[key]['value']
+    if (
+        enable_cache
+        and cache[key]["value"] is not None
+        and (current_time - cache[key]["timestamp"] < CACHE_EXPIRATION)
+    ):
+        return cache[key]["value"]
 
     fresh_value = fresh_value_func()
-    cache[key]['value'] = fresh_value
-    cache[key]['timestamp'] = current_time
+    cache[key]["value"] = fresh_value
+    cache[key]["timestamp"] = current_time
     return fresh_value
+
 
 def get_cpu_metrics():
     """Collect all CPU-related metrics in one go"""
     cpu_freq = psutil.cpu_freq()
-    temps = psutil.sensors_temperatures().get('coretemp', [None])[0]
+    temps = psutil.sensors_temperatures().get("coretemp", [None])[0]
     return {
-        'cpu_core': psutil.cpu_count(logical=True),
-        'cpu_percent': psutil.cpu_percent(interval=0.1),
-        'cpu_frequency': round(cpu_freq.current) if cpu_freq else 0,
-        'cpu_max_frequency': round(cpu_freq.max) if cpu_freq else 0,
-        'current_temp': getattr(temps, 'current', 0) if temps else 0,
-        'high_temp': getattr(temps, 'high', 0) if temps else 0,
-        'critical_temp': getattr(temps, 'critical', 0) if temps else 0,
-        'cpu_usage_core': [round(x, 2) for x in psutil.cpu_percent(interval=0.1, percpu=True)]
+        "cpu_core": psutil.cpu_count(logical=True),
+        "cpu_percent": psutil.cpu_percent(interval=0.1),
+        "cpu_frequency": round(cpu_freq.current) if cpu_freq else 0,
+        "cpu_max_frequency": round(cpu_freq.max) if cpu_freq else 0,
+        "current_temp": getattr(temps, "current", 0) if temps else 0,
+        "high_temp": getattr(temps, "high", 0) if temps else 0,
+        "critical_temp": getattr(temps, "critical", 0) if temps else 0,
+        "cpu_usage_core": [
+            round(x, 2) for x in psutil.cpu_percent(interval=0.1, percpu=True)
+        ],
     }
 
 
 def get_gpu_metrics():
     """Collect all GPU-related metrics in one go"""
     gpus = GPUtil.getGPUs()
-    
+
     if gpus:
         main_gpu = gpus[0]  # Assuming the first GPU is the main one
         return {
-            'is_gpu': True,
-            'gpu_id': main_gpu.id,
-            'gpu_name': main_gpu.name,
-            'gpu_load': round(main_gpu.load * 100, 2),  # Load in percentage
-            'gpu_memory_total': main_gpu.memoryTotal,
-            'gpu_memory_used': main_gpu.memoryUsed,
-            'gpu_memory_free': main_gpu.memoryFree,
-            'gpu_temperature': main_gpu.temperature,
+            "is_gpu": True,
+            "gpu_id": main_gpu.id,
+            "gpu_name": main_gpu.name,
+            "gpu_load": round(main_gpu.load * 100, 2),  # Load in percentage
+            "gpu_memory_total": main_gpu.memoryTotal,
+            "gpu_memory_used": main_gpu.memoryUsed,
+            "gpu_memory_free": main_gpu.memoryFree,
+            "gpu_temperature": main_gpu.temperature,
         }
+
 
 def get_memory_metrics():
     """Collect all memory-related metrics in one go"""
     memory_info = psutil.virtual_memory()
     return {
-        'memory_percent': round(memory_info.percent, 2),
-        'memory_used': round((memory_info.total - memory_info.available) / CONVERSION_FACTOR_GB, 2),
-        'memory_available': round(memory_info.total / CONVERSION_FACTOR_GB, 1),
-        'dashboard_memory_usage': round(psutil.Process().memory_info().rss / CONVERSION_FACTOR_MB)
+        "memory_percent": round(memory_info.percent, 2),
+        "memory_used": round(
+            (memory_info.total - memory_info.available) / CONVERSION_FACTOR_GB, 2
+        ),
+        "memory_available": round(memory_info.total / CONVERSION_FACTOR_GB, 1),
+        "dashboard_memory_usage": round(
+            psutil.Process().memory_info().rss / CONVERSION_FACTOR_MB
+        ),
     }
+
 
 def get_disk_metrics():
     """Collect all disk-related metrics in one go"""
     # Initial metrics
-    disk_info = psutil.disk_usage('/')
+    disk_info = psutil.disk_usage("/")
 
     return {
-        'disk_percent': round(disk_info.percent, 2),
-        'disk_total': round(disk_info.total / CONVERSION_FACTOR_GB, 1),
-        'disk_used': round(disk_info.used / CONVERSION_FACTOR_GB, 1),
-        'disk_free': round(disk_info.free / CONVERSION_FACTOR_GB, 1),
+        "disk_percent": round(disk_info.percent, 2),
+        "disk_total": round(disk_info.total / CONVERSION_FACTOR_GB, 1),
+        "disk_used": round(disk_info.used / CONVERSION_FACTOR_GB, 1),
+        "disk_free": round(disk_info.free / CONVERSION_FACTOR_GB, 1),
     }
 
 
@@ -198,16 +204,16 @@ def get_network_metrics():
     # Initial metrics
     initial_net_io = psutil.net_io_counters()
     final_net_io = psutil.net_io_counters()
-        
+
     # Calculate upload/download speeds
     upload_speed = final_net_io.bytes_sent - initial_net_io.bytes_sent
     download_speed = final_net_io.bytes_recv - initial_net_io.bytes_recv
 
     return {
-        'network_sent': round(final_net_io.bytes_sent / CONVERSION_FACTOR_MB, 2),
-        'network_received': round(final_net_io.bytes_recv / CONVERSION_FACTOR_MB, 2),
-        'upload_speed': format_speed(upload_speed),
-        'download_speed': format_speed(download_speed),
+        "network_sent": round(final_net_io.bytes_sent / CONVERSION_FACTOR_MB, 2),
+        "network_received": round(final_net_io.bytes_recv / CONVERSION_FACTOR_MB, 2),
+        "upload_speed": format_speed(upload_speed),
+        "download_speed": format_speed(download_speed),
     }
 
 
@@ -225,78 +231,95 @@ def get_battery_metrics():
                 time_remaining_str = f"{hours}h {minutes}m {seconds}s"
 
             return {
-                'battery_percent': round(battery.percent),
-                'battery_status': "Charging" if battery.power_plugged else "Discharging",
-                'battery_time_remaining': time_remaining_str,
-                'battery_health': "Good" if battery.percent > 20 else "Low",
+                "battery_percent": round(battery.percent),
+                "battery_status": (
+                    "Charging" if battery.power_plugged else "Discharging"
+                ),
+                "battery_time_remaining": time_remaining_str,
+                "battery_health": "Good" if battery.percent > 20 else "Low",
             }
         else:
-            return {'battery_percent': 0, 'battery_status': "Not available", 'time_remaining': "N/A", 'battery_health': "N/A"}
+            return {
+                "battery_percent": 0,
+                "battery_status": "Not available",
+                "time_remaining": "N/A",
+                "battery_health": "N/A",
+            }
     except Exception as e:
         logger.error(f"Error collecting battery metrics: {e}")
-        return {'battery_percent': 0, 'battery_status': "N/A", 'time_remaining': "N/A", 'battery_health': "N/A"}
+        return {
+            "battery_percent": 0,
+            "battery_status": "N/A",
+            "time_remaining": "N/A",
+            "battery_health": "N/A",
+        }
+
 
 def get_top_processes(number=5, combined=False):
     """Get the top processes by memory usage."""
     if combined:
-        combined_processes = defaultdict(lambda: {'cpu_percent': 0, 'memory_percent': 0, 'pid': None})
+        combined_processes = defaultdict(
+            lambda: {"cpu_percent": 0, "memory_percent": 0, "pid": None}
+        )
 
-        for p in psutil.process_iter(['name', 'cpu_percent', 'memory_percent', 'pid']):
+        for p in psutil.process_iter(["name", "cpu_percent", "memory_percent", "pid"]):
             try:
-                name = p.info['name'].title()
+                name = p.info["name"].title()
                 pinfo = p.info
-                if pinfo['memory_percent'] > combined_processes[name]['memory_percent']:
+                if pinfo["memory_percent"] > combined_processes[name]["memory_percent"]:
                     combined_processes[name] = {
-                        'cpu_percent': pinfo['cpu_percent'] or 0,
-                        'memory_percent': pinfo['memory_percent'] or 0,
-                        'pid': pinfo['pid']
+                        "cpu_percent": pinfo["cpu_percent"] or 0,
+                        "memory_percent": pinfo["memory_percent"] or 0,
+                        "pid": pinfo["pid"],
                     }
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 continue
 
         processes = sorted(
-            [(name, info['cpu_percent'], round(info['memory_percent'], 2), info['pid'])
-             for name, info in combined_processes.items()],
+            [
+                (
+                    name,
+                    info["cpu_percent"],
+                    round(info["memory_percent"], 2),
+                    info["pid"],
+                )
+                for name, info in combined_processes.items()
+            ],
             key=lambda x: x[2],
-            reverse=True
+            reverse=True,
         )[:number]
     else:
         processes = [
-            (p.info['name'].title(), p.info['cpu_percent'], round(p.info['memory_percent'], 2), p.info['pid'])
+            (
+                p.info["name"].title(),
+                p.info["cpu_percent"],
+                round(p.info["memory_percent"], 2),
+                p.info["pid"],
+            )
             for p in sorted(
-                psutil.process_iter(['name', 'cpu_percent', 'memory_percent', 'pid']),
-                key=lambda p: p.info['memory_percent'],
-                reverse=True
+                psutil.process_iter(["name", "cpu_percent", "memory_percent", "pid"]),
+                key=lambda p: p.info["memory_percent"],
+                reverse=True,
             )[:number]
         ]
 
     return processes
 
+
 def get_process_metrics(num_processes=12):
     """Collect process metrics with optimized collection"""
     try:
-        return {'top_processes': get_top_processes(number=num_processes, combined=True)}
+        return {"top_processes": get_top_processes(number=num_processes, combined=True)}
     except Exception as e:
         logger.error(f"Error collecting process metrics: {e}")
-        return {'top_processes': []}
+        return {"top_processes": []}
 
-def get_running_daemons():
-    """Get the list of running daemons on the system."""
-    try:
-        daemons = []
-        for proc in psutil.process_iter(['name', 'cmdline']):
-            if proc.info['cmdline'] and 'python' in proc.info['cmdline'][0]:
-                daemons.append(proc.info['cmdline'][1])
-        return daemons
-    except Exception as e:
-        logger.error(f"Error collecting running daemons: {e}")
-        return []
 
 @lru_cache(maxsize=1)
 def get_instance_metadata():
     """
     Retrieve all available metadata about the current EC2 instance.
-    
+
     Returns:
         dict: A dictionary containing all instance metadata.
     """
@@ -308,7 +331,9 @@ def get_instance_metadata():
         # Get a session token for IMDSv2
         token_response = requests.put(
             "http://169.254.169.254/latest/api/token",
-            headers={"X-aws-ec2-metadata-token-ttl-seconds": "21600"}  # Token valid for 6 hours
+            headers={
+                "X-aws-ec2-metadata-token-ttl-seconds": "21600"
+            },  # Token valid for 6 hours
         )
         token_response.raise_for_status()
         token = token_response.text
@@ -323,54 +348,29 @@ def get_instance_metadata():
         for key in keys:
             # Fetch each piece of metadata
             full_url = f"{base_url}{key}"
-            value_response = requests.get(full_url, headers={"X-aws-ec2-metadata-token": token})
+            value_response = requests.get(
+                full_url, headers={"X-aws-ec2-metadata-token": token}
+            )
             metadata[key] = value_response.text
-        
+
         return metadata
-    
+
     except requests.RequestException as e:
         print(f"Error fetching instance metadata: {e}")
         return {}
-   
-#     return {
-#     "ami-id": "ami-0dee22c13ea7a9a67",
-#     "ami-launch-index": "0",
-#     "ami-manifest-path": "(unknown)",
-#     "block-device-mapping/": "ami\nephemeral0\nephemeral1\nroot",
-#     "events/": "maintenance/",
-#     "hostname": "ip-172-31-8-110.ap-south-1.compute.internal",
-#     "identity-credentials/": "ec2/",
-#     "instance-action": "none",
-#     "instance-id": "i-0e507e5d61d61e934",
-#     "instance-life-cycle": "on-demand",
-#     "instance-type": "t2.micro",
-#     "local-hostname": "ip-172-31-8-110.ap-south-1.compute.internal",
-#     "local-ipv4": "172.31.8.110",
-#     "mac": "0a:5e:96:cf:af:03",
-#     "metrics/": "vhostmd",
-#     "network/": "interfaces/",
-#     "placement/": "availability-zone\navailability-zone-id\nregion",
-#     "profile": "default-hvm",
-#     "public-hostname": "ec2-3-109-200-174.ap-south-1.compute.amazonaws.com",
-#     "public-ipv4": "3.109.200.174",
-#     "public-keys/": "0=sec_key_south",
-#     "reservation-id": "r-0c3490ac8ce97f43a",
-#     "security-groups": "launch-wizard-1",
-#     "services/": "domain\npartition",
-#     "system": "xen-on-nitro"
-# }
+
 
 def _collect_metrics():
     """Optimized system information collection using parallel processing"""
     try:
         with ThreadPoolExecutor(max_workers=7) as executor:
             futures = {
-                'cpu': executor.submit(get_cpu_metrics),
-                'memory': executor.submit(get_memory_metrics),
-                'disk': executor.submit(get_disk_metrics),
-                'network': executor.submit(get_network_metrics),
-                'battery': executor.submit(get_battery_metrics),
-                'processes': executor.submit(get_process_metrics)
+                "cpu": executor.submit(get_cpu_metrics),
+                "memory": executor.submit(get_memory_metrics),
+                "disk": executor.submit(get_disk_metrics),
+                "network": executor.submit(get_network_metrics),
+                "battery": executor.submit(get_battery_metrics),
+                "processes": executor.submit(get_process_metrics),
             }
 
             results = {}
@@ -380,36 +380,33 @@ def _collect_metrics():
                 except Exception as e:
                     logger.error(f"Error collecting {key} metrics: {e}")
 
-        results['timestamp'] = datetime.datetime.now()
-        results['process_count'] = len(psutil.pids())
-    
+        results["timestamp"] = datetime.datetime.now()
+        results["process_count"] = len(psutil.pids())
+
         return results
 
     except Exception as e:
         logger.error(f"Error in _collect_metrics: {e}")
         return {}
 
+
 def fetch_system_metrics():
-    """ Get system information with caching for certain values and fresh data for others."""
-    system_username = get_cached_value('system_username', get_system_username)
-    nodename = get_cached_value('nodename', get_system_node_name)
-    boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
-    current_server_time = datetime.datetime.now()
+    """Get system information with caching for certain values and fresh data for others."""
+    boot_time = get_cached_value(
+        "boot_time", lambda: datetime.datetime.fromtimestamp(psutil.boot_time())
+    )
     ipv4_address = get_ip_address()
-    os_info = get_cached_value('os_info', get_os_info)
-    os_info.update(get_cached_value('os_release_info', get_os_release_info))
-    
+    os_info = get_cached_value("os_info", get_os_info)
+    os_info.update(get_cached_value("os_release_info", get_os_release_info))
+
     info = {
-        "system_username": system_username,
-        'nodename': nodename,
-        'processor_name': get_linux_processor_name(),
-        'boot_time': boot_time.strftime("%Y-%m-%d %H:%M:%S"),
-        'swap_memory': psutil.swap_memory().percent,
-        'ipv4_connections': ipv4_address,
-        'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
-        'os_info': os_info,
-        'instance_metadata': "",
+        "processor_name": get_linux_processor_name(),
+        "boot_time": boot_time.strftime("%Y-%m-%d %H:%M:%S"),
+        "swap_memory": psutil.swap_memory().percent,
+        "ipv4_connections": ipv4_address,
+        "os_info": os_info,
     }
     info.update(_collect_metrics())
+    info.update(get_basic_system_information())
 
     return info

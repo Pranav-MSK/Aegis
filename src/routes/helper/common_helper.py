@@ -5,7 +5,7 @@ from functools import wraps
 from flask_login import current_user
 from flask import flash, redirect, url_for, render_template, request, session
 
-from src.models import UserProfile, PageToggleSettings, UserActivity, ActivityTable
+from src.models import UserProfile, UserActivity, ActivityTable
 from src.config import app
 
 
@@ -62,22 +62,6 @@ def check_sudo_password(sudo_password):
         # Log any exception that occurs while validating the sudo password
         return False, str(e)
     
-
-def check_page_toggle(setting_name):
-    """ Decorator to check if a page toggle setting is enabled. 
-    If the setting is enabled, the page is rendered.
-    Otherwise, a 403 error page is rendered.
-    """
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            page_toggles_settings = PageToggleSettings.query.first()
-            if not getattr(page_toggles_settings, setting_name, False):
-                flash("You do not have permission to view this page.", "danger")
-                return render_template("error/403.html")
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
 
 def reset_sudo_timestamp():
     """

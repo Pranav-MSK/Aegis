@@ -6,7 +6,7 @@ import subprocess
 from flask import render_template, request, flash, blueprints, redirect, url_for, session
 
 from src.config import app, csrf
-from src.models import UserCardSettings, UserDashboardSettings, GeneralSettings, PageToggleSettings
+from src.models import UserDashboardSettings, GeneralSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
 from src.alert_manager import send_smtp_email
@@ -74,45 +74,6 @@ def general_settings():
         return redirect(url_for('general_settings'))
 
     return render_template('settings/general_settings.html', general_settings=general_settings)
-
-@app.route('/control_panel/page-toggles', methods=['GET', 'POST'])
-@login_required
-def feature_toggles():
-    page_toggles_settings = PageToggleSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
-    if request.method == 'POST':
-        # is_dashboard_network_enabled
-        page_toggles_settings.is_dashboard_network_enabled = 'is_dashboard_network_enabled' in request.form
-        page_toggles_settings.is_cpu_info_enabled = 'is_cpu_info_enabled' in request.form
-        page_toggles_settings.is_memory_info_enabled = 'is_memory_info_enabled' in request.form
-        page_toggles_settings.is_disk_info_enabled = 'is_disk_info_enabled' in request.form
-        page_toggles_settings.is_network_info_enabled = 'is_network_info_enabled' in request.form
-        page_toggles_settings.is_process_info_enabled = 'is_process_info_enabled' in request.form
-        page_toggles_settings.save()
-        flash('Feature toggles updated successfully!', 'success')
-        return redirect(url_for('feature_toggles'))
-    return render_template('settings/page_toggles.html', page_toggles_settings=page_toggles_settings)
-
-@app.route('/control_panel/card-toggles', methods=['GET', 'POST'])
-@login_required
-def card_toggles():
-    card_settings = UserCardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
-    if request.method == 'POST':
-        card_settings.is_user_card_enabled = 'is_user_card_enabled' in request.form
-        card_settings.is_server_card_enabled = 'is_server_card_enabled' in request.form
-        card_settings.is_battery_card_enabled = 'is_battery_card_enabled' in request.form
-        card_settings.is_cpu_core_card_enabled = 'is_cpu_core_card_enabled' in request.form
-        card_settings.is_cpu_usage_card_enabled = 'is_cpu_usage_card_enabled' in request.form
-        card_settings.is_cpu_temp_card_enabled = 'is_cpu_temp_card_enabled' in request.form
-        card_settings.is_dashboard_memory_card_enabled = 'is_dashboard_memory_card_enabled' in request.form
-        card_settings.is_memory_usage_card_enabled = 'is_memory_usage_card_enabled' in request.form
-        card_settings.is_disk_usage_card_enabled = 'is_disk_usage_card_enabled' in request.form
-        card_settings.is_system_uptime_card_enabled = 'is_system_uptime_card_enabled' in request.form
-        card_settings.is_network_statistic_card_enabled = 'is_network_statistic_card_enabled' in request.form
-        card_settings.is_speedtest_enabled = 'is_speedtest_enabled' in request.form
-        card_settings.save()
-        flash('Card toggles updated successfully!', 'success')
-        return redirect(url_for('card_toggles'))
-    return render_template('settings/card_toggles.html', card_settings=card_settings)
 
 
 @app.route('/api/v1/utility', methods=['POST'])

@@ -98,7 +98,6 @@ def metrics():
 #     )
 #     return Response(output, mimetype="text/plain")
 
-
 @app.route("/system/targets", methods=["GET", "POST", "PUT", "DELETE"])
 @systemguard_enterprise()
 @admin_required

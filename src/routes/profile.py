@@ -3,9 +3,10 @@ import random
 import string
 import hashlib
 from datetime import datetime
-from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints
+from sqlalchemy import desc
+from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints, jsonify
 from flask_login import login_required, current_user
-from src.models import AlertTicket
+from src.models import AlertTicket, UserProfile, UserActivity
 from werkzeug.security import generate_password_hash, check_password_hash
 from src.routes.helper.notification_helper import generate_system_notification
 from src.routes.helper.common_helper import log_activity
@@ -161,3 +162,33 @@ def delete_user_self():
 
     flash('Your account has been deleted.', 'success')
     return redirect(url_for('login'))
+
+# API Routes
+@app.route("/api/v1/recent_activity", methods=["GET"])
+@login_required
+def get_activities():
+    """Get user's recent activities"""
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+
+    user_points = UserProfile.query.get(current_user.id).user_points
+
+    activities = (
+        UserActivity.query.filter_by(user_id=current_user.id)
+        .order_by(desc(UserActivity.created_at))
+        .paginate(page=page, per_page=per_page)
+    )
+
+    return (
+        jsonify(
+            {
+                "activities": [activity.to_dict() for activity in activities.items],
+                "total": activities.total,
+                "pages": activities.pages,
+                "current_page": activities.page,
+                "user_points": user_points,
+            }
+        ),
+        200,
+    )
+

@@ -1,12 +1,12 @@
 # cython: language_level=3
 import os
 import datetime
-from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints
+from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints, jsonify
 from flask_login import current_user
 from werkzeug.security import generate_password_hash
 
-from src.config import app, db, get_app_info
-from src.models import UserProfile, UserDashboardSettings, UserCardSettings, PageToggleSettings
+from src.config import app, db, get_app_info, csrf
+from src.models import UserProfile, UserDashboardSettings, ActivityTable
 from src.utils import render_template_from_file, ROOT_DIR
 from src.alert_manager import send_smtp_email
 from src.routes.helper.common_helper import get_email_addresses
@@ -85,8 +85,6 @@ def create_user():
         
         # Now you can use the new user's ID to create related settings
         db.session.add(UserDashboardSettings(user_id=new_user.id))
-        db.session.add(UserCardSettings(user_id=new_user.id))
-        db.session.add(PageToggleSettings(user_id=new_user.id))
         
         new_user.save()
 
@@ -98,7 +96,6 @@ def create_user():
 @app.route('/users')
 @admin_required
 def view_users():
-
     users = UserProfile.query.all()
     return render_template('users/view_users.html', users=users)
 
@@ -154,3 +151,68 @@ def delete_user(username):
     flash(f'User {username} has been deleted successfully!', 'success')
     return redirect(url_for('view_users'))
 
+@app.route("/system/activity_list", methods=["GET", "POST"])
+@app.route("/system/activity_list/<int:activity_id>", methods=["GET", "PUT", "DELETE"])
+@csrf.exempt
+@admin_required
+def manage_activities(activity_id=None):
+    """ Manage Predefined Activities and points """
+    try:
+        if request.method == "GET":
+            if activity_id:
+                # Get single activity
+                activity = ActivityTable.query.get_or_404(activity_id)
+                return jsonify(
+                    {
+                        "id": activity.id,
+                        "activity_name": activity.activity_name,
+                        "activity_point": activity.activity_point,
+                        "activity_description": activity.activity_description,
+                    }
+                )
+            else:
+                # Get all activities
+                activities = ActivityTable.query.all()
+                return render_template(
+                    "users/manage_activities.html", activities=activities
+                )
+
+        elif request.method == "POST":
+            data = request.get_json()
+            new_activity = ActivityTable(
+                activity_name=data["activity_name"],
+                activity_point=data["activity_point"],
+                activity_description=data["activity_description"],
+            )
+            new_activity.save()
+            logger.info(f"new activity added: {new_activity} by {current_user.first_name}(email: {current_user.email})")
+            return (
+                jsonify({"message": "Activity added successfully!", "success": True}),
+                201,
+            )
+
+        elif request.method == "PUT":
+            activity = ActivityTable.query.get_or_404(activity_id)
+            data = request.get_json()
+
+            activity.activity_name = data["activity_name"]
+            activity.activity_point = data["activity_point"]
+            activity.activity_description = data["activity_description"]
+            activity.save()
+            logger.info(f"activity updated: {activity} by {current_user.first_name}(email: {current_user.email})")
+            return jsonify(
+                {"message": "Activity updated successfully!", "success": True}
+            )
+
+        elif request.method == "DELETE":
+            activity = ActivityTable.query.get_or_404(activity_id)
+            activity.delete()
+            logger.info(f"activity deleted: {activity} by {current_user.first_name}(email: {current_user.email})")
+            return jsonify(
+                {"message": "Activity deleted successfully!", "success": True}
+            )
+
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error in manage_activities: {str(e)}")
+        return jsonify({"message": str(e), "success": False}), 400

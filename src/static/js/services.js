@@ -71,7 +71,7 @@ function displayServices() {
 
 async function fetchServices() {
     try {
-        const url = state.category === 'all' ? '/api/v1/services' : `/api/v1/services/${state.category}`;
+        const url = state.category === 'all' ? '/api/v1/system/services' : `/api/v1/system/services/${state.category}`;
         const response = await fetch(url);
         state.serviceData = await response.json();
         state.filteredServices = state.category === 'all' 

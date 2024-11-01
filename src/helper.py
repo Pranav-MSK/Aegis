@@ -2,6 +2,8 @@
 import os
 import ctypes
 import subprocess
+from functools import lru_cache
+
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(CURR_DIR)
@@ -19,6 +21,22 @@ def retrieve_obfuscated_key(key_name):
     library.get_obfuscated_key.restype = ctypes.c_char_p
     obfuscated_key = library.get_obfuscated_key()
     return obfuscated_key.decode()
+
+@lru_cache(maxsize=128)
+def get_basic_system_information():
+    """
+    Get basic system information.
+    ---
+    Parameters:
+    ---
+    Returns:
+        dict: Basic system information.
+    """
+    system_info = {
+        "system_username": os.getlogin(),
+        "nodename": os.uname().nodename,
+    }
+    return system_info
 
 def get_system_username():
     """

@@ -6,9 +6,9 @@ from http.client import HTTPException
 import psutil
 from typing import Dict, List, Any, Union
 import docker
-import traceback
 from src.utils import ROOT_DIR
 from src.logger import logger
+from humanize import naturalsize, naturaltime
 
 # Type aliases
 ContainerMetrics = Dict[str, Any]
@@ -30,6 +30,7 @@ class ServiceMonitor:
 
     def get_process_info(self, proc: psutil.Process) -> Dict[str, Any]:
         """Get relevant information about a process."""
+
         try:
             with proc.oneshot():
                 created_time = datetime.fromtimestamp(proc.create_time())
@@ -45,7 +46,7 @@ class ServiceMonitor:
                     "ports": self.get_process_ports(proc),
                     "created_time": created_time.isoformat(),
                     "uptime_seconds": int(uptime.total_seconds()),
-                    "uptime_human": self.format_uptime(uptime),
+                    "uptime_human": naturaltime(uptime),
                 }
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             return {}
@@ -112,20 +113,6 @@ class ServiceMonitor:
             )
 
         return {"timestamp": timestamp, "services": services, "summary": summary}
-
-    @staticmethod
-    def format_uptime(uptime) -> str:
-        """Format uptime duration to readable string."""
-        days = uptime.days
-        hours, remainder = divmod(uptime.seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-
-        if days > 0:
-            return f"{days}d {hours}h {minutes}m"
-        elif hours > 0:
-            return f"{hours}h {minutes}m"
-        else:
-            return f"{minutes}m {seconds}s"
 
 # ------------------------------------------------------------------------------------------------------------------------
 # docker container helper

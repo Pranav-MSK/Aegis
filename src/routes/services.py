@@ -9,7 +9,7 @@ from src.routes.helper.common_helper import admin_required
 
 services_bp = blueprints.Blueprint('services', __name__)
 
-@app.get("/api/v1/services")
+@app.get("/api/v1/system/services")
 @login_required
 def fetch_all_running_services():
     """Get all running services."""
@@ -19,7 +19,7 @@ def fetch_all_running_services():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/v1/services/<category>")
+@app.get("/api/v1/system/services/<category>")
 @login_required
 def get_services_by_category(category: str):
     """Get services for a specific category."""
@@ -41,7 +41,7 @@ def get_services_by_category(category: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/v1/services/categories")
+@app.get("/api/v1/system/services/categories")
 @login_required
 def list_service_categories():
     """Get list of available service categories."""

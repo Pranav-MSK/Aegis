@@ -117,7 +117,7 @@ function updateScore(user_points) {
 
 // Recent UserActivity Feed
 async function fetchActivities(page = 1, perPage = 10) {
-  const response = await fetch(`/api/v1/activities?page=${page}&per_page=${perPage}`);
+  const response = await fetch(`/api/v1/recent_activity?page=${page}&per_page=${perPage}`);
   const data = await response.json();
   return data;
 }

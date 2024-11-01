@@ -1,9 +1,7 @@
 # cython: language_level=3
 from src.config import db, app
-from src.models.user_card_settings import UserCardSettings
 from src.models.dashboard_netowrk import DashboardNetworkSettings
 from src.models.user_dashboard_settings import UserDashboardSettings
-from src.models.page_toggle_settings import PageToggleSettings
 from src.models.application_general_settings import GeneralSettings
 from src.models.smtp_configuration import SMTPSettings
 from src.models.network_speed_test_result import NetworkSpeedTestResult
@@ -29,28 +27,19 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 def inject_settings():
     if current_user.is_anonymous:
         user_dashboard_settings = UserDashboardSettings(user_id=0)
-        card_settings = None
-        page_toggles_settings = None
         general_settings = None
         return dict(
             user_dashboard_settings=user_dashboard_settings,
-            card_settings=card_settings,
-            page_toggles_settings=page_toggles_settings,
             general_settings=general_settings,
         )
     general_settings = GeneralSettings.query.first()
-    card_settings = UserCardSettings.query.filter_by(user_id=current_user.id).first()
     user_dashboard_settings = UserDashboardSettings.query.filter_by(
         user_id=current_user.id
     ).first()  # Retrieve user-specific user_dashboard_settings from DB
-    page_toggles_settings = PageToggleSettings.query.filter_by(
-        user_id=current_user.id
-    ).first()
+  
     all_settings = dict(
         user_dashboard_settings=user_dashboard_settings,
         general_settings=general_settings,
-        card_settings=card_settings,
-        page_toggles_settings=page_toggles_settings,
     )
     return all_settings
 
@@ -115,8 +104,6 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                 if not user.dashboard_settings:
                     # Initialize settings with defaults if not set
                     db.session.add(UserDashboardSettings(user_id=user.id))
-                    db.session.add(UserCardSettings(user_id=user.id))
-                    db.session.add(PageToggleSettings(user_id=user.id))
                     
                     for config in initial_chart_configurations:
                         # Skip adding production settings if not in production
