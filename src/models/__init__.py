@@ -13,7 +13,7 @@ from src.models.notification_settings import NotificationSettings, Notification,
 from src.models.alert_data_models import AlertTicket, InvestigationNote, Report, AlertLog, CustomFields
 from src.models.graph_config import ChartConfiguration
 from src.models.instance_metadata import InstanceMetadata
-from src.models.user_post_model import UserArticle, UserPostComment, UserPostLike
+from src.models.user_post_model import UserArticle, UserPostComment, UserPostLike, UserSavedPost, UserPostReport
 
 from src.config import db, app
 from src.logger import logger

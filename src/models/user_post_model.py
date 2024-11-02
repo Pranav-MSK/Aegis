@@ -10,6 +10,7 @@ class UserArticle(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    is_deleted = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -48,3 +49,34 @@ class UserPostLike(BaseModel):
     
     def __repr__(self):
         return f"<Like {self.id} on Post {self.post_id}>"
+
+
+class UserSavedPost(BaseModel):
+    __tablename__ = 'saved_posts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    user = db.relationship('UserProfile', backref='saved_posts')
+    post = db.relationship('UserArticle', backref='saved_by')
+
+    def __repr__(self):
+        return f"<SavedPost user_id={self.user_id} post_id={self.post_id}>"
+
+
+class UserPostReport(BaseModel):
+    __tablename__ = 'post_reports'
+
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    reason = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    post = db.relationship('UserArticle', backref='reports')
+    user = db.relationship('UserProfile', backref='post_reports')
+
+    def __repr__(self):
+        return f"<Report user_id={self.user_id} post_id={self.post_id}>"
