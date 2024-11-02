@@ -1,5 +1,9 @@
 # cython: language_level=3
-from src.config import db, app
+import os
+import json
+from flask_login import current_user
+from werkzeug.security import generate_password_hash
+
 from src.models.user_dashboard_settings import UserDashboardSettings
 from src.models.application_general_settings import GeneralSettings
 from src.models.smtp_configuration import SMTPSettings
@@ -9,11 +13,10 @@ from src.models.notification_settings import NotificationSettings, Notification,
 from src.models.alert_data_models import AlertTicket, InvestigationNote, Report, AlertLog, CustomFields
 from src.models.graph_config import ChartConfiguration
 from src.models.instance_metadata import InstanceMetadata
-from flask_login import current_user
+from src.models.user_post_model import UserArticle, UserPostComment, UserPostLike
+
+from src.config import db, app
 from src.logger import logger
-from werkzeug.security import generate_password_hash
-import json
-import os
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

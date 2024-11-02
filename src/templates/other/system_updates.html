@@ -1,0 +1,217 @@
+{% extends 'base/base.html' %}
+{% block title %}System Updates{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white border-b sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <h1 class="text-xl font-semibold text-gray-800">System Updates</h1>
+                <button @click="$dispatch('open-new-post')" class="md:hidden bg-blue-600 text-white p-2 rounded-full">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <!-- Left Sidebar (Hidden on Mobile) -->
+            <div class="hidden md:block md:col-span-3">
+                <div class="bg-white rounded-lg shadow-sm p-4 sticky top-20">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <img src="{{ current_user.get_profile_picture_url(48) }}" alt="Profile" class="w-12 h-12 rounded-full">
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ current_user.username }}</p>
+                            <p class="text-sm text-gray-500">System Administrator</p>
+                        </div>
+                    </div>
+                    <nav class="space-y-2">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-home w-5"></i>
+                            <span>Home</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-bookmark w-5"></i>
+                            <span>Saved Posts</span>
+                        </a>
+                        <a href="#" class="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md">
+                            <i class="fas fa-chart-bar w-5"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="md:col-span-6">
+                <!-- Create Post Card -->
+                <div class="bg-white rounded-lg shadow-sm mb-6" x-data="{ isExpanded: false }">
+                    <div class="p-4">
+                        <div class="flex items-center space-x-3">
+                            <img src="{{ current_user.get_profile_picture_url(40) }}" alt="Profile" class="w-10 h-10 rounded-full">
+                            <button @click="isExpanded = true" class="flex-1 text-left px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-full text-gray-500">
+                                What's new in the system?
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Expanded Form -->
+                    <div x-show="isExpanded" class="border-t" x-transition>
+                        <form action="{{ url_for('create_post') }}" method="POST" class="p-4">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <textarea name="content" rows="4" class="w-full border-0 focus:ring-0 resize-none" placeholder="Share your update..."></textarea>
+                            
+                            <div class="flex items-center justify-between border-t pt-3">
+                                <div class="flex space-x-2">
+                                    <button type="button" class="p-2 text-gray-500 hover:text-blue-600 rounded-full hover:bg-blue-50">
+                                        <i class="fas fa-image"></i>
+                                    </button>
+                                    <button type="button" class="p-2 text-gray-500 hover:text-blue-600 rounded-full hover:bg-blue-50">
+                                        <i class="fas fa-link"></i>
+                                    </button>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button type="button" @click="isExpanded = false" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                                        Post Update
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Posts Feed -->
+                <div class="space-y-4">
+                    {% for post in posts|sort(attribute='created_at', reverse=true) %}
+                    <div class="bg-white rounded-lg shadow-sm" x-data="{ showComments: false }">
+                        <div class="p-4">
+                            <!-- Post Header -->
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <img src="{{ post.user.get_profile_picture_url(40) }}" alt="Profile" class="w-10 h-10 rounded-full">
+                                    <div>
+                                        <p class="font-semibold text-gray-900">{{ post.user.username }}</p>
+                                        <p class="text-xs text-gray-500">{{ post.created_at | natural_time }}</p>
+                                    </div>
+                                </div>
+                                <div class="relative" x-data="{ open: false }">
+                                    <button @click="open = !open" class="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <div x-show="open" @click.away="open = false" class="absolute right-0 w-48 bg-white rounded-lg shadow-lg py-1 mt-2 z-10">
+                                        {% if post.user_id == current_user.id %}
+                                        <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Edit</button>
+                                        <button class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Delete</button>
+                                        {% endif %}
+                                        <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Save</button>
+                                        <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Report</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post Content -->
+                            <div class="prose max-w-none">
+                                <p class="text-gray-800">{{ post.content }}</p>
+                            </div>
+
+                            <!-- Post Stats -->
+                            <div class="flex items-center space-x-4 mt-4 text-sm text-gray-500">
+                                <span>{{ post.likes|length }} likes</span>
+                                <span>{{ post.comments|length }} comments</span>
+                            </div>
+                        </div>
+
+                        <!-- Post Actions -->
+                        <div class="flex border-t border-gray-100">
+                            <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" class="flex-1">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="w-full flex items-center justify-center space-x-2 p-3 text-gray-700 hover:bg-gray-50">
+                                    <i class="fas {% if post.id in current_user.liked_post_ids %}fa-heart text-red-500{% else %}fa-heart{% endif %}"></i>
+                                    <span>Like</span>
+                                </button>
+                            </form>
+                            <button @click="showComments = !showComments" class="flex-1 flex items-center justify-center space-x-2 p-3 text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-comment"></i>
+                                <span>Comment</span>
+                            </button>
+                            <button class="flex-1 flex items-center justify-center space-x-2 p-3 text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-share"></i>
+                                <span>Share</span>
+                            </button>
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div x-show="showComments" class="border-t" x-transition>
+                            <div class="p-4 space-y-4">
+                                {% for comment in post.comments[:3] %}
+                                <div class="flex space-x-3">
+                                    <img src="{{ comment.user.get_profile_picture_url(32) }}" alt="Profile" class="w-8 h-8 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="bg-gray-50 rounded-2xl p-3">
+                                            <p class="font-semibold text-sm">{{ comment.user.username }}</p>
+                                            <p class="text-sm text-gray-700">{{ comment.content }}</p>
+                                        </div>
+                                        <div class="flex items-center space-x-4 mt-1 ml-2 text-xs text-gray-500">
+                                            <span>{{ comment.created_at | natural_time }}</span>
+                                            <button class="hover:text-gray-700">Like</button>
+                                            <button class="hover:text-gray-700">Reply</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+
+                                {% if post.comments|length > 3 %}
+                                <button class="text-blue-600 hover:text-blue-700 text-sm">
+                                    View all {{ post.comments|length }} comments
+                                </button>
+                                {% endif %}
+
+                                <!-- Comment Form -->
+                                <form action="{{ url_for('comment', post_id=post.id) }}" method="POST" class="flex space-x-3">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <img src="{{ current_user.get_profile_picture_url(32) }}" alt="Profile" class="w-8 h-8 rounded-full">
+                                    <div class="flex-1">
+                                        <input type="text" name="content" class="w-full bg-gray-50 border-0 focus:ring-2 focus:ring-blue-500 rounded-full px-4 py-2" placeholder="Write a comment...">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="hidden md:block md:col-span-3">
+                <div class="bg-white rounded-lg shadow-sm p-4 sticky top-20">
+                    <h3 class="font-semibold text-gray-900 mb-4">Recent Updates</h3>
+                    <div class="space-y-4">
+                        {% for post in posts[:5]|sort(attribute='created_at', reverse=true) %}
+                        <a href="#" class="block hover:bg-gray-50 p-2 rounded-md">
+                            <p class="text-sm font-medium text-gray-900 line-clamp-2">{{ post.content[:100] }}...</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ post.created_at | natural_time }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Messages -->
+<div id="toast" class="fixed bottom-4 right-4 transform transition-transform duration-300 ease-in-out" 
+     x-data="{ show: false, message: '' }" 
+     x-show="show" 
+     @notify.window="show = true; message = $event.detail; setTimeout(() => show = false, 3000)"
+     x-transition>
+    <div class="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg">
+        <span x-text="message"></span>
+    </div>
+</div>
+{% endblock %}

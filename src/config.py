@@ -38,7 +38,7 @@ DB_DIR = os.path.join(HOME_DIR, ".database")
 os.makedirs(DB_DIR, exist_ok=True)
 
 # Configure the SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_POOL_SIZE'] = 10
 app.config['SQLALCHEMY_MAX_OVERFLOW'] = 5
@@ -118,3 +118,12 @@ def get_app_info():
         "monthly_alert_tickets_limit": safe_int_conversion(plan_details.get('monthly_alert_tickets_limit', 0)),
         "max_users_allowed": safe_int_conversion(plan_details.get('max_users_allowed', 0))
     }
+
+from datetime import datetime
+from humanize import naturaltime
+@app.template_filter()
+def natural_time(value):
+    """Convert a datetime object to a human-readable format."""
+    if isinstance(value, datetime):
+        return naturaltime(value)
+    return value
