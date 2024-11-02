@@ -17,8 +17,8 @@
     
 
     <!-- Stats Preview -->
-    <div class="px-6 py-4 bg-gradient-to-b from-purple-50 to-blue-50">
-        <div class="rounded-xl bg-white p-4 shadow-lg border border-blue-200 transition-transform transform hover:scale-105">
+    <div class="px-4 py-4 bg-gradient-to-b from-blue-50 via-purple-50 to-white">
+        <div class="rounded-2xl bg-white p-4 shadow-lg border border-purple-100/50 transition-all duration-300 hover:shadow-xl hover:border-purple-200">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800">System Overview</h3>
                 <span class="text-xs text-blue-600 font-medium">Live Preview</span>
@@ -28,22 +28,13 @@
                     <div class="text-3xl font-extrabold text-green-600">24/7</div>
                     <div class="text-sm text-gray-600">Monitoring</div>
                 </div>
-                <div class="p-4 rounded-lg bg-yellow-50 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <div class="text-3xl font-extrabold text-yellow-600 response-time"></div>
-                    <div class="text-sm text-gray-600">Response Time</div>
+                <div class="p-4 rounded-lg bg-blue-50 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <div class="text-3xl font-extrabold text-blue-600">99.9%</div>
+                    <div class="text-sm text-gray-600">Uptime</div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        // update the response time in the response-time div
-        fetch('/health')
-            .then(response => response.json())
-            .then(data => {
-                document.querySelector('.response-time').textContent = data.response_time + 'ms';
-            });
-    </script>
     
     <!-- Auth Section -->
     <div class="px-6 py-4 space-y-4">

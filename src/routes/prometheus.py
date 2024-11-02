@@ -266,7 +266,7 @@ def configure_targets():
             return redirect(url_for("configure_targets"))
 
     return render_template(
-        "prometheus/system/targets.html",
+        "system/targets.html",
         targets_info=targets_info,
         total_targets=total_targets
     )
@@ -326,6 +326,7 @@ def prometheus_rules_api():
 
 @app.route("/system/alerts/rules", methods=["GET", "POST"])
 @systemguard_enterprise()
+@admin_required
 def manage_rules():
     # Load existing rules from the YAML file
     with open(RULES_FILE_PATH, "r") as file:
@@ -436,6 +437,7 @@ def manage_rules():
 
 
 @app.route("/system/alertmanager/status")
+@login_required
 def alertmanager_status():
     active_alertmanagers = retrieve_active_alertmanagers()
     if active_alertmanagers:
@@ -447,6 +449,7 @@ def alertmanager_status():
 
 
 @app.route('/api/v1/alertmanagers', methods=['GET'])
+@login_required
 def api_alertmanagers():
     try:
         url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"

@@ -33,44 +33,32 @@
 
 
     <!-- Stats Preview -->
-    <div class="px-6 py-4 bg-gradient-to-b from-purple-100 to-blue-100">
-        <div
-            class="rounded-xl bg-white p-4 shadow-lg border border-blue-200 transition-transform transform hover:scale-105">
+    <div class="px-4 py-4 bg-gradient-to-b from-blue-50 via-purple-50 to-white">
+        <div class="rounded-2xl bg-white p-4 shadow-lg border border-purple-100/50 transition-all duration-300 hover:shadow-xl hover:border-purple-200">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-800">Performance Insights</h3>
-                <span class="text-xs text-blue-600 font-medium">Updated Live</span>
+                <h3 class="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">Performance Insights</h3>
+                <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium animate-pulse">Live</span>
             </div>
-            <div class="grid grid-cols-2 gap-6">
-                <div class="p-4 rounded-lg bg-blue-50 shadow-md hover:shadow-xl transition-shadow duration-300">
-                    <div class="text-3xl font-extrabold text-blue-600">100%</div>
-                    <div class="text-sm text-gray-600">Resource Utilization</div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 shadow-md hover:shadow-xl transition-all duration-300 group">
+                    <div class="text-3xl font-extrabold text-blue-600 group-hover:scale-110 transition-transform duration-300">100%</div>
+                    <div class="text-sm text-gray-600 font-medium">Resource Utilization</div>
                 </div>
-                <div class="p-4 rounded-lg bg-yellow-50 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <div class="text-3xl font-extrabold text-yellow-600 response-time"></div>
-                    <div class="text-sm text-gray-600">Response Time</div>
+                <div class="p-4 rounded-xl bg-gradient-to-br from-yellow-50 to-yellow-100 shadow-md hover:shadow-xl transition-all duration-300 group">
+                    <div class="text-3xl font-extrabold text-yellow-600 response-time group-hover:scale-110 transition-transform duration-300">0.5ms</div>
+                    <div class="text-sm text-gray-600 font-medium">Response Time</div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        // update the response time in the response-time div
-        fetch('/health')
-            .then(response => response.json())
-            .then(data => {
-                document.querySelector('.response-time').textContent = data.response_time + 'ms';
-            });
-    </script>
-    
-
 
     <!-- Navigation -->
     <nav class="flex-1 overflow-y-auto px-4 py-2 ">
         <div class="space-y-6">
             <!-- Metrics Section -->
             <div>
-                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Metrics</p>
-                <div class="space-y-1">
+                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Metrics</p>
+                <div class="space-y-2">
                     <a href="{{ url_for('historical_system_metrics') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'historical_system_metrics' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                         <div

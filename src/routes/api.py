@@ -27,6 +27,7 @@ from src.routes.helper.prometheus_helper import (
     save_alert_rules,
 )
 from src.config import disk_metrics, network_metrics
+from src.routes.helper.health_helper import check_database
 
 api_bp = blueprints.Blueprint("api", __name__)
 
@@ -490,13 +491,43 @@ def get_network_metrics():
     return jsonify(network_data)
 
 
+def check_prometheus_health():
+    prometheus_url = 'http://localhost:9090/api/v1/targets'  # Adjust the URL as necessary
+    try:
+        response = requests.get(prometheus_url, timeout=2)
+        if response.status_code == 200:
+            return "healthy"
+        else:
+            return "unhealthy"
+    except requests.exceptions.RequestException:
+        return "unhealthy"
+
+
 @app.route('/api/v1/status', methods=['GET'])
 @login_required
 def get_status():
-    # TODO: Implement the status check logic
+
+    running_services = 0
+
+    total_services = 2
+
+    db_status = check_database()
+    db_health = db_status.get('status', 'unknown')
+    running_services += 1 if db_health == 'healthy' else 0
+
+    prometheus_health = check_prometheus_health()
+    running_services += 1 if prometheus_health == 'healthy' else 0
+
     status = {
-        "network_status": 'good',
-        "disk_status": 'good',
-        "system_status": "3/5 Services Running",
+        "service": {
+            "total_services": total_services,
+            "running_services": running_services,
+            "db_health": db_health,
+            "prometheus_health": prometheus_health,
+            "status": f"{running_services}/{total_services} Services Running",
+        },
+        "timestamp": datetime.utcnow().isoformat()
     }
-    return jsonify(status)
+    
+    # HTTP status code 200 for success
+    return jsonify(status), 200

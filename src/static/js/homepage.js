@@ -917,84 +917,15 @@ async function fetchStatus() {
 
 function updateStatus(data) {
   const systemStatus = document.getElementById('system-status');
-  const networkStatus = document.getElementById('network-status');
-  const diskStatus = document.getElementById('disk-status');
 
   systemStatus.innerHTML = `
       <div class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
         <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
-        <span class="ml-2 text-sm font-medium text-green-700">${data.system_status}</span>
+        <span class="ml-2 text-sm font-medium text-green-700">${data.service.status}</span>
       </div>`;
 
-  // Network Status
-  let networkStatusHtml = '';
-  switch (data.network_status) {
-    case "good":
-      networkStatusHtml = `
-        <div class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
-            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-            </svg>
-            <span class="ml-2 text-sm font-medium text-green-700">Network Status: Good</span>
-        </div>`;
-      break;
-    case "normal":
-      networkStatusHtml = `
-        <div class="flex items-center px-3 py-1.5 bg-yellow-50 rounded-full shadow-sm">
-            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-            </svg>
-            <span class="ml-2 text-sm font-medium text-yellow-700">Network Status: Normal</span>
-        </div>`;
-      break;
-    case "critical":
-      networkStatusHtml = `
-        <div class="flex items-center px-3 py-1.5 bg-red-50 rounded-full shadow-sm">
-            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-            </svg>
-            <span class="ml-2 text-sm font-medium text-red-700">Network Status: Critical</span>
-        </div>`;
-      break;
-  }
-
-  // Disk Status
-  let diskStatusHtml = '';
-  switch (data.disk_status) {
-    case "good":
-      diskStatusHtml = `
-        <div class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
-            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-            </svg>
-            <span class="ml-2 text-sm font-medium text-green-700">Disk Status: Good</span>
-        </div>`;
-      break;
-    case "normal":
-      diskStatusHtml = `
-        <div class="flex items-center px-3 py-1.5 bg-yellow-50 rounded-full shadow-sm">
-            <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-            </svg>
-            <span class="ml-2 text-sm font-medium text-yellow-700">Disk Status: Normal</span>
-        </div>`;
-      break;
-    case "critical":
-      diskStatusHtml = `
-        <div class="flex items-center px-3 py-1.5 bg-red-50 rounded-full shadow-sm">
-            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-            </svg>
-            <span class="ml-2 text-sm font-medium text-red-700">Disk Status: Critical</span>
-        </div>`;
-      break;
-  }
-
-  // Combine and insert HTML
-  networkStatus.innerHTML = networkStatusHtml;
-  diskStatus.innerHTML = diskStatusHtml;
 }
 
 // Call fetchStatus every 2 seconds
