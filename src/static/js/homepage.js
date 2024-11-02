@@ -8,13 +8,13 @@ const CONFIG = {
     NETWORK: 'rgba(234, 179, 8, 1)',
   },
   API_ENDPOINTS: {
-    SYSTEM_INFO: '/api/v1/system-info',
-    DASHBOARD_STATS: '/api/v1/dashboard/stats',
-    CONTAINER_INFO: '/api/v1/system/containers',
-    SERVICES: '/api/v1/system/services',
-    SERVICE_CATEGORIES: '/api/v1/system/services/categories',
-    NOTIFICATIONS: '/api/v1/notifications/',
-    STATUS: '/api/v1/status'
+    SYSTEM_INFO_API: '/api/v1/system-info',
+    DASHBOARD_STATS_API: '/api/v1/dashboard/stats',
+    CONTAINER_INFO_API: '/api/v1/system/containers',
+    SYSTEM_SERVICES_API: '/api/v1/system/services',
+    SYSTEM_SERVICE_CATEGORIES_API: '/api/v1/system/services/categories',
+    SYSTEM_NOTIFICATIONS_API: '/api/v1/notifications/',
+    SYSTEM_STATUS_API: '/api/v1/status'
   }
 };
 
@@ -128,7 +128,7 @@ class DashboardController {
   }
   async updateSystemInfo() {
     try {
-      const systemInfo = await this.fetchData(CONFIG.API_ENDPOINTS.SYSTEM_INFO);
+      const systemInfo = await this.fetchData(CONFIG.API_ENDPOINTS.SYSTEM_INFO_API);
       this.updateCharts(systemInfo);
       this.updateMetricsDisplay(systemInfo);
       this.updateProcessGrid(systemInfo.top_processes);
@@ -139,7 +139,7 @@ class DashboardController {
 
   async updateDashboard() {
     try {
-      const dashboardStats = await this.fetchData(CONFIG.API_ENDPOINTS.DASHBOARD_STATS);
+      const dashboardStats = await this.fetchData(CONFIG.API_ENDPOINTS.DASHBOARD_STATS_API);
       this.updateDashboardStats(dashboardStats);
     } catch (error) {
       this.handleError('Failed to update dashboard stats', error);
@@ -373,14 +373,12 @@ class DashboardController {
     // Implement your error handling strategy here (e.g., show toast notification)
   }
 
-  callContainerDataAPI() {
-    this.fetchContainerData();
-  }
+
 
   start() {
     setInterval(() => this.updateSystemInfo(), CONFIG.REFRESH_INTERVAL);
     setInterval(() => this.updateDashboard(), 30000);
-    setInterval(() => this.callContainerDataAPI(), 30000);
+    setInterval(() => this.fetchContainerData(), 30000);
   }
 }
 
@@ -413,7 +411,7 @@ function getStatusBadgeClass(status) {
 }
 
 // Fetch categories and populate the filter
-fetch(CONFIG.API_ENDPOINTS.SERVICE_CATEGORIES)
+fetch(CONFIG.API_ENDPOINTS.SYSTEM_SERVICE_CATEGORIES_API)
   .then(response => response.json())
   .then(data => {
     categories = data.categories;
@@ -427,7 +425,7 @@ fetch(CONFIG.API_ENDPOINTS.SERVICE_CATEGORIES)
 
 // Fetch and display service data
 function fetchServices(category = 'all') {
-  const url = category === 'all' ? CONFIG.API_ENDPOINTS.SERVICES : `${CONFIG.API_ENDPOINTS.SERVICES}/${category}`;
+  const url = category === 'all' ? CONFIG.API_ENDPOINTS.SYSTEM_SERVICES_API : `${CONFIG.API_ENDPOINTS.SYSTEM_SERVICES_API}/${category}`;
   fetch(url)
     .then(response => response.json())
     .then(data => {
@@ -762,7 +760,7 @@ class NotificationHandler {
 
   async fetchNotifications() {
     try {
-      const response = await fetch(CONFIG.API_ENDPOINTS.NOTIFICATIONS);
+      const response = await fetch(CONFIG.API_ENDPOINTS.SYSTEM_NOTIFICATIONS_API);
       if (!response.ok) throw new Error('Network response was not ok');
 
       const notifications = await response.json();
@@ -910,7 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // header status
 async function fetchStatus() {
-  const response = await fetch(CONFIG.API_ENDPOINTS.STATUS);
+  const response = await fetch(CONFIG.API_ENDPOINTS.SYSTEM_STATUS_API);
   const data = await response.json();
   updateStatus(data);
 }

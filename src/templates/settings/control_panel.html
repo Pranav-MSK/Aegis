@@ -1,11 +1,9 @@
 {% extends 'base/base.html' %}
 {% block title %}Control Panel{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/control_panel.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js"></script>
 {% endblock %}
 {% block content %}
-
 
 <div class="min-h-screen p-4 md:p-8" x-data="{ activeTab: 'profile' }">
     <!-- Header -->
@@ -13,10 +11,11 @@
         <h1 class="text-center">
             <span
                 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                {{ title }} Control Panel
+                Welcome, {{ current_user.first_name }}!
             </span>
             <i class="fas fa-cogs ml-3 text-indigo-600"></i>
         </h1>
+        <p class="text-center text-gray-600 mt-2">Manage your settings and preferences</p>
     </div>
 
     <!-- Main Content -->
@@ -28,57 +27,50 @@
                     <nav class="space-y-2">
                         {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
                         <button @click="activeTab = 'users'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'users',
-                                    'hover:bg-slate-50': activeTab !== 'users'}"
+                                    'hover:bg-indigo-100': activeTab !== 'users'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fas fa-users w-5"></i>
                             <span class="font-medium">Users</span>
                         </button>
 
                         <button @click="activeTab = 'systemguard'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'systemguard',
-                                    'hover:bg-slate-50': activeTab !== 'systemguard'}"
+                                    'hover:bg-indigo-100': activeTab !== 'systemguard'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fa-brands fa-centercode w-5"></i>
                             <span class="font-medium">SystemGuard Central</span>
                         </button>
 
                         <button @click="activeTab = 'alerts'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'alerts',
-                                    'hover:bg-slate-50': activeTab !== 'alerts'}"
+                                    'hover:bg-indigo-100': activeTab !== 'alerts'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fas fa-bell w-5"></i>
                             <span class="font-medium">Alerts & Notifications</span>
                         </button>
 
                         <button @click="activeTab = 'utilities'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'utilities',
-                                    'hover:bg-slate-50': activeTab !== 'utilities'}"
+                                    'hover:bg-indigo-100': activeTab !== 'utilities'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fas fa-tools w-5"></i>
                             <span class="font-medium">Utilities</span>
                         </button>
 
                         <button @click="activeTab = 'security'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'security',
-                                    'hover:bg-slate-50': activeTab !== 'security'}"
+                                    'hover:bg-indigo-100': activeTab !== 'security'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fas fa-shield-alt w-5"></i>
                             <span class="font-medium">Security Tools</span>
                         </button>
-
-                        <!-- <button @click="activeTab = 'settings'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'settings',
-                                    'hover:bg-slate-50': activeTab !== 'settings'}"
-                            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
-                            <i class="fas fa-cogs w-5"></i>
-                            <span class="font-medium">General</span>
-                        </button> -->
                         {% endif %}
 
                         <button @click="activeTab = 'system'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'system',
-                                    'hover:bg-slate-50': activeTab !== 'system'}"
+                                    'hover:bg-indigo-100': activeTab !== 'system'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fas fa-info-circle w-5"></i>
                             <span class="font-medium">System Info</span>
                         </button>
 
                         <button @click="activeTab = 'profile'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'profile',
-                                    'hover:bg-slate-50': activeTab !== 'profile'}"
+                                    'hover:bg-indigo-100': activeTab !== 'profile'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fas fa-user w-5"></i>
                             <span class="font-medium">Profile</span>
@@ -86,20 +78,6 @@
                     </nav>
                 </div>
             </div>
-
-            <!-- <div class="flex flex-wrap gap-4">
-                <a href="{{ url_for('view_users') }}"
-                    class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors">
-                    <i class="fas fa-users"></i>
-                    <span>Manage Users</span>
-                </a>
-                <a href="{{ url_for('create_user') }}"
-                    class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Create New User</span>
-                </a>
-            </div>
-             -->
             <!-- Content Area -->
             <div class="lg:w-3/4">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
@@ -172,14 +150,6 @@
                                 </div>
                                 <span class="font-medium text-gray-700 group-hover:text-purple-700">Edit Profile</span>
                             </a>
-<!-- 
-                            <a href="{{ url_for('user_settings') }}"
-                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-200 hover:bg-purple-50 transition-all group">
-                                <div class="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors">
-                                    <i class="fas fa-user-cog text-purple-600"></i>
-                                </div>
-                                <span class="font-medium text-gray-700 group-hover:text-purple-700">User Settings</span>
-                            </a> -->
                         </div>
                     </div>
 
@@ -283,14 +253,6 @@
                             <h2 class="text-2xl font-bold text-gray-800">Utilities</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- <a href="{{ url_for('terminal') }}"
-                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
-                                <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
-                                    <i class="fas fa-terminal text-emerald-600"></i>
-                                </div>
-                                <span class="font-medium text-gray-700 group-hover:text-emerald-700">Terminal</span>
-                            </a> -->
-
                             <a href="{{ url_for('utility_control') }}"
                                 class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:bg-emerald-50 transition-all group">
                                 <div class="p-3 bg-emerald-100 rounded-lg group-hover:bg-emerald-200 transition-colors">
@@ -345,26 +307,6 @@
                             </a>
                         </div>
                     </div>
-
-                    <!-- Settings Section -->
-                    <!-- <div x-show="activeTab === 'settings'" class="space-y-6">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="p-3 bg-violet-100 rounded-xl">
-                                <i class="fas fa-cogs text-violet-600 text-xl"></i>
-                            </div>
-                            <h2 class="text-2xl font-bold text-gray-800">General Settings</h2>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <a href="{{ url_for('general_settings') }}"
-                                class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-violet-200 hover:bg-violet-50 transition-all group">
-                                <div class="p-3 bg-violet-100 rounded-lg group-hover:bg-violet-200 transition-colors">
-                                    <i class="fas fa-sliders-h text-violet-600"></i>
-                                </div>
-                                <span class="font-medium text-gray-700 group-hover:text-violet-700">General
-                                    Settings</span>
-                            </a>
-                        </div>
-                    </div> -->
 
                     <!-- System Info Section -->
                     <div x-show="activeTab === 'system'" class="space-y-6">

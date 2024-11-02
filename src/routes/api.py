@@ -506,18 +506,19 @@ def check_prometheus_health():
 @app.route('/api/v1/status', methods=['GET'])
 @login_required
 def get_status():
-
+    total_services = 2
     running_services = 0
 
-    total_services = 2
-
+    # Check database status
     db_status = check_database()
     db_health = db_status.get('status', 'unknown')
-    running_services += 1 if db_health == 'healthy' else 0
+    running_services += (db_health == 'healthy')
 
+    # Check Prometheus health
     prometheus_health = check_prometheus_health()
-    running_services += 1 if prometheus_health == 'healthy' else 0
+    running_services += (prometheus_health == 'healthy')
 
+    # Prepare the response
     status = {
         "service": {
             "total_services": total_services,
@@ -529,5 +530,4 @@ def get_status():
         "timestamp": datetime.utcnow().isoformat()
     }
     
-    # HTTP status code 200 for success
     return jsonify(status), 200

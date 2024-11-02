@@ -7,9 +7,10 @@ class ChartManager {
 
     createChart(ctx, data, config) {
         this.setupCanvasStyle(ctx.canvas);
+        console.log("config", config)
 
         const chart = new Chart(ctx, {
-            type: config.type || 'line',
+            type: config.chart_type || 'line',
             data: this.prepareChartData(data, config),
             options: this.getChartOptions(config),
         });
