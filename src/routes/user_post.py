@@ -1,4 +1,5 @@
-from flask import render_template, request, redirect, url_for, Blueprint
+from datetime import datetime
+from flask import render_template, request, redirect, url_for, Blueprint, jsonify
 from flask_login import login_required, current_user
 
 from src.config import app
@@ -14,10 +15,14 @@ def discussion_board():
     if request.method == 'POST':
         content = request.form.get('content')
         form_type = request.form.get('form_type')
+        new_post_tags = request.form.getlist('tags')
+        # make comma seprated string
+        new_post_tags = ','.join(new_post_tags)
 
         if form_type == 'create_post' and content:
-            new_post = UserArticle(user_id=current_user.id, content=content)
-            new_post.save()
+            new_post = UserArticle(user_id=current_user.id, content=content, tags=new_post_tags)
+            new_post.save()                
+
             notification_data = {
                 "type": "info",
                 "icon": "info-circle",
@@ -55,12 +60,16 @@ def discussion_board():
 
     deleted_posts = UserArticle.query.filter_by(is_deleted=True).all()
 
+    post_tags = ["#annoument", "#introduction", "#general", "#help", "#feedback", "#suggestion", 
+                 "#bug", "#feature", "#question", "#discussion", "#off-topic"]
+
     return render_template('other/discussion_board.html', 
                            pagination=pagination, 
                            saved_pagination=saved_pagination, 
                            liked_post_ids=liked_post_ids,
                            latest_posts=latest_posts,
-                            deleted_posts=deleted_posts)
+                            deleted_posts=deleted_posts,
+                            post_tags=post_tags)
 
 # get all the comments
 @app.route('/comments/<int:post_id>', methods=['GET'])
@@ -192,3 +201,26 @@ def delete_post_permanently(post_id):
     if post.user_id == current_user.id:
         post.delete()
     return redirect(url_for('discussion_board'))
+
+
+@app.route('/edit_comment/<int:comment_id>', methods=['POST'])
+@login_required
+def edit_comment(comment_id):
+    comment = UserPostComment.query.get_or_404(comment_id)
+    if comment.user_id == current_user.id:
+        content = request.form.get('content')
+        if content:
+            comment.content = content
+            comment.updated_at = datetime.utcnow()  # Update the timestamp
+            comment.save()
+    return redirect(url_for('discussion_board'))
+
+
+@app.route('/delete_comment/<int:comment_id>', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = UserPostComment.query.get_or_404(comment_id)
+    if comment.user_id == current_user.id:
+        comment.delete()
+    return redirect(url_for('discussion_board'))
+

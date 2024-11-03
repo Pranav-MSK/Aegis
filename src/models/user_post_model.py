@@ -10,17 +10,17 @@ class UserArticle(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    tags = db.Column(db.String(255), nullable=True)
     is_deleted = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     user = db.relationship('UserProfile', backref='posts')
     comments = db.relationship('UserPostComment', backref='post', lazy=True, cascade='all, delete-orphan')
     likes = db.relationship('UserPostLike', backref='post', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<Post {self.id} by User {self.user_id}>"
-
 
 class UserPostComment(BaseModel):
     __tablename__ = 'comments'
@@ -30,9 +30,10 @@ class UserPostComment(BaseModel):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
     user = db.relationship('UserProfile', backref='UserPostComment')
-    
+
     def __repr__(self):
         return f"<Comment {self.id} on Post {self.post_id}>"
 

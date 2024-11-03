@@ -55,12 +55,23 @@
                         </button>
                     </nav>
                 </div>
+
+                 <!-- # available tags suggestion -->
+                 <div class="bg-white rounded-xl shadow-sm p-6 sticky top-20 mt-6">
+                    <h3 class="font-bold text-gray-900 mb-4">Available Tags</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in post_tags %}
+                        <a href="#" class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">{{ tag }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
             </aside>
 
             <!-- Main Content -->
             <section class="md:col-span-6">
                 <!-- Tab Content -->
                 <div x-show="activeTab === 'home'">
+
                     <!-- Create Post Card -->
                     <div class="bg-white rounded-xl shadow-sm mb-6 overflow-hidden" x-data="{ isExpanded: false }">
                         <div class="p-4">
@@ -82,6 +93,25 @@
                                 <textarea name="content" rows="4"
                                     class="w-full border-0 focus:ring-0 resize-none rounded-xl bg-gray-50 p-4"
                                     placeholder="Share your update..."></textarea>
+
+                                
+                                <!-- Tags Input -->
+                                <div class="mt-2">
+                                    <input type="text" name="tags" placeholder="Add tags (comma separated)"
+                                        class="w-full border-0 focus:ring-0 rounded-xl bg-gray-50 p-2" x-ref="tagsInput" />
+                                </div>
+                                <!-- Suggested Tags -->
+                                <div class="mt-2">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Suggested Tags:</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        {% for tag in post_tags %}
+                                        <button type="button" @click="$refs.tagsInput.value += '{{ tag }}, '"
+                                            class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm hover:bg-blue-200 transition-colors">
+                                            {{ tag }}
+                                        </button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
 
                                 <div class="flex items-center justify-end space-x-3 border-t pt-4">
                                     <button type="button" @click="isExpanded = false"
@@ -131,25 +161,7 @@
                                                     class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Delete</button>
                                             </form>
                                             {% endif %}
-                                            <!-- {% if current_user.id in post.saved_by | map(attribute='user_id') %}
-                                            <form action="{{ url_for('unsave_post', post_id=post.id) }}" method="POST">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <button type="submit"
-                                                    class="w-full flex items-center px-4 py-2 text-sm text-blue-500 hover:bg-gray-50 transition-colors">
-                                                    <i class="fas fa-bookmark mr-2"></i>
-                                                    <span>Unsave</span>
-                                                </button>
-                                            </form>
-                                            {% else %}
-                                            <form action="{{ url_for('save_post', post_id=post.id) }}" method="POST">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <button type="submit"
-                                                    class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                                    <i class="fas fa-bookmark mr-2"></i>
-                                                    <span>Save</span>
-                                                </button>
-                                            </form>
-                                            {% endif %} -->
+                                           
                                         </div>
                                     </div>
                                 </header>
@@ -185,6 +197,13 @@
                                         {{ post.comments|length }}
                                     </span>
                                 </div>
+                                <!-- # show tags -->
+                                <div class="flex items center space-x-6 mt-4 text-sm text-gray-500">
+                                    <span class="flex items center">
+                                        <i class="fas fa-tags text-red-500 mr-2"></i>
+                                        {{ post.tags }}
+                                    </span>
+                                </div>  
                             </div>
 
                             <!-- Post Actions -->
@@ -496,6 +515,7 @@
                     </div>
                 </div>
             </aside>
+
         </div>
     </main>
 
