@@ -1,3 +1,4 @@
+# cython: language_level=3
 from datetime import datetime
 
 from src.models.base_model import BaseModel
