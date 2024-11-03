@@ -28,8 +28,7 @@
                         <img src="{{ current_user.get_profile_picture_url(48) }}" alt="Profile"
                             class="w-14 h-14 rounded-full ring-2 ring-blue-100">
                         <div>
-                            <p class="font-bold text-gray-900">{{ current_user.first_name }} {{ current_user.last_name
-                                }}</p>
+                            <p class="font-bold text-gray-900">{{ current_user.first_name }} {{ current_user.last_name }}</p>
                             <p class="text-sm text-gray-500">{{ current_user.profession }}</p>
                         </div>
                     </div>
@@ -40,28 +39,39 @@
                             <span>Home</span>
                         </button>
                         <button @click="activeTab = 'saved'"
+                            title="saved post by you"
                             :class="{'bg-blue-50 text-blue-600': activeTab === 'saved'}"
                             class="flex items-center w-full space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors">
                             <i class="fas fa-bookmark w-5"></i>
                             <span>Saved Posts</span>
                         </button>
-                        
+
                         <!-- deleted post tab -->
                         <button @click="activeTab = 'deleted'"
+                            title="post deleted by you"
                             :class="{'bg-blue-50 text-blue-600': activeTab === 'deleted'}"
                             class="flex items-center w-full space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors">
                             <i class="fas fa-trash w-5"></i>
                             <span>Deleted Posts</span>
                         </button>
+
+                        <!-- analytics tab -->
+                        <button @click="activeTab = 'analytics'"
+                            :class="{'bg-blue-50 text-blue-600': activeTab === 'analytics'}"
+                            class="flex items-center w-full space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors">
+                            <i class="fas fa-chart-line w-5"></i>
+                            <span>Analytics</span>
+                        </button>
                     </nav>
                 </div>
 
-                 <!-- # available tags suggestion -->
-                 <div class="bg-white rounded-xl shadow-sm p-6 sticky top-20 mt-6">
+                <!-- # available tags suggestion -->
+                <div class="bg-white rounded-xl shadow-sm p-6 sticky top-20 mt-6">
                     <h3 class="font-bold text-gray-900 mb-4">Available Tags</h3>
                     <div class="flex flex-wrap gap-2">
                         {% for tag in post_tags %}
-                        <a href="#" class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">{{ tag }}</a>
+                        <a href="#" class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">{{
+                            tag }}</a>
                         {% endfor %}
                     </div>
                 </div>
@@ -94,11 +104,12 @@
                                     class="w-full border-0 focus:ring-0 resize-none rounded-xl bg-gray-50 p-4"
                                     placeholder="Share your update..."></textarea>
 
-                                
+
                                 <!-- Tags Input -->
                                 <div class="mt-2">
                                     <input type="text" name="tags" placeholder="Add tags (comma separated)"
-                                        class="w-full border-0 focus:ring-0 rounded-xl bg-gray-50 p-2" x-ref="tagsInput" />
+                                        class="w-full border-0 focus:ring-0 rounded-xl bg-gray-50 p-2"
+                                        x-ref="tagsInput" />
                                 </div>
                                 <!-- Suggested Tags -->
                                 <div class="mt-2">
@@ -161,7 +172,7 @@
                                                     class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">Delete</button>
                                             </form>
                                             {% endif %}
-                                           
+
                                         </div>
                                     </div>
                                 </header>
@@ -203,7 +214,7 @@
                                         <i class="fas fa-tags text-red-500 mr-2"></i>
                                         {{ post.tags }}
                                     </span>
-                                </div>  
+                                </div>
                             </div>
 
                             <!-- Post Actions -->
@@ -379,6 +390,15 @@
                     </div>
                 </div>
 
+                <!-- user_analytics = {
+                    "total_posts": UserArticle.query.filter_by(user_id=current_user.id).count(),
+                    "total_likes_received": UserPostLike.query.filter(UserPostLike.post_id.in_([post.id for post in UserArticle.query.filter_by(user_id=current_user.id).all()])).count(),
+                    "total_comments": UserPostComment.query.filter(UserPostComment.post_id.in_([post.id for post in UserArticle.query.filter_by(user_id=current_user.id).all()])).count(),
+                    "posts_liked": UserPostLike.query.filter_by(user_id=current_user.id).count(),
+                    "posts_saved": UserSavedPost.query.filter_by(user_id=current_user.id).count(),
+                    "comments_made": UserPostComment.query.filter_by(user_id=current_user.id).count()
+                } -->
+
                 <!-- Analytics Tab -->
                 <div x-show="activeTab === 'analytics'" x-cloak>
                     <div class="bg-white rounded-xl shadow-sm p-6">
@@ -390,46 +410,46 @@
                                 <div class="space-y-4">
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Total Posts</span>
-                                        <span class="text-2xl font-bold text-blue-600">{{ posts|length }}</span>
+                                        <span class="text-2xl font-bold text-blue-600">{{ user_analytics.total_posts }}</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Total Likes Received</span>
                                         <span class="text-2xl font-bold text-red-500">
-                                            {{ posts|map(attribute='likes')|map('length')|sum }}
+                                            {{ user_analytics.total_likes_received }}
                                         </span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Total Comments</span>
                                         <span class="text-2xl font-bold text-green-500">
-                                            {{ posts|map(attribute='comments')|map('length')|sum }}
+                                            {{ user_analytics.total_comments }}
                                         </span>
                                     </div>
                                 </div>
                             </div>
                             <!-- Engagement Stats -->
-                            <!-- <div class="bg-gray-50 rounded-xl p-6">
+                            <div class="bg-gray-50 rounded-xl p-6">
                                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Engagement</h3>
                                 <div class="space-y-4">
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Posts Liked</span>
                                         <span class="text-2xl font-bold text-purple-600">
-                                            {{ current_user.liked_posts|length }}
+                                            {{ user_analytics.posts_liked }}
                                         </span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Posts Saved</span>
                                         <span class="text-2xl font-bold text-yellow-500">
-                                            {{ current_user.saved_posts|length }}
+                                            {{ user_analytics.posts_saved }}
                                         </span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Comments Made</span>
                                         <span class="text-2xl font-bold text-blue-500">
-                                            {{ current_user.comments|length }}
+                                            {{ user_analytics.comments_made }}
                                         </span>
                                     </div>
                                 </div>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -441,10 +461,10 @@
                         {% if deleted_posts %}
                         <div class="space-y-6">
                             {% for post in deleted_posts %}
-                                {% if post.user_id == current_user.id %}
-                            <article class="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
-                                <div class="flex items center justify-between mb-4">
-                                    <div class="flex items center space-x-3">
+                            {% if post.user_id == current_user.id %}
+                            <article class="border-b border-gray-200 last:border-0 pb-6 last:pb-0">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center space-x-3">
                                         <img src="{{ post.user.get_profile_picture_url(40) }}" alt="Profile"
                                             class="w-10 h-10 rounded-full ring-2 ring-blue-100">
                                         <div>
@@ -453,32 +473,35 @@
                                             <p class="text-sm text-gray-500">{{ post.created_at | natural_time }}</p>
                                         </div>
                                     </div>
-                                    <form action="{{ url_for('restore_post', post_id=post.id) }}" method="POST">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit"
-                                            class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                                            title="Restore Post">
-                                            <i class="fas fa-trash-restore"></i>
-                                        </button>
-                                    </form>
-                                    <form action="{{ url_for('delete_post_permanently', post_id=post.id) }}" method="POST">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit"
-                                            class="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors"
-                                            title="Delete Permanently">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    <div class="flex space-x-2">
+                                        <form action="{{ url_for('restore_post', post_id=post.id) }}" method="POST">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit"
+                                                class="text-gray-600 hover:text-gray-800 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                                                title="Restore Post">
+                                                <i class="fas fa-undo-alt"></i> <!-- Updated icon -->
+                                            </button>
+                                        </form>
+                                        <form action="{{ url_for('delete_post_permanently', post_id=post.id) }}"
+                                            method="POST">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit"
+                                                class="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors"
+                                                title="Delete Permanently">
+                                                <i class="fas fa-trash-alt"></i> <!-- Updated icon -->
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                                 <p class="text-gray-800">{{ post.content }}</p>
-                                <div class="flex items center space-x-6 mt-4 text-sm text-gray-500">
-                                    <span class="flex items center">
+                                <div class="flex items-center space-x-6 mt-4 text-sm text-gray-500">
+                                    <span class="flex items-center">
                                         <i class="fas fa-heart text-red-500 mr-2"></i>
-                                        {{ post.likes|length }}
+                                        {{ post.likes | length }}
                                     </span>
-                                    <span class="flex items center">
-                                        <i class="fas fa-comment text-blue-500 mr-2"></i>
-                                        {{ post.comments|length }}
+                                    <span class="flex items-center">
+                                        <i class="fas fa-comments text-blue-500 mr-2"></i>
+                                        {{ post.comments | length }}
                                     </span>
                                 </div>
                             </article>

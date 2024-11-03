@@ -9,16 +9,15 @@ from src.routes.helper.notification_helper import generate_system_notification
 
 user_post_bp = Blueprint('user_post', __name__)
 
-@app.route('/system/updates', methods=['GET', 'POST'])
+@app.route('/system/discussion', methods=['GET', 'POST'])
 @login_required
 def discussion_board():
     if request.method == 'POST':
         content = request.form.get('content')
         form_type = request.form.get('form_type')
         new_post_tags = request.form.getlist('tags')
-        # make comma seprated string
-        new_post_tags = ','.join(new_post_tags)
-
+        new_post_tags = ','.join(list(set(tag.strip() for tag in new_post_tags[0].split(',') if tag.strip())))
+ 
         if form_type == 'create_post' and content:
             new_post = UserArticle(user_id=current_user.id, content=content, tags=new_post_tags)
             new_post.save()                
@@ -63,13 +62,23 @@ def discussion_board():
     post_tags = ["#annoument", "#introduction", "#general", "#help", "#feedback", "#suggestion", 
                  "#bug", "#feature", "#question", "#discussion", "#off-topic"]
 
+    user_analytics = {
+        "total_posts": UserArticle.query.filter_by(user_id=current_user.id, is_deleted=False).count(),
+        "total_likes_received": UserPostLike.query.filter(UserPostLike.post_id.in_([post.id for post in UserArticle.query.filter_by(user_id=current_user.id, is_deleted=False).all()])).count(),
+        "total_comments": UserPostComment.query.filter(UserPostComment.post_id.in_([post.id for post in UserArticle.query.filter_by(user_id=current_user.id, is_deleted=False).all()])).count(),
+        "posts_liked": UserPostLike.query.filter_by(user_id=current_user.id).count(),
+        "posts_saved": UserSavedPost.query.filter_by(user_id=current_user.id).count(),
+        "comments_made": UserPostComment.query.filter_by(user_id=current_user.id).count()
+    }
+
     return render_template('other/discussion_board.html', 
                            pagination=pagination, 
                            saved_pagination=saved_pagination, 
                            liked_post_ids=liked_post_ids,
                            latest_posts=latest_posts,
                             deleted_posts=deleted_posts,
-                            post_tags=post_tags)
+                            post_tags=post_tags,
+                            user_analytics=user_analytics)
 
 # get all the comments
 @app.route('/comments/<int:post_id>', methods=['GET'])
