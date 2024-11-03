@@ -24,7 +24,7 @@ from src.models import (
     AlertLog,
     CustomFields,
     Notification,
-    UserNotification
+    SystemNotification
 )
 
 from src.routes.helper.access_decorators import (
@@ -600,7 +600,7 @@ def alert_ticket(alert_id):
 def mark_notification(notification_id):
     user_id = current_user.id
    
-    user_notification = UserNotification.query.filter_by(
+    user_notification = SystemNotification.query.filter_by(
         user_id=user_id,
         notification_id=notification_id).first()
     if user_notification:
@@ -631,12 +631,12 @@ def get_user_notifications(
     """
     query = (
         db.session.query(Notification)
-        .join(UserNotification)
-        .filter(UserNotification.user_id == user_id)
+        .join(SystemNotification)
+        .filter(SystemNotification.user_id == user_id)
     )
 
     if unread_only:
-        query = query.filter(UserNotification.unread == True)
+        query = query.filter(SystemNotification.unread == True)
 
     # Add global notifications that aren't already associated with the user
     global_notifications = (
@@ -645,8 +645,8 @@ def get_user_notifications(
             .filter(
                 Notification.is_global == True,
                 ~Notification.id.in_(
-                    db.session.query(UserNotification.notification_id)
-                    .filter(UserNotification.user_id == user_id)
+                    db.session.query(SystemNotification.notification_id)
+                    .filter(SystemNotification.user_id == user_id)
                 )
             )
         )
@@ -661,7 +661,7 @@ def get_user_notifications(
     )
     return [notification.to_dict() for notification in notifications]
 
-@app.route('/api/v1/notifications/', methods=['GET'])
+@app.route('/api/v1/system/notifications/', methods=['GET'])
 @login_required
 def show_all_notifications():
     """API endpoint to retrieve user notifications with optional query parameters."""
@@ -684,11 +684,11 @@ def show_all_notifications():
             'message': str(e)
         }), 500
 
-@app.route('/api/v1/notifications/<int:notification_id>', methods=['GET'])
+@app.route('/api/v1/system/notifications/<int:notification_id>', methods=['GET'])
 @login_required
 def get_notification(notification_id):
     user_id = current_user.id
-    user_notification = UserNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()
+    user_notification = SystemNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()
     if user_notification:
         return jsonify(user_notification.notification.to_dict()), 200
     else:

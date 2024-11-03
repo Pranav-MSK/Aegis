@@ -9,7 +9,7 @@ from src.models.application_general_settings import GeneralSettings
 from src.models.smtp_configuration import SMTPSettings
 from src.models.network_speed_test_result import NetworkSpeedTestResult
 from src.models.user_profile import UserProfile, UserActivity, ActivityTable
-from src.models.notification_settings import NotificationSettings, Notification, UserNotification
+from src.models.notification_settings import NotificationSettings, Notification, SystemNotification
 from src.models.alert_data_models import AlertTicket, InvestigationNote, Report, AlertLog, CustomFields
 from src.models.graph_config import ChartConfiguration
 from src.models.instance_metadata import InstanceMetadata

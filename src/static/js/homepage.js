@@ -13,7 +13,7 @@ const CONFIG = {
     CONTAINER_INFO_API: '/api/v1/system/containers',
     SYSTEM_SERVICES_API: '/api/v1/system/services',
     SYSTEM_SERVICE_CATEGORIES_API: '/api/v1/system/services/categories',
-    SYSTEM_NOTIFICATIONS_API: '/api/v1/notifications/',
+    SYSTEM_NOTIFICATIONS_API: '/api/v1/system/notifications/',
     SYSTEM_STATUS_API: '/api/v1/status'
   }
 };

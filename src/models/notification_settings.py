@@ -72,7 +72,7 @@ class Notification(BaseModel):
     time = db.Column(db.DateTime, default=datetime.utcnow)
     is_global = db.Column(db.Boolean, default=False)  # True for global notifications
 
-    user_notifications = relationship('UserNotification', back_populates='notification')
+    user_notifications = relationship('SystemNotification', back_populates='notification')
 
     def __repr__(self):
         return f'<Notification {self.title}>'
@@ -88,8 +88,8 @@ class Notification(BaseModel):
             "is_global": self.is_global
         }
 
-# UserNotification association model
-class UserNotification(BaseModel):
+# SystemNotification association model
+class SystemNotification(BaseModel):
     __tablename__ = 'user_notifications'
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
@@ -99,4 +99,4 @@ class UserNotification(BaseModel):
     notification = relationship('Notification', back_populates='user_notifications')
 
     def __repr__(self):
-        return f'<UserNotification user_id={self.user_id}, notification_id={self.notification_id}>'
+        return f'<SystemNotification user_id={self.user_id}, notification_id={self.notification_id}>'

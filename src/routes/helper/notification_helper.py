@@ -16,7 +16,7 @@ from src.alert_manager import (
     send_teams_alert,
     send_google_chat_alert,
 )
-from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog, Notification, UserNotification
+from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog, Notification, SystemNotification
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper.alert_helper import can_create_alert
@@ -434,12 +434,12 @@ def generate_system_notification(notification_data, user_id=None):
     new_notification.save()
     
     if new_notification.is_global:
-        # user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
+        # user_notification = SystemNotification(user_id=user_id, notification_id=new_notification.id)
         for user in UserProfile.query.all():
-            user_notification = UserNotification(user_id=user.id, notification_id=new_notification.id)
+            user_notification = SystemNotification(user_id=user.id, notification_id=new_notification.id)
             user_notification.save()
     else:
         if not user_id:
             user_id = current_user.id
-        user_notification = UserNotification(user_id=user_id, notification_id=new_notification.id)
+        user_notification = SystemNotification(user_id=user_id, notification_id=new_notification.id)
     user_notification.save()
