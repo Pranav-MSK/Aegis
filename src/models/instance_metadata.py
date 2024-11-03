@@ -3,6 +3,42 @@ from src.models.base_model import BaseModel
 from src.config import db
 
 class InstanceMetadata(BaseModel):
+    """ 
+    Instance metadata model for the application
+
+    Attributes:
+        - id: int
+        - ami_id: AMI ID
+        - ami_launch_index: AMI launch index
+        - ami_manifest_path: AMI manifest path
+        - block_device_mapping: Block device mapping
+        - events: Events
+        - hostname: Hostname
+        - identity_credentials: Identity credentials
+        - instance_action: Instance action
+        - instance_id: Instance ID
+        - instance_life_cycle: Instance life cycle
+        - instance_type: Instance type
+        - local_hostname: Local hostname
+        - local_ipv4: Local IPv4
+        - mac: MAC address
+        - metrics: Metrics
+        - network: Network
+        - placement: Placement
+        - profile: Profile
+        - public_hostname: Public hostname
+        - public_ipv4: Public IPv4
+        - public_keys: Public keys
+        - region_name: Region name
+        - reservation_id: Reservation ID
+        - security_groups: Security groups
+        - services: Services
+        - system: System
+
+    Methods:
+        - to_dict: Convert instance metadata to a dictionary
+    """
+
     id = db.Column(db.Integer, primary_key=True)
     ami_id = db.Column(db.String(50))
     ami_launch_index = db.Column(db.String(50))

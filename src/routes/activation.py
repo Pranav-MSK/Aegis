@@ -19,6 +19,12 @@ internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', '
 @app.route('/activation', methods=['GET', 'POST'])
 @login_required
 def activation():
+    """ 
+    Activation page route to activate the product with the activation code and show the product details.
+
+    Returns:
+        render_template: Activation page template
+    """
     plan_details = get_plan_details()
     app.jinja_env.globals.update(
         is_plan_not_expired=plan_details.get('is_plan_not_expired'),

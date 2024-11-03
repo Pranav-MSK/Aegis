@@ -315,7 +315,7 @@
                         {% for label, value in [
                         ("Product Name", plan_type),
                         ("Product Version", version),
-                        ("SystemGuard Unique ID", systemguard_unique_id),
+                        ("Unique ID", systemguard_unique_id),
                         ("Remaining Days", remaining_plan_days),
                         ("Username", system_info.system_username)
                         ] %}
@@ -730,7 +730,7 @@
                     <span class="animate-pulse h-2 w-2 bg-red-500 rounded-full"></span>
                 </div>
                 <div class="p-4 bg-red-50 rounded-lg mt-4">
-                    <p class="text-sm font-medium text-red-700">SystemGuard Enterprise is required to access this page.
+                    <p class="text-sm font-medium text-red-700">{{ title }} Enterprise is required to access this page.
                     </p>
                     <a href="{{ url_for('activation') }}" class="text-blue-600 hover:text-blue-800">Upgrade to
                         Enterprise</a>

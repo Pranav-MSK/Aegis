@@ -50,4 +50,5 @@ __all__ = [
     "metrics_bp",
     "middleware_bp",
     "cmd_bp",
+    "user_post_bp",
 ]

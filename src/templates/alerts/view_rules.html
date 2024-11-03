@@ -48,7 +48,7 @@
             total_rules>= max_alert_rules | int %}onsubmit="return false;"{% endif %}>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="action" value="add">
-            <input type="hidden" name="group_name" value="SystemGuard's alert rules">
+            <input type="hidden" name="group_name" value="{{ title }}'s alert rules">
 
             <!-- Form Grid Layout -->
             <div class="space-y-4">

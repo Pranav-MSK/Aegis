@@ -13,7 +13,7 @@ class UserProfile(BaseModel, UserMixin):
     """
     User profile model for the application
     ---
-    Properties:
+    Attributes:
         - id: int
         - username: the username
         - email: the email
@@ -21,6 +21,15 @@ class UserProfile(BaseModel, UserMixin):
         - user_level: the user level
         - receive_email_alerts: if the user receives email alerts
         - profession: the profession of the user
+
+    Methods:
+        - get_by_username: Get user profile by username
+        - get_by_email: Get user profile by email
+        - get_by_id: Get user profile by ID
+        - get_all: Get all user profiles
+        - check_password: Check the password
+        - get_profile_picture_url: Get the profile picture URL
+
     """
     __tablename__ = 'users'
     
@@ -74,6 +83,19 @@ class UserProfile(BaseModel, UserMixin):
         return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
     
 class UserActivity(BaseModel):
+    """
+    User activity model for the application
+
+    Attributes:
+        - id: int
+        - user_id: int
+        - type: str
+        - text: str
+        - created_at: datetime
+
+    Methods:
+        - to_dict: Convert user activity to a dictionary
+    """
     __tablename__ = 'user_activity'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -92,6 +114,18 @@ class UserActivity(BaseModel):
 
 
 class ActivityTable(BaseModel):
+    """"
+    Activity Table Model
+    ---
+    Attributes:
+        - id: int
+        - activity_name: str
+        - activity_point: int
+        - activity_description: str
+
+    Methods:
+        - __repr__: Return the string representation of the model
+    """
     __tablename__ = 'activity_table'
     
     id = db.Column(db.Integer, primary_key=True)

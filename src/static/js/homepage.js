@@ -8,7 +8,7 @@ const CONFIG = {
     NETWORK: 'rgba(234, 179, 8, 1)',
   },
   API_ENDPOINTS: {
-    SYSTEM_INFO_API: '/api/v1/system-info',
+    SYSTEM_INFO_API: '/api/v1/system_info',
     DASHBOARD_STATS_API: '/api/v1/dashboard/stats',
     CONTAINER_INFO_API: '/api/v1/system/containers',
     SYSTEM_SERVICES_API: '/api/v1/system/services',

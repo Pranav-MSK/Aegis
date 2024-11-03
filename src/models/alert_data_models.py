@@ -8,6 +8,37 @@ from src.config import db
 
 # Alert Ticket model to save the alert ticket data
 class AlertTicket(BaseModel):
+    """ 
+    Alert ticket model to save the alert ticket data
+    ---
+    Attributes:
+
+        - id: int
+        - alert_name: str
+        - instance: str
+        - severity: str
+        - summary: str
+        - description: str
+        - alert_status: str
+        - ticket_status: str
+        - system_username: str
+        - system_hostname: str
+        - fingerprint: str
+        - runbook_url: str
+        - created_at: datetime
+        - updated_at: datetime
+        - assigned_user_id: int
+        - assigned_supervisor_id: int
+        - investigation_notes: list
+        - reports: list
+        - alertlogs: list
+        - customfields: list
+    
+    Methods:
+        - to_dict: Return the dictionary representation of the model
+        - serialize: Return the serialized representation of the model
+    """
+
     __tablename__ = 'alert_tickets'
     __table_args__ = (
         db.Index('ix_alert_name', 'alert_name'),
@@ -95,6 +126,19 @@ class AlertTicket(BaseModel):
         }
 
 class AlertLog(BaseModel):
+    """
+    Alert Log model to save individual alert logs for an alert ticket
+    ---
+    Attributes:
+        - id: int
+        - alert_ticket_id: int
+        - log: str
+        - created_at: datetime
+    ---
+    Methods:
+        - to_dict: Return the dictionary representation of the model
+
+    """
     __tablename__ = 'alert_logs'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -112,6 +156,19 @@ class AlertLog(BaseModel):
 
 # Investigation Note model to save individual investigation notes
 class InvestigationNote(BaseModel):
+    """
+    Investigation Note model to save individual investigation notes for an alert ticket
+
+    Attributes:
+        - id: int
+        - alert_ticket_id: int
+        - user_id: int
+        - note: str
+        - created_at: datetime
+    
+    Methods:
+        - to_dict: Return the dictionary representation of the model
+    """
     __tablename__ = 'investigation_notes'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -135,6 +192,7 @@ class InvestigationNote(BaseModel):
 
 # Report model to save individual reports
 class Report(BaseModel):
+    
     __tablename__ = 'reports'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -157,6 +215,21 @@ class Report(BaseModel):
 
 
 class CustomFields(BaseModel):
+    """ 
+    Custom field model to save remark fields for an alert ticket
+
+    Attributes:
+        - id: int
+        - alert_ticket_id: int
+        - field_name: str
+        - field_value: str
+        - created_at: datetime
+    
+    Methods:
+        - to_dict: Return the dictionary representation of the model
+    
+    """
+
 
     __tablename__ = 'custom_fields'
 

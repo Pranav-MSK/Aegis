@@ -4,32 +4,32 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
+from datetime import datetime
+from humanize import naturaltime
 
 from src.disk_manager import DiskMetrics
 from src.network_manager import NetworkMetrics
+from src.helper import get_system_node_name, get_ip_address, load_secret_key
+from src.activator import get_plan_details
 
+# disk and metrics background process
 disk_metrics = DiskMetrics()
 disk_metrics.start()
 network_metrics = NetworkMetrics()
 network_metrics.start()
 
-from src.helper import get_system_node_name, get_ip_address, load_secret_key
-from src.activator import get_plan_details
-
 app = Flask(__name__)
 
 # Application Metadata
-APP_NAME = "SystemGuard"
+APP_NAME = "Aegis"
 DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor your system resources."
 AUTHOR = "SystemGuard Team"
 YEAR = "2024"
 PRE_RELEASE = False
 VERSION = "v1.0.6"
-PROJECT_URL = f"https://github.com/codeperfectplus/{APP_NAME}"
 CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()
-
 
 obfuscated_flask_config = load_secret_key("flask_configuration.so")
 
@@ -67,7 +67,6 @@ app.jinja_env.globals.update(
     year=YEAR,
     version=VERSION,
     pre_release=PRE_RELEASE,
-    project_url=PROJECT_URL,
     contact_email=CONTACT_EMAIL,
     system_name=SYSTEM_NAME,
     system_ip_address=SYSTEM_IP_ADDRESS,
@@ -101,7 +100,6 @@ def get_app_info():
         "year": int(YEAR),
         "version": VERSION,
         "pre_release": PRE_RELEASE,
-        "project_url": PROJECT_URL,
         "contact_email": CONTACT_EMAIL,
         "system_name": SYSTEM_NAME,
         "system_ip_address": SYSTEM_IP_ADDRESS,
@@ -119,8 +117,7 @@ def get_app_info():
         "max_users_allowed": safe_int_conversion(plan_details.get('max_users_allowed', 0))
     }
 
-from datetime import datetime
-from humanize import naturaltime
+
 @app.template_filter()
 def natural_time(value):
     """Convert a datetime object to a human-readable format."""

@@ -26,5 +26,4 @@ Welcome to SystemGuard's documentation!
    alerts.rst
    workflows.rst
    external_api_monitoring.rst
-   screenshots.rst
    api_endpoints.rst

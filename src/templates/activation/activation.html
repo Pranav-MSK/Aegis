@@ -7,7 +7,7 @@
         <!-- Header Section -->
         <div class="text-center mb-12">
             <h1 class="text-4xl font-bold text-gray-900 mb-3">{{ title }} Activation</h1>
-            <p class="text-xl text-gray-600">Activate your SystemGuard and start protecting your system now!</p>
+            <p class="text-xl text-gray-600">Activate your {{ title }} and start protecting your system now!</p>
         </div>
 
         {% include 'ext/message.html' %}
@@ -31,7 +31,7 @@
             <!-- SystemGuard ID Section -->
             {% if systemguard_unique_id %}
             <div class="bg-gray-50 p-6 rounded-lg">
-                <h5 class="text-lg font-medium text-gray-900 mb-2">SystemGuard Unique ID</h5>
+                <h5 class="text-lg font-medium text-gray-900 mb-2">{{ title }} Unique ID</h5>
                 <p class="text-gray-700 font-mono bg-white p-3 rounded border border-gray-200">{{ systemguard_unique_id }}</p>
             </div>
             {% endif %}
@@ -115,7 +115,7 @@
 
         <!-- Footer -->
         <footer class="mt-12 text-center">
-            <p class="text-gray-600">&copy; 2024 SystemGuard. All rights reserved.</p>
+            <p class="text-gray-600">&copy; 2024 {{ title }}. All rights reserved.</p>
             <div class="mt-4 space-x-4">
                 <a href="{{ url_for('terms') }}" class="text-indigo-600 hover:text-indigo-500 text-sm">Terms & Conditions</a>
                 <a href="{{ url_for('privacy') }}" class="text-indigo-600 hover:text-indigo-500 text-sm">Privacy Policy</a>

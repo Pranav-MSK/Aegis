@@ -37,7 +37,7 @@
                                     'hover:bg-indigo-100': activeTab !== 'systemguard'}"
                             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left">
                             <i class="fa-brands fa-centercode w-5"></i>
-                            <span class="font-medium">SystemGuard Central</span>
+                            <span class="font-medium">{{ title }} Central</span>
                         </button>
 
                         <button @click="activeTab = 'alerts'" :class="{'bg-gradient-to-r from-indigo-500 to-purple-500 text-white': activeTab === 'alerts',
@@ -159,7 +159,7 @@
                             <div class="p-3 bg-blue-100 rounded-xl">
                                 <i class="fa-brands fa-centercode text-blue-600 text-xl"></i>
                             </div>
-                            <h2 class="text-2xl font-bold text-gray-800">SystemGuard Central</h2>
+                            <h2 class="text-2xl font-bold text-gray-800">{{ title }} Central</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <a href="{{ url_for('configure_targets') }}"
@@ -339,7 +339,7 @@
                                 <div class="p-3 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
                                     <i class="fas fa-key text-gray-600"></i>
                                 </div>
-                                <span class="font-medium text-gray-700 group-hover:text-gray-700">SystemGuard Activation</span>
+                                <span class="font-medium text-gray-700 group-hover:text-gray-700">{{ title }} Activation</span>
                             </a>
                             {% endif %}
                         </div>

@@ -3,6 +3,21 @@ from src.config import db
 
 
 class BaseModel(db.Model):
+    """ 
+    Base model for all models in the application
+    ---
+    Attributes:
+        - id: int
+        - created_at: datetime
+        - updated_at: datetime
+    ---
+    Methods:
+        - save: Save the model to the database
+        - delete: Delete the model from the database
+        - get_all: Get all records of the model
+        - get_by_id: Get a record by ID
+        - fetch_total_count: Fetch the total count of records
+    """
     __abstract__ = True  # This ensures that SQLAlchemy doesn't create a table for this class
 
     def save(self):

@@ -14,7 +14,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-blue-600 mb-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                     </svg>
-                    <h2 class="text-3xl font-extrabold text-gray-900">SystemGuard</h2>
+                    <h2 class="text-3xl font-extrabold text-gray-900">{{ title }}</h2>
                     <p class="text-sm text-gray-600 mt-2">Secure Monitoring & Visualization Platform</p>
                 </div>
                 <form method="post" class="space-y-6" novalidate>
@@ -121,7 +121,7 @@
         
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-500">
-                © {{ current_year }} SystemGuard. All rights reserved.
+                © {{ current_year }} {{ title }}. All rights reserved.
             </p>
         </div>
     </div>

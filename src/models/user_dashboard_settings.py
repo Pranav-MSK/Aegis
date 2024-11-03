@@ -8,12 +8,15 @@ class UserDashboardSettings(BaseModel):
     """
     User dashboard settings model for the application
     ---
-    Properties:
+    Attributes:
         - id: int
         - user_id: the user id
         - speedtest_cooldown: the cooldown for speedtests
         - number_of_speedtests: the number of speedtests
         - refresh_interval: the refresh interval for the dashboard
+        - bytes_to_megabytes: the conversion factor from bytes to
+            megabytes
+    
     """
     __tablename__ = 'user_dashboard_settings'
 

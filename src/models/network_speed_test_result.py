@@ -9,12 +9,15 @@ class NetworkSpeedTestResult(BaseModel):
     """
     Network speed test result model for the application
     ---
-    Properties:
+    Attributes:
         - id: int
         - download_speed: the download speed
         - upload_speed: the upload speed
         - ping: the ping
         - timestamp: the timestamp of the speed test
+    
+    Methods:
+        - __repr__: Return the string representation of the model
     """
     __tablename__ = "network_speed_test_result"
     id = db.Column(db.Integer, primary_key=True)

@@ -7,13 +7,19 @@ class SMTPSettings(BaseModel):
     """
     SMTP settings model for the application
     ---
-    Properties:
+    Attributes:
         - id: int
         - username: the username for the SMTP server
         - password: the password for the SMTP server
         - smtp_server: the SMTP server
         - smtp_port: the SMTP port
         - email_from: the email address to send from
+
+    Methods:
+        - to_dict: Convert SMTP settings to a dictionary
+        - get_all: Get all SMTP settings
+        - get_by_id: Get SMTP settings by ID
+        - get_by_username: Get SMTP settings by username
     """
     __tablename__ = "smtp_settings"
     id = db.Column(db.Integer, primary_key=True)

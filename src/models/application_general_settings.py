@@ -6,12 +6,13 @@ class GeneralSettings(BaseModel):
     """
     General settings model for the application
     ---
-    Properties:
+    Attributes:
         - id: int
         - enable_alerts: if email alerts are enabled
         - timezone: the timezone of the system
         - enable_cache: if caching is enabled
         - is_logging_system_info: if system info is logged
+
     """
     __tablename__ = 'general_settings'
     

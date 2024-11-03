@@ -6,6 +6,22 @@ from src.config import db
 
 
 class UserArticle(BaseModel):
+    """  User Article Model 
+
+    Attributes:
+        - id: int
+        - user_id: int
+        - title: str
+        - content: str
+        - tags: str
+        - is_deleted: bool
+        - created_at: datetime
+        - updated_at: datetime
+
+    Methods:
+        - __repr__: Return the string representation of the model
+    """
+
     __tablename__ = 'posts'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -24,6 +40,22 @@ class UserArticle(BaseModel):
         return f"<Post {self.id} by User {self.user_id}>"
 
 class UserPostComment(BaseModel):
+    """ User Post Comment Model\
+    
+    Attributes:
+        - id: int
+        - post_id: int
+        - user_id: int
+        - content: str
+        - created_at: datetime
+        - updated_at: datetime
+
+
+    Methods:
+        - __repr__: Return the string representation of the model
+
+    """
+
     __tablename__ = 'comments'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -40,6 +72,18 @@ class UserPostComment(BaseModel):
 
 
 class UserPostLike(BaseModel):
+    """
+    User Post Like Model 
+
+    Attributes:
+        - id: int
+        - post_id: int
+        - user_id: int
+        - created_at: datetime
+
+    Methods:
+        - __repr__: Return the string representation of the model
+    """
     __tablename__ = 'likes'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -54,6 +98,22 @@ class UserPostLike(BaseModel):
 
 
 class UserSavedPost(BaseModel):
+    """
+    User Saved Post Model
+
+    Attributes:
+        - id: int
+        - user_id: int
+        - post_id: int
+        - created_at: datetime
+
+    Methods:
+        - __repr__: Return the string representation of the
+    
+    Relationships:
+        - user: User relationship
+        - post: Post relationship
+    """
     __tablename__ = 'saved_posts'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -69,6 +129,20 @@ class UserSavedPost(BaseModel):
 
 
 class UserPostReport(BaseModel):
+    """
+    User Post Report Model
+
+    Attributes:
+        - id: int
+        - post_id: int
+        - user_id: int
+        - reason: str
+        - created_at: datetime
+
+    Methods:
+        - __repr__: Return the string representation of the model
+        
+    """
     __tablename__ = 'post_reports'
 
     id = db.Column(db.Integer, primary_key=True)

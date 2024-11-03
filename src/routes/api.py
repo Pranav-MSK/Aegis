@@ -5,7 +5,6 @@ import aiohttp
 from datetime import datetime, timezone
 from flask import jsonify, blueprints, request, render_template
 from flask_login import login_required, current_user
-from flask_compress import Compress
 from src.config import app, db, csrf
 from src.models import (
     UserDashboardSettings,
@@ -32,14 +31,14 @@ from src.routes.helper.health_helper import check_database
 api_bp = blueprints.Blueprint("api", __name__)
 
 cache = {}
-compress = Compress(app)
+
 
 PROMETHEUS_BASE_URL = "http://localhost:9090"
 QUERY_API_URL = f"{PROMETHEUS_BASE_URL}/api/v1/query_range"
 TARGETS_API_URL = f"{PROMETHEUS_BASE_URL}/api/v1/targets"
 
 
-@app.route("/api/v1/system-info", methods=["GET"])
+@app.route("/api/v1/system_info", methods=["GET"])
 @csrf.exempt
 @login_required
 def system_api():
@@ -133,11 +132,11 @@ def graph_data_api():
         elif time_range_seconds <= 900:  # 15 minutes
             step = "10s"
         elif time_range_seconds <= 3600:  # 1 hour
-            step = "30s"
+            step = "15s"
         elif time_range_seconds <= 86400:  # 1 day
-            step = "5m"
+            step = "20s"
         elif time_range_seconds <= 259200:  # 3 days
-            step = "10m"
+            step = "5m"
         elif time_range_seconds <= 604800:  # 1 week
             step = "30m"
 

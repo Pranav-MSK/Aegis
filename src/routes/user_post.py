@@ -49,7 +49,7 @@ def discussion_board():
 
     # Retrieve saved posts for the current user, filtering out deleted ones
     saved_post_ids = [post.post_id for post in UserSavedPost.query.filter_by(user_id=current_user.id).all()]
-    saved_posts = UserArticle.query.filter(UserArticle.id.in_(saved_post_ids), UserArticle.is_deleted == False).all()
+    # saved_posts = UserArticle.query.filter(UserArticle.id.in_(saved_post_ids), UserArticle.is_deleted == False).all()
 
     # Use pagination for saved posts
     saved_pagination = UserArticle.query.filter(UserArticle.id.in_(saved_post_ids), UserArticle.is_deleted == False).order_by(UserArticle.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)

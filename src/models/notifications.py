@@ -7,6 +7,26 @@ from sqlalchemy.orm import relationship
 class NotificationSettings(BaseModel):
     """
     Notification settings for Slack, Discord, and Teams.
+
+    Attributes:
+        - id: Notification ID
+        - slack_webhook_url: Slack webhook URL
+        - discord_webhook_url: Discord webhook URL
+        - teams_webhook_url: Teams webhook URL
+        - google_chat_webhook_url: Google Chat webhook URL
+        - is_email_alert_enabled: True if email alerts are enabled
+        - is_slack_alert_enabled: True if Slack alerts are enabled
+        - is_discord_alert_enabled: True if Discord alerts are enabled
+        - is_teams_alert_enabled: True if Teams alerts are enabled
+        - is_google_chat_alert_enabled: True if Google Chat alerts are enabled
+
+    Methods:
+        - to_dict: Convert notification settings to a dictionary
+        - get_slack_webhook_url: Get the Slack webhook URL
+        - get_discord_webhook_url: Get the Discord webhook URL
+        - get_teams_webhook_url: Get the Teams webhook URL
+        - get_google_chat_webhook_url: Get the Google Chat webhook URL
+        - get_telegram_webhook_url: Get the Telegram webhook URL
     """
 
     id = db.Column(db.Integer, primary_key=True)
@@ -62,6 +82,25 @@ class NotificationSettings(BaseModel):
 
 # Notification model
 class Notification(BaseModel):
+    """
+    Notification model for system notifications.
+    
+    Attributes:
+        - id: Notification ID
+        - type: Notification type (e.g., 'info', 'warning', 'error')
+        - icon: Notification icon (e.g., 'info', 'warning', 'error')
+        - title: Notification title
+        - message: Notification message content
+        - time: Notification timestamp
+        - is_global: True for global notifications
+    
+    Relationships:
+        - user_notifications: User notifications relationship
+
+    Methods:
+        - to_dict: Convert notification attributes to a dictionary
+
+    """
     __tablename__ = 'notifications'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -88,8 +127,22 @@ class Notification(BaseModel):
             "is_global": self.is_global
         }
 
-# SystemNotification association model
 class SystemNotification(BaseModel):
+    """ 
+    System notification model to track read/unread notifications for users.
+
+    Attributes:
+        - user_id: User ID
+        - notification_id: Notification ID
+        - unread: True if notification is unread
+
+    Relationships:
+        - notification: Notification relationship
+
+    Methods:
+        - __repr__: Return a string representation of the object
+    """
+
     __tablename__ = 'user_notifications'
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)

@@ -6,6 +6,28 @@ from src.config import db
 
 
 class ChartConfiguration(BaseModel):
+    """ 
+    Chart configuration model for the application
+
+    Attributes:
+        - id: int
+        - user_id: the user id
+        - metric_name: the metric name
+        - title: the title of the chart
+        - xlabel: the x-axis label
+        - ylabel: the y-axis label
+        - chart_type: the type of chart
+        - tension: the tension of the chart
+        - point_radius: the point radius of the chart
+        - point_hover_radius: the point hover radius of the chart
+        - is_active: True if the chart is active
+        - created_at: the created date of the chart
+        - updated_at: the updated date of the chart
+    
+    Methods:
+        - serialize: Serialize the chart configuration
+        - to_dict: Convert the chart configuration to a dictionary
+    """
 
     __tablename__ = "chart_configurations"
 
