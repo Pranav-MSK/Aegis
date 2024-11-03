@@ -10,7 +10,7 @@ user_post_bp = Blueprint('user_post', __name__)
 
 @app.route('/system/updates', methods=['GET', 'POST'])
 @login_required
-def system_updates():
+def discussion_board():
     if request.method == 'POST':
         content = request.form.get('content')
         form_type = request.form.get('form_type')
@@ -26,7 +26,7 @@ def system_updates():
                 "is_global": True
             }
             generate_system_notification(notification_data)
-            return redirect(url_for('system_updates'))
+            return redirect(url_for('discussion_board'))
 
         if form_type == 'edit_post':
             post_id = request.form.get('post_id')
@@ -34,7 +34,7 @@ def system_updates():
             if post and not post.is_deleted:  # Ensure the post exists and is not deleted
                 post.content = content
                 post.save()
-            return redirect(url_for('system_updates'))
+            return redirect(url_for('discussion_board'))
 
     page = request.args.get('page', 1, type=int)  # Get the current page number
     per_page = 10
@@ -55,7 +55,7 @@ def system_updates():
 
     deleted_posts = UserArticle.query.filter_by(is_deleted=True).all()
 
-    return render_template('other/system_updates.html', 
+    return render_template('other/discussion_board.html', 
                            pagination=pagination, 
                            saved_pagination=saved_pagination, 
                            liked_post_ids=liked_post_ids,
@@ -95,7 +95,7 @@ def like_post(post_id):
         }
         generate_system_notification(notification_data, user_id=post_owner_id)
     
-    return redirect(url_for('system_updates'))
+    return redirect(url_for('discussion_board'))
 
 @app.route('/comment/<int:post_id>', methods=['POST'])
 @login_required
@@ -116,7 +116,7 @@ def comment(post_id):
             "user_id": post_owner_id
         }
         generate_system_notification(notification_data, user_id=post_owner_id)
-    return redirect(url_for('system_updates'))
+    return redirect(url_for('discussion_board'))
 
 
 @app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
@@ -124,14 +124,14 @@ def comment(post_id):
 def edit_post(post_id):
     post = UserArticle.query.get_or_404(post_id)
     if post.user_id != current_user.id:
-        return redirect(url_for('system_updates'))  # Prevent editing other users' posts
+        return redirect(url_for('discussion_board'))  # Prevent editing other users' posts
     
     if request.method == 'POST':
         content = request.form.get('content')
         if content:
             post.content = content
             post.save()
-            return redirect(url_for('system_updates'))
+            return redirect(url_for('discussion_board'))
     
     return render_template('other/edit_post.html', post=post)
 
@@ -154,7 +154,7 @@ def delete_post(post_id):
         post.save()
 
 
-    return redirect(url_for('system_updates'))
+    return redirect(url_for('discussion_board'))
 
 @app.route('/save_post/<int:post_id>', methods=['POST'])
 @login_required
@@ -163,7 +163,7 @@ def save_post(post_id):
     if not existing_save:
         new_save = UserSavedPost(post_id=post_id, user_id=current_user.id)
         new_save.save()
-    return redirect(url_for('system_updates'))
+    return redirect(url_for('discussion_board'))
 
 @app.route('/unsave_post/<int:post_id>', methods=['POST'])
 @login_required
@@ -171,7 +171,7 @@ def unsave_post(post_id):
     existing_save = UserSavedPost.query.filter_by(post_id=post_id).first()
     if existing_save:
         existing_save.delete()
-    return redirect(url_for('system_updates'))
+    return redirect(url_for('discussion_board'))
 
 
 # restore_post
@@ -182,7 +182,7 @@ def restore_post(post_id):
     if post.user_id == current_user.id:
         post.is_deleted = False
         post.save()
-    return redirect(url_for('system_updates'))
+    return redirect(url_for('discussion_board'))
 
 # delete_post_permanently
 @app.route('/delete_post_permanently/<int:post_id>', methods=['POST'])
@@ -191,4 +191,4 @@ def delete_post_permanently(post_id):
     post = UserArticle.query.get_or_404(post_id)
     if post.user_id == current_user.id:
         post.delete()
-    return redirect(url_for('system_updates'))
+    return redirect(url_for('discussion_board'))

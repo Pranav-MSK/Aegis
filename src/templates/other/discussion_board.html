@@ -76,7 +76,7 @@
 
                         <!-- Expanded Form -->
                         <div x-show="isExpanded" class="border-t" x-transition>
-                            <form action="{{ url_for('system_updates') }}" method="POST" class="p-4">
+                            <form action="{{ url_for('discussion_board') }}" method="POST" class="p-4">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="form_type" value="create_post">
                                 <textarea name="content" rows="4"
@@ -275,7 +275,7 @@
                         <!-- Pagination Controls -->
                         <nav class="flex justify-center items-center space-x-4 mt-8">
                             {% if pagination.has_prev %}
-                            <a href="{{ url_for('system_updates', page=pagination.prev_num) }}"
+                            <a href="{{ url_for('discussion_board', page=pagination.prev_num) }}"
                                 class="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
                                 <i class="fas fa-chevron-left mr-2"></i> Previous
                             </a>
@@ -284,7 +284,7 @@
                                 Page {{ pagination.page }} of {{ pagination.pages }}
                             </span>
                             {% if pagination.has_next %}
-                            <a href="{{ url_for('system_updates', page=pagination.next_num) }}"
+                            <a href="{{ url_for('discussion_board', page=pagination.next_num) }}"
                                 class="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
                                 Next <i class="fas fa-chevron-right ml-2"></i>
                             </a>
