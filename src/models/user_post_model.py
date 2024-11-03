@@ -15,8 +15,8 @@ class UserArticle(BaseModel):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     user = db.relationship('UserProfile', backref='posts')
-    comments = db.relationship('UserPostComment', backref='post', lazy=True)
-    likes = db.relationship('UserPostLike', backref='post', lazy=True)
+    comments = db.relationship('UserPostComment', backref='post', lazy=True, cascade='all, delete-orphan')
+    likes = db.relationship('UserPostLike', backref='post', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<Post {self.id} by User {self.user_id}>"

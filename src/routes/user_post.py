@@ -14,6 +14,7 @@ def system_updates():
     if request.method == 'POST':
         content = request.form.get('content')
         form_type = request.form.get('form_type')
+
         if form_type == 'create_post' and content:
             new_post = UserArticle(user_id=current_user.id, content=content)
             new_post.save()
@@ -26,27 +27,40 @@ def system_updates():
             }
             generate_system_notification(notification_data)
             return redirect(url_for('system_updates'))
-        
+
         if form_type == 'edit_post':
             post_id = request.form.get('post_id')
             post = UserArticle.query.get(post_id)
-            post.content = content
-            post.save()
+            if post and not post.is_deleted:  # Ensure the post exists and is not deleted
+                post.content = content
+                post.save()
             return redirect(url_for('system_updates'))
-        
+
     page = request.args.get('page', 1, type=int)  # Get the current page number
     per_page = 10
+
+    # Get paginated list of undeleted posts
     pagination = UserArticle.query.filter_by(is_deleted=False).order_by(UserArticle.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
 
-    # return saved_post as well to show saved post sepratly 
-    saved_posts = UserSavedPost.query.filter_by(user_id=current_user.id).all()
-    saved_post_ids = [post.post_id for post in saved_posts]
-    saved_posts = UserArticle.query.filter(UserArticle.id.in_(saved_post_ids)).all()
+    # Retrieve saved posts for the current user, filtering out deleted ones
+    saved_post_ids = [post.post_id for post in UserSavedPost.query.filter_by(user_id=current_user.id).all()]
+    saved_posts = UserArticle.query.filter(UserArticle.id.in_(saved_post_ids), UserArticle.is_deleted == False).all()
 
-    # use pagination in saved post 
-    saved_pagination = UserArticle.query.filter(UserArticle.id.in_(saved_post_ids)).order_by(UserArticle.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    
-    return render_template('other/system_updates.html', posts=pagination.items, pagination=pagination, saved_posts=saved_pagination.items, saved_pagination=saved_pagination)
+    # Use pagination for saved posts
+    saved_pagination = UserArticle.query.filter(UserArticle.id.in_(saved_post_ids), UserArticle.is_deleted == False).order_by(UserArticle.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+
+    liked_post_ids = [like.post_id for like in UserPostLike.query.filter_by(user_id=current_user.id).all()]
+
+    latest_posts = UserArticle.query.filter_by(is_deleted=False).order_by(UserArticle.created_at.desc()).limit(5).all()
+
+    deleted_posts = UserArticle.query.filter_by(is_deleted=True).all()
+
+    return render_template('other/system_updates.html', 
+                           pagination=pagination, 
+                           saved_pagination=saved_pagination, 
+                           liked_post_ids=liked_post_ids,
+                           latest_posts=latest_posts,
+                            deleted_posts=deleted_posts)
 
 # get all the comments
 @app.route('/comments/<int:post_id>', methods=['GET'])
@@ -157,4 +171,24 @@ def unsave_post(post_id):
     existing_save = UserSavedPost.query.filter_by(post_id=post_id).first()
     if existing_save:
         existing_save.delete()
+    return redirect(url_for('system_updates'))
+
+
+# restore_post
+@app.route('/restore_post/<int:post_id>', methods=['POST'])
+@login_required
+def restore_post(post_id):
+    post = UserArticle.query.get_or_404(post_id)
+    if post.user_id == current_user.id:
+        post.is_deleted = False
+        post.save()
+    return redirect(url_for('system_updates'))
+
+# delete_post_permanently
+@app.route('/delete_post_permanently/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post_permanently(post_id):
+    post = UserArticle.query.get_or_404(post_id)
+    if post.user_id == current_user.id:
+        post.delete()
     return redirect(url_for('system_updates'))
