@@ -1,7 +1,6 @@
 # cython: language_level=3
 from http import HTTPStatus
 from datetime import datetime
-from typing import List, Dict, Any
 from flask import (
     request,
     jsonify,
@@ -23,8 +22,7 @@ from src.models import (
     InvestigationNote,
     AlertLog,
     CustomFields,
-    Notification,
-    SystemNotification
+    SystemNotification,
 )
 
 from src.routes.helper.access_decorators import (
@@ -34,6 +32,7 @@ from src.routes.helper.access_decorators import (
 from src.routes.helper.alert_helper import user_has_access_to_alert, user_id_to_username
 from src.routes.helper.notification_helper import generate_system_notification
 from src.routes.helper.common_helper import award_points
+from src.routes.helper.notification_helper import fetch_user_notifications
 
 alert_bp = Blueprint("alert", __name__)
 
@@ -204,35 +203,58 @@ def alert_history():
     closed_page = request.args.get("closed_page", 1, type=int)
 
     def paginate_alerts(query, page):
-        return query.order_by(AlertTicket.updated_at.desc(), AlertTicket.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        return query.order_by(
+            AlertTicket.updated_at.desc(), AlertTicket.created_at.desc()
+        ).paginate(page=page, per_page=per_page, error_out=False)
 
     unassigned_alerts = paginate_alerts(
-        base_query.filter(AlertTicket.assigned_user_id.is_(None)),
-        unassigned_page
+        base_query.filter(AlertTicket.assigned_user_id.is_(None)), unassigned_page
     )
     open_alerts = paginate_alerts(
-        base_query.filter(AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)),
-        open_page
+        base_query.filter(
+            AlertTicket.ticket_status == "Open",
+            AlertTicket.assigned_user_id.isnot(None),
+        ),
+        open_page,
     )
     in_progress_alerts = paginate_alerts(
-        base_query.filter(AlertTicket.ticket_status == "In Progress", AlertTicket.assigned_user_id.isnot(None)),
-        in_progress_page
+        base_query.filter(
+            AlertTicket.ticket_status == "In Progress",
+            AlertTicket.assigned_user_id.isnot(None),
+        ),
+        in_progress_page,
     )
     resolved_alerts = paginate_alerts(
-        base_query.filter(AlertTicket.ticket_status == "Resolved", AlertTicket.assigned_user_id.isnot(None)),
-        resolved_page
+        base_query.filter(
+            AlertTicket.ticket_status == "Resolved",
+            AlertTicket.assigned_user_id.isnot(None),
+        ),
+        resolved_page,
     )
     closed_alerts = paginate_alerts(
-        base_query.filter(AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)),
-        closed_page
+        base_query.filter(
+            AlertTicket.ticket_status == "Closed",
+            AlertTicket.assigned_user_id.isnot(None),
+        ),
+        closed_page,
     )
 
     # Get counts for unassigned, open, in progress, resolved, and closed alerts
     unassigned_count = base_query.filter(AlertTicket.assigned_user_id.is_(None)).count()
-    open_count = base_query.filter(AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)).count()
-    in_progress_count = base_query.filter(AlertTicket.ticket_status == "In Progress", AlertTicket.assigned_user_id.isnot(None)).count()
-    resolved_count = base_query.filter(AlertTicket.ticket_status == "Resolved", AlertTicket.assigned_user_id.isnot(None)).count()
-    closed_count = base_query.filter(AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)).count()
+    open_count = base_query.filter(
+        AlertTicket.ticket_status == "Open", AlertTicket.assigned_user_id.isnot(None)
+    ).count()
+    in_progress_count = base_query.filter(
+        AlertTicket.ticket_status == "In Progress",
+        AlertTicket.assigned_user_id.isnot(None),
+    ).count()
+    resolved_count = base_query.filter(
+        AlertTicket.ticket_status == "Resolved",
+        AlertTicket.assigned_user_id.isnot(None),
+    ).count()
+    closed_count = base_query.filter(
+        AlertTicket.ticket_status == "Closed", AlertTicket.assigned_user_id.isnot(None)
+    ).count()
 
     critical_count = base_query.filter(AlertTicket.severity == "critical").count()
     warning_count = base_query.filter(AlertTicket.severity == "warning").count()
@@ -258,6 +280,7 @@ def alert_history():
         info_count=info_count,
         current_user=current_user,
     )
+
 
 @app.route("/alerts/ticket/<int:alert_id>", methods=["GET", "POST"])
 @systemguard_enterprise()
@@ -295,7 +318,7 @@ def alert_ticket(alert_id):
                     alert.ticket_status = "In Progress"
                     log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
                     flash("User assigned successfully!", "success")
-            
+
                     notification_data = {
                         "type": "info",
                         "icon": "info-circle",  # Font Awesome icon
@@ -304,7 +327,7 @@ def alert_ticket(alert_id):
                         "is_global": False,
                     }
                     generate_system_notification(notification_data, assigned_user_id)
-                    award_points('ticket', user_id=assigned_user_id)
+                    award_points("ticket", user_id=assigned_user_id)
                 else:
                     alert.assigned_supervisor_id = assigned_user_id
                     log_message = f"Supervisor {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
@@ -313,7 +336,7 @@ def alert_ticket(alert_id):
                 if form_type == "assign_user":
                     alert.assigned_user_id = None
                     log_message = f"User {user_id_to_username(previous_user_id)} removed from alert ticket by {current_user.username}"
-                    award_points('ticket', reverse=True, user_id=previous_user_id)
+                    award_points("ticket", reverse=True, user_id=previous_user_id)
                     flash("User removed successfully!", "success")
                 else:
                     alert.assigned_supervisor_id = None
@@ -431,7 +454,7 @@ def alert_ticket(alert_id):
             if form_type == "close_ticket":
                 alert.ticket_status = "Closed"
                 note_content = request.form.get("investigation_notes")
-                award_points('closed', user_id=alert.assigned_user_id)
+                award_points("closed", user_id=alert.assigned_user_id)
                 if note_content:
                     InvestigationNote(
                         alert_ticket_id=alert.id,
@@ -477,7 +500,7 @@ def alert_ticket(alert_id):
             elif form_type == "resolve_ticket":
                 alert.ticket_status = "Resolved"
                 note_content = request.form.get("investigation_notes")
-                award_points('resolved', user_id=alert.assigned_user_id)
+                award_points("resolved", user_id=alert.assigned_user_id)
                 if note_content:
                     InvestigationNote(
                         alert_ticket_id=alert.id,
@@ -594,103 +617,54 @@ def alert_ticket(alert_id):
         investigation_notes=investigation_notes,
     )
 
-@app.route('/api/v1/mark_notification/<int:notification_id>', methods=['POST'])
+
+@app.route("/api/v1/mark_notification/<int:notification_id>", methods=["POST"])
 @csrf.exempt
 @login_required
 def mark_notification(notification_id):
     user_id = current_user.id
-   
+
     user_notification = SystemNotification.query.filter_by(
-        user_id=user_id,
-        notification_id=notification_id).first()
+        user_id=user_id, notification_id=notification_id
+    ).first()
     if user_notification:
         user_notification.unread = False  # Mark as read
         db.session.commit()
         # flash("Notification marked as read!", "success")
-        return jsonify({'message': 'Notification marked as read!'}), 200
+        return jsonify({"message": "Notification marked as read!"}), 200
     else:
-        return jsonify({'message': 'Notification not found for user.'}), 404
+        return jsonify({"message": "Notification not found for user."}), 404
 
-def get_user_notifications(
-    user_id: int,
-    unread_only: bool = True,
-    limit: int = 50,
-    offset: int = 0
-) -> List[Dict[str, Any]]:
-    """
-    Get notifications for a specific user with optional filtering and pagination.
-    
-    Args:
-        user_id: The ID of the user
-        unread_only: If True, only return unread notifications
-        limit: Maximum number of notifications to return
-        offset: Number of notifications to skip
-        
-    Returns:
-        List of notification dictionaries
-    """
-    query = (
-        db.session.query(Notification)
-        .join(SystemNotification)
-        .filter(SystemNotification.user_id == user_id)
-    )
 
-    if unread_only:
-        query = query.filter(SystemNotification.unread == True)
-
-    # Add global notifications that aren't already associated with the user
-    global_notifications = (
-        query.union(
-            db.session.query(Notification)
-            .filter(
-                Notification.is_global == True,
-                ~Notification.id.in_(
-                    db.session.query(SystemNotification.notification_id)
-                    .filter(SystemNotification.user_id == user_id)
-                )
-            )
-        )
-    )
-
-    notifications = (
-        global_notifications
-        .order_by(Notification.time.desc())
-        .offset(offset)
-        .limit(limit)
-        .all()
-    )
-    return [notification.to_dict() for notification in notifications]
-
-@app.route('/api/v1/system/notifications/', methods=['GET'])
+@app.route("/api/v1/system/notifications/", methods=["GET"])
 @login_required
 def show_all_notifications():
     """API endpoint to retrieve user notifications with optional query parameters."""
     try:
-        unread_only = request.args.get('unread_only', 'true').lower() == 'true'
-        limit = min(int(request.args.get('limit', 50)), 100)  # Cap at 100
-        offset = max(int(request.args.get('offset', 0)), 0)   # Ensure non-negative
-        
-        notifications = get_user_notifications(
-            user_id=current_user.id,
-            unread_only=unread_only,
-            limit=limit,
-            offset=offset
+        unread_only = request.args.get("unread_only", "true").lower() == "true"
+        limit = min(int(request.args.get("limit", 50)), 100)  # Cap at 100
+        offset = max(int(request.args.get("offset", 0)), 0)  # Ensure non-negative
+
+        notifications = fetch_user_notifications(
+            user_id=current_user.id, unread_only=unread_only, limit=limit, offset=offset
         )
-        
+
         return jsonify(notifications), 200
     except Exception as e:
-        return jsonify({
-            'error': 'Failed to retrieve notifications',
-            'message': str(e)
-        }), 500
+        return (
+            jsonify({"error": "Failed to retrieve notifications", "message": str(e)}),
+            500,
+        )
 
-@app.route('/api/v1/system/notifications/<int:notification_id>', methods=['GET'])
+
+@app.route("/api/v1/system/notifications/<int:notification_id>", methods=["GET"])
 @login_required
 def get_notification(notification_id):
     user_id = current_user.id
-    user_notification = SystemNotification.query.filter_by(user_id=user_id, notification_id=notification_id).first()
+    user_notification = SystemNotification.query.filter_by(
+        user_id=user_id, notification_id=notification_id
+    ).first()
     if user_notification:
         return jsonify(user_notification.notification.to_dict()), 200
     else:
-        return jsonify({'message': 'Notification not found for user.'}), 404
-    
+        return jsonify({"message": "Notification not found for user."}), 404
