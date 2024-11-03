@@ -118,3 +118,12 @@ def get_app_info():
         "monthly_alert_tickets_limit": safe_int_conversion(plan_details.get('monthly_alert_tickets_limit', 0)),
         "max_users_allowed": safe_int_conversion(plan_details.get('max_users_allowed', 0))
     }
+
+from datetime import datetime
+from humanize import naturaltime
+@app.template_filter()
+def natural_time(value):
+    """Convert a datetime object to a human-readable format."""
+    if isinstance(value, datetime):
+        return naturaltime(value)
+    return value

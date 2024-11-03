@@ -22,6 +22,7 @@ from src.routes.services import services_bp
 from src.routes.api_metrics import metrics_bp
 from src.routes.middleware import middleware_bp
 from src.routes.cmd_route import cmd_bp
+from src.routes.user_post import user_post_bp
 
 __all__ = [
     "dashboard_bp",

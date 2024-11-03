@@ -246,15 +246,6 @@ class DashboardController {
       data.memory_percent,
       data.current_temp
     ]);
-
-    // // Initialize or update CPU cores chart
-    // if (!this.charts.get('cpuCores') && this.cpuCoresCtx) {
-    //   const datasets = this.createCpuCoreDatasets(data.cpu_usage_core.length);
-    //   this.charts.set('cpuCores', ChartFactory.createChart(this.cpuCoresCtx, 'CPU Usage Core Over Time', datasets));
-    // }
-    // if (this.charts.get('cpuCores')) {
-    //   this.updateChartData(this.charts.get('cpuCores'), timestamp, data.cpu_usage_core);
-    // }
   }
 
   createCpuCoreDatasets(cpuCoreCount) {
