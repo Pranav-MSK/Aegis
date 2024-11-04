@@ -1,18 +1,105 @@
-{% extends 'base/base.html' %}
-{% block title %}Permission Denied{% endblock %}
-{% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/403.css') }}">
-{% endblock %}
-
+{% extends 'base/base_.html' %}
+{% block title %}403 - Access Denied{% endblock %}
 {% block content %}
-{% include 'ext/message.html' %}
-<div class="permission-denied-container">
-    <div class="content-wrapper">
-        <div class="icon">&#128683;</div> <!-- Unicode for a forbidden sign -->
-        <h1>Permission Denied</h1>
-        <p>Oops! You don't have permission to access this page.</p>
-        <p>{{error_message}}</p>
-        <a href="{{ url_for('dashboard') }}" class="btn">Go Back Home</a>
+<div class="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center p-6">
+    <div class="w-full max-w-4xl">
+        <!-- Main Content Container -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Side - Content -->
+            <div class="order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
+                <!-- Error Code -->
+                <div class="flex items-center space-x-4 text-gray-900">
+                    <h1 class="text-7xl md:text-8xl font-bold tracking-tight">403</h1>
+                    <div class="h-16 w-0.5 bg-gray-200"></div>
+                    <div class="text-xl font-medium">Access<br>Denied</div>
+                </div>
+
+                <!-- Error Message -->
+                <div class="space-y-3">
+                    <p class="text-gray-600 text-lg max-w-md">
+                        Sorry! You don't have the necessary permissions to access this page.
+                    </p>
+                    {% if error_message %}
+                    <p class="text-red-600 text-sm bg-red-50 px-4 py-2 rounded-lg">
+                        {{ error_message }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                    <a href="{{ url_for('dashboard') }}" 
+                       class="inline-flex items-center justify-center px-6 py-3 rounded-xl
+                              bg-red-600 text-white font-medium hover:bg-red-700 
+                              transition-all duration-200 shadow-lg shadow-red-600/20
+                              hover:shadow-xl hover:shadow-red-600/30 hover:-translate-y-0.5">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Return Home
+                    </a>
+                    <button onclick="window.history.back()" 
+                            class="inline-flex items-center justify-center px-6 py-3 rounded-xl
+                                   border-2 border-gray-200 text-gray-600 font-medium
+                                   hover:border-gray-300 hover:text-gray-900
+                                   transition-all duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                        </svg>
+                        Go Back
+                    </button>
+                </div>
+
+                <!-- Help Links -->
+                <div class="flex items-center gap-6 pt-4 text-sm text-gray-500">
+                    <a href="{{ url_for('help') }}" 
+                       class="flex items-center hover:text-red-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Help Center
+                    </a>
+                    <a href="{{ url_for('support') }}" 
+                       class="flex items-center hover:text-red-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Contact Support
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Side - Illustration -->
+            <div class="order-1 lg:order-2 flex justify-center">
+                <div class="relative w-full max-w-md">
+                    <!-- Lock Icon Illustration -->
+                    <div class="relative">
+                        <!-- Large Lock Icon -->
+                        <img src="{{ url_for('static', filename='images/403 Error Forbidden-amico.svg') }}"
+                        alt="404 Illustration" class="w-full h-auto">
+                        <!-- Decorative Elements -->
+                        <div class="absolute top-0 -right-4 w-12 h-12 bg-red-100/50 rounded-full animate-bounce delay-100"></div>
+                        <div class="absolute bottom-0 -left-4 w-8 h-8 bg-red-100/50 rounded-full animate-bounce delay-300"></div>
+                        <div class="absolute top-1/2 right-0 w-6 h-6 bg-red-100/50 rounded-full animate-bounce delay-200"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Animation Styles -->
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+</style>
 {% endblock %}

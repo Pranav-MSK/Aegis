@@ -94,3 +94,11 @@ def terms():
 @app.route('/privacy')
 def privacy():
     return render_template('other/privacy.html')
+
+@app.route('/help')
+def help():
+    return render_template('other/help.html')
+
+@app.route('/support')
+def support():
+    return render_template('other/support.html')

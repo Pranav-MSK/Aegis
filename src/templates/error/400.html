@@ -1,16 +1,133 @@
-{% extends 'base/base.html' %}
-{% block title %}Bad Request{% endblock %}
-{% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/error.css') }}">
-{% endblock %}
-
+{% extends 'base/base_.html' %}
+{% block title %}400 - Bad Request{% endblock %}
 {% block content %}
-<div class="error-container">
-    <div class="content-wrapper">
-        <div class="icon">&#9940;</div> <!-- Unicode for a cross mark -->
-        <h1>400</h1>
-        <p>The request could not be understood by the server.</p>
-        <a href="{{ url_for('dashboard') }}" class="btn">Go Back Home</a>
+<div class="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center p-6">
+    <div class="w-full max-w-4xl">
+        <!-- Main Content Container -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Side - Content -->
+            <div class="order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
+                <!-- Error Code -->
+                <div class="flex items-center space-x-4 text-gray-900">
+                    <h1 class="text-7xl md:text-8xl font-bold tracking-tight">400</h1>
+                    <div class="h-16 w-0.5 bg-gray-200"></div>
+                    <div class="text-xl font-medium">Bad<br>Request</div>
+                </div>
+
+                <!-- Error Message -->
+                <div class="space-y-3">
+                    <p class="text-gray-600 text-lg max-w-md">
+                        Oops! The server cannot process your request due to malformed syntax or invalid parameters.
+                    </p>
+                    {% if error_message %}
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <p class="text-orange-700 text-sm font-medium">
+                            {{ error_message }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Common Issues List -->
+                <div class="w-full max-w-md bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                    <h3 class="text-sm font-semibold text-gray-900 mb-2">Common causes include:</h3>
+                    
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-orange-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Invalid form data or input parameters
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-orange-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Malformed URL or request syntax
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-orange-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Missing required parameters
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                    <a href="{{ url_for('dashboard') }}" 
+                       class="inline-flex items-center justify-center px-6 py-3 rounded-xl
+                              bg-blue-600 text-white font-medium hover:bg-blue-700 
+                              transition-all duration-200 shadow-lg shadow-blue-600/20
+                              hover:shadow-xl hover:shadow-blue-600/30 hover:-translate-y-0.5">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Return Home
+                    </a>
+                    <button onclick="window.history.back()" 
+                            class="inline-flex items-center justify-center px-6 py-3 rounded-xl
+                                   border-2 border-gray-200 text-gray-600 font-medium
+                                   hover:border-gray-300 hover:text-gray-900
+                                   transition-all duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                        </svg>
+                        Go Back
+                    </button>
+                </div>
+
+                <!-- Help Links -->
+                <div class="flex items-center gap-6 pt-4 text-sm text-gray-500">
+                    <a href="{{ url_for('help') }}" 
+                       class="flex items-center hover:text-orange-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Help Center
+                    </a>
+                    <a href="{{ url_for('support') }}" 
+                       class="flex items-center hover:text-orange-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Contact Support
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Side - Illustration -->
+            <div class="order-1 lg:order-2 flex justify-center">
+                <div class="relative w-full max-w-md">
+                    <!-- Main Illustration -->
+                    <div class="relative">
+                        <!-- Central Icon -->
+                        <img src="{{ url_for('static', filename='images/400 Error Bad Request-cuate.svg') }}"
+                            alt="404 Illustration" class="w-full h-auto">
+                        <!-- Decorative Elements -->
+                        <div class="absolute top-0 -right-4 w-12 h-12 bg-orange-100/50 rounded-full animate-bounce delay-100"></div>
+                        <div class="absolute bottom-0 -left-4 w-8 h-8 bg-orange-100/50 rounded-full animate-bounce delay-300"></div>
+                        <div class="absolute top-1/2 right-0 w-6 h-6 bg-orange-100/50 rounded-full animate-bounce delay-200"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Animation Styles -->
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+</style>
 {% endblock %}
