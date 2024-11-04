@@ -8,13 +8,13 @@ const CONFIG = {
     NETWORK: 'rgba(234, 179, 8, 1)',
   },
   API_ENDPOINTS: {
-    SYSTEM_INFO_API: '/api/v1/system_info',
+    SYSTEM_INFO_API: '/api/v1/system/metrics',
     DASHBOARD_STATS_API: '/api/v1/dashboard/stats',
     CONTAINER_INFO_API: '/api/v1/system/containers',
     SYSTEM_SERVICES_API: '/api/v1/system/services',
     SYSTEM_SERVICE_CATEGORIES_API: '/api/v1/system/services/categories',
     SYSTEM_NOTIFICATIONS_API: '/api/v1/system/notifications/',
-    SYSTEM_STATUS_API: '/api/v1/status'
+    SYSTEM_STATUS_API: '/api/v1/system/status'
   }
 };
 

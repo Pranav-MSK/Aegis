@@ -256,90 +256,78 @@
         {% endfor %}
     </div>
 
-    <div class="details-grid">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="details-grid font-sans">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- System Information Card -->
-            <div
-                class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-                <div class="flex items-center justify-between p-4 border-b border-gray-50">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center justify-between p-4 border-b border-gray-100">
                     <div class="flex items-center gap-3">
-                        <div class="p-1.5 bg-blue-50 rounded-lg">
-                            <i class="fas fa-microchip text-blue-500 text-sm"></i>
-                        </div>
-                        <h3 class="text-lg font-medium text-gray-800">System Information</h3>
+                        <h3 class="text-xl font-semibold text-gray-800 p-2">System Information</h3>
                     </div>
-                    <span class="refresh-indicator"></span>
+                    <span class="refresh-indicator text-gray-400 hover:text-gray-600 cursor-pointer" title="Refresh">
+                    </span>
                 </div>
-
+    
                 <div class="p-4">
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         {% for label, value, class in [
                         ("OS", system_info.os_info.os_full_name, 'system-info'),
                         ("Processor Name", system_info.processor_name, 'processor-name'),
-                        ("Boot Time", system_info.boot_time, 'boot-time'),
                         ("Process Count", system_info.process_count, 'process-count'),
                         ("Kernel Version", system_info.os_info.kernel_version, 'kernel-version')
                         ] %}
-                        <div
-                            class="group bg-gray-50 rounded-lg p-3 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-blue-100/50 transition-all duration-200">
+                        <div class="group bg-gray-50 rounded-lg p-4 hover:bg-gradient-to-r hover:from-blue-100 hover:to-blue-300 transition-all duration-200">
                             <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 flex items-center justify-center rounded-md bg-white shadow-sm">
-                                        <i class="fas fa-desktop text-blue-500/70 text-xs"></i>
-                                    </div>
-                                    <span class="text-sm text-gray-600">{{ label }}</span>
+                                <div class="flex items-center gap-3">
+                                        <i class="fas fa-desktop text-blue-500 text-lg"></i>
+                                    <span class="text-base text-gray-700 font-medium">{{ label }}</span>
                                 </div>
-                                <span class="text-sm font-medium text-gray-700 {{ class }} font-mono">{{ value }}</span>
+                                <span class="text-base font-semibold text-gray-800 {{ class }} font-mono">{{ value }}</span>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
-
+    
             <!-- Product Information Card -->
-            <div
-                class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-                <div class="flex items-center justify-between p-4 border-b border-gray-50">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div class="flex items-center justify-between p-4 border-b border-gray-100">
                     <div class="flex items-center gap-3">
-                        <div class="p-1.5 bg-purple-50 rounded-lg">
-                            <i class="fas fa-cube text-purple-500 text-sm"></i>
-                        </div>
-                        <h3 class="text-lg font-medium text-gray-800">Product Information</h3>
+                        <h3 class="text-xl font-semibold text-gray-800 p-2">Product Information</h3>
                     </div>
-                    <span class="refresh-indicator"></span>
+                    <span class="refresh-indicator text-gray-400 hover:text-gray-600 cursor-pointer" title="Refresh">
+                    </span>
                 </div>
-
+    
                 <div class="p-4">
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         {% for label, value in [
-                        ("Product Name", plan_type),
-                        ("Product Version", version),
+                        ("Product Name", title + " " + plan_type + " (" + version + ")"),
                         ("Unique ID", systemguard_unique_id),
                         ("Remaining Days", remaining_plan_days),
                         ("Username", system_info.system_username)
                         ] %}
-                        <div
-                            class="group bg-gray-50 rounded-lg p-3 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-purple-100/50 transition-all duration-200">
+                        <div class="group bg-gray-50 rounded-lg p-4 hover:bg-gradient-to-r hover:from-purple-100 hover:to-purple-300 transition-all duration-200">
                             <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 flex items-center justify-center rounded-md bg-white shadow-sm">
-                                        <i class="fas fa-tag text-purple-500/70 text-xs"></i>
-                                    </div>
-                                    <span class="text-sm text-gray-600">{{ label }}</span>
+                                <div class="flex items-center gap-3">
+                                        <i class="fas fa-tag text-purple-500 text-lg"></i>
+                                    <span class="text-base text-gray-700 font-medium">{{ label }}</span>
                                 </div>
-                                <span class="text-sm font-medium text-gray-700 font-mono">{{ value }}</span>
+                                <span class="text-base font-semibold text-gray-800 font-mono">{{ value }}</span>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
+    
 
+    <!-- Top Process running -->
     <div class="details-grid">
-        <!-- Top Process running -->
         <div class="metric-card">
             <div class="card-header">
                 <h3>Top Processes</h3>
@@ -361,6 +349,7 @@
             </div>
         </div>
     </div>
+    
     <!-- service monitor -->
     <div class="details-grid">
         <div class="metric-card">
@@ -723,7 +712,7 @@
     <div class="details-grid">
         <!-- ticket statistics -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            {% if plan_type != "SystemGuard Enterprise" %}
+            {% if plan_type != "Enterprise" %}
             <div class="border-b border-gray-200 p-6">
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-semibold text-gray-900">Enterprise Dashboard</h3>

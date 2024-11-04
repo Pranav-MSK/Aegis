@@ -174,7 +174,7 @@ async function updateBatteryIcon(iconSelector, batteryStatusKey, batteryPercentK
 
 // Refresh all card data
 async function refreshData() {
-    const data = await queueRequest('/api/v1/system_info');
+    const data = await queueRequest('/api/v1/system/metrics');
     if (!data) return;
 
     updateCard('.bg-disk', 'disk_percent', data, '%', '.disk-bar');

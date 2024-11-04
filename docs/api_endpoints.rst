@@ -3,7 +3,7 @@ API Endpoints Overview
 
 System Information
 ------------------
-- **Endpoint**: ``/api/v1/system_info``
+- **Endpoint**: ``/api/v1/system/metrics``
 - **Method**: ``GET``
 - **Description**: Retrieve system metrics and performance data.
 

@@ -11,11 +11,11 @@ class PlanAuthorization:
     """Handler for plan-based authorization."""
     
     PLAN_HIERARCHY = [
-        "Free Edition",
-        "Community Edition",
-        "SystemGuard Core", 
-        "SystemGuard Plus",
-        "SystemGuard Enterprise"
+        "Free",
+        "Community",
+        "Core", 
+        "Plus",
+        "Enterprise"
     ]
 
     @classmethod
@@ -65,7 +65,7 @@ class PlanAuthorization:
             @wraps(f)
             def decorated_function(*args, **kwargs):
                 current_plan = cls.get_current_plan()
-                
+
                 if not cls.check_plan_access(required_plan):
                     abort(403, description=(
                         f"This feature requires {required_plan} or higher. "
@@ -78,20 +78,20 @@ class PlanAuthorization:
 # Convenience decorators for specific plan levels
 def free_edition():
     """Decorator for Free Edition features."""
-    return PlanAuthorization.requires_plan("Free Edition")
+    return PlanAuthorization.requires_plan("Free")
 
 def community_edition():
     """Decorator for Community Edition features."""
-    return PlanAuthorization.requires_plan("Community Edition")
+    return PlanAuthorization.requires_plan("Community")
 
 def systemguard_core():
     """Decorator for SystemGuard Core features."""
-    return PlanAuthorization.requires_plan("SystemGuard Core")
+    return PlanAuthorization.requires_plan("Core")
 
 def systemguard_plus():
     """Decorator for SystemGuard Plus features."""
-    return PlanAuthorization.requires_plan("SystemGuard Plus")
+    return PlanAuthorization.requires_plan("Plus")
 
 def systemguard_enterprise():
     """Decorator for SystemGuard Enterprise features."""
-    return PlanAuthorization.requires_plan("SystemGuard Enterprise")
+    return PlanAuthorization.requires_plan("Enterprise")

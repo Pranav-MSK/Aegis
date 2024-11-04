@@ -38,7 +38,7 @@ QUERY_API_URL = f"{PROMETHEUS_BASE_URL}/api/v1/query_range"
 TARGETS_API_URL = f"{PROMETHEUS_BASE_URL}/api/v1/targets"
 
 
-@app.route("/api/v1/system_info", methods=["GET"])
+@app.route("/api/v1/system/metrics", methods=["GET"])
 @csrf.exempt
 @login_required
 def system_api():
@@ -502,7 +502,7 @@ def check_prometheus_health():
         return "unhealthy"
 
 
-@app.route('/api/v1/status', methods=['GET'])
+@app.route('/api/v1/system/status', methods=['GET'])
 @login_required
 def get_status():
     total_services = 2
