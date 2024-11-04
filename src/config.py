@@ -23,7 +23,7 @@ app = Flask(__name__)
 # Application Metadata
 APP_NAME = "Aegis"
 DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor your system resources."
-AUTHOR = "SystemGuard Team"
+AUTHOR = "{} Team".format(APP_NAME)
 YEAR = "2024"
 PRE_RELEASE = False
 VERSION = "v1.0.6"

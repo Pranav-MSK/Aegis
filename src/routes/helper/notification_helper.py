@@ -436,7 +436,6 @@ def generate_system_notification(notification_data, user_id=None):
     new_notification.save()
     
     if new_notification.is_global:
-        # user_notification = SystemNotification(user_id=user_id, notification_id=new_notification.id)
         for user in UserProfile.query.all():
             user_notification = SystemNotification(user_id=user.id, notification_id=new_notification.id)
             user_notification.save()
@@ -446,7 +445,7 @@ def generate_system_notification(notification_data, user_id=None):
         user_notification = SystemNotification(user_id=user_id, notification_id=new_notification.id)
     user_notification.save()
 
-def send_notification(title, message):
+def send_desktop_notification(title, message):
     """Send a desktop notification using notify-send."""
     try:
         subprocess.run(['notify-send', title, message], check=True)
