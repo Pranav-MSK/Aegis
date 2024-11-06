@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Development</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="min-h-screen geometric-background">
+    <!-- Back Button -->
+    <div class="fixed top-6 left-6">
+        <a href="/" class="back-button flex items-center px-4 py-2 space-x-2 text-gray-700 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors">
+            <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Back to Homepage</span>
+        </a>
+    </div>
+
+    <div class="container mx-auto px-4 h-screen flex items-center justify-center">
+        <div class="glass-effect rounded-xl shadow-2xl p-8 max-w-6xl w-full">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-12">
+                <div class="w-full md:w-1/2 space-y-6">
+                    <div class="space-y-4">
+                        <h1 class="text-4xl font-bold text-gray-800">
+                            🚧 Something Amazing
+                            <br>Is Coming Soon
+                        </h1>
+                        <p class="text-lg text-gray-600">
+                            We're working hard to bring you something spectacular. Our team of developers is crafting an exceptional experience just for you.
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-4 py-6">
+                        <h2 class="text-xl font-semibold text-gray-800">What to expect:</h2>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Innovative Features
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Modern Design
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                Seamless Experience
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Stay Updated</h2>
+                        <div class="flex gap-4">
+                            <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Notify Me
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <img src="{{ url_for('static', filename='images/Under construction.gif') }}" alt="Under Construction" class="w-full max-w-md rounded-lg shadow-lg">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
