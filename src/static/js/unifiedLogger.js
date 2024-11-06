@@ -186,6 +186,40 @@ function reloadCurrentView() {
     }
 }
 
+document.getElementById('viewLogFileButton').addEventListener('click', () => {
+    const filePath = document.getElementById('filePathInput').value.trim();
+    if (filePath) {
+        // Extract the directory from the file path
+        const directory = filePath.substring(0, filePath.lastIndexOf('/'));
+        currentDir = directory; // Set currentDir for further operations
+
+        // Extract the filename
+        currentFile = filePath.substring(filePath.lastIndexOf('/') + 1);
+
+        // Load logs from the specified file path
+        document.getElementById('defaultMessage').style.display = 'none';
+        loadLogs(directory, currentFile, 1, false);
+    } else {
+        alert('Please enter a valid file path.');
+    }
+});
+
+function isValidFilePath(filePath) {
+    // Simple regex to check for valid file path
+    const regex = /^(\/[^\/]+)+\/[^\/]+(\.[a-z0-9]+)?$/i;
+    return regex.test(filePath);
+}
+
+document.getElementById('viewLogFileButton').addEventListener('click', () => {
+    const filePath = document.getElementById('filePathInput').value.trim();
+    if (isValidFilePath(filePath)) {
+        // Proceed with loading logs...
+    } else {
+        alert('Please enter a valid file path.');
+    }
+});
+
+
 // Initial load
 document.addEventListener('DOMContentLoaded', fetchDirectories);
 

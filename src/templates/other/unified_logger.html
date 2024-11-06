@@ -25,15 +25,14 @@
 </style>
 {% endblock %}
 {% block content %}
-
 <div class="max-w-7xl mx-auto">
     <!-- Header Section -->
-    <div class="mb-8 fade-in">
-        <h1 class="text-4xl font-bold text-gray-800 mb-6">Unified Logger</h1>
-        <div class="flex flex-wrap gap-4 items-center">
-            <div class="relative group">
+    <div class="mb-10 fade-in">
+        <h1 class="text-5xl font-bold text-gray-900 mb-4">Unified Logger</h1>
+        <div class="flex flex-col lg:flex-row gap-4 items-start mb-4">
+            <div class="relative group flex-grow">
                 <select id="directorySelect"
-                    class="form-select pl-4 pr-10 py-3 rounded-xl border-2 border-gray-200 bg-white shadow-sm hover:border-indigo-400 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 transition duration-200 appearance-none w-64">
+                    class="form-select pl-4 pr-10 py-3 rounded-lg border border-gray-300 bg-white shadow-md hover:border-blue-500 focus:border-blue-600 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition duration-200 w-full lg:w-64">
                     <option value="">Select Directory</option>
                 </select>
                 <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
@@ -45,6 +44,13 @@
                 <i class="fas fa-sync-alt mr-2"></i>
                 <span>Refresh</span>
             </button>
+            <div class="relative group flex-grow mt-2 lg:mt-0">
+                <input type="text" id="filePathInput" placeholder="Enter full log file path"
+                    class="form-input pl-4 pr-10 py-3 rounded-lg border border-gray-300 bg-white shadow-md hover:border-blue-500 focus:border-blue-600 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition duration-200 w-full lg:w-64">
+                <button id="viewLogFileButton" class="ml-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 shadow-md">
+                    View Logs
+                </button>
+            </div>
         </div>
     </div>
 
@@ -53,11 +59,11 @@
         <!-- Sidebar -->
         <div class="lg:w-96 fade-in" style="animation-delay: 0.1s">
             <div class="glass-effect rounded-2xl shadow-lg border border-white">
-                <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                <div class="p-5 border-b border-gray-200 flex justify-between items-center">
                     <h2 class="text-lg font-semibold text-gray-800">Available Log Files</h2>
                     <span id="fileCount" class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm"></span>
                 </div>
-                <div id="logFilesList" class="divide-y divide-gray-100 max-h-[calc(100vh-24rem)] overflow-y-auto">
+                <div id="logFilesList" class="divide-y divide-gray-200 max-h-[calc(100vh-24rem)] overflow-y-auto p-4">
                     <div class="text-center text-gray-500 py-12">
                         <i class="fas fa-folder-open text-4xl mb-4 text-gray-300"></i>
                         <p>Select a directory to view log files</p>
@@ -69,30 +75,27 @@
         <!-- Log Content -->
         <div class="flex-1 fade-in" style="animation-delay: 0.2s">
             <div class="glass-effect rounded-2xl shadow-lg border border-white h-[calc(100vh-12rem)] flex flex-col">
-                <div class="border-b border-gray-100 p-5 flex justify-between items-center">
+                <div class="border-b border-gray-200 p-5 flex justify-between items-center">
                     <div class="flex items-center space-x-4">
                         <h3 id="currentFileName" class="text-xl font-semibold text-gray-800">Select a log file</h3>
                         <span id="fileSize" class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm"></span>
                     </div>
                     <div class="flex items-center space-x-4">
                         <div id="loadingSpinner" class="hidden">
-                            <div
-                                class="animate-spin rounded-full h-5 w-5 border-2 border-indigo-500 border-t-transparent">
-                            </div>
+                            <div class="animate-spin rounded-full h-5 w-5 border-2 border-indigo-500 border-t-transparent"></div>
                         </div>
                         <span id="logStats" class="text-sm text-gray-500"></span>
-                        <button id="scrollToBottom"
-                            class="hidden p-2 hover:bg-gray-100 rounded-full transition duration-200">
+                        <button id="scrollToBottom" class="hidden p-2 hover:bg-gray-100 rounded-full transition duration-200">
                             <i class="fas fa-arrow-down text-gray-600"></i>
                         </button>
                     </div>
                 </div>
-                <div id="logContent" class="flex-1 overflow-y-auto p-5 bg-opacity-50">
+                <div id="logContent" class="flex-1 overflow-y-auto p-5 bg-opacity-50 bg-gray-100 rounded-b-lg">
                     <div id="defaultMessage" class="text-center py-20">
                         <i class="fas fa-file-alt text-5xl text-gray-300 mb-4"></i>
                         <p class="text-gray-500">Select a log file to view its contents</p>
                     </div>
-                    <div id="logsContainer" class="space-y-1 font-mono text-sm"></div>
+                    <div id="logsContainer" class="space-y-1 font-mono text-sm h-80 overflow-y-auto"></div>
                 </div>
             </div>
         </div>
