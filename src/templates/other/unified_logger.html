@@ -1,0 +1,104 @@
+{% extends 'base/base.html' %}
+{% block title %} Unified Logger - {{ title }} {% endblock %}
+{% block extra_head %}
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .glass-effect {
+        backdrop-filter: blur(8px);
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto">
+    <!-- Header Section -->
+    <div class="mb-8 fade-in">
+        <h1 class="text-4xl font-bold text-gray-800 mb-6">Unified Logger</h1>
+        <div class="flex flex-wrap gap-4 items-center">
+            <div class="relative group">
+                <select id="directorySelect"
+                    class="form-select pl-4 pr-10 py-3 rounded-xl border-2 border-gray-200 bg-white shadow-sm hover:border-indigo-400 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 transition duration-200 appearance-none w-64">
+                    <option value="">Select Directory</option>
+                </select>
+                <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <i class="fas fa-folder"></i>
+                </div>
+            </div>
+            <button onclick="reloadCurrentView()"
+                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 shadow-md">
+                <i class="fas fa-sync-alt mr-2"></i>
+                <span>Refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Sidebar -->
+        <div class="lg:w-96 fade-in" style="animation-delay: 0.1s">
+            <div class="glass-effect rounded-2xl shadow-lg border border-white">
+                <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-gray-800">Available Log Files</h2>
+                    <span id="fileCount" class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm"></span>
+                </div>
+                <div id="logFilesList" class="divide-y divide-gray-100 max-h-[calc(100vh-24rem)] overflow-y-auto">
+                    <div class="text-center text-gray-500 py-12">
+                        <i class="fas fa-folder-open text-4xl mb-4 text-gray-300"></i>
+                        <p>Select a directory to view log files</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Content -->
+        <div class="flex-1 fade-in" style="animation-delay: 0.2s">
+            <div class="glass-effect rounded-2xl shadow-lg border border-white h-[calc(100vh-12rem)] flex flex-col">
+                <div class="border-b border-gray-100 p-5 flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <h3 id="currentFileName" class="text-xl font-semibold text-gray-800">Select a log file</h3>
+                        <span id="fileSize" class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm"></span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div id="loadingSpinner" class="hidden">
+                            <div
+                                class="animate-spin rounded-full h-5 w-5 border-2 border-indigo-500 border-t-transparent">
+                            </div>
+                        </div>
+                        <span id="logStats" class="text-sm text-gray-500"></span>
+                        <button id="scrollToBottom"
+                            class="hidden p-2 hover:bg-gray-100 rounded-full transition duration-200">
+                            <i class="fas fa-arrow-down text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="logContent" class="flex-1 overflow-y-auto p-5 bg-opacity-50">
+                    <div id="defaultMessage" class="text-center py-20">
+                        <i class="fas fa-file-alt text-5xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Select a log file to view its contents</p>
+                    </div>
+                    <div id="logsContainer" class="space-y-1 font-mono text-sm"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/unifiedLogger.js') }}"></script>
+{% endblock %}
