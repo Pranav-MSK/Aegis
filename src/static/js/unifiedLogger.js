@@ -37,6 +37,7 @@ const observer = new IntersectionObserver(
     { threshold: 0.1 }
 );
 
+        
 async function fetchDirectories() {
     try {
         const response = await fetch('/api/v1/logger/directories');
@@ -131,7 +132,7 @@ async function loadLogs(directory, filename, pageNum, append = true) {
 
         totalLinesLoaded += data.content.length;
         logStats.textContent = `${totalLinesLoaded} lines loaded`;
-        
+
         hasMore = data.has_more;
 
         if (!hasMore) {
@@ -174,7 +175,8 @@ function selectLogFile(filename) {
         if (currentFile && currentDir && page === 1) {
             loadLogs(currentDir, currentFile, 1, false);
         }
-    }, 2000);
+        fetchLogFiles(currentDir);
+    }, 3000);
 }
 
 function reloadCurrentView() {
@@ -229,3 +231,78 @@ setInterval(() => {
         loadLogs(currentDir, currentFile, 1, false);
     }
 }, 30000);
+
+
+document.getElementById('addDirectoryButton').addEventListener('click', function () {
+    // Show the form
+    document.getElementById('directoryForm').style.display = 'block';
+});
+
+
+document.getElementById('submitDirectory').addEventListener('click', function () {
+    const directoryPath = document.getElementById('directoryPath').value;
+    if (directoryPath) {
+        fetch('/api/v1/logger/directories', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ path: directoryPath })
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.text().then(text => {
+                if (!response.ok) {
+                    throw new Error(text);
+                }
+                return JSON.parse(text);
+            });
+        })
+        .then(data => {
+            alert('Directory added successfully');
+            // Refresh the directory list
+            fetchDirectories();
+            document.getElementById('directoryForm').style.display = 'none'; // Hide the form
+            document.getElementById('directoryPath').value = ''; // Clear the input
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(`An error occurred while adding the directory: ${error.message}`);
+        });
+    } else {
+        alert('Please enter a valid directory path.');
+    }
+});
+
+document.getElementById('deleteDirectoryButton').addEventListener('click', function () {
+    const directoryPath = directorySelect.value; // Get the selected directory
+    if (directoryPath) {
+        fetch('/api/v1/logger/directories', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ path: directoryPath })
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.text().then(text => {
+                if (!response.ok) {
+                    throw new Error(text);
+                }
+                return JSON.parse(text);
+            });
+        })
+        .then(data => {
+            alert('Directory deleted successfully');
+            // Refresh the directory list
+            fetchDirectories();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(`An error occurred while deleting the directory: ${error.message}`);
+        });
+    } else {
+        alert('Please select a directory to delete.');
+    }
+});

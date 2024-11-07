@@ -5,27 +5,19 @@ import json
 from flask import jsonify, render_template, request, Blueprint
 from flask_login import login_required
 
-from src.config import app
+from src.config import app, csrf
 from src.utils import ROOT_DIR
+from src.models import LogDirectory
 
 unified_logger_bp = Blueprint("unified_logger", __name__)
 user_name = os.getenv("USER_NAME")
 # Constants
 CHUNK_SIZE = 100  # Number of lines to fetch per request
 
-
 # Load configuration from config file
 def load_config():
-
-    return {
-        "log_directories": [
-            {
-                "name": os.path.join(os.path.expanduser("~"), "logs"),
-                "path": os.path.join(os.path.expanduser("~"), "logs"),
-            },
-            {"name": "/var/log", "path": "/var/log"},
-        ]
-    }
+    log_directories = LogDirectory.query.all()
+    return {"log_directories": [log_directory.to_dict() for log_directory in log_directories]}
 
 # Centralized error response
 def error_response(message, status_code):
@@ -38,9 +30,35 @@ def unified_logger():
     return render_template("other/unified_logger.html")
 
 
-@app.route("/api/v1/logger/directories", methods=["GET"])
+@app.route("/api/v1/logger/directories", methods=["GET", "POST", "DELETE"])
+@csrf.exempt
 @login_required
 def list_directories():
+    if request.method == "POST":
+        data = request.get_json()
+        if not data or "path" not in data:
+            return error_response("Invalid request", 400)
+
+        log_directory = LogDirectory.query.filter_by(path=data["path"]).first()
+        if log_directory:
+            return error_response("Directory already exists", 400)
+
+        new_log_directory = LogDirectory(name=data["path"], path=data["path"])
+        new_log_directory.save()
+        return jsonify(new_log_directory.to_dict())
+    
+    if request.method == "DELETE":
+        data = request.get_json()
+        if not data or "path" not in data:
+            return error_response("Invalid request", 400)
+
+        log_directory = LogDirectory.query.filter_by(path=data["path"]).first()
+        if not log_directory:
+            return error_response("Directory not found", 404)
+
+        log_directory.delete()
+        return jsonify({"message": "Directory deleted successfully"})
+
     config = load_config()
     return jsonify(config["log_directories"])
 
@@ -82,7 +100,7 @@ def get_log_file(file_path):
 
     page = request.args.get("page", 1, type=int)
     chunk_size = request.args.get("chunk_size", CHUNK_SIZE, type=int)
-
+    stats = os.stat(file_path)
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             f.seek(0, os.SEEK_END)
@@ -103,6 +121,7 @@ def get_log_file(file_path):
                         "has_more": start_pos > 0,
                         "page": page,
                         "total_size": file_size,
+                        "modified": datetime.fromtimestamp(stats.st_mtime).isoformat(),
                     }
                 ),
                 200,
