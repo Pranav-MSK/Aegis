@@ -775,7 +775,34 @@ class NotificationHandler {
     notifications.forEach(notification => {
       fragment.appendChild(this.createNotificationElement(notification));
     });
+    
+    if (notifications.length > 1) {
+      const markAll = document.createElement('button');
+      markAll.className = 'mark-all bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4';
+      markAll.textContent = 'Mark all as read';
+      markAll.addEventListener('click', async () => {
+        try {
+        const response = await fetch('/api/v1/mark_all_notifications', {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) throw new Error('Failed to mark all notifications as read');
+        else {
+          this.toast.show('All notifications marked as read', 'success');
+          this.fetchNotifications();
+        }
+        } catch (error) {
+        console.error('Error marking all notifications as read:', error);
+        this.toast.show('Failed to mark all notifications as read', 'error');
+        }
+      });
+      fragment.appendChild(markAll);
+    }
     this.container.appendChild(fragment);
+    
   }
 
   createNotificationElement(notification) {

@@ -114,6 +114,10 @@ BYPASS_ROUTES = {
 def global_middleware():
     """Global middleware for all requests"""
     request.start_time = time.time()
+
+    if app.config.get('under_maintenance', False) and request.endpoint not in ['under_maintenance']:
+        return redirect(url_for('under_maintenance'))
+
     
     # Skip middleware for bypass routes
     if request.endpoint in BYPASS_ROUTES:

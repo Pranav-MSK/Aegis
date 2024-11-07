@@ -37,6 +37,7 @@ HOME_DIR = os.path.expanduser("~")
 DB_DIR = os.path.join(HOME_DIR, ".database")
 os.makedirs(DB_DIR, exist_ok=True)
 
+
 # Configure the SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -49,6 +50,7 @@ app.config['WTF_CSRF_HEADER_NAME'] = "X-CSRFToken"
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent access to cookies via JavaScript
 app.config['SESSION_COOKIE_SAMESITE'] = "Lax"  # Prevent CSRF attacks via cross-site requests
 app.config['SESSION_COOKIE_SECURE'] = False  # Change to True for production with HTTPS
+app.config['under_maintenance'] = False
 
 
 # Initialize the database

@@ -102,3 +102,8 @@ def help():
 @app.route('/support')
 def support():
     return render_template('other/support.html')
+
+
+@app.route('/under_maintenance')
+def under_maintenance():
+    return render_template('other/under_maintenance.html'), 503

@@ -60,7 +60,7 @@ def discussion_board():
 
     deleted_posts = UserArticle.query.filter_by(is_deleted=True).all()
 
-    post_tags = ["#annoument", "#introduction", "#general", "#help", "#feedback", "#suggestion", 
+    post_tags = ["#announcement", "#introduction", "#general", "#help", "#feedback", "#suggestion", 
                  "#bug", "#feature", "#question", "#discussion", "#off-topic"]
 
     user_analytics = {

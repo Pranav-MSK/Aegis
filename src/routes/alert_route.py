@@ -635,6 +635,19 @@ def mark_notification(notification_id):
     else:
         return jsonify({"message": "Notification not found for user."}), 404
 
+@app.route("/api/v1/mark_all_notifications", methods=["POST"])
+@csrf.exempt
+@login_required
+def mark_all_notifications():
+    user_id = current_user.id
+
+    user_notifications = SystemNotification.query.filter_by(user_id=user_id, unread=True).all()
+    for user_notification in user_notifications:
+        user_notification.unread = False
+    user_notification.save()
+
+    return jsonify({"message": "All notifications marked as read!"}), 200
+
 
 @app.route("/api/v1/system/notifications/", methods=["GET"])
 @login_required

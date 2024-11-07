@@ -6,12 +6,9 @@ from flask import jsonify, render_template, request, Blueprint
 from flask_login import login_required
 
 from src.config import app, csrf
-from src.utils import ROOT_DIR
 from src.models import LogDirectory
 
 unified_logger_bp = Blueprint("unified_logger", __name__)
-user_name = os.getenv("USER_NAME")
-# Constants
 CHUNK_SIZE = 100  # Number of lines to fetch per request
 
 # Load configuration from config file
