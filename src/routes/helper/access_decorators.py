@@ -68,8 +68,9 @@ class PlanAuthorization:
 
                 if not cls.check_plan_access(required_plan):
                     abort(403, description=(
-                        f"This feature requires {required_plan} or higher. "
-                        f"Your current plan is: {current_plan}"
+                        f"This feature requires {required_plan} or higher."
+                        f"Your current plan is: SystemGuard {current_plan}. "
+                        f"Please upgrade your plan to access this feature. "
                     ))
                 return f(*args, **kwargs)
             return decorated_function

@@ -1,12 +1,12 @@
 # cython: language_level=3
 import os
 from datetime import datetime
-import json
 from flask import jsonify, render_template, request, Blueprint
 from flask_login import login_required
 
 from src.config import app, csrf
 from src.models import LogDirectory
+from src.routes.helper.access_decorators import systemguard_enterprise
 
 unified_logger_bp = Blueprint("unified_logger", __name__)
 CHUNK_SIZE = 100  # Number of lines to fetch per request
@@ -23,6 +23,7 @@ def error_response(message, status_code):
 
 @app.route("/unified_logger", methods=["GET"])
 @login_required
+@systemguard_enterprise()
 def unified_logger():
     return render_template("other/unified_logger.html")
 
@@ -30,6 +31,7 @@ def unified_logger():
 @app.route("/api/v1/logger/directories", methods=["GET", "POST", "DELETE"])
 @csrf.exempt
 @login_required
+@systemguard_enterprise()
 def list_directories():
     if request.method == "POST":
         data = request.get_json()
@@ -62,6 +64,7 @@ def list_directories():
 
 @app.route("/api/v1/logfiles", methods=["GET"])
 @login_required
+@systemguard_enterprise()
 def list_log_files():
     directory = request.args.get("directory")
     if not directory or not os.path.isdir(directory):
@@ -90,6 +93,7 @@ def list_log_files():
 
 @app.route("/api/v1/logs/<path:file_path>", methods=["GET"])
 @login_required
+@systemguard_enterprise()
 def get_log_file(file_path):
     file_path = os.path.join("/", file_path)  # Ensure the path is correctly formed
     if not os.path.isfile(file_path):

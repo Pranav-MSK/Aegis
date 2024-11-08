@@ -7,6 +7,7 @@ from flask_login import login_required
 
 from src.config import app
 from src.routes.helper.service_helper import get_running_docker_containers
+from src.routes.helper.access_decorators import systemguard_enterprise
 
 metrics_bp = blueprints.Blueprint('metrics', __name__)
 
@@ -265,12 +266,15 @@ def get_metrics_summary():
 
 @app.route('/system/bucket_metrics')
 @login_required
+@systemguard_enterprise()
+@systemguard_enterprise()
 def get_bucket_metrics():
     return render_template('other/bucket_metrics.html')
 
 
 @app.route('/system/summary_metrics')
 @login_required
+@systemguard_enterprise()
 def get_summary_metrics():
     return render_template('other/summary_metrics.html')
 

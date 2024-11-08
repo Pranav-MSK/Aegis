@@ -14,11 +14,13 @@ from src.config import app, csrf, get_app_info
 from src.routes.helper.common_helper import admin_required
 from src.models import ChartConfiguration
 from src.logger import logger
+from src.routes.helper.access_decorators import systemguard_enterprise
 
 graphs_bp = blueprints.Blueprint("graphs", __name__)
 
 
 @app.route("/historical_system_metrics")
+@systemguard_enterprise()
 @login_required
 def historical_system_metrics():
     total_chart = ChartConfiguration.query.filter_by(user_id=current_user.id).count()

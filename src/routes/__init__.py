@@ -7,7 +7,7 @@ from src.routes.auth import auth_bp
 from src.routes.other import other_bp
 from src.routes.smtp_email_config import smtp_email_config_bp
 from src.routes.user_management import user_management_bp
-from src.routes.graphs import graphs_bp
+from src.routes.historical_system_metrics import graphs_bp
 from src.routes.firewall import firewall_bp
 from src.routes.health import health_bp
 from src.routes.api import api_bp
@@ -22,7 +22,7 @@ from src.routes.services import services_bp
 from src.routes.api_metrics import metrics_bp
 from src.routes.middleware import middleware_bp
 from src.routes.cmd_route import cmd_bp
-from src.routes.user_post import user_post_bp
+from src.routes.discussion_board import discussion_board_bp
 from src.routes.unified_logger import unified_logger_bp
 
 __all__ = [
@@ -51,5 +51,6 @@ __all__ = [
     "metrics_bp",
     "middleware_bp",
     "cmd_bp",
-    "user_post_bp",
+    "discussion_board_bp",
+    "unified_logger_bp",
 ]

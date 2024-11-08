@@ -9,11 +9,13 @@ from src.routes.helper.firewall_helper import (
 from src.routes.helper.common_helper import admin_required, handle_sudo_password
 from src.logger import logger
 from src.routes.helper.network_helper import handle_network_scan, handle_port_scan
+from src.routes.helper.access_decorators import systemguard_enterprise
 
 firewall_bp = Blueprint('firewall', __name__)
 
-@app.route('/firewall', methods=['GET', 'POST'])
+@app.route('/system/firewall', methods=['GET', 'POST'])
 @admin_required
+@systemguard_enterprise()
 @handle_sudo_password("firewall")
 def firewall():
     """

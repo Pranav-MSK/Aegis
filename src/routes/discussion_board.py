@@ -1,16 +1,17 @@
 # cython: language_level=3
 from datetime import datetime
-from flask import render_template, request, redirect, url_for, Blueprint, jsonify
+from flask import render_template, request, redirect, url_for, Blueprint
 from flask_login import login_required, current_user
 
 from src.config import app
-from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost, UserPostReport
+from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
 from src.routes.helper.notification_helper import generate_system_notification
+from src.routes.helper.access_decorators import systemguard_enterprise
 
-
-user_post_bp = Blueprint('user_post', __name__)
+discussion_board_bp = Blueprint('user_post', __name__)
 
 @app.route('/system/discussion', methods=['GET', 'POST'])
+@systemguard_enterprise()
 @login_required
 def discussion_board():
     if request.method == 'POST':

@@ -6,6 +6,7 @@ from flask_login import login_required
 from src.config import app
 from src.routes.helper.service_helper import ServiceMonitor
 from src.routes.helper.common_helper import admin_required
+from src.routes.helper.access_decorators import systemguard_enterprise
 
 services_bp = blueprints.Blueprint('services', __name__)
 
@@ -53,6 +54,7 @@ def list_service_categories():
 
 
 @app.get("/system/services")
+@systemguard_enterprise()
 @login_required
 def show_system_services():
     return render_template('other/services.html')
