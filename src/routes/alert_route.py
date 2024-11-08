@@ -154,7 +154,7 @@ def test_alert():
     return jsonify(response), response.get("status", 500)
 
 
-@app.route("/alerts/ticket", methods=["GET", "POST"])
+@app.route("/system/alerts", methods=["GET", "POST"])
 @systemguard_enterprise()
 @login_required
 def alert_history():
@@ -282,7 +282,7 @@ def alert_history():
     )
 
 
-@app.route("/alerts/ticket/<int:alert_id>", methods=["GET", "POST"])
+@app.route("/system/alerts/<int:alert_id>", methods=["GET", "POST"])
 @systemguard_enterprise()
 @user_has_access_to_alert
 @login_required

@@ -291,17 +291,17 @@ def api_active_alerts():
         return jsonify({"error": str(e)}), 500
 
 # alerts
-@app.route("/system/alerts")
-@login_required
-def show_alerts():
-    try:
-        response = requests.get(f"{ALERTMANAGER_BASE_URL}/api/v2/alerts")
-        response.raise_for_status()  # Raise an error for bad responses
-        alerts = response.json()  # Parse JSON response
+# @app.route("/system/alerts")
+# @login_required
+# def show_alerts():
+#     try:
+#         response = requests.get(f"{ALERTMANAGER_BASE_URL}/api/v2/alerts")
+#         response.raise_for_status()  # Raise an error for bad responses
+#         alerts = response.json()  # Parse JSON response
 
-        return render_template("alerts/show_alerts.html", alerts=alerts)
-    except requests.exceptions.RequestException as e:
-        return f"Error fetching alerts: {str(e)}", 500
+#         return render_template("alerts/show_alerts.html", alerts=alerts)
+#     except requests.exceptions.RequestException as e:
+#         return f"Error fetching alerts: {str(e)}", 500
     
 # prometheus active alerts
 @app.route("/system/alerts/active")

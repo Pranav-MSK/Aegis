@@ -1,0 +1,21 @@
+{% if plan_type not in ['Core', 'Pro', 'Enterprise'] %}
+<!-- show tailwind banner to upgrade -->
+<div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+    <div class="flex">
+        <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                    d="M2 3a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V3zm2 0v14h14V3H4zm2 2h10a1 1 0 010 2H6a1 1 0 010-2zm0 4h10a1 1 0 010 2H6a1 1 0 010-2zm0 4h7a1 1 0 010 2H6a1 1 0 010-2z"
+                    clip-rule="evenodd" />
+            </svg>
+        </div>
+        <div class="ml-3">
+            <p class="text-sm text-blue-700">
+                You are currently on the <span class="font-semibold">{{ plan_type }}</span> plan. Upgrade to
+                <span class="font-semibold">Pro</span> or <span class="font-semibold">Enterprise</span> to unlock more features.
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}     

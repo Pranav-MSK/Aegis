@@ -19,7 +19,7 @@ from src.routes.helper.access_decorators import systemguard_enterprise
 graphs_bp = blueprints.Blueprint("graphs", __name__)
 
 
-@app.route("/historical_system_metrics")
+@app.route("/system/historical_system_metrics")
 @systemguard_enterprise()
 @login_required
 def historical_system_metrics():

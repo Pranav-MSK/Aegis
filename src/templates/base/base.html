@@ -109,7 +109,7 @@
                             </div>
 
                         </div>
-                        
+
                     </div>
                     {% endif %}
                 </div>
@@ -118,12 +118,13 @@
             <!-- Main Content -->
             <main class="flex-1 pb-8">
                 <!-- Page content -->
-                <div class="mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="space-y-8 py-8">
-                        {% block content %}
-                        <!-- Main content goes here -->
-                        {% endblock %}
-                    </div>
+                <div class="space-y-8 py-8">
+                    {% include 'ext/message.html' %}
+                    {% include 'ext/plan_notice.html' %}
+                    {% block content %}
+
+                    <!-- Main content goes here -->
+                    {% endblock %}
                 </div>
             </main>
         </div>
