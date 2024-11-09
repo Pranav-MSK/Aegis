@@ -1,7 +1,5 @@
 # cython: language_level=3
-import os
-import subprocess
-from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for, session
+from flask import render_template, request, flash, blueprints, redirect, url_for, session
 from flask_login import login_required
 
 from src.models import GeneralSettings

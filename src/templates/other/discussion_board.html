@@ -5,17 +5,15 @@
 {% include 'ext/message.html' %}
 <div class="bg-gray-50 min-h-screen" x-data="{ activeTab: 'home' }">
     <!-- Header -->
-    <header class="bg-white border-b sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
-                <h1
-                    class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Welcome, {{ current_user.first_name }}!</h1>
-                <button @click="$dispatch('open-new-post')"
-                    class="md:hidden bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
+    <header class="bg-white border-b sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Welcome, {{ current_user.first_name }}!
+            </h1>
+            <button @click="$dispatch('open-new-post')"
+                class="md:hidden bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-plus"></i>
+            </button>
         </div>
     </header>
 
@@ -181,7 +179,7 @@
 
                                 <!-- Post Content -->
                                 <div class="prose max-w-none" x-show="!isEditing">
-                                    <p class="text-gray-800">{{ post.content }}</p>
+                                    <p class="text-gray-800 whitespace-pre-line">{{ post.content }}</p>
                                 </div>
 
                                 <!-- Edit Form -->
@@ -362,6 +360,16 @@
                                         {{ post.comments|length }}
                                     </span>
                                 </div>
+                                {% if post.tags %}
+                                <div class="flex items-center space-x-2 mt-4 text-sm text-gray-500">
+                                    <i class="fas fa-tags text-gray-400"></i>
+                                    <div class="flex flex-wrap gap-2">
+                                        {% for tag in post.tags.split(',') %}
+                                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ tag }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
                             </article>
                             {% endfor %}
                         </div>
@@ -391,15 +399,6 @@
                         {% endif %}
                     </div>
                 </div>
-
-                <!-- user_analytics = {
-                    "total_posts": UserArticle.query.filter_by(user_id=current_user.id).count(),
-                    "total_likes_received": UserPostLike.query.filter(UserPostLike.post_id.in_([post.id for post in UserArticle.query.filter_by(user_id=current_user.id).all()])).count(),
-                    "total_comments": UserPostComment.query.filter(UserPostComment.post_id.in_([post.id for post in UserArticle.query.filter_by(user_id=current_user.id).all()])).count(),
-                    "posts_liked": UserPostLike.query.filter_by(user_id=current_user.id).count(),
-                    "posts_saved": UserSavedPost.query.filter_by(user_id=current_user.id).count(),
-                    "comments_made": UserPostComment.query.filter_by(user_id=current_user.id).count()
-                } -->
 
                 <!-- Analytics Tab -->
                 <div x-show="activeTab === 'analytics'" x-cloak>
@@ -506,6 +505,16 @@
                                         {{ post.comments | length }}
                                     </span>
                                 </div>
+                                {% if post.tags %}
+                                <div class="flex items-center space-x-2 mt-4 text-sm text-gray-500">
+                                    <i class="fas fa-tags text-gray-400"></i>
+                                    <div class="flex flex-wrap gap-2">
+                                        {% for tag in post.tags.split(',') %}
+                                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ tag }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
                             </article>
                             {% endif %}
                             {% endfor %}

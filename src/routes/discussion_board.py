@@ -21,6 +21,7 @@ def discussion_board():
         new_post_tags = ','.join(list(set(tag.strip() for tag in new_post_tags[0].split(',') if tag.strip())))
  
         if form_type == 'create_post' and content:
+            
             new_post = UserArticle(user_id=current_user.id, content=content, tags=new_post_tags)
             new_post.save()                
 
@@ -78,9 +79,9 @@ def discussion_board():
                            saved_pagination=saved_pagination, 
                            liked_post_ids=liked_post_ids,
                            latest_posts=latest_posts,
-                            deleted_posts=deleted_posts,
-                            post_tags=post_tags,
-                            user_analytics=user_analytics)
+                           deleted_posts=deleted_posts,
+                           post_tags=post_tags,
+                           user_analytics=user_analytics)
 
 # get all the comments
 @app.route('/comments/<int:post_id>', methods=['GET'])

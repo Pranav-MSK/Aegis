@@ -3,7 +3,6 @@
 from flask import render_template, Blueprint, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func, case
-from sqlalchemy.orm import joinedload
 
 from src.config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration, InstanceMetadata

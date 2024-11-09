@@ -191,8 +191,6 @@ def get_metrics_summary():
         queries = {
             'sum': f'{metric_name}_sum{{{route_filter}}}',
             'count': f'{metric_name}_count{{{route_filter}}}',
-            'last_hour': f'rate({metric_name}_count{{{route_filter}}}[1h])',
-            'last_day': f'rate({metric_name}_count{{{route_filter}}}[24h])',
         }
         
         results = {}

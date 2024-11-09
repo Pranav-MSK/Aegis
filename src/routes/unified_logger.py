@@ -99,34 +99,45 @@ def get_log_file(file_path):
     if not os.path.isfile(file_path):
         return error_response("File not found", 404)
 
-    page = request.args.get("page", 1, type=int)
-    chunk_size = request.args.get("chunk_size", CHUNK_SIZE, type=int)
+    chunk_size = request.args.get("chunk_size", CHUNK_SIZE, type=int)  # Default chunk size in lines
     stats = os.stat(file_path)
+
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
+        # Open the file in binary mode for more precise seeking and decoding
+        with open(file_path, "rb") as f:
+            # Move to the end of the file
             f.seek(0, os.SEEK_END)
             file_size = f.tell()
-            start_pos = max(0, file_size - (page * chunk_size * 1024))
-            f.seek(start_pos)
+            lines = []
+            buffer = b""
+            lines_read = 0
 
-            if start_pos > 0:
-                f.readline()  # Skip partial line
+            # Read the file backwards in chunks until enough lines are gathered
+            while lines_read < chunk_size and f.tell() > 0:
+                # Move the pointer backwards by small chunks
+                read_size = min(4096, f.tell())  # Read in chunks of 4KB or less if near start
+                f.seek(-read_size, os.SEEK_CUR)
+                buffer = f.read(read_size) + buffer  # Prepend new data
+                f.seek(-read_size, os.SEEK_CUR)  # Move pointer back to continue
 
-            lines = [f.readline().strip() for _ in range(chunk_size) if f.readline()]
+                # Split buffer into lines
+                lines = buffer.splitlines()
 
-            return (
-                jsonify(
-                    {
-                        "filename": file_path,
-                        "content": lines,
-                        "has_more": start_pos > 0,
-                        "page": page,
-                        "total_size": file_size,
-                        "modified": datetime.fromtimestamp(stats.st_mtime).isoformat(),
-                    }
-                ),
-                200,
-            )
+                # If enough lines collected, stop
+                lines_read = len(lines)
+
+            # Get only the last 'chunk_size' lines
+            latest_lines = [line.decode("utf-8", errors="ignore") for line in lines[-chunk_size:]]
+
+            return jsonify(
+                {
+                    "filename": file_path,
+                    "content": latest_lines,
+                    "has_more": len(lines) > chunk_size,
+                    "total_size": file_size,
+                    "modified": datetime.fromtimestamp(stats.st_mtime).isoformat(),
+                }
+            ), 200
 
     except Exception as e:
         return error_response(str(e), 500)

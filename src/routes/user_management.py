@@ -16,7 +16,7 @@ from src.routes.helper.common_helper import admin_required
 
 user_management_bp = blueprints.Blueprint('user_management', __name__)
 
-@app.route('/create_user', methods=['GET', 'POST'])
+@app.route('/system/create_user', methods=['GET', 'POST'])
 @admin_required
 def create_user():
     total_users = UserProfile.fetch_total_count()
@@ -93,13 +93,13 @@ def create_user():
     
     return render_template('users/create_user.html', total_users=total_users)
 
-@app.route('/users')
+@app.route('/system/user_management', methods=['GET'])
 @admin_required
 def view_users():
     users = UserProfile.query.all()
     return render_template('users/view_users.html', users=users)
 
-@app.route('/user/<username>', methods=['GET', 'POST'])
+@app.route('/system/user/<username>', methods=['GET', 'POST'])
 @admin_required
 def update_user_profile(username):
     user = UserProfile.query.filter_by(username=username).first_or_404()

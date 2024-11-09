@@ -1,5 +1,4 @@
 # cython: language_level=3
-import os
 import subprocess
 from flask import (
     request,

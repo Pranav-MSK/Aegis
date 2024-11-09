@@ -292,6 +292,18 @@
                 </a>
                 {% endif %}
 
+                {% if current_user.user_level == 'admin' %}
+                <a href="{{ url_for('view_users') }}"
+                    class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'view_users' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                    <div
+                        class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-lg {% if request.endpoint == 'view_users' %}bg-indigo-100 text-indigo-600{% else %}bg-gray-100 group-hover:bg-indigo-100 group-hover:text-indigo-600{% endif %}">
+                        <i
+                            class="fas fa-users w-5 h-5 mr-2 {% if request.endpoint == 'view_users' %}text-indigo-600{% else %}text-gray-400 group-hover:text-indigo-600{% endif %} transition-colors duration-200"></i>
+                    </div>
+                    <span class="ml-2">User Management</span>
+                </a>
+                {% endif %}
+
                 <a href="{{ url_for('settings') }}"
                     class="group flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 {% if request.endpoint == 'settings' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                     <div

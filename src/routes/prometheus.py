@@ -26,7 +26,6 @@ from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
     load_yaml,
     save_yaml,
-    is_valid_file,
     show_targets,
     prometheus_yml_path,
     update_prometheus_container,

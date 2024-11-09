@@ -16,7 +16,7 @@ from src.routes.helper.notification_helper import generate_system_notification
 activation_bp = Blueprint('activation', __name__)
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
 
-@app.route('/activation', methods=['GET', 'POST'])
+@app.route('/system/activation', methods=['GET', 'POST'])
 @login_required
 def activation():
     """ 
@@ -79,7 +79,7 @@ def activation():
                            activation_code=activation_code,
                            license_key=license_key)
 
-@app.route('/download-license', methods=['GET'])
+@app.route('/system/download-license', methods=['GET'])
 @login_required
 def download_license():
     try:

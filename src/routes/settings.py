@@ -1,6 +1,5 @@
 # cython: language_level=3
 import os
-import time
 import datetime
 import subprocess
 from flask import render_template, request, flash, blueprints, redirect, url_for, session

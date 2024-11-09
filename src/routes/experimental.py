@@ -1,9 +1,8 @@
 # cython: language_level=3
-from flask import Blueprint, jsonify, request, render_template, flash
+from flask import Blueprint, jsonify
 
-from flask_login import current_user
-from src.config import app, db, csrf
-from src.models import ActivityTable, InstanceMetadata
+from src.config import app
+from src.models import InstanceMetadata
 from src.routes.helper.common_helper import admin_required
 from src.utils import get_instance_metadata
 from src.logger import logger
