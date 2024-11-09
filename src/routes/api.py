@@ -476,14 +476,14 @@ def retrieve_labels():
     return render_template("graphs/labels.html", labels=data)
 
 
-@app.route("/api/v1/disk", methods=["GET"])
+@app.route("/api/v1/system/disk", methods=["GET"])
 @login_required
 def get_disk_usage():
     disk_info = disk_metrics.get_metrics
     return jsonify(disk_info)
 
 
-@app.route("/api/v1/network", methods=["GET"])
+@app.route("/api/v1/system/network", methods=["GET"])
 @login_required
 def get_network_metrics():
     network_data = network_metrics.get_metrics
@@ -501,11 +501,21 @@ def check_prometheus_health():
     except requests.exceptions.RequestException:
         return "unhealthy"
 
+def check_alert_manager_health():
+    alert_manager_url = 'http://localhost:9093/api/v2/status'
+    try:
+        response = requests.get(alert_manager_url, timeout=2)
+        if response.status_code == 200:
+            return "healthy"
+        else:
+            return "unhealthy"
+    except requests.exceptions.RequestException:
+        return "unhealthy"
 
 @app.route('/api/v1/system/status', methods=['GET'])
 @login_required
 def get_status():
-    total_services = 2
+    total_services = 3
     running_services = 0
 
     # Check database status
@@ -517,6 +527,10 @@ def get_status():
     prometheus_health = check_prometheus_health()
     running_services += (prometheus_health == 'healthy')
 
+    # check alert manager health
+    alert_manager_health = check_alert_manager_health()
+    running_services += (alert_manager_health == 'healthy')
+
     # Prepare the response
     status = {
         "service": {
@@ -524,6 +538,7 @@ def get_status():
             "running_services": running_services,
             "db_health": db_health,
             "prometheus_health": prometheus_health,
+            "alert_manager_health": alert_manager_health,
             "status": f"{running_services}/{total_services} Services Running",
         },
         "timestamp": datetime.utcnow().isoformat()

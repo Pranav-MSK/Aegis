@@ -14,7 +14,8 @@ const CONFIG = {
     SYSTEM_SERVICES_API: '/api/v1/system/services',
     SYSTEM_SERVICE_CATEGORIES_API: '/api/v1/system/services/categories',
     SYSTEM_NOTIFICATIONS_API: '/api/v1/system/notifications/',
-    SYSTEM_STATUS_API: '/api/v1/system/status'
+    SYSTEM_STATUS_API: '/api/v1/system/status',
+    SYSTEM_DISK_API: "/api/v1/system/disk",
   }
 };
 
@@ -934,13 +935,50 @@ async function fetchStatus() {
 function updateStatus(data) {
   const systemStatus = document.getElementById('system-status');
 
+  // {
+  //   "service": {
+  //     "alert_manager_health": "healthy",
+  //     "db_health": "healthy",
+  //     "prometheus_health": "healthy",
+  //     "running_services": 3,
+  //     "status": "3/3 Services Running",
+  //     "total_services": 3
+  //   },
+  //   "timestamp": "2024-11-09T03:48:09.007835"
+  // }
+  
+
   systemStatus.innerHTML = `
-      <div class="flex items-center px-3 py-1.5 bg-green-50 rounded-full shadow-sm">
-        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+    <div class="flex items-center space-x-4">
+       <div class="flex items-center px-3 py-1.5 ${data.service.running_services === data.service.total_services ? 'bg-green-50' : 'bg-red-50'} rounded-full shadow-sm">
+        <svg class="w-4 h-4 ${data.service.running_services === data.service.total_services ? 'text-green-500' : 'text-red-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
-        <span class="ml-2 text-sm font-medium text-green-700">${data.service.status}</span>
-      </div>`;
+        <span class="ml-2 text-sm font-medium ${data.service.running_services === data.service.total_services ? 'text-green-700' : 'text-red-700'}">${data.service.status}</span>
+      </div>
+      <div class="flex items-center px-3 py-1.5 ${data.service.prometheus_health === 'healthy' ? 'bg-green-50' : 'bg-red-50'} rounded-full shadow-sm">
+        <svg class="w-4 h-4 ${data.service.prometheus_health === 'healthy' ? 'text-green-500' : 'text-red-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+        <span class="ml-2 text-sm font-medium ${data.service.prometheus_health === 'healthy' ? 'text-green-700' : 'text-red-700'}">Prometheus: ${data.service.prometheus_health}</span>
+      </div>
+      <div class="flex items-center px-3 py-1.5 ${data.service.alert_manager_health === 'healthy' ? 'bg-green-50' : 'bg-red-50'} rounded-full shadow-sm">
+        <svg class="w-4 h-4 ${data.service.alert_manager_health === 'healthy' ? 'text-green-500' : 'text-red-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+        <span class="ml-2 text-sm font-medium ${data.service.alert_manager_health === 'healthy' ? 'text-green-700' : 'text-red-700'}">Alert Manager: ${data.service.alert_manager_health}</span>
+      </div>
+      <div class="flex items-center px-3 py-1.5 ${data.service.db_health === 'healthy' ? 'bg-green-50' : 'bg-red-50'} rounded-full shadow-sm">
+        <svg class="w-4 h-4 ${data.service.db_health === 'healthy' ? 'text-green-500' : 'text-red-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+        <span class="ml-2 text-sm font-medium ${data.service.db_health === 'healthy' ? 'text-green-700' : 'text-red-700'}">DB: ${data.service.db_health}</span>
+      </div>
+     
+    </div>
+  `;
+      
+
 
 }
 

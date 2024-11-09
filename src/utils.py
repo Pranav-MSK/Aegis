@@ -363,12 +363,11 @@ def get_instance_metadata():
 def _collect_metrics():
     """Optimized system information collection using parallel processing"""
     try:
-        with ThreadPoolExecutor(max_workers=7) as executor:
+        with ThreadPoolExecutor(max_workers=5) as executor:
             futures = {
                 "cpu": executor.submit(get_cpu_metrics),
                 "memory": executor.submit(get_memory_metrics),
                 "disk": executor.submit(get_disk_metrics),
-                "network": executor.submit(get_network_metrics),
                 "battery": executor.submit(get_battery_metrics),
                 "processes": executor.submit(get_process_metrics),
             }
