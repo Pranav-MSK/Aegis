@@ -760,11 +760,10 @@ install_from_release() {
 
     #rename app_name.lower
     VERSION=$(echo "$VERSION" | sed 's/v//')
-    mv "$EXTRACT_DIR/$APP_NAME_LOWER-$VERSION" "$EXTRACT_DIR/$APP_NAME-source"
-
+    mv "$EXTRACT_DIR/$APP_NAME-$VERSION" "$EXTRACT_DIR/$APP_NAME-source"
     rm "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip"
-    log "Extraction completed."
 
+    log "Extraction completed."
     install_executable
     setup_cron_job
 

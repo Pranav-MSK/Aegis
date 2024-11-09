@@ -1,5 +1,6 @@
 # cython: language_level=3
 import os
+from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -21,10 +22,10 @@ network_metrics.start()
 app = Flask(__name__)
 
 # Application Metadata
-APP_NAME = "Aegis"
+APP_NAME = "SystemGuard"
 DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor, analyze, and manage your system resources."
 AUTHOR = "{} Team".format(APP_NAME)
-YEAR = "2024"
+YEAR = datetime.now().year
 PRE_RELEASE = False
 VERSION = "v1.0.0"
 CONTACT_EMAIL = ""
