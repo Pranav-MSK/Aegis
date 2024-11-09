@@ -7,7 +7,7 @@ from flask_login import login_required
 
 from src.config import app
 from src.routes.helper.service_helper import get_running_docker_containers
-from src.routes.helper.access_decorators import systemguard_enterprise
+from src.routes.helper.access_decorators import systemguard_enterprise, community_edition
 
 metrics_bp = blueprints.Blueprint('metrics', __name__)
 
@@ -49,6 +49,7 @@ def get_histogram_metrics():
     return metrics
 
 @app.route('/api/v1/histogram/endpoints')
+@login_required
 def get_endpoints_histogram():
     """Get list of endpoints that have histogram metrics."""
     try:
@@ -58,6 +59,7 @@ def get_endpoints_histogram():
         return jsonify({"error": f"Prometheus connection error: {str(e)}"}), 500
 
 @app.route('/api/v1/histogram/data/<path:endpoint>/<metric_name>')
+@login_required
 def get_metrics(endpoint, metric_name):
     """Get histogram data for specific endpoint and metric."""
     try:
@@ -264,15 +266,14 @@ def get_metrics_summary():
 
 @app.route('/system/bucket_metrics')
 @login_required
-@systemguard_enterprise()
-@systemguard_enterprise()
+@community_edition()
 def get_bucket_metrics():
     return render_template('other/bucket_metrics.html')
 
 
 @app.route('/system/summary_metrics')
 @login_required
-@systemguard_enterprise()
+@community_edition()
 def get_summary_metrics():
     return render_template('other/summary_metrics.html')
 

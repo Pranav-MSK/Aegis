@@ -1,5 +1,6 @@
 # cython: language_level=3
 from flask import Blueprint, render_template, request, session, flash
+from flask_login import login_required
 
 from src.config import app
 from src.routes.helper.firewall_helper import (
@@ -101,6 +102,7 @@ def validate_port(port):
     
 
 @app.route('/system/security', methods=['GET', 'POST'])
+@login_required
 def perform_security_analysis():
     if request.method == 'POST':
         if 'scan_network' in request.form:

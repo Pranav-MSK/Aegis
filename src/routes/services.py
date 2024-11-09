@@ -53,7 +53,6 @@ def list_service_categories():
 
 
 @app.get("/system/services")
-@systemguard_enterprise()
 @login_required
 def show_system_services():
     return render_template('other/services.html')
