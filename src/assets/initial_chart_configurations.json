@@ -75,7 +75,7 @@
         "tension": 0.4,
         "point_radius": 0,
         "point_hover_radius": 6,
-        "is_active": true,
+        "is_active": false,
         "production": true
     }
 ]

@@ -22,11 +22,11 @@ app = Flask(__name__)
 
 # Application Metadata
 APP_NAME = "Aegis"
-DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor your system resources."
+DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor, analyze, and manage your system resources."
 AUTHOR = "{} Team".format(APP_NAME)
 YEAR = "2024"
 PRE_RELEASE = False
-VERSION = "v1.0.6"
+VERSION = "v1.0.0"
 CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()

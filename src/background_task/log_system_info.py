@@ -68,8 +68,6 @@ def update_prometheus_metrics(system_info):
             'cpu_usage_metric': system_info['cpu_percent'],
             'memory_usage_metric': system_info['memory_percent'],
             'disk_usage_metric': system_info['disk_percent'],
-            'network_sent_metric': system_info['network_sent'],
-            'network_recv_metric': system_info['network_received'],
             'cpu_temp_metric': system_info['current_temp'],
             'cpu_frequency_metric': system_info['cpu_frequency'],
             'battery_percentage_metric': system_info['battery_percent'],
@@ -81,6 +79,7 @@ def update_prometheus_metrics(system_info):
             
         metrics['request_count'].inc()
     except Exception as e:
+        print("Error updating Prometheus metrics:", e)
         logger.error(f"Failed to update Prometheus metrics: {e}")
 
 

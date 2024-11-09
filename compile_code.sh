@@ -102,5 +102,7 @@ copy_files
 generate_c_files
 compile_c_files "$SOURCE_DIRECTORY"
 # cleanup
+# create logs directory in compiled code
+mkdir -p "$COMPILED_CODE_DIRECTORY/logs"
 
 echo "Build process completed successfully."
