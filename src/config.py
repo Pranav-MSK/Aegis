@@ -1,5 +1,6 @@
 # cython: language_level=3
 import os
+import hashlib
 from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -127,3 +128,9 @@ def natural_time(value):
     if isinstance(value, datetime):
         return naturaltime(value)
     return value
+
+@app.template_filter()
+def get_profile_picture_url(email, size=200):
+    # Create an MD5 hash of the email address
+    email_hash = hashlib.md5(email.strip().lower().encode('utf-8')).hexdigest()
+    return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
