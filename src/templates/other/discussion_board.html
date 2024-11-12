@@ -37,8 +37,7 @@
                             <i class="fas fa-home w-5"></i>
                             <span>Home</span>
                         </button>
-                        <button @click="activeTab = 'saved'"
-                            title="saved post by you"
+                        <button @click="activeTab = 'saved'" title="saved post by you"
                             :class="{'bg-blue-50 text-blue-600': activeTab === 'saved'}"
                             class="flex items-center w-full space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors">
                             <i class="fas fa-bookmark w-5"></i>
@@ -46,8 +45,7 @@
                         </button>
 
                         <!-- deleted post tab -->
-                        <button @click="activeTab = 'deleted'"
-                            title="post deleted by you"
+                        <button @click="activeTab = 'deleted'" title="post deleted by you"
                             :class="{'bg-blue-50 text-blue-600': activeTab === 'deleted'}"
                             class="flex items-center w-full space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors">
                             <i class="fas fa-trash w-5"></i>
@@ -65,12 +63,13 @@
                 </div>
 
                 <!-- # available tags suggestion -->
-                 <!-- TODO: implement search based on tags -->
+                <!-- TODO: implement search based on tags -->
                 <div class="bg-white rounded-xl shadow-sm p-6 mt-6">
                     <h3 class="font-bold text-gray-900 mb-4">Available Tags</h3>
                     <div class="flex flex-wrap gap-2">
                         {% for tag in post_tags %}
-                        <a href="#" class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">{{ tag }}</a>
+                        <a href="#" class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">{{
+                            tag }}</a>
                         {% endfor %}
                     </div>
                 </div>
@@ -179,7 +178,7 @@
 
                                 <!-- Post Content -->
                                 <div class="prose max-w-none" x-show="!isEditing">
-                                    <p class="text-gray-800 whitespace-pre-line">{{ post.content }}</p>
+                                    <div class="whitespace-pre-line">{{ post.content | markdown | safe }}</div>
                                 </div>
 
                                 <!-- Edit Form -->
@@ -214,7 +213,7 @@
                                     <i class="fas fa-tags text-gray-400"></i>
                                     <div class="flex flex-wrap gap-2">
                                         {% for tag in post.tags.split(',') %}
-                                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ tag }}</span>
+                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ tag }}</span>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -349,7 +348,7 @@
                                         </button>
                                     </form>
                                 </div>
-                                <p class="text-gray-800">{{ post.content }}</p>
+                                <p class="text-gray-800">{{ post.content | markdown | safe }}</p>
                                 <div class="flex items-center space-x-6 mt-4 text-sm text-gray-500">
                                     <span class="flex items-center">
                                         <i class="fas fa-heart text-red-500 mr-2"></i>
@@ -365,7 +364,7 @@
                                     <i class="fas fa-tags text-gray-400"></i>
                                     <div class="flex flex-wrap gap-2">
                                         {% for tag in post.tags.split(',') %}
-                                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ tag }}</span>
+                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ tag }}</span>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -411,7 +410,8 @@
                                 <div class="space-y-4">
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Total Posts</span>
-                                        <span class="text-2xl font-bold text-blue-600">{{ user_analytics.total_posts }}</span>
+                                        <span class="text-2xl font-bold text-blue-600">{{ user_analytics.total_posts
+                                            }}</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-gray-600">Total Likes Received</span>
@@ -494,7 +494,7 @@
                                         </form>
                                     </div>
                                 </div>
-                                <p class="text-gray-800">{{ post.content }}</p>
+                                <p class="text-gray-800">{{ post.content | markdown | safe }}</p>
                                 <div class="flex items-center space-x-6 mt-4 text-sm text-gray-500">
                                     <span class="flex items-center">
                                         <i class="fas fa-heart text-red-500 mr-2"></i>
@@ -510,7 +510,7 @@
                                     <i class="fas fa-tags text-gray-400"></i>
                                     <div class="flex flex-wrap gap-2">
                                         {% for tag in post.tags.split(',') %}
-                                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ tag }}</span>
+                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">{{ tag }}</span>
                                         {% endfor %}
                                     </div>
                                 </div>
