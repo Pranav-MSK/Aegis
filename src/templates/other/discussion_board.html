@@ -178,7 +178,7 @@
 
                                 <!-- Post Content -->
                                 <div class="prose max-w-none" x-show="!isEditing">
-                                    <div class="whitespace-pre-line">{{ post.content | markdown | safe }}</div>
+                                    <div class="leading-relaxed whitespace-pre-line">{{ post.content | markdown | safe }}</div>
                                 </div>
 
                                 <!-- Edit Form -->
@@ -348,7 +348,7 @@
                                         </button>
                                     </form>
                                 </div>
-                                <p class="text-gray-800">{{ post.content | markdown | safe }}</p>
+                                <div class="leading-relaxed whitespace-pre-line text-gray-800">{{ post.content | markdown | safe }}</div>
                                 <div class="flex items-center space-x-6 mt-4 text-sm text-gray-500">
                                     <span class="flex items-center">
                                         <i class="fas fa-heart text-red-500 mr-2"></i>
@@ -494,7 +494,7 @@
                                         </form>
                                     </div>
                                 </div>
-                                <p class="text-gray-800">{{ post.content | markdown | safe }}</p>
+                                <div class="leading-relaxed whitespace-pre-line text-gray-800">{{ post.content | markdown | safe }}</div>
                                 <div class="flex items-center space-x-6 mt-4 text-sm text-gray-500">
                                     <span class="flex items-center">
                                         <i class="fas fa-heart text-red-500 mr-2"></i>
@@ -542,7 +542,7 @@
                                     class="w-8 h-8 rounded-full ring-2 ring-blue-100">
                                 <p class="text-sm font-medium text-gray-900">{{ post.user.first_name }}</p>
                             </div>
-                            <p class="text-sm text-gray-600 line-clamp-2">{{ post.content[:100] | markdown | safe }}...</p>
+                            <div class="text-sm text-gray-600 line-clamp-2">{{ post.content[:200] | markdown | safe }}...</div>
                             {% if post.tags %}
                             <div class="flex items center space-x-2 mt-2 text-sm text-gray-500">
                                 <i class="fas fa-tags text-gray-400"></i>
