@@ -18,7 +18,14 @@ from src.alert_manager import (
     send_teams_alert,
     send_google_chat_alert,
 )
-from src.models import NotificationSettings, AlertTicket, UserProfile, AlertLog, Notification, SystemNotification
+from src.models import (
+    NotificationSettings,
+    AlertTicket,
+    UserProfile,
+    AlertLog,
+    Notification,
+    SystemNotification,
+)
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper.alert_helper import can_create_alert
@@ -34,7 +41,6 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
         "This alert is intended for testing purposes only and does not indicate any real issues.\n"
         "If this alert appears in your monitoring system, please disregard it."
     )
-    
     # Define the alert data with the unique alert name and improved annotations
     alert_data = [
         {
@@ -111,21 +117,30 @@ def process_alert(alert):
     if fingerprint:
         existing_alert = AlertTicket.query.filter_by(fingerprint=fingerprint).first()
         # if alert_status of existing alert is "firing" and new alert_status is "resolved", update the existing alert
-        if existing_alert and existing_alert.alert_status == "firing" and alert_status == "resolved":
+        if (
+            existing_alert
+            and existing_alert.alert_status == "firing"
+            and alert_status == "resolved"
+        ):
             existing_alert.alert_status = alert_status
             existing_alert.updated_at = datetime.utcnow()
-            # also log 
+            # also log
             log_message = f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
-            alert_log = AlertLog(
-                alert_ticket_id=existing_alert.id,
-                log=log_message
-            )
+            alert_log = AlertLog(alert_ticket_id=existing_alert.id, log=log_message)
             alert_log.save()
             existing_alert.save()
-            logger.info(f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve).")
-            return 
-        elif existing_alert and existing_alert.alert_status == "resolved" and alert_status == "firing":
-            logger.info(f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert.")
+            logger.info(
+                f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
+            )
+            return
+        elif (
+            existing_alert
+            and existing_alert.alert_status == "resolved"
+            and alert_status == "firing"
+        ):
+            logger.info(
+                f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert."
+            )
             return
 
     notification_data = {
@@ -133,17 +148,38 @@ def process_alert(alert):
         "icon": "info-circle",  # Font Awesome icon
         "title": alert_name,
         "message": description,
-        "is_global": True
+        "is_global": True,
     }
     generate_system_notification(notification_data)
 
     log_alert(severity, alert_name, instance, description, summary)
-    create_alert_ticket(alert_name, alert_status, instance, severity, description, summary, system_username, system_hostname, fingerprint, runbook_url)
+    create_alert_ticket(
+        alert_name,
+        alert_status,
+        instance,
+        severity,
+        description,
+        summary,
+        system_username,
+        system_hostname,
+        fingerprint,
+        runbook_url,
+    )
     notify_alert(alert_name, instance, severity, description, summary)
 
-def create_alert_ticket(alert_name, alert_status, instance, severity, 
-                    description, summary, system_username, system_hostname, 
-                    fingerprint, runbook_url=None):
+
+def create_alert_ticket(
+    alert_name,
+    alert_status,
+    instance,
+    severity,
+    description,
+    summary,
+    system_username,
+    system_hostname,
+    fingerprint,
+    runbook_url=None,
+):
     """
     Saves the alert data to the database.
 
@@ -155,12 +191,14 @@ def create_alert_ticket(alert_name, alert_status, instance, severity,
         summary (str): Brief alert summary.
     """
     # Fetch all supervisors with user_level "admin"
-    all_supervisors = UserProfile.query.filter_by(user_level="admin").all()
+    all_supervisors = UserProfile.query.filter_by(
+        user_level="admin", assign_tickets=True
+    ).all()
 
     if not can_create_alert():
         logger.warning("Monthly alert ticket limit reached. Ignoring the alert.")
         return
-    
+
     if not all_supervisors:
         assigned_supervisor_id = None
         logger.warning("No supervisors available to assign.")
@@ -169,7 +207,7 @@ def create_alert_ticket(alert_name, alert_status, instance, severity,
         supervisor_loads = {
             supervisor.id: AlertTicket.query.filter(
                 AlertTicket.assigned_supervisor_id == supervisor.id,
-                AlertTicket.ticket_status.in_(["Open", "In Progress"])
+                AlertTicket.ticket_status.in_(["Open", "In Progress"]),
             ).count()
             for supervisor in all_supervisors
         }
@@ -177,12 +215,22 @@ def create_alert_ticket(alert_name, alert_status, instance, severity,
 
         # Find the supervisor(s) with the minimum load
         min_load = min(supervisor_loads.values())
-        eligible_supervisors = [supervisor_id for supervisor_id, load in supervisor_loads.items() if load == min_load]
+        eligible_supervisors = [
+            supervisor_id
+            for supervisor_id, load in supervisor_loads.items()
+            if load == min_load
+        ]
 
         # If there's a tie, use round-robin logic based on the last assigned supervisor
-        last_assigned_supervisor = AlertTicket.query.order_by(AlertTicket.id.desc()).first()
-        last_assigned_supervisor_id = last_assigned_supervisor.assigned_supervisor_id if last_assigned_supervisor else None
-        
+        last_assigned_supervisor = AlertTicket.query.order_by(
+            AlertTicket.id.desc()
+        ).first()
+        last_assigned_supervisor_id = (
+            last_assigned_supervisor.assigned_supervisor_id
+            if last_assigned_supervisor
+            else None
+        )
+
         if last_assigned_supervisor_id in eligible_supervisors:
             # Continue from the last assigned supervisor
             last_index = eligible_supervisors.index(last_assigned_supervisor_id)
@@ -204,10 +252,11 @@ def create_alert_ticket(alert_name, alert_status, instance, severity,
         system_username=system_username,
         system_hostname=system_hostname,
         fingerprint=fingerprint,
-        runbook_url=runbook_url
+        runbook_url=runbook_url,
     )
     alert_ticket.save()
     logger.info(f"Saving alert ticket: {alert_ticket}")
+
 
 def log_alert(severity, alert_name, instance, description, summary):
     """
@@ -240,6 +289,7 @@ def get_notification_settings():
     """
     return NotificationSettings().to_dict()
 
+
 def is_enabled(notification_config, setting_key):
     """
     Checks if a particular notification setting is enabled.
@@ -247,13 +297,16 @@ def is_enabled(notification_config, setting_key):
     Args:
         notification_config (dict): Notification settings configuration.
         setting_key (str): The key corresponding to the setting.
-    
+
     Returns:
         bool: True if the setting is enabled, False otherwise.
     """
     return notification_config.get(setting_key, False)
 
-def send_slack_alert_wrapper(config, alert_name, instance, severity, description, summary):
+
+def send_slack_alert_wrapper(
+    config, alert_name, instance, severity, description, summary
+):
     """
     Sends a Slack alert using the provided configuration.
 
@@ -263,8 +316,10 @@ def send_slack_alert_wrapper(config, alert_name, instance, severity, description
     """
     slack_webhook = config.get("slack_webhook_url")
     if slack_webhook:
-        send_slack_alert(slack_webhook, alert_name, instance, severity, description, summary)
-          
+        send_slack_alert(
+            slack_webhook, alert_name, instance, severity, description, summary
+        )
+
 
 def send_email_alert_wrapper(alert_name, instance, severity, description, summary):
     """
@@ -280,15 +335,13 @@ def send_email_alert_wrapper(alert_name, instance, severity, description, summar
         "instance": instance,
         "severity": severity,
         "description": description,
-        "summary": summary, 
+        "summary": summary,
     }
 
     login_alert_template = os.path.join(
         ROOT_DIR, "src/templates/email_templates/alert_template.html"
     )
-    email_body = render_template_from_file(
-        login_alert_template, **context
-    )
+    email_body = render_template_from_file(login_alert_template, **context)
     if admin_emails:
         send_smtp_email(
             receiver_email=admin_emails,
@@ -298,7 +351,9 @@ def send_email_alert_wrapper(alert_name, instance, severity, description, summar
         )
 
 
-def send_discord_alert_wrapper(config, alert_name, instance, severity, description, summary):
+def send_discord_alert_wrapper(
+    config, alert_name, instance, severity, description, summary
+):
     """
     Sends a Discord alert using the provided configuration.
     """
@@ -309,7 +364,9 @@ def send_discord_alert_wrapper(config, alert_name, instance, severity, descripti
         )
 
 
-def send_teams_alert_wrapper(config, alert_name, instance, severity, description, summary):
+def send_teams_alert_wrapper(
+    config, alert_name, instance, severity, description, summary
+):
     """
     Sends a Microsoft Teams alert using the provided configuration.
     """
@@ -318,8 +375,11 @@ def send_teams_alert_wrapper(config, alert_name, instance, severity, description
         send_teams_alert(
             teams_webhook_url, alert_name, instance, severity, description, summary
         )
-   
-def send_google_chat_alert_wrapper(config, alert_name, instance, severity, description, summary):
+
+
+def send_google_chat_alert_wrapper(
+    config, alert_name, instance, severity, description, summary
+):
     """
     Sends a Google Chat alert using the provided configuration.
     """
@@ -327,7 +387,12 @@ def send_google_chat_alert_wrapper(config, alert_name, instance, severity, descr
     google_chat_webhook_url = config.get("google_chat_webhook_url")
     if google_chat_webhook_url:
         send_google_chat_alert(
-            google_chat_webhook_url, alert_name, instance, severity, description, summary
+            google_chat_webhook_url,
+            alert_name,
+            instance,
+            severity,
+            description,
+            summary,
         )
 
 
@@ -348,43 +413,51 @@ def notify_alert(alert_name, instance, severity, description, summary):
         send_email_alert_wrapper(alert_name, instance, severity, description, summary)
 
     if is_enabled(notification_config, "is_slack_alert_enabled"):
-        send_slack_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+        send_slack_alert_wrapper(
+            notification_config, alert_name, instance, severity, description, summary
+        )
 
     if is_enabled(notification_config, "is_discord_alert_enabled"):
-        send_discord_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+        send_discord_alert_wrapper(
+            notification_config, alert_name, instance, severity, description, summary
+        )
 
     if is_enabled(notification_config, "is_teams_alert_enabled"):
-        send_teams_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+        send_teams_alert_wrapper(
+            notification_config, alert_name, instance, severity, description, summary
+        )
 
     if is_enabled(notification_config, "is_google_chat_alert_enabled"):
-        send_google_chat_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+        send_google_chat_alert_wrapper(
+            notification_config, alert_name, instance, severity, description, summary
+        )
 
 
 class PDF(fpdf.FPDF):
     def header(self):
-        self.set_font("Arial", 'B', 14)
-        self.cell(0, 10, "Alert Ticket Report", 0, 1, 'C')
+        self.set_font("Arial", "B", 14)
+        self.cell(0, 10, "Alert Ticket Report", 0, 1, "C")
         self.ln(5)
 
     def chapter_title(self, title):
-        self.set_font("Arial", 'B', 12)
+        self.set_font("Arial", "B", 12)
         self.set_fill_color(220, 220, 220)  # Light gray background
-        self.cell(0, 10, title, 0, 1, 'L', 1)
+        self.cell(0, 10, title, 0, 1, "L", 1)
         self.ln(5)
 
     def chapter_body(self, body):
-        self.set_font("Arial", '', 12)
+        self.set_font("Arial", "", 12)
         self.multi_cell(0, 10, body)
         self.ln()
 
     def add_table(self, header, data):
-        self.set_font("Arial", 'B', 12)
+        self.set_font("Arial", "B", 12)
         self.set_fill_color(200, 200, 200)  # Gray header
         for col in header:
-            self.cell(60, 10, col, 1, 0, 'C', 1)
+            self.cell(60, 10, col, 1, 0, "C", 1)
         self.ln()
 
-        self.set_font("Arial", '', 12)
+        self.set_font("Arial", "", 12)
         for row in data:
             for item in row:
                 self.cell(60, 10, item, 1)
@@ -393,8 +466,9 @@ class PDF(fpdf.FPDF):
     def add_icon(self, icon_path, size=(10, 10)):
         self.image(icon_path, x=None, y=None, w=size[0], h=size[1])
 
+
 def generate_alert_ticket_pdf(alert, investigation_notes, alert_logs):
-    pdf = PDF(format='letter')
+    pdf = PDF(format="letter")
     pdf.add_page()
 
     # Add alert ticket details
@@ -404,19 +478,31 @@ def generate_alert_ticket_pdf(alert, investigation_notes, alert_logs):
     pdf.chapter_body(f"Severity: {alert.severity}")
     pdf.chapter_body(f"Description: {alert.description}")
     pdf.chapter_body(f"Summary: {alert.summary}")
-    pdf.chapter_body(f"Assigned Investigator: {alert.assigned_user.username if alert.assigned_user else 'Unassigned'}")
-    pdf.chapter_body(f"Assigned Supervisor: {alert.assigned_supervisor.username if alert.assigned_supervisor else 'Unassigned'}")
+    pdf.chapter_body(
+        f"Assigned Investigator: {alert.assigned_user.username if alert.assigned_user else 'Unassigned'}"
+    )
+    pdf.chapter_body(
+        f"Assigned Supervisor: {alert.assigned_supervisor.username if alert.assigned_supervisor else 'Unassigned'}"
+    )
     pdf.chapter_body(f"Created At: {alert.created_at.strftime('%Y-%m-%d %H:%M:%S')}")
-    pdf.chapter_body(f"Last Updated At: {alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if alert.updated_at else 'N/A'}")
+    pdf.chapter_body(
+        f"Last Updated At: {alert.updated_at.strftime('%Y-%m-%d %H:%M:%S') if alert.updated_at else 'N/A'}"
+    )
 
     # Add Investigation Notes
     pdf.chapter_title("Investigation Notes")
-    notes_data = [(note.created_at.strftime('%Y-%m-%d %H:%M:%S'), note.user.username, note.note) for note in investigation_notes.items]
+    notes_data = [
+        (note.created_at.strftime("%Y-%m-%d %H:%M:%S"), note.user.username, note.note)
+        for note in investigation_notes.items
+    ]
     pdf.add_table(["Date", "User", "Note"], notes_data)
 
     # Add Alert Logs
     pdf.chapter_title("Alert Logs")
-    logs_data = [(log.created_at.strftime('%Y-%m-%d %H:%M:%S'), log.log) for log in alert_logs.items]
+    logs_data = [
+        (log.created_at.strftime("%Y-%m-%d %H:%M:%S"), log.log)
+        for log in alert_logs.items
+    ]
     pdf.add_table(["Date", "Log"], logs_data)
 
     # Save the PDF
@@ -425,30 +511,36 @@ def generate_alert_ticket_pdf(alert, investigation_notes, alert_logs):
 
     return pdf_file_path
 
+
 def generate_system_notification(notification_data, user_id=None):
     new_notification = Notification(
-        type=notification_data.get('type', 'info'),
-        icon=notification_data.get('icon', 'info-circle'),
-        title=notification_data['title'],
-        message=notification_data['message'],
-        is_global=notification_data.get('is_global', False)
+        type=notification_data.get("type", "info"),
+        icon=notification_data.get("icon", "info-circle"),
+        title=notification_data["title"],
+        message=notification_data["message"],
+        is_global=notification_data.get("is_global", False),
     )
     new_notification.save()
-    
+
     if new_notification.is_global:
         for user in UserProfile.query.all():
-            user_notification = SystemNotification(user_id=user.id, notification_id=new_notification.id)
+            user_notification = SystemNotification(
+                user_id=user.id, notification_id=new_notification.id
+            )
             user_notification.save()
     else:
         if not user_id:
             user_id = current_user.id
-        user_notification = SystemNotification(user_id=user_id, notification_id=new_notification.id)
+        user_notification = SystemNotification(
+            user_id=user_id, notification_id=new_notification.id
+        )
     user_notification.save()
+
 
 def send_desktop_notification(title, message):
     """Send a desktop notification using notify-send."""
     try:
-        subprocess.run(['notify-send', title, message], check=True)
+        subprocess.run(["notify-send", title, message], check=True)
     except Exception as e:
         print(f"Failed to send notification: {e}")
 

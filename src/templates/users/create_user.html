@@ -57,6 +57,7 @@
           <label for="profession">
             <i class="fas fa-briefcase"></i>Profession
           </label>
+
           <select id="profession" name="profession" 
                   class="form-control" {% if total_users >= max_users_allowed | int %}disabled{% endif %}>
             <option value="Software Developer">Software Developer</option>
@@ -64,6 +65,10 @@
             <option value="System Administrator">System Administrator</option>
             <option value="Database Administrator">Database Administrator</option>
             <option value="Security Analyst">Security Analyst</option>
+            <option value="DevOps Engineer">DevOps Engineer</option>
+            <option value="Data Scientist">Data Scientist</option>
+            <option value="Product Manager">Product Manager</option>
+            <option value="Other">Other</option>
           </select>
         </div>
       </div>
