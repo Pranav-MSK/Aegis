@@ -74,7 +74,7 @@ def discussion_board():
         "comments_made": UserPostComment.query.filter_by(user_id=current_user.id).count()
     }
 
-    return render_template('other/discussion_board.html', 
+    return render_template('system/discussion_board.html', 
                            pagination=pagination, 
                            saved_pagination=saved_pagination, 
                            liked_post_ids=liked_post_ids,

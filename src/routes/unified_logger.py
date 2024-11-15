@@ -21,11 +21,11 @@ def error_response(message, status_code):
     return jsonify({"error": message}), status_code
 
 
-@app.route("/unified_logger", methods=["GET"])
+@app.route("/system/unified_logger", methods=["GET"])
 @login_required
 @systemguard_enterprise()
 def unified_logger():
-    return render_template("other/unified_logger.html")
+    return render_template("system/unified_logger.html")
 
 
 @app.route("/api/v1/logger/directories", methods=["GET", "POST", "DELETE"])

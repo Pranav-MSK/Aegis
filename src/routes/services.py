@@ -55,5 +55,5 @@ def list_service_categories():
 @app.get("/system/services")
 @login_required
 def show_system_services():
-    return render_template('other/services.html')
+    return render_template('system/services.html')
 

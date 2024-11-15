@@ -80,7 +80,7 @@ def update_webhooks():
         return redirect(url_for("update_webhooks"))
 
     return render_template(
-        "other/update_webhooks.html",
+        "settings/update_webhooks.html",
         webhook_settings=webhook_settings,
         enable_alerts=enable_alerts
     )

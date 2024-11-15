@@ -268,14 +268,14 @@ def get_metrics_summary():
 @login_required
 @community_edition()
 def get_bucket_metrics():
-    return render_template('other/bucket_metrics.html')
+    return render_template('system/bucket_metrics.html')
 
 
 @app.route('/system/summary_metrics')
 @login_required
 @community_edition()
 def get_summary_metrics():
-    return render_template('other/summary_metrics.html')
+    return render_template('system/summary_metrics.html')
 
 
 @app.route('/api/v1/system/containers')
