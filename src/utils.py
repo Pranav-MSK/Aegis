@@ -199,24 +199,6 @@ def get_disk_metrics():
     }
 
 
-def get_network_metrics():
-    """Collect all network-related metrics in one go"""
-    # Initial metrics
-    initial_net_io = psutil.net_io_counters()
-    final_net_io = psutil.net_io_counters()
-
-    # Calculate upload/download speeds
-    upload_speed = final_net_io.bytes_sent - initial_net_io.bytes_sent
-    download_speed = final_net_io.bytes_recv - initial_net_io.bytes_recv
-
-    return {
-        "network_sent": round(final_net_io.bytes_sent / CONVERSION_FACTOR_MB, 2),
-        "network_received": round(final_net_io.bytes_recv / CONVERSION_FACTOR_MB, 2),
-        "upload_speed": format_speed(upload_speed),
-        "download_speed": format_speed(download_speed),
-    }
-
-
 def get_battery_metrics():
     """Collect battery metrics"""
     try:

@@ -209,9 +209,9 @@ def restore_post(post_id):
 @app.route('/delete_post_permanently/<int:post_id>', methods=['POST'])
 @login_required
 def delete_post_permanently(post_id):
-    post = UserArticle.query.get_or_404(post_id)
-    if post.user_id == current_user.id:
-        post.delete()
+    user_article = UserArticle.query.get_or_404(post_id)
+    if user_article.user_id == current_user.id:
+        user_article.delete()
     return redirect(url_for('discussion_board'))
 
 

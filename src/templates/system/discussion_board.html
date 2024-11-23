@@ -3,6 +3,69 @@
 
 {% block content %}
 {% include 'ext/message.html' %}
+<style>
+    h1 {
+        font-weight: 900;
+        font-size: 2.5rem;
+    }
+
+    h2 {
+        font-weight: 800;
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    h4 {
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid #e5e7eb;
+        /* Light gray border */
+        padding: 0.5rem;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f3f4f6;
+        /* Light gray header background */
+        font-weight: bold;
+    }
+
+    .prose ul,
+    .prose ol {
+        margin-left: 1.5rem;
+        /* Add left margin for proper indentation */
+        margin-bottom: 1rem;
+        /* Add spacing below lists */
+        list-style-position: outside;
+        /* Ensure bullet points or numbers are outside the text */
+        list-style-type: disc;
+        /* Default bullet style for unordered lists */
+    }
+
+    .prose ol {
+        list-style-type: decimal;
+        /* Default style for ordered lists */
+    }
+
+    .prose ul li,
+    .prose ol li {
+        margin-bottom: 0.5rem;
+        /* Add spacing between list items */
+    }
+</style>
 <div class="bg-gray-50 min-h-screen" x-data="{ activeTab: 'home' }">
     <!-- Header -->
     <header class="bg-white border-b sticky top-0 z-50 shadow-md">
