@@ -43,9 +43,11 @@ prometheus_client==0.20.0   # Exposes metrics for Prometheus to scrape
 pyyaml==6.0.2               # Reads and writes YAML configuration files
 
 # Asynchronous HTTP client/server framework
-aiohttp==3.10.7             # Async HTTP client for non-blocking requests
+aiohttp==3.10.11             # Async HTTP client for non-blocking requests
 
 fpdf==1.7.2                 # PDF generation library
 humanize==4.11.0            # Humanizes data (e.g., file sizes, timestamps)
 
 markdown==3.7
+
+pybind11==2.13.6            # C++11 bindings for Python

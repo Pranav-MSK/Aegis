@@ -45,7 +45,7 @@ def send_discord_alert(webhook_url, alert_name, instance, severity, description,
     }
     
     # Send the POST request to the Discord webhook URL
-    response = requests.post(webhook_url, json=message)
+    response = requests.post(webhook_url, json=message, timeout=10)
 
     # Check the response status
     if response.status_code != 204:
