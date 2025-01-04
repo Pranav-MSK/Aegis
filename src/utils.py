@@ -391,3 +391,30 @@ def fetch_system_metrics():
     info.update(get_basic_system_information())
 
     return info
+
+
+def safe_open_file(filename, base_path, mode='r'):
+    """
+    Safely open a file ensuring it is within a specified base directory.
+
+    :param filename: The path to the file to be opened.
+    :param base_path: The base directory within which files can be accessed.
+    :param mode: The mode in which to open the file (default is 'r').
+    :return: A file object if successful.
+    :raises ValueError: If the file path is outside the base directory.
+    :raises IOError: For other file-related errors.
+    """
+    try:
+        # Resolve absolute paths
+        absolute_base_path = os.path.abspath(base_path)
+        absolute_file_path = os.path.abspath(filename)
+
+        # Ensure the file resides within the base directory
+        if not os.path.commonpath([absolute_base_path, absolute_file_path]) == absolute_base_path:
+            raise ValueError(f"Invalid file path: {absolute_file_path} is outside {absolute_base_path}")
+
+        # Open and return the file
+        return open(absolute_file_path, mode)
+    except (OSError, ValueError) as e:
+        # Handle file access errors and raise them with an informative message
+        raise IOError(f"Error opening file: {e}")

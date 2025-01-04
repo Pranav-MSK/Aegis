@@ -7,6 +7,7 @@ from flask_login import login_required
 from src.config import app, csrf
 from src.models import LogDirectory
 from src.routes.helper.access_decorators import systemguard_enterprise
+from src.utils import safe_open_file
 
 unified_logger_bp = Blueprint("unified_logger", __name__)
 CHUNK_SIZE = 100  # Number of lines to fetch per request
@@ -102,9 +103,12 @@ def get_log_file(file_path):
     chunk_size = request.args.get("chunk_size", CHUNK_SIZE, type=int)  # Default chunk size in lines
     stats = os.stat(file_path)
 
+    filename = os.path.basename(file_path)
+    basepath = os.path.dirname(file_path)
+
     try:
         # Open the file in binary mode for more precise seeking and decoding
-        with open(file_path, "rb") as f:
+        with safe_open_file(filename, basepath) as f:
             # Move to the end of the file
             f.seek(0, os.SEEK_END)
             file_size = f.tell()
