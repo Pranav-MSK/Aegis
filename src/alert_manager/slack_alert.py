@@ -47,7 +47,10 @@ def send_slack_alert(webhook_url, alert_name, instance, severity, description, s
     }
     
     # Send the POST request to the Slack webhook URL
-    response = requests.post(webhook_url, data=json.dumps(payload), headers={'Content-Type': 'application/json'})
+    response = requests.post(webhook_url, 
+                             data=json.dumps(payload), 
+                             headers={'Content-Type': 'application/json'},
+                             timeout=10)
     
     # Check the response status
     if response.status_code != 200:

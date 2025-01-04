@@ -24,33 +24,3 @@ from src.routes.middleware import middleware_bp
 from src.routes.cmd_route import cmd_bp
 from src.routes.discussion_board import discussion_board_bp
 from src.routes.unified_logger import unified_logger_bp
-
-__all__ = [
-    "dashboard_bp",
-    "settings_bp",
-    "speedtest_bp",
-    "process_bp",
-    "auth_bp",
-    "network_bp",
-    "other_bp",
-    "smtp_email_config_bp",
-    "user_management_bp",
-    "graphs_bp",
-    "ping_bp",
-    "firewall_bp",
-    "health_bp",
-    "api_bp",
-    "experimental_bp",
-    "error_handlers_bp",
-    "profile_bp",
-    "prometheus_bp",
-    "alert_bp",
-    "webhooks_bp",
-    "activation_bp",
-    "services_bp",
-    "metrics_bp",
-    "middleware_bp",
-    "cmd_bp",
-    "discussion_board_bp",
-    "unified_logger_bp",
-]

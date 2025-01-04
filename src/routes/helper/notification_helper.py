@@ -63,6 +63,7 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
             f"{alertmanager_url}/api/v2/alerts",
             headers={"Content-Type": "application/json"},
             data=json.dumps(alert_data),
+            timeout=10,
         )
 
         # Check the response

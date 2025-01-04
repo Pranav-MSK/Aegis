@@ -3,7 +3,7 @@ import os
 import subprocess
 from functools import wraps
 from flask_login import current_user
-from flask import flash, redirect, url_for, render_template, request, session
+from flask import flash, redirect, url_for, request, session
 
 from src.models import UserProfile, UserActivity, ActivityTable
 from src.config import app
@@ -68,7 +68,12 @@ def reset_sudo_timestamp():
     Reset the sudo timestamp, which requires the user to input their sudo password again
     the next time a sudo command is executed.
     """
-    subprocess.run(['sudo', '-k'])
+    try:
+        # Example of safe sudo command execution
+        command = ['sudo', '-k']
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing command: {e}")
 
 
 def handle_sudo_password(redirect_url):

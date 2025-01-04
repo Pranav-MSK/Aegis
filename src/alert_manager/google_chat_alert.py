@@ -61,7 +61,8 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
     response = requests.post(
         webhook_url,
         headers={"Content-Type": "application/json"},
-        data=json.dumps(message_payload)
+        data=json.dumps(message_payload),
+        timeout=10
     )
 
     # Check if the request was successful

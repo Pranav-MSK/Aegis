@@ -21,10 +21,10 @@ def send_telegram_message(bot_token, chat_id, message):
     }
     
     # Send the request
-    response = requests.post(url, data=payload)
+    response = requests.post(url, data=payload, timeout=10)
     
     # Check if the request was successful
     if response.status_code == 200:
-        logger("Alert sent to Telegram.")
+        logger.info("Alert sent to Telegram.")
     else:
         logger.error(f"Failed to send message. Error code: {response.status_code}")

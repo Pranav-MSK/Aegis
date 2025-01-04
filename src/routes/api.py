@@ -363,7 +363,7 @@ def manage_alert_rules():
 # Reload Prometheus configuration
 def reload_prometheus():
     url = f"{PROMETHEUS_BASE_URL}/-/reload"
-    response = requests.post(url)
+    response = requests.post(url, timeout=10)
     if response.status_code == 200:
         return (
             jsonify(
