@@ -101,13 +101,7 @@ def get_log_file(file_path):
 
     chunk_size = request.args.get("chunk_size", CHUNK_SIZE, type=int)  # Default chunk size in lines
     stats = os.stat(file_path)
-
-    filename = os.path.basename(file_path)
-    basepath = os.path.dirname(file_path)
-
-    print("Basepath: ", basepath)
-    print("Filename: ", filename)
-
+    
     try:
         # Open the file in binary mode for more precise seeking and decoding
         with open(file_path, "rb") as f:
