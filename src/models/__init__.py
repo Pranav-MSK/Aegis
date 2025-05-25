@@ -17,7 +17,9 @@ from src.models.user_post_model import UserArticle, UserPostComment, UserPostLik
 from src.models.log_directories import LogDirectory
 
 from src.config import db, app
-from src.logger import logger
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

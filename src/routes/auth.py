@@ -14,7 +14,8 @@ from src.models import (
 from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper.common_helper import get_email_addresses
 from src.config import get_app_info
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 
 auth_bp = blueprints.Blueprint("auth", __name__)
 

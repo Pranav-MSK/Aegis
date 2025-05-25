@@ -4,7 +4,8 @@ from threading import Timer, Lock
 from sqlalchemy.exc import SQLAlchemyError
 from contextlib import contextmanager
 
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from src.config import app, db
 from src.utils import _collect_metrics
 from src.models import GeneralSettings

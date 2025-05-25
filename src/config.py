@@ -14,6 +14,7 @@ from src.disk_manager import DiskMetrics
 from src.network_manager import NetworkMetrics
 from src.helper import get_system_node_name, get_ip_address, load_secret_key
 from src.activator import get_plan_details
+from src.parser.markdown_parser import process_markdown_with_tailwind
 
 # disk and metrics background process
 disk_metrics = DiskMetrics()
@@ -29,7 +30,7 @@ DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor, anal
 AUTHOR = "{} Team".format(APP_NAME)
 YEAR = datetime.now().year
 PRE_RELEASE = False
-VERSION = "v1.0.1"
+VERSION = "v1.0.2
 CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()
@@ -140,4 +141,4 @@ def get_profile_picture_url(email, size=200):
 # Define a custom filter to convert Markdown to HTML
 @app.template_filter('markdown')
 def markdown_filter(content):
-    return markdown.markdown(content, extensions=['fenced_code', 'tables'])
+    return process_markdown_with_tailwind(content)

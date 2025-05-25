@@ -1,7 +1,9 @@
 # cython: language_level=3
 from datetime import datetime
 import requests
-from src.logger import logger
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 def send_discord_alert(webhook_url, alert_name, instance, severity, description, summary):
     """

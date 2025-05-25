@@ -2,7 +2,9 @@
 import json
 import requests
 from datetime import datetime
-from src.logger import logger
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 def send_slack_alert(webhook_url, alert_name, instance, severity, description, summary):
     """

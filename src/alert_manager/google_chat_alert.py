@@ -1,7 +1,9 @@
 # cython: language_level=3
 import requests
 import json
-from src.logger import logger
+from src.logger import get_logger
+
+from src.logger import get_logger
 
 def send_google_chat_alert(webhook_url, alert_name, instance, severity, description, summary):
     """

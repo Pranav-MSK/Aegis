@@ -21,7 +21,8 @@ from flask_login import login_required
 from src.config import app, get_app_info
 from src.models import UserProfile
 from src.utils import ROOT_DIR
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
     load_yaml,

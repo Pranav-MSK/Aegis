@@ -1,7 +1,9 @@
 # cython: language_level=3
 import requests
 import json
-from src.logger import logger
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def send_teams_alert(webhook_url, alert_name, instance, severity, description, summary):

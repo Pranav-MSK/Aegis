@@ -13,7 +13,8 @@ from flask import (
 from flask_login import current_user, login_required
 
 from src.config import app, csrf, db, get_app_info
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from src.routes.helper.notification_helper import send_test_alert, process_alert
 from src.utils import get_ip_address
 from src.models import (

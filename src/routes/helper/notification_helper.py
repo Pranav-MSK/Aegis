@@ -10,7 +10,8 @@ from flask_login import current_user
 import subprocess
 
 from src.config import db
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from src.alert_manager import (
     send_slack_alert,
     send_smtp_email,

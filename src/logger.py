@@ -1,44 +1,24 @@
 # cython: language_level=3
+import logging
 import os
-import ctypes
-from src.helper import load_library
+from pathlib import Path
 
-CURR_DIR = os.path.dirname(os.path.realpath(__file__))
-ROOT_DIR = os.path.dirname(CURR_DIR)
+# /hom/<user>/logs/
+HOME_LOGS_DIR = Path.home() / "logs"
+# Ensure the logs directory exists
+HOME_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Load the shared library
-logger_lib = load_library(os.path.join(ROOT_DIR, 'src/toolkit/logger.so'))
+def get_logger(name: str = __name__):
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
 
-# Define the function prototype
-logger_lib.log_message.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+    # Prevent adding multiple handlers to the same logger
+    if not logger.handlers:
+        log_dir = HOME_LOGS_DIR / name
+        os.makedirs(log_dir, exist_ok=True)
 
-class Logger:
-    def __init__(self):
-        pass
-
-    def log_message(self, level, message):
-        """General logger function."""
-        logger_lib.log_message(level.encode('utf-8'), message.encode('utf-8'))
-
-    def info(self, message):
-        """Log an info message."""
-        self.log_message("INFO", message)
-
-    def debug(self, message):
-        """Log a debug message."""
-        self.log_message("DEBUG", message)
-
-    def warning(self, message):
-        """Log a warning message."""
-        self.log_message("WARNING", message)
-
-    def error(self, message):
-        """Log an error message."""
-        self.log_message("ERROR", message)
-
-    def exception(self, message):
-        """Log an exception message."""
-        self.log_message("EXCEPTION", message)
-
-# Create an instance of the Logger
-logger = Logger()
+        file_handler = logging.FileHandler(f"{log_dir}/log.txt", mode='a')
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s", "%Y-%m-%d %H:%M:%S")
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    return logger

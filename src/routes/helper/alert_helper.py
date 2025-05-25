@@ -5,7 +5,8 @@ from flask import flash, redirect, url_for, abort
 from flask_login import current_user
 
 from src.models import AlertTicket, UserProfile
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from src.config import get_app_info
 
 

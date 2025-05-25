@@ -7,7 +7,8 @@ from email.mime.base import MIMEBase
 from email import encoders
 from flask import redirect, url_for, flash
 from src.config import app
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from src.models import GeneralSettings, SMTPSettings
 from src.config import get_app_info
 

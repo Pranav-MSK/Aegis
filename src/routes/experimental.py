@@ -5,7 +5,8 @@ from src.config import app
 from src.models import InstanceMetadata
 from src.routes.helper.common_helper import admin_required
 from src.utils import get_instance_metadata
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 
 experimental_bp = Blueprint("experimental", __name__)
 

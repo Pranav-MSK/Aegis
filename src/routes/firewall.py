@@ -8,7 +8,8 @@ from src.routes.helper.firewall_helper import (
     enable_port, 
     disable_port)
 from src.routes.helper.common_helper import admin_required, handle_sudo_password
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from src.routes.helper.network_helper import handle_network_scan, handle_port_scan
 from src.routes.helper.access_decorators import systemguard_enterprise
 

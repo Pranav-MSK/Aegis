@@ -6,7 +6,8 @@ from collections import OrderedDict
 import requests
 
 from src.utils import ROOT_DIR
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 
 prometheus_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/prometheus.yml')
 alert_manager_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/alertmanager.yml')

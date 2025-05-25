@@ -13,7 +13,8 @@ from flask_login import login_required, current_user
 from src.config import app, csrf, get_app_info
 from src.routes.helper.common_helper import admin_required
 from src.models import ChartConfiguration
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 
 graphs_bp = blueprints.Blueprint("graphs", __name__)
 

@@ -10,7 +10,8 @@ from sqlalchemy.engine import Engine
 from prometheus_client import Counter
 
 from src.config import app
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from src.activator import get_plan_details
 from src.background_task.prometheus_metrics import metrics
 

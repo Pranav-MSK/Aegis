@@ -7,7 +7,8 @@ import psutil
 from typing import Dict, List, Any, Union
 import docker
 from src.utils import ROOT_DIR
-from src.logger import logger
+from src.logger import get_logger
+logger = get_logger(__name__)
 from humanize import naturalsize, naturaltime
 
 # Type aliases

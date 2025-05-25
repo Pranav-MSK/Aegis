@@ -13,9 +13,11 @@ from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from functools import lru_cache
 
-from src.logger import logger
+from src.logger import get_logger
 from src.models import GeneralSettings
 from src.helper import get_basic_system_information, get_ip_address
+
+logger = get_logger(__name__)
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
