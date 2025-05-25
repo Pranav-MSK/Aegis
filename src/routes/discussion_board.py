@@ -22,7 +22,7 @@ def discussion_board():
  
         if form_type == 'create_post' and content:
             
-            new_post = UserArticle(user_id=current_user.id, content=content, tags=new_post_tags)
+            new_post = UserArticle(user_id=current_user.id, content=content, tags=new_post_tags) # type: ignore
             new_post.save()                
 
             notification_data = {
@@ -89,7 +89,7 @@ def discussion_board():
 def get_comments(post_id):
     page = request.args.get('page', 1, type=int)
     comments_per_page = 4
-    comments = UserPostComment.query.filter_by(post_id=post_id).paginate(page, comments_per_page, error_out=False)
+    comments = UserPostComment.query.filter_by(post_id=post_id).paginate(page, comments_per_page, error_out=False) # type: ignore
     
     return render_template('comments.html', comments=comments, post_id=post_id)
 
@@ -101,11 +101,11 @@ def like_post(post_id):
     if existing_like:
         existing_like.delete()
     else:
-        new_like = UserPostLike(post_id=post_id, user_id=current_user.id)
+        new_like = UserPostLike(post_id=post_id, user_id=current_user.id) # type: ignore
         new_like.save()
 
         #post owner id
-        post_owner_id = UserArticle.query.get(post_id).user_id
+        post_owner_id = UserArticle.query.get(post_id).user_id # type: ignore
         notification_data = {
             "type": "info",
             "icon": "info-circle",
@@ -123,11 +123,11 @@ def like_post(post_id):
 def comment(post_id):
     content = request.form.get('content')
     if content:
-        new_comment = UserPostComment(post_id=post_id, user_id=current_user.id, content=content)
+        new_comment = UserPostComment(post_id=post_id, user_id=current_user.id, content=content) # type: ignore
         new_comment.save()
 
         #post owner id
-        post_owner_id = UserArticle.query.get(post_id).user_id
+        post_owner_id = UserArticle.query.get(post_id).user_id # type: ignore
         notification_data = {
             "type": "info",
             "icon": "info-circle",
@@ -182,7 +182,7 @@ def delete_post(post_id):
 def save_post(post_id):
     existing_save = UserSavedPost.query.filter_by(post_id=post_id, user_id=current_user.id).first()
     if not existing_save:
-        new_save = UserSavedPost(post_id=post_id, user_id=current_user.id)
+        new_save = UserSavedPost(post_id=post_id, user_id=current_user.id) # type: ignore
         new_save.save()
     return redirect(url_for('discussion_board'))
 

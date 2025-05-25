@@ -38,15 +38,28 @@ from src.routes.helper.prometheus_helper import (
     calculate_total_rules,
 )
 from src.routes.helper.access_decorators import systemguard_enterprise
+from src.config_loader import configuration_settings
 
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint("prometheus", __name__)
 
-PROMETHEUS_BASE_URL = "http://localhost:9090"
-ALERTMANAGER_BASE_URL = "http://localhost:9093"
-PROMETHEUS_RELOAD_URL = (
-    "http://localhost:9090/api/v1/admin/tsdb/reload"  # Adjust as necessary
+# [monitoring.prometheus]
+# BASE_URL = http://localhost:9090
+# QUERY_API = http://localhost:9090/api/v1/query
+# TARGETS_API = http://localhost:9090/api/v1/targets
+
+
+PROMETHEUS_BASE_URL = configuration_settings.get(
+    "monitoring.prometheus", "BASE_URL"
 )
+ALERTMANAGER_BASE_URL = configuration_settings.get(
+    "monitoring.alertmanager", "BASE_URL"
+)
+
+PROMETHEUS_RELOAD_URL = configuration_settings.get(
+    "monitoring.prometheus", "RELOAD_URL"
+)
+
 RULES_FILE_PATH = os.path.join(ROOT_DIR, "prometheus_config/alert_rules.yml")
 
 
@@ -69,7 +82,7 @@ def verify_user(username, password):
 @app.route("/metrics")
 def metrics():
     auth = request.authorization
-    if not verify_user(auth.username, auth.password):
+    if not verify_user(auth.username, auth.password): # type: ignore
         return Response(
             "Could not verify",
             401,
@@ -109,7 +122,7 @@ def configure_targets():
 
     if request.form.get("_method") == "POST":
         max_scrap_target = get_app_info().get("max_scrap_target")
-        if total_targets >= max_scrap_target:
+        if max_scrap_target is not None and total_targets >= max_scrap_target:
             flash(
                 f"Cannot add more targets. You have reached the maximum limit of {max_scrap_target} targets.",
                 "danger",
@@ -129,7 +142,7 @@ def configure_targets():
         config = load_yaml(prometheus_yml_path)
 
         # Validate target format
-        if ":" not in new_target:
+        if not new_target or ":" not in new_target:
             flash(
                 "Invalid target format. It should be in the format <ip>:<port>.",
                 "danger",
@@ -222,7 +235,7 @@ def configure_targets():
     if request.form.get("_method") == "PUT":
         if request.form.get("action") == "update_interval":
             job_name = request.form.get("job_name")
-            new_interval = request.form.get("new_interval") + "s"  # New scrape interval
+            new_interval = (request.form.get("new_interval") or "15") + "s"  # New scrape interval
             config = load_yaml(prometheus_yml_path)
 
             for scrape_config in config["scrape_configs"]:
@@ -340,7 +353,7 @@ def manage_rules():
 
         if action == "add":
             max_alert_rules = get_app_info().get("max_alert_rules")
-            if total_rules >= max_alert_rules:
+            if max_alert_rules is not None and total_rules >= max_alert_rules:
                 flash(
                     f"Cannot add more rules. You have reached the maximum limit of {max_alert_rules} rules.",
                     "danger",
@@ -380,7 +393,14 @@ def manage_rules():
             return redirect(url_for("manage_rules"))
 
         elif action == "edit":
-            index = int(request.form.get("index"))
+            # index = int(request.form.get("index"))
+
+            index_str = request.form.get("index")
+            if index_str is None:
+                flash("No rule index provided.", "danger")
+                return redirect(url_for("manage_rules"))
+            index = int(index_str)
+                
 
             # Find the group and edit the specified rule
             for group in rules["groups"]:
@@ -412,7 +432,12 @@ def manage_rules():
             return redirect(url_for("manage_rules"))
 
         elif action == "delete":
-            index = int(request.form.get("index"))
+            # index = int(request.form.get("index"))
+            index_str = request.form.get("index")
+            if index_str is None:
+                flash("No rule index provided.", "danger")
+                return redirect(url_for("manage_rules"))
+            index = int(index_str)
             
 
             # Find the group and delete the specified rule

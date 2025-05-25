@@ -171,7 +171,8 @@ def get_activities():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
 
-    user_points = UserProfile.query.get(current_user.id).user_points
+    user_profile = UserProfile.query.get(current_user.id)
+    user_points = user_profile.user_points if user_profile else 0
 
     activities = (
         UserActivity.query.filter_by(user_id=current_user.id)

@@ -64,13 +64,13 @@ class UserProfile(BaseModel, UserMixin):
     def get_by_email(email):
         return UserProfile.query.filter_by(email=email).first()
     
-    @staticmethod
-    def get_by_id(id):
-        return UserProfile.query.get(id)
+    # @staticmethod
+    # def get_by_id(id):
+    #     return UserProfile.query.get(id)
     
-    @staticmethod
-    def get_all():
-        return UserProfile.query.all()
+    # @staticmethod
+    # def get_all():
+    #     return UserProfile.query.all()
     
     # check_hashed_password
     def check_password(self, password):

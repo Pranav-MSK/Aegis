@@ -15,7 +15,7 @@ def update_webhooks():
     general_settings = GeneralSettings.query.first()
 
     # Default to enabling all alerts if the general settings are missing
-    enable_alerts = general_settings.enable_alerts
+    enable_alerts = general_settings.enable_alerts if general_settings else True
 
     if request.method == "POST":
         # Fetch the submitted webhook URLs and alert enable states from the form
@@ -42,7 +42,7 @@ def update_webhooks():
 
         # Update and save the general settings
         if not general_settings:
-            general_settings = GeneralSettings(enable_alerts=enable_alerts)
+            general_settings = GeneralSettings(enable_alerts=enable_alerts) # type: ignore
             general_settings.save()
         else:
             general_settings.enable_alerts = enable_alerts
@@ -51,15 +51,15 @@ def update_webhooks():
         # Update or create new webhook settings
         if not webhook_settings:
             webhook_settings = NotificationSettings(
-                slack_webhook_url=slack_webhook_url,
-                discord_webhook_url=discord_webhook_url,
-                teams_webhook_url=teams_webhook_url,
-                google_chat_webhook_url=google_chat_webhook_url,
-                is_email_alert_enabled=is_email_alert_enabled,
-                is_slack_alert_enabled=is_slack_alert_enabled,
-                is_discord_alert_enabled=is_discord_alert_enabled,
-                is_teams_alert_enabled=is_teams_alert_enabled,
-                is_google_chat_alert_enabled=is_google_chat_alert_enabled,
+                slack_webhook_url=slack_webhook_url, # type: ignore
+                discord_webhook_url=discord_webhook_url, # type: ignore
+                teams_webhook_url=teams_webhook_url, # type: ignore
+                google_chat_webhook_url=google_chat_webhook_url, # type: ignore
+                is_email_alert_enabled=is_email_alert_enabled, # type: ignore
+                is_slack_alert_enabled=is_slack_alert_enabled, # type: ignore
+                is_discord_alert_enabled=is_discord_alert_enabled, # type: ignore
+                is_teams_alert_enabled=is_teams_alert_enabled, # type: ignore
+                is_google_chat_alert_enabled=is_google_chat_alert_enabled, # type: ignore
             )
             webhook_settings.save()
         else:

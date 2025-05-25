@@ -82,7 +82,7 @@ if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
                     if not UserProfile.query.filter_by(user_level=user_data["user_level"]).first():
                         hashed_password = generate_password_hash(user_data["password"])
                         user = UserProfile(
-                            first_name=user_data["first_name"],
+                            first_name=user_data["first_name"], 
                             last_name=user_data["last_name"],
                             username=user_data["username"],
                             email=user_data["email"],

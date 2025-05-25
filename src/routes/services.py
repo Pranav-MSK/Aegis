@@ -17,7 +17,7 @@ def fetch_all_running_services():
     try:
         return jsonify(monitor.get_running_services())
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) # type: ignore
 
 @app.get("/api/v1/system/services/<category>")
 @login_required
@@ -27,7 +27,7 @@ def get_services_by_category(category: str):
         monitor = ServiceMonitor()
         data = monitor.get_running_services()
         if category not in data['services']:
-            raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
+            raise HTTPException(status_code=404, detail=f"Category '{category}' not found") # type: ignore
         
         return jsonify({
             'timestamp': data['timestamp'],
@@ -39,7 +39,7 @@ def get_services_by_category(category: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) # type: ignore
 
 @app.get("/api/v1/system/services/categories")
 @login_required

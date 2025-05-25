@@ -298,7 +298,7 @@ def alert_ticket(alert_id):
         log_message = ""
 
         def log_and_save(message):
-            AlertLog(alert_ticket_id=alert_id, log=message).save()
+            AlertLog(alert_ticket_id=alert_id, log=message).save() # type: ignore
 
         # User Assignment
         if form_type in ["assign_user", "assign_supervisor"]:
@@ -394,7 +394,7 @@ def alert_ticket(alert_id):
             note_content = request.form.get("investigation_notes")
             if note_content:
                 InvestigationNote(
-                    alert_ticket_id=alert.id, user_id=current_user.id, note=note_content
+                    alert_ticket_id=alert.id, user_id=current_user.id, note=note_content # type: ignore
                 ).save()
                 log_message = f"Comment added by {current_user.username}"
                 log_and_save(log_message)
@@ -411,7 +411,7 @@ def alert_ticket(alert_id):
                 field_value = request.form.get("field_value")
                 if field_name and field_value:
                     alert.customfields.append(
-                        CustomFields(field_name=field_name, field_value=field_value)
+                        CustomFields(field_name=field_name, field_value=field_value) # type: ignore
                     )
                     log_message = (
                         f"Custom field '{field_name}' added by {current_user.username}"
@@ -458,9 +458,9 @@ def alert_ticket(alert_id):
                 award_points("closed", user_id=alert.assigned_user_id)
                 if note_content:
                     InvestigationNote(
-                        alert_ticket_id=alert.id,
-                        user_id=current_user.id,
-                        note=note_content,
+                        alert_ticket_id=alert.id, # type: ignore
+                        user_id=current_user.id, # type: ignore
+                        note=note_content, # type: ignore
                     ).save()
                     log_message = (
                         f"Ticket closed as 'Resolved' by {current_user.username}"
@@ -473,10 +473,10 @@ def alert_ticket(alert_id):
                 note_content = request.form.get("investigation_notes")
                 if note_content:
                     InvestigationNote(
-                        alert_ticket_id=alert.id,
-                        user_id=current_user.id,
-                        note=note_content,
-                    ).save()
+                        alert_ticket_id=alert.id, # type: ignore
+                        user_id=current_user.id, # type: ignore
+                        note=note_content, # type: ignore
+                    ).save() 
                     log_message = f"Ticket reopened for further investigation by {current_user.username}"
                     flash("Ticket reopened successfully!", "success")
                 else:
@@ -487,9 +487,9 @@ def alert_ticket(alert_id):
                 note_content = request.form.get("investigation_notes")
                 if note_content:
                     InvestigationNote(
-                        alert_ticket_id=alert.id,
-                        user_id=current_user.id,
-                        note=note_content,
+                        alert_ticket_id=alert.id, # type: ignore
+                        user_id=current_user.id, # type: ignore
+                        note=note_content, # type: ignore
                     ).save()
                     log_message = (
                         f"Ticket marked as 'In Progress' by {current_user.username}"
@@ -504,9 +504,9 @@ def alert_ticket(alert_id):
                 award_points("resolved", user_id=alert.assigned_user_id)
                 if note_content:
                     InvestigationNote(
-                        alert_ticket_id=alert.id,
-                        user_id=current_user.id,
-                        note=note_content,
+                        alert_ticket_id=alert.id, # type: ignore
+                        user_id=current_user.id, # type: ignore
+                        note=note_content, # type: ignore
                     ).save()
                     log_message = (
                         f"Ticket marked as 'Resolved' by {current_user.username}"
@@ -525,9 +525,9 @@ def alert_ticket(alert_id):
                 note_content = request.form.get("investigation_notes")
                 if note_content:
                     InvestigationNote(
-                        alert_ticket_id=alert.id,
-                        user_id=current_user.id,
-                        note=note_content,
+                        alert_ticket_id=alert.id, # type: ignore
+                        user_id=current_user.id, # type: ignore
+                        note=note_content, # type: ignore
                     ).save()
                     log_message = f"Ticket marked as 'Critical Severity' by {current_user.username}"
                     flash("Ticket marked as critical severity successfully!", "success")
@@ -539,9 +539,9 @@ def alert_ticket(alert_id):
                 note_content = request.form.get("investigation_notes")
                 if note_content:
                     InvestigationNote(
-                        alert_ticket_id=alert.id,
-                        user_id=current_user.id,
-                        note=note_content,
+                        alert_ticket_id=alert.id, # type: ignore
+                        user_id=current_user.id, # type: ignore
+                        note=note_content, # type: ignore
                     ).save()
                     log_message = f"Ticket marked as 'Warning Severity' by {current_user.username}"
                     flash("Ticket marked as warning severity successfully!", "success")
@@ -553,9 +553,9 @@ def alert_ticket(alert_id):
                 note_content = request.form.get("investigation_notes")
                 if note_content:
                     InvestigationNote(
-                        alert_ticket_id=alert.id,
-                        user_id=current_user.id,
-                        note=note_content,
+                        alert_ticket_id=alert.id, # type: ignore
+                        user_id=current_user.id, # type: ignore
+                        note=note_content, # type: ignore
                     ).save()
                     log_message = (
                         f"Ticket marked as 'Info Severity' by {current_user.username}"
@@ -645,7 +645,7 @@ def mark_all_notifications():
     user_notifications = SystemNotification.query.filter_by(user_id=user_id, unread=True).all()
     for user_notification in user_notifications:
         user_notification.unread = False
-    user_notification.save()
+    user_notification.save() # type: ignore
 
     return jsonify({"message": "All notifications marked as read!"}), 200
 

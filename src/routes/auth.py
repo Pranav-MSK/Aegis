@@ -21,7 +21,7 @@ auth_bp = blueprints.Blueprint("auth", __name__)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = "login"
+login_manager.login_view = "login" # type: ignore
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -50,9 +50,9 @@ def login():
             user.save()
 
             if remember_me:
-                login_manager.remember_cookie_duration = datetime.timedelta(days=7)
-            else:
-                login_manager.remember_cookie_duration = datetime.timedelta(days=1)
+                login_manager.remember_cookie_duration = datetime.timedelta(days=7) # type: ignore
+            else: 
+                login_manager.remember_cookie_duration = datetime.timedelta(days=1) # type: ignore
 
             receiver_email = current_user.email
             admin_emails_with_alerts = get_email_addresses(
@@ -99,7 +99,7 @@ def signup():
     total_users = UserProfile.fetch_total_count()
     max_users_allowed = get_app_info().get("max_users_allowed")
 
-    if total_users >= max_users_allowed:
+    if max_users_allowed is not None and total_users >= max_users_allowed:
         flash(
             f"Cannot create more users. You have reached the maximum limit of {max_users_allowed} users.",
             "danger",
@@ -139,14 +139,14 @@ def signup():
 
         hashed_password = generate_password_hash(password)
         new_user = UserProfile(
-            first_name=first_name,
-            last_name=last_name,
-            username=username,
-            email=email,
-            password=hashed_password,
-            user_level=user_level,
-            receive_email_alerts=receive_email_alerts,
-            profession=profession,
+            first_name=first_name, # type: ignore
+            last_name=last_name, # type: ignore
+            username=username, # type: ignore
+            email=email, # type: ignore
+            password=hashed_password, # type: ignore
+            user_level=user_level, # type: ignore
+            receive_email_alerts=receive_email_alerts, # type: ignore
+            profession=profession, # type: ignore
         )
 
         # Get Admin Emails with Alerts Enabled:
@@ -180,7 +180,7 @@ def signup():
         send_smtp_email(email, subject, email_body, is_html=True)
 
         new_user.save()
-        db.session.add(UserDashboardSettings(user_id=new_user.id))
+        db.session.add(UserDashboardSettings(user_id=new_user.id)) # type: ignore
         db.session.commit()
         flash("Account created successfully, Contact Admin to activate your account", "success")
         logger.info(f"New user {new_user.username} created")

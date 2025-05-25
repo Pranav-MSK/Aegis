@@ -19,32 +19,32 @@ def ec2_metadata():
     if not instance_metadata:
         logger.info("Instance metadata not found. Creating new instance metadata.")
         instance_metadata = InstanceMetadata(
-            ami_id=instance_data.get("ami-id"),
-            ami_launch_index=instance_data.get("ami-launch-index"),
-            ami_manifest_path=instance_data.get("ami-manifest-path"),
-            block_device_mapping=instance_data.get("block-device-mapping/"),
-            events=instance_data.get("events/"),
-            hostname=instance_data.get("hostname"),
-            identity_credentials=instance_data.get("identity-credentials/"),
-            instance_action=instance_data.get("instance-action"),
-            instance_id=instance_data.get("instance-id"),
-            instance_life_cycle=instance_data.get("instance-life-cycle"),
-            instance_type=instance_data.get("instance-type"),
-            local_hostname=instance_data.get("local-hostname"),
-            local_ipv4=instance_data.get("local-ipv4"),
-            mac=instance_data.get("mac"),
-            metrics=instance_data.get("metrics/"),
-            network=instance_data.get("network/"),
-            placement=instance_data.get("placement/"),
-            profile=instance_data.get("profile"),
-            public_hostname=instance_data.get("public-hostname"),
-            public_ipv4=instance_data.get("public-ipv4"),
-            public_keys=instance_data.get("public-keys/"),
-            region_name=instance_data.get("public-hostname").split(".")[1],
-            reservation_id=instance_data.get("reservation-id"),
-            security_groups=instance_data.get("security-groups"),
-            services=instance_data.get("services/"),
-            system=instance_data.get("system"),
+            ami_id=instance_data.get("ami-id"), # type: ignore
+            ami_launch_index=instance_data.get("ami-launch-index"), # type: ignore
+            ami_manifest_path=instance_data.get("ami-manifest-path"), # type: ignore
+            block_device_mapping=instance_data.get("block-device-mapping/"), # type: ignore
+            events=instance_data.get("events/"), # type: ignore
+            hostname=instance_data.get("hostname"), # type: ignore
+            identity_credentials=instance_data.get("identity-credentials/"), # type: ignore
+            instance_action=instance_data.get("instance-action"), # type: ignore
+            instance_id=instance_data.get("instance-id"), # type: ignore
+            instance_life_cycle=instance_data.get("instance-life-cycle"), # type: ignore
+            instance_type=instance_data.get("instance-type"), # type: ignore
+            local_hostname=instance_data.get("local-hostname"), # type: ignore
+            local_ipv4=instance_data.get("local-ipv4"), # type: ignore
+            mac=instance_data.get("mac"), # type: ignore
+            metrics=instance_data.get("metrics/"), # type: ignore
+            network=instance_data.get("network/"), # type: ignore
+            placement=instance_data.get("placement/"), # type: ignore
+            profile=instance_data.get("profile"), # type: ignore
+            public_hostname=instance_data.get("public-hostname"), # type: ignore
+            public_ipv4=instance_data.get("public-ipv4"), # type: ignore
+            public_keys=instance_data.get("public-keys/"), # type: ignore
+            region_name=instance_data.get("public-hostname").split(".")[1], # type: ignore
+            reservation_id=instance_data.get("reservation-id"), # type: ignore
+            security_groups=instance_data.get("security-groups"), # type: ignore
+            services=instance_data.get("services/"), # type: ignore
+            system=instance_data.get("system"), # type: ignore
         )
         instance_metadata.save()
     else:
@@ -70,7 +70,8 @@ def ec2_metadata():
         instance_metadata.public_hostname = instance_data.get("public-hostname")
         instance_metadata.public_ipv4 = instance_data.get("public-ipv4")
         instance_metadata.public_keys = instance_data.get("public-keys/")
-        instance_metadata.region_name = instance_data.get("public-hostname").split(".")[1]
+        public_hostname = instance_data.get("public-hostname")
+        instance_metadata.region_name = public_hostname.split(".")[1] if public_hostname and "." in public_hostname else None
         instance_metadata.reservation_id = instance_data.get("reservation-id")
         instance_metadata.security_groups = instance_data.get("security-groups")
         instance_metadata.services = instance_data.get("services/")

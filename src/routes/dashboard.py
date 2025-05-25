@@ -19,8 +19,8 @@ def fetch_statistics(user_id):
     user_stats, ticket_stats, chart_stats, top_alert_tickets = (
         UserProfile.query.with_entities(
             func.count().label('total_users'),
-            func.sum(case((UserProfile.is_active == True, 1), else_=0)).label('active_users'),
-            func.sum(case((UserProfile.is_active == False, 1), else_=0)).label('inactive_users'),
+            func.sum(case((UserProfile.is_active == True, 1), else_=0)).label('active_users'), # type: ignore
+            func.sum(case((UserProfile.is_active == False, 1), else_=0)).label('inactive_users'), # type: ignore
             func.sum(case((UserProfile.user_level == 'admin', 1), else_=0)).label('admin_users'),
             func.sum(case((UserProfile.user_level == 'user', 1), else_=0)).label('regular_users'),
         ).first(),
@@ -70,16 +70,16 @@ def dashboard():
     user_stats, ticket_stats, chart_stats, top_alert_tickets = fetch_statistics(current_user.id)
     
     # Update system_info with gathered statistics
-    system_info.update(user_stats._asdict())
-    system_info.update(ticket_stats._asdict())
-    system_info.update(chart_stats._asdict())
+    system_info.update(user_stats._asdict()) # type: ignore
+    system_info.update(ticket_stats._asdict()) # type: ignore
+    system_info.update(chart_stats._asdict()) # type: ignore
     system_info["top_alert_tickets"] = top_alert_tickets
     
     # Prometheus metrics
     system_info["total_targets"] = count_of_targets()
     system_info["total_rules"] = calculate_total_rules()
     system_info["active_alertmanagers"] = retrieve_active_alertmanagers()
-    instance_metadata = InstanceMetadata.to_dict(InstanceMetadata.query.first())
+    instance_metadata = InstanceMetadata.to_dict(InstanceMetadata.query.first()) # type: ignore
     system_info['instance_metadata'] = instance_metadata
     
     return render_template("dashboard/homepage.html", system_info=system_info, current_user=current_user)
@@ -94,9 +94,9 @@ def api_dashboard_stats():
 
     # Prepare the response data
     response_data = {
-        "user_stats": user_stats._asdict(),
-        "ticket_stats": ticket_stats._asdict(),
-        "chart_stats": chart_stats._asdict(),
+        "user_stats": user_stats._asdict(), # type: ignore
+        "ticket_stats": ticket_stats._asdict(), # type: ignore
+        "chart_stats": chart_stats._asdict(), # type: ignore
         "total_targets": count_of_targets(),
         "total_rules": calculate_total_rules(),
         "active_alertmanagers": retrieve_active_alertmanagers(),

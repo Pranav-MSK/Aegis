@@ -114,7 +114,7 @@ BYPASS_ROUTES = {
 @app.before_request
 def global_middleware():
     """Global middleware for all requests"""
-    request.start_time = time.time()
+    request.start_time = time.time() # type: ignore
 
     if app.config.get('under_maintenance', False) and request.endpoint not in ['under_maintenance']:
         return redirect(url_for('under_maintenance'))
@@ -170,28 +170,35 @@ def after_request(response: Response) -> Response:
     """Process response and record metrics"""
     try:
         if request.endpoint not in BYPASS_ROUTES:
-            metrics_middleware.record_request_metrics(response, request.start_time)
+            metrics_middleware.record_request_metrics(response, request.start_time) # type: ignore
     except Exception as e:
         logger.error(f"Error processing response: {e}")
     
     return response
 
 # Database query monitoring
-QUERY_TYPE_LABELS = {
-    "insert": "insert",
-    "select": "select",
-    "delete": "delete",
-    "update": "update",
-    "create": "create",
-    "alter": "alter",
-    "drop": "drop"
-}
+# QUERY_TYPE_LABELS = {
+#     "insert": "insert",
+#     "select": "select",
+#     "delete": "delete",
+#     "update": "update",
+#     "create": "create",
+#     "alter": "alter",
+#     "drop": "drop"
+# }
 
+QUERY_TYPE_LABELS = [
+    'insert', 'select', 'delete', 'update',
+    'create', 'alter', 'drop'
+]
+
+# before_cursor_execute and after_cursor_execute events for SQLAlchemy
 @event.listens_for(Engine, 'before_cursor_execute')
 def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
     """Record database query start time and type"""
     context._query_start_time = time.time()
 
+# after_cursor_execute event for SQLAlchemy 
 @event.listens_for(Engine, 'after_cursor_execute')
 def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
     """Monitor and record database query metrics"""

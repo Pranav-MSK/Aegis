@@ -279,6 +279,10 @@ def manage_refresh_interval():
 
         # Update refresh interval (POST request)
         if request.method == "POST":
+            
+            if not request.is_json or request.json is None:
+                return jsonify({"error": "Invalid or missing JSON in request"}), 400
+        
             new_interval = request.json.get("refresh_interval")
 
             # Validate the new refresh interval
@@ -291,7 +295,7 @@ def manage_refresh_interval():
             ).first()
             if not settings:
                 settings = UserDashboardSettings(
-                    user_id=current_user.id, refresh_interval=new_interval
+                    user_id=current_user.id, refresh_interval=new_interval # type: ignore
                 )
                 db.session.add(settings)
             else:
@@ -311,6 +315,10 @@ def manage_refresh_interval():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+    return {
+        "error": "Method not allowed. Use GET to fetch or POST to update the refresh interval."
+    }, 405
 
 
 @app.route("/api/v1/os-info", methods=["GET"])
@@ -338,7 +346,7 @@ def manage_prometheus_config():
     config = load_prometheus_config()
     if request.method == "POST":
         new_config = request.json
-        config.update(new_config)
+        config.update(new_config) # type: ignore
         save_prometheus_config(config)
         return jsonify({"message": "Configuration updated successfully"}), 200
     return jsonify(config)

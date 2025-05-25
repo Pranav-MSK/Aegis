@@ -56,7 +56,7 @@ def chart_configurations():
                 return redirect(url_for("chart_configurations"))
         else:  # Creating a new configuration
             max_number_of_graphs = get_app_info().get("max_number_of_graphs")
-            if total_configs >= max_number_of_graphs:
+            if max_number_of_graphs is not None and total_configs >= max_number_of_graphs:
                 flash(
                     "You have reached the maximum number of graphs allowed for your plan",
                     "danger",
@@ -66,15 +66,15 @@ def chart_configurations():
                 )
                 return redirect(url_for("chart_configurations"))
             new_config = ChartConfiguration(
-                user_id=current_user.id,
-                metric_name=request.form["metric_name"],
-                title=request.form["title"],
-                xlabel=request.form["xlabel"],
-                ylabel=request.form["ylabel"],
-                chart_type=request.form.get("chart_type", "bar"),
-                tension=request.form.get("tension", 0.4),
-                point_radius=request.form.get("point_radius", 0),
-                point_hover_radius=request.form.get("point_hover_radius", 6),
+                user_id=current_user.id, # type: ignore
+                metric_name=request.form["metric_name"], # type: ignore
+                title=request.form["title"], # type: ignore
+                xlabel=request.form["xlabel"], # type: ignore
+                ylabel=request.form["ylabel"], # type: ignore
+                chart_type=request.form.get("chart_type", "bar"), # type: ignore
+                tension=request.form.get("tension", 0.4), # type: ignore
+                point_radius=request.form.get("point_radius", 0), # type: ignore
+                point_hover_radius=request.form.get("point_hover_radius", 6), # type: ignore
             )
 
             new_config.save()

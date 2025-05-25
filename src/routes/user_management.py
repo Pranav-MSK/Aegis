@@ -24,7 +24,7 @@ def create_user():
     if request.method == 'POST':
         max_users_allowed = get_app_info().get("max_users_allowed")
 
-        if total_users >= max_users_allowed:
+        if max_users_allowed is not None and total_users >= max_users_allowed:
             flash(
                 f"Cannot create more users. You have reached the maximum limit of {max_users_allowed} users.",
                 "danger",
@@ -46,14 +46,14 @@ def create_user():
             return redirect(url_for('create_user'))
 
         new_user = UserProfile(
-            username=username,
-            email=email,
-            password=generate_password_hash(password),
-            profession=profession,
-            user_level=user_level,
-            receive_email_alerts=receive_email_alerts,
-            is_active=True,
-            assign_tickets=assign_tickets
+            username=username, # type: ignore
+            email=email, # type: ignore
+            password=generate_password_hash(password), # type: ignore
+            profession=profession, # type: ignore
+            user_level=user_level, # type: ignore
+            receive_email_alerts=receive_email_alerts,  # type: ignore
+            is_active=True, # type: ignore
+            assign_tickets=assign_tickets # type: ignore
         )
 
         # Send email alerts to admins
@@ -85,7 +85,7 @@ def create_user():
         new_user.save()
         
         # Now you can use the new user's ID to create related settings
-        db.session.add(UserDashboardSettings(user_id=new_user.id))
+        db.session.add(UserDashboardSettings(user_id=new_user.id)) # type: ignore
         
         new_user.save()
 
@@ -181,9 +181,9 @@ def manage_activities(activity_id=None):
         elif request.method == "POST":
             data = request.get_json()
             new_activity = ActivityTable(
-                activity_name=data["activity_name"],
-                activity_point=data["activity_point"],
-                activity_description=data["activity_description"],
+                activity_name=data["activity_name"], # type: ignore
+                activity_point=data["activity_point"], # type: ignore
+                activity_description=data["activity_description"], # type: ignore
             )
             new_activity.save()
             logger.info(f"new activity added: {new_activity} by {current_user.first_name}(email: {current_user.email})")
@@ -212,6 +212,9 @@ def manage_activities(activity_id=None):
             return jsonify(
                 {"message": "Activity deleted successfully!", "success": True}
             )
+
+        # If none of the above, return a 405 Method Not Allowed
+        return jsonify({"message": "Method Not Allowed", "success": False}), 405
 
     except Exception as e:
         db.session.rollback()

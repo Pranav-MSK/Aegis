@@ -27,9 +27,9 @@ def smtp_config():
         
         
         if not smtp_config:
-            smtp_config = SMTPSettings(username=username, password=new_password, 
-                                       smtp_server=smtp_server, smtp_port=smtp_port, 
-                                       email_from=email_from)
+            smtp_config = SMTPSettings(username=username, password=new_password, # type: ignore
+                                       smtp_server=smtp_server, smtp_port=smtp_port, # type: ignore
+                                       email_from=email_from) # type: ignore
             db.session.add(smtp_config)
         else:
             smtp_config.username = username

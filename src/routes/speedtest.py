@@ -12,12 +12,12 @@ from src.routes.helper.common_helper import admin_required
 
 speedtest_bp = Blueprint("speedtest", __name__)
 
-@app.route("/speedtest")
+@speedtest_bp.route("/speedtest")
 @admin_required
 def speedtest():
     user_dashboard_settings = UserDashboardSettings.query.first()
-    speedtest_cooldown_duration = user_dashboard_settings.speedtest_cooldown
-    required_speedtest_count = user_dashboard_settings.number_of_speedtests
+    speedtest_cooldown_duration = user_dashboard_settings.speedtest_cooldown if user_dashboard_settings else 5
+    required_speedtest_count = user_dashboard_settings.number_of_speedtests if user_dashboard_settings else 3
 
     cooldown_threshold_time = datetime.datetime.now() - datetime.timedelta(
         minutes=speedtest_cooldown_duration
@@ -37,9 +37,9 @@ def speedtest():
 
         if current_speedtest_result:
             new_speedtest_record = NetworkSpeedTestResult(
-                download_speed=current_speedtest_result["download_speed"],
-                upload_speed=current_speedtest_result["upload_speed"],
-                ping=current_speedtest_result["ping"],
+                download_speed=current_speedtest_result["download_speed"], # type: ignore
+                upload_speed=current_speedtest_result["upload_speed"], # type: ignore
+                ping=current_speedtest_result["ping"], # type: ignore
             )
             new_speedtest_record.save()
 
@@ -76,3 +76,5 @@ def speedtest():
             next_test_time=next_test_time,
             remaining_time_for_next_test=remaining_time_for_next_test,
         )
+
+    return render_template("error/speedtest_error.html", error="No speedtest results found.")

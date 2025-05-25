@@ -47,6 +47,18 @@ class NotificationSettings(BaseModel):
     @staticmethod
     def to_dict():
         notification_settings = NotificationSettings.query.first()
+        if notification_settings is None:
+            return {
+                "slack_webhook_url": None,
+                "discord_webhook_url": None,
+                "teams_webhook_url": None,
+                "google_chat_webhook_url": None,
+                "is_email_alert_enabled": False,
+                "is_slack_alert_enabled": False,
+                "is_discord_alert_enabled": False,
+                "is_teams_alert_enabled": False,
+                "is_google_chat_alert_enabled": False,
+            }
         return {
             "slack_webhook_url": notification_settings.slack_webhook_url,
             "discord_webhook_url": notification_settings.discord_webhook_url,
@@ -61,23 +73,32 @@ class NotificationSettings(BaseModel):
 
     @staticmethod
     def get_slack_webhook_url():
-        return NotificationSettings.query.first().slack_webhook_url
+        notification_settings = NotificationSettings.query.first()
+        return notification_settings.slack_webhook_url if notification_settings else None
 
     @staticmethod
     def get_discord_webhook_url():
-        return NotificationSettings.query.first().discord_webhook_url
+        notification_settings = NotificationSettings.query.first()
+        # return NotificationSettings.query.first().discord_webhook_url
+        return notification_settings.discord_webhook_url if notification_settings else None
 
     @staticmethod
     def get_teams_webhook_url():
-        return NotificationSettings.query.first().teams_webhook_url
+        notification_settings = NotificationSettings.query.first()
+        # return NotificationSettings.query.first().teams_webhook_url
+        return notification_settings.teams_webhook_url if notification_settings else None
 
     @staticmethod
     def get_google_chat_webhook_url():
-        return NotificationSettings.query.first().google_chat_webhook_url
+        notification_settings = NotificationSettings.query.first()
+        # return NotificationSettings.query.first().google_chat_webhook_url
+        return notification_settings.google_chat_webhook_url if notification_settings else None
 
     @staticmethod
     def get_telegram_webhook_url():
-        return NotificationSettings.query.first().telegram_webhook_url
+        notification_settings = NotificationSettings.query.first()
+        # return NotificationSettings.query.first().telegram_webhook_url
+        return notification_settings.telegram_webhook_url if notification_settings else None
 
 
 # Notification model

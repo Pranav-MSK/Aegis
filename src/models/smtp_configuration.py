@@ -41,13 +41,13 @@ class SMTPSettings(BaseModel):
             "email_from": self.email_from
         }
 
-    @staticmethod
-    def get_all():
-        return SMTPSettings.query.all()
+    # @staticmethod
+    # def get_all():
+    #     return SMTPSettings.query.all()
     
-    @staticmethod
-    def get_by_id(id):
-        return SMTPSettings.query.get(id)
+    # @staticmethod
+    # def get_by_id(id):
+    #     return SMTPSettings.query.get(id)
     
     @staticmethod
     def get_by_username(username):

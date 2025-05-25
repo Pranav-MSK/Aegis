@@ -884,6 +884,7 @@ install() {
     }
     sudo -u "$USER_NAME" bash "$PROMETHEUS_INSTALL_SCRIPT"
     start_server
+    install_alert_manager
     message_box "The $APP_NAME server is running at $HOST_URL" 0
     # open_browser
 }

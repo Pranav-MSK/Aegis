@@ -97,7 +97,7 @@ def process():
         "memory": 2,
         "name": 0,
     }.get(sort_by, 1)
-    top_processes.sort(key=lambda x: x[sort_key], reverse=(order == "desc"))
+    top_processes.sort(key=lambda x: x[sort_key], reverse=(order == "desc")) # type: ignore
 
     return render_template(
         "info_pages/process.html",
@@ -113,8 +113,8 @@ def kill_process():
     sudo_password = session.get("sudo_password", "")
     if request.method == "POST":
         data = request.json
-        pid_to_kill = data.get("kill_pid")
-        process_name = data.get("process_name")
+        pid_to_kill = data.get("kill_pid") # type: ignore
+        process_name = data.get("process_name") # type: ignore
 
         if pid_to_kill and process_name:
             try:

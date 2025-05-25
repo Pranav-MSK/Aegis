@@ -61,7 +61,7 @@ def send_email_page():
         
         return redirect(url_for('send_email_page'))
 
-    return render_template("other/send_email.html", enable_alerts=enable_alerts)
+    return render_template("other/send_email.html", enable_alerts=enable_alerts) # type: ignore
 
 
 @app.route("/about")
