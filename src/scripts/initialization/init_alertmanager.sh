@@ -6,6 +6,17 @@ PROMETHEUS_CONFIG_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")/promet
 ALERTMANAGER_CONFIG_FILE="$PROMETHEUS_CONFIG_DIR/alertmanager.yml"
 IP_ADDRESS=$(hostname -I | awk '{print $1}')
 
+# check if $ALERTMANAGER_CONFIG_FILE is file not a directory, if it is a directory, then delete it
+if [ -d "$ALERTMANAGER_CONFIG_FILE" ]; then
+  # delete the directory
+  rm -rf "$ALERTMANAGER_CONFIG_FILE"
+  echo "Removed existing directory at $ALERTMANAGER_CONFIG_FILE"
+elif [ -f "$ALERTMANAGER_CONFIG_FILE" ]; then
+  echo "Alertmanager configuration file already exists at $ALERTMANAGER_CONFIG_FILE. Skipping initialization."
+fi
+
+
+
 # Create the Alertmanager configuration
 cat > "$ALERTMANAGER_CONFIG_FILE" <<EOL
 global:
