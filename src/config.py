@@ -1,9 +1,10 @@
 # cython: language_level=3
 import os
 import hashlib
-import markdown
+
+from pathlib import Path
 from datetime import datetime
-from flask import Flask
+from flask import Flask, config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
@@ -15,6 +16,7 @@ from src.network_manager import NetworkMetrics
 from src.helper import get_system_node_name, get_ip_address, load_secret_key
 from src.activator import get_plan_details
 from src.parser.markdown_parser import process_markdown_with_tailwind
+from src.config_loader import configuration_settings
 
 # disk and metrics background process
 disk_metrics = DiskMetrics()
@@ -24,14 +26,24 @@ network_metrics.start()
 
 app = Flask(__name__)
 
+# [app.meta]
+# NAME = SystemGuard
+# VERSION = 1.0.2
+# DESCRIPTION = A web application to monitor and manage system resources.
+# AUTHOR = SystemGuard Team
+# YEAR = 2023
+# CONTACT_EMAIL = ""
+# PRE_RELEASE = False
+
+
 # Application Metadata
-APP_NAME = "SystemGuard"
-DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor, analyze, and manage your system resources."
-AUTHOR = "{} Team".format(APP_NAME)
-YEAR = datetime.now().year
-PRE_RELEASE = False
-VERSION = "v1.0.2
-CONTACT_EMAIL = ""
+APP_NAME = configuration_settings["app.meta"].get('NAME', fallback='SystemGuard')
+DESCRIPTION = configuration_settings.get('app.meta', 'DESCRIPTION', fallback='A web application to monitor and manage system resources.')
+AUTHOR = configuration_settings.get('app.meta', 'AUTHOR', fallback='SystemGuard Team')
+YEAR = configuration_settings.get('app.meta', 'YEAR', fallback='2023')
+PRE_RELEASE = configuration_settings.getboolean('app.meta', 'PRE_RELEASE', fallback=False)
+VERSION = configuration_settings.get('app.meta', 'VERSION', fallback='1.0.2')
+CONTACT_EMAIL = configuration_settings.get('app.meta', 'CONTACT_EMAIL', fallback='')
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()
 
@@ -45,16 +57,16 @@ os.makedirs(DB_DIR, exist_ok=True)
 # Configure the SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_POOL_SIZE'] = 10
-app.config['SQLALCHEMY_MAX_OVERFLOW'] = 5
+app.config['SQLALCHEMY_POOL_SIZE'] = configuration_settings.getint('database', 'POOL_SIZE', fallback=10)
+app.config['SQLALCHEMY_MAX_OVERFLOW'] = configuration_settings.getint('database', 'MAX_OVERFLOW', fallback=5)
 app.config['SECRET_KEY'] = obfuscated_flask_config
 app.config['WTF_CSRF_SECRET_KEY'] = obfuscated_flask_config
 app.config['WTF_CSRF_TIME_LIMIT'] = 3600
 app.config['WTF_CSRF_HEADER_NAME'] = "X-CSRFToken"
-app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent access to cookies via JavaScript
-app.config['SESSION_COOKIE_SAMESITE'] = "Lax"  # Prevent CSRF attacks via cross-site requests
-app.config['SESSION_COOKIE_SECURE'] = False  # Change to True for production with HTTPS
-app.config['under_maintenance'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = configuration_settings.getboolean('session', 'COOKIE_HTTPONLY', fallback=True)  # Prevent JavaScript access to cookies
+app.config['SESSION_COOKIE_SAMESITE'] = configuration_settings.get('session', 'COOKIE_SAMESITE', fallback='Lax')  # Set SameSite policy for cookies
+app.config['SESSION_COOKIE_SECURE'] = configuration_settings.getboolean('session', 'COOKIE_SECURE', fallback=False)  # Use secure cookies if running over HTTPS
+app.config['under_maintenance'] = configuration_settings.getboolean('app.settings', 'UNDER_MAINTENANCE', fallback=False)
 
 
 # Initialize the database

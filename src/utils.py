@@ -6,6 +6,7 @@ import datetime
 import subprocess
 import psutil
 import requests
+import configparser
 import GPUtil
 import functools
 from jinja2 import Environment, FileSystemLoader
@@ -16,16 +17,19 @@ from functools import lru_cache
 from src.logger import get_logger
 from src.models import GeneralSettings
 from src.helper import get_basic_system_information, get_ip_address
+from src.config_loader import configuration_settings
 
 logger = get_logger(__name__)
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 cache = {}
-CACHE_EXPIRATION = 3600
-DIVIDE_BY_1024 = False
-CONVERSION_FACTOR_MB = (1024**2) if DIVIDE_BY_1024 else (1000**2)
-CONVERSION_FACTOR_GB = (1024**3) if DIVIDE_BY_1024 else (1000**3)
+
+CACHE_EXPIRATION = configuration_settings.getint("metrics.settings", "CACHE_EXPIRATION")
+DIVIDE_BY_1024 = configuration_settings.getboolean("metrics.settings", "DIVIDE_BY_1024")
+
+CONVERSION_FACTOR_MB = 1024**2 if DIVIDE_BY_1024 else 1000**2
+CONVERSION_FACTOR_GB = 1024**3 if DIVIDE_BY_1024 else 1000**3
 domain_name = "google.com"
 
 def run_speedtest():

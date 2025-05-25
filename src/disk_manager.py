@@ -10,12 +10,13 @@ import time
 from typing import Dict, Union
 from dataclasses import dataclass
 from contextlib import contextmanager
+from src.config_loader import configuration_settings
 
 # Constants
-BYTES_PER_GB = 1024 ** 3
-BYTES_PER_MB = 1024 ** 2
-BYTES_PER_KB = 1024
-UPDATE_INTERVAL = 1.0  # seconds
+BYTES_PER_GB = configuration_settings.getint('metrics.settings', 'BYTES_PER_GB')
+BYTES_PER_MB = configuration_settings.getint('metrics.settings', 'BYTES_PER_MB')
+BYTES_PER_KB = configuration_settings.getint('metrics.settings', 'BYTES_PER_KB')
+UPDATE_INTERVAL = configuration_settings.getfloat('metrics.settings', 'UPDATE_INTERVAL')
 
 @dataclass
 class IOStats:

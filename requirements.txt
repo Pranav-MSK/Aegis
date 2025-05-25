@@ -52,4 +52,4 @@ markdown==3.7
 
 pybind11==2.13.6            # C++11 bindings for Python
 
-beautifulsoup4==4.13.4
+beautifulsoup4==4.13.4      # HTML and XML parsing library

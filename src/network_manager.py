@@ -10,12 +10,13 @@ import time
 from typing import Dict, Union, NamedTuple
 from dataclasses import dataclass
 from contextlib import contextmanager
+from src.config_loader import configuration_settings
 
 # Constants
 BYTES_PER_MB_BINARY = 1024 ** 2  # Binary megabyte (MiB)
 BYTES_PER_MB_DECIMAL = 1000 ** 2  # Decimal megabyte (MB)
-BYTES_PER_KB = 1024
-UPDATE_INTERVAL = 1.0  # seconds
+BYTES_PER_KB = configuration_settings.getint('metrics.settings', 'BYTES_PER_KB')  # Kilobyte (KB)
+UPDATE_INTERVAL = configuration_settings.getfloat('metrics.settings', 'UPDATE_INTERVAL')
 
 class SpeedUnits(NamedTuple):
     """Network speed formatting thresholds and labels."""

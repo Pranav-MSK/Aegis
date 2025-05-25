@@ -27,15 +27,15 @@ from src.routes.helper.prometheus_helper import (
 )
 from src.config import disk_metrics, network_metrics
 from src.routes.helper.health_helper import check_database
+from src.config_loader import configuration_settings
 
 api_bp = blueprints.Blueprint("api", __name__)
 
 cache = {}
 
-
-PROMETHEUS_BASE_URL = "http://localhost:9090"
-QUERY_API_URL = f"{PROMETHEUS_BASE_URL}/api/v1/query_range"
-TARGETS_API_URL = f"{PROMETHEUS_BASE_URL}/api/v1/targets"
+PROMETHEUS_BASE_URL = configuration_settings.get("monitoring.prometheus", "BASE_URL")
+QUERY_API_URL = configuration_settings.get("monitoring.prometheus", "QUERY_API")
+TARGETS_API_URL = configuration_settings.get("monitoring.prometheus", "TARGETS_API")
 
 
 @app.route("/api/v1/system/metrics", methods=["GET"])
