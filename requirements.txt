@@ -1,14 +1,14 @@
 # Flask web framework
-Flask==3.0.3                # Web framework for Python
-Cython==3.0.11              # C-extensions for Python
+Flask==3.1.1               # Web framework for Python
+Cython==3.1.1              # C-extensions for Python
 
 # System information and performance monitoring
-psutil==6.0.0               # Retrieves system metrics (CPU, memory, etc.)
+psutil==7.0.0               # Retrieves system metrics (CPU, memory, etc.)
 GPUtil==1.4.0               # Retrieves GPU metrics (if available)
 
 # Environment variable management
-python-dotenv==1.0.1        # Loads environment variables from .env file
-cryptography==43.0.1
+python-dotenv==1.1.0        # Loads environment variables from .env file
+cryptography==45.0.2
 
 # WSGI HTTP server for production
 gunicorn==23.0.0            # Production server for running Flask applications
@@ -18,14 +18,14 @@ docker==7.1.0               # Python API for Docker containers
 flask-sqlalchemy==3.1.1     # SQLAlchemy ORM integration with Flask
 flask-login==0.6.3          # User session management (authentication)
 flask-session==0.8.0        # Server-side session storage
-flask-migrate==4.0.7        # Handles database migrations for Flask apps
-Flask-WTF==1.2.1            # Flask integration with WTForms
-Flask-Caching==2.3.0        # Caching extension for Flask
-Flask-Compress==1.15        # Compresses Flask HTTP responses (e.g., gzip)
+flask-migrate==4.1.0        # Handles database migrations for Flask apps
+Flask-WTF==1.2.2            # Flask integration with WTForms
+Flask-Caching==2.3.1        # Caching extension for Flask
+Flask-Compress==1.17        # Compresses Flask HTTP responses (e.g., gzip)
 # Flask-Limiter==3.8.0        # Rate limiting extension for Flask
 
 # File system monitoring
-watchdog==5.0.2             # Monitors filesystem events and changes
+watchdog==6.0.0             # Monitors filesystem events and changes
 
 # HTTP requests library
 requests==2.32.3            # Simplified HTTP requests for Python
@@ -34,7 +34,7 @@ requests==2.32.3            # Simplified HTTP requests for Python
 speedtest-cli==2.1.3        # CLI for testing internet speed
 
 # Prometheus client for monitoring and exposing metrics
-prometheus_client==0.20.0   # Exposes metrics for Prometheus to scrape
+prometheus_client==0.22.0   # Exposes metrics for Prometheus to scrape
 
 # (Optional) InfluxDB client for writing metrics to InfluxDB
 # influxdb-client==1.46.0   # InfluxDB client for time-series data
@@ -43,12 +43,12 @@ prometheus_client==0.20.0   # Exposes metrics for Prometheus to scrape
 pyyaml==6.0.2               # Reads and writes YAML configuration files
 
 # Asynchronous HTTP client/server framework
-aiohttp==3.10.11             # Async HTTP client for non-blocking requests
+aiohttp==3.12.0             # Async HTTP client for non-blocking requests
 
 fpdf==1.7.2                 # PDF generation library
-humanize==4.11.0            # Humanizes data (e.g., file sizes, timestamps)
+humanize==4.12.3            # Humanizes data (e.g., file sizes, timestamps)
 
-markdown==3.7
+markdown==3.8
 
 pybind11==2.13.6            # C++11 bindings for Python
 
