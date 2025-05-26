@@ -1,3 +1,4 @@
+# cython: language_level=3
 import configparser
 from pathlib import Path
 

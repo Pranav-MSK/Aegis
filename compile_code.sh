@@ -81,6 +81,8 @@ compile_c_files() {
 copy_files() {
     echo "Copying necessary files..."
     cp requirements.txt "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy requirements.txt"; exit 1; }
+    cp src/config.ini "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy config.ini"; exit 1; }
+
     cp systemguard.py "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy app.py"; exit 1; }
     cp setup.sh "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy setup.sh"; exit 1; }
     rsync -av --exclude='.initialized' src/assets "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy assets"; exit 1; }
