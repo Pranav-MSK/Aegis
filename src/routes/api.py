@@ -28,6 +28,10 @@ from src.routes.helper.prometheus_helper import (
 from src.config import disk_metrics, network_metrics
 from src.routes.helper.health_helper import check_database
 from src.config_loader import configuration_settings
+from src.logger import get_logger
+
+# Initialize logger
+logger = get_logger(__name__)
 
 api_bp = blueprints.Blueprint("api", __name__)
 
@@ -198,6 +202,7 @@ def graph_data_api():
 
     except Exception as e:
         # Handle and log the error for debugging purposes
+        logger.error(f"Error fetching graph data: {str(e)}")
         return (
             jsonify(
                 {
