@@ -12,7 +12,7 @@ from src.routes.helper.common_helper import admin_required
 
 speedtest_bp = Blueprint("speedtest", __name__)
 
-@speedtest_bp.route("/speedtest")
+@app.route("/speedtest")
 @admin_required
 def speedtest():
     user_dashboard_settings = UserDashboardSettings.query.first()

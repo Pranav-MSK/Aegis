@@ -4,6 +4,10 @@ External API Monitoring
 =======================
 
 This section explains how to monitor external API endpoints by counting the number of requests, measuring request duration, and tracking various other metrics.
+SystemGuard uses **Prometheus** to display metrics in its UI. There are two types of metrics displayed:
+
+- **Historical Metrics**: Show `Counter` and `Gauge` metrics. These include real-time and historical data.
+- **Summary Metrics**: Show `Summary` metrics with real-time updates.
 
 Counting Requests
 -----------------
@@ -143,17 +147,56 @@ To track a random gauge value, you can use the `Gauge` class. The following exam
         random_gauge.set(value)
         return f'Random value: {value}'
 
-Expose Metrics to SystemGuard/Prometheus
+
+Firewall Configuration
+-----------------------
+
+Make sure the exporter port (e.g., 5001) is accessible by updating your firewall rules. For example, with UFW:
+
+.. code-block:: bash
+
+    sudo ufw allow 5001/tcp
+
+Configure Prometheus to Scrape the Exporter Target
+-----------------------------
+
+After running your Prometheus exporter (e.g., at ``http://localhost:5001/metrics``), you need to configure **SystemGuard** to add this target so that Prometheus can begin scraping metrics.
+
+Add a Target in SystemGuard
+----------------------------
+
+1. Navigate to the ``/system/targets`` page in the SystemGuard UI.
+2. Click on **"Add Target"**.
+3. Fill in the following fields:
+
+   - **Job Name**: Enter a descriptive job name (e.g., ``my_function_exporter``).
+   - **Target URL**: Enter the full URL to your metrics endpoint (e.g., ``http://localhost:5001``).
+   - **Scrape Interval**: e.g., ``15s`` (how frequently Prometheus should scrape this target).
+   - **Username**: ``admin`` Optional, if your exporter requires authentication.
+   - **Password**: ``••••••••`` Optional, if your exporter requires authentication.
+
+4. Click the **"Add Target"** button to save the target.
+5. Scroll down and click on the **"Update Prometheus"** button to apply changes and restart Prometheus with the new configuration.
+
+
+Add a Chart Configuration in SystemGuard
 ----------------------------------------
 
-To expose the metrics to SystemGuard or Prometheus, you need to start a http server that serves the metrics. The following example demonstrates how to expose the metrics on port 8080:
+To visualize your metrics in the SystemGuard UI:
 
-.. code-block:: python
+1. Navigate to ``/chart_configurations``.
+2. Click to **Add a new chart**.
+3. Fill in the following fields:
 
-    from prometheus_client import start_http_server
+   - **Metric Name**: `my_function_total_calls`, `my_function_temperature_celsius`, etc.
+   - **Title**: Descriptive name for your chart
+   - **X-Axis Label**: e.g., `Time`
+   - **Y-Axis Label**: e.g., `Temperature (°C)`, `Call Count`
 
-    start_http_server(8080)
+Viewing Metrics
+---------------
 
-After running the above code, you can access the metrics at `http://localhost:8080/metrics`.
+- **Historical Metrics**: Available at ``/system/historical_system_metrics``
+- **Summary Metrics**: Available at ``/system/summary_metrics``
 
-.. # now configure the systemgaurd to see the metrics : TODO
+You can now see both real-time and historical metrics from your system directly in the SystemGuard dashboard.
