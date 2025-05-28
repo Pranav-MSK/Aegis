@@ -1,110 +1,106 @@
 #!/bin/bash
 
-# Define directories
-ROOT_DIRECTORY=$(pwd)
-SOURCE_DIRECTORY="$ROOT_DIRECTORY/src"
-COMPILED_CODE_DIRECTORY="$ROOT_DIRECTORY/systemguard_compiled"
-COMPILED_CODE_SOURCE_DIRECTORY="$COMPILED_CODE_DIRECTORY/src"
-PROMETHEUS_OUTPUT_DIRECTORY="$COMPILED_CODE_DIRECTORY/prometheus_config"
+set -euo pipefail
+trap 'echo "❌ Error occurred. Exiting..."; exit 1' ERR
 
-# Create necessary directories
-mkdir -p "$PROMETHEUS_OUTPUT_DIRECTORY"
+# Constants
+readonly ROOT_DIRECTORY=$(pwd)
+readonly SOURCE_DIRECTORY="$ROOT_DIRECTORY/src"
+readonly COMPILED_CODE_DIRECTORY="$ROOT_DIRECTORY/systemguard_compiled"
+readonly COMPILED_CODE_SOURCE_DIRECTORY="$COMPILED_CODE_DIRECTORY/src"
+readonly PROMETHEUS_OUTPUT_DIRECTORY="$COMPILED_CODE_DIRECTORY/prometheus_config"
 
-# Function to find all .py files in the source directory
+mkdir -p "$COMPILED_CODE_SOURCE_DIRECTORY" "$PROMETHEUS_OUTPUT_DIRECTORY" "$COMPILED_CODE_DIRECTORY/logs"
+
+log() {
+    echo -e "\033[1;34m[INFO]\033[0m $*"
+}
+
+safe_copy() {
+    cp -r "$1" "$2" || { echo "Error: Failed to copy $1"; exit 1; }
+}
+
 find_python_files() {
-    python_files=()
-    while IFS= read -r -d '' file; do
-        python_files+=("$file")
-    done < <(find "$SOURCE_DIRECTORY" -name '*.py' -print0)
-    echo "${python_files[@]}"
+    find "$SOURCE_DIRECTORY" -name '*.py' -print0
 }
 
-# Function to compile .py files to .c files using Cython
-generate_c_files() {
-    echo "Generating C files from Python files..."
-    local python_files
-    python_files=($(find_python_files))
-    local total_files=${#python_files[@]}
-    local compiled_files=0
-    counter=0
+find_c_files() {
+    find "$SOURCE_DIRECTORY" -name '*.c' -print0
+}
 
-    for python_file in "${python_files[@]}"; do
-        counter=$((counter + 1))
-        echo "Processing $counter out of $total_files files: $python_file"
-    
-        # Add the language level directive if not present
-        if ! grep -q "# cython: language_level=" "$python_file"; then
-            echo "# cython: language_level=3" | cat - "$python_file" > temp && mv temp "$python_file"
+generate_c_files_parallel() {
+    log "Generating C files from Python in parallel..."
+    find_python_files | xargs -0 -n 1 -P "$(nproc)" -I {} bash -c '
+        f="{}"
+        if ! grep -q "# cython: language_level=" "$f"; then
+            echo "# cython: language_level=3" | cat - "$f" > tmp && mv tmp "$f"
         fi
-        cython "$python_file" -o "${python_file%.py}.c" && compiled_files=$((compiled_files + 1)) || {
-            echo "Error: Failed to generate C file for '$python_file'"
-            exit 1
-        }
-    done
-
-    echo "Generated $compiled_files out of $total_files C files."
+        cython "$f" -o "${f%.py}.c"
+    '
 }
 
-# Function to compile .c files to .so files
-compile_c_files() {
-    local directory="$1"
-    echo "Compiling .c files to .so files in '$COMPILED_CODE_SOURCE_DIRECTORY'..."
-    
-    local c_files=()
-    while IFS= read -r -d '' c_file; do
-        c_files+=("$c_file")
-    done < <(find "$directory" -name "*.c" -print0)
-
-    local total_files=${#c_files[@]}
-    local compiled_files=0
-
-    for c_file in "${c_files[@]}"; do
-        # Get the relative path and create output directory
-        relative_path="${c_file#$SOURCE_DIRECTORY/}"
-        output_file_directory="$(dirname "$relative_path")"
-        mkdir -p "$COMPILED_CODE_SOURCE_DIRECTORY/$output_file_directory"
-        
-        # Get the base name of the file without extension
-        base_name=$(basename "$c_file" .c)
-        
-        # Compile to a .so file in the corresponding output directory
-        gcc -shared -o "$COMPILED_CODE_SOURCE_DIRECTORY/$output_file_directory/$base_name.so" -fPIC $(python -m pybind11 --includes) "$c_file" && compiled_files=$((compiled_files + 1)) || {
-            echo "Error: Failed to compile '$c_file'"
-            exit 1
-        }
-    done
-
-    echo "Compiled $compiled_files out of $total_files C files."
+compile_c_to_so_parallel() {
+    log "Compiling .c files to .so in parallel..."
+    find_c_files | xargs -0 -n 1 -P "$(nproc)" -I {} bash -c '
+        c_file="{}"
+        source_dir="'"$SOURCE_DIRECTORY"'"
+        output_dir="'"$COMPILED_CODE_SOURCE_DIRECTORY"'"
+        relative_path="${c_file#$source_dir/}"
+        output_subdir="$(dirname "$relative_path")"
+        mkdir -p "$output_dir/$output_subdir"
+        base_name="$(basename "$c_file" .c)"
+        gcc -shared -o "$output_dir/$output_subdir/$base_name.so" -fPIC $(python3 -m pybind11 --includes) "$c_file"
+    '
 }
 
-# Function to copy necessary files to output directory
 copy_files() {
-    echo "Copying necessary files..."
-    cp requirements.txt "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy requirements.txt"; exit 1; }
-    cp src/config.ini "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy config.ini"; exit 1; }
-
-    cp systemguard.py "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy app.py"; exit 1; }
-    cp setup.sh "$COMPILED_CODE_DIRECTORY" || { echo "Error: Failed to copy setup.sh"; exit 1; }
-    rsync -av --exclude='.initialized' src/assets "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy assets"; exit 1; }
-    cp -r src/templates "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy templates"; exit 1; }
-    cp -r src/static "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy static files"; exit 1; }
-    rsync -av --exclude='*.py' --exclude='*.c' src/scripts "$COMPILED_CODE_SOURCE_DIRECTORY" || { echo "Error: Failed to copy scripts"; exit 1; }
-    cp prometheus_config/alert_rules.yml "$PROMETHEUS_OUTPUT_DIRECTORY/" || { echo "Error: Failed to copy Prometheus config"; exit 1; }
+    log "Copying project files..."
+    safe_copy requirements.txt "$COMPILED_CODE_DIRECTORY"
+    safe_copy src/config.ini "$COMPILED_CODE_SOURCE_DIRECTORY"
+    safe_copy systemguard.py "$COMPILED_CODE_DIRECTORY"
+    safe_copy setup.sh "$COMPILED_CODE_DIRECTORY"
+    safe_copy docs "$COMPILED_CODE_DIRECTORY"
+    rsync -av --exclude='.initialized' src/assets "$COMPILED_CODE_SOURCE_DIRECTORY"
+    safe_copy src/templates "$COMPILED_CODE_SOURCE_DIRECTORY"
+    safe_copy src/static "$COMPILED_CODE_SOURCE_DIRECTORY"
+    rsync -av --exclude='*.py' --exclude='*.c' src/scripts "$COMPILED_CODE_SOURCE_DIRECTORY"
+    safe_copy prometheus_config/alert_rules.yml "$PROMETHEUS_OUTPUT_DIRECTORY/"
 }
 
 cleanup() {
-    echo "Cleaning up temporary files..."
+    log "Cleaning up generated C files..."
     find "$SOURCE_DIRECTORY" -name "*.c" -delete
     rm -rf build
 }
 
-# Main execution flow
-mkdir -p "$COMPILED_CODE_SOURCE_DIRECTORY"
-copy_files
-generate_c_files
-compile_c_files "$SOURCE_DIRECTORY"
-# cleanup
-# create logs directory in compiled code
-mkdir -p "$COMPILED_CODE_DIRECTORY/logs"
+# Time tracking
+start_timer() {
+    date +%s.%N
+}
 
-echo "Build process completed successfully."
+elapsed_time() {
+    start=$1
+    end=$(date +%s.%N)
+    echo "$(echo "$end - $start" | bc)"
+}
+
+# ------------------ EXECUTION ------------------
+
+log "🚀 Build started..."
+
+start=$(start_timer)
+copy_files
+log "✅ Files copied in $(elapsed_time "$start") seconds"
+
+start=$(start_timer)
+generate_c_files_parallel
+log "✅ C files generated in $(elapsed_time "$start") seconds"
+
+start=$(start_timer)
+compile_c_to_so_parallel
+log "✅ Shared objects compiled in $(elapsed_time "$start") seconds"
+
+# Optional cleanup
+# cleanup
+
+log "🎉 Build completed successfully."

@@ -9,6 +9,6 @@ if __name__ == "__main__":
     host = configuration_settings.get('webserver.test', 'HOST')
     port = configuration_settings.getint('webserver.test', 'PORT')
     debug = configuration_settings.getboolean('webserver.test', 'DEBUG', fallback=True)
-    app.run(host="0.0.0.0",
+    app.run(host=host,
             port=port, 
             debug=debug)
