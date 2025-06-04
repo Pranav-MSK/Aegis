@@ -1,5 +1,6 @@
 # cython: language_level=3
 import os
+import re
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 
@@ -27,15 +28,18 @@ def get_os_installation_uuid():
     except Exception as e:
         return f"Error reading OS Installation UUID: {str(e)}"
 
+
 def calculate_unique_system_id():
-    """Calculate a unique system identifier using various hardware IDs."""
+    """
+    Calculate a unique system identifier using the OS installation UUID.
+    The ID is filtered to alphanumeric characters, downsampled, and includes a checksum.
+    """
     os_uuid = get_os_installation_uuid()
-    unique_id = f"{os_uuid}"
-    unique_id = ''.join(e for e in unique_id if e.isalnum())
-    unique_id = unique_id[::2]
-    checksum = calculate_checksum(unique_id, number_of_sum_check_digits)
-    unique_id += f"{checksum}"
-    return unique_id
+    clean_uuid = re.sub(r'\W+', '', os_uuid)
+    short_uuid = clean_uuid[::2]
+    checksum = calculate_checksum(short_uuid, number_of_sum_check_digits)    
+    return f"{short_uuid}{checksum}"
+
 
 def verify_activation_code(activation_code, hardware_id, obfuscated_key):
     try:
