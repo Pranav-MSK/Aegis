@@ -6,8 +6,11 @@ from http.client import HTTPException
 import psutil
 from typing import Dict, List, Any, Union
 import docker
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 from src.utils import ROOT_DIR
 from src.logger import get_logger
+
 logger = get_logger(__name__)
 from humanize import naturalsize, naturaltime
 
@@ -222,81 +225,65 @@ def format_container_creation_time(created_str):
         logger.error(f"Error formatting container creation time: {e}")
         return "Unknown"
 
+client = docker.from_env()
 
-def get_running_docker_containers() -> List[ContainerMetrics]:
+def get_running_docker_containers() -> List[Dict[str, Any]]:
     """
-    Get metrics for all running Docker containers.
+    Fetch metrics for all running Docker containers concurrently.
 
     Returns:
-        List[ContainerMetrics]: List of container metrics dictionaries
+        List[Dict[str, Any]]: Metrics for each container.
     """
+
+    def collect_metrics(container):
+        try:
+            stats = container.stats(stream=False)
+            cpu_percent = calculate_cpu_percent(stats)
+
+            memory_usage = safe_int_convert(stats.get("memory_stats", {}).get("usage", 0))
+            memory_limit = safe_int_convert(stats.get("memory_stats", {}).get("limit", 1))
+            memory_percent = (memory_usage / memory_limit) * 100.0 if memory_limit > 0 else 0
+
+            # Network stats
+            net = stats.get("networks", {})
+            rx, tx = 0, 0
+            for iface in net.values():
+                rx += safe_int_convert(iface.get("rx_bytes", 0))
+                tx += safe_int_convert(iface.get("tx_bytes", 0))
+
+            return {
+                "name": container.name,
+                "id": container.id[:12],
+                "status": container.status,
+                "image": container.image.tags[0] if container.image.tags else "none",
+                "created": format_container_creation_time(container.attrs.get("Created", "")),
+                "cpu_percent": round(cpu_percent, 2),
+                "memory": {
+                    "usage": format_bytes(memory_usage),
+                    "percent": round(memory_percent, 2),
+                },
+                "network": {
+                    "received": format_bytes(rx),
+                    "transmitted": format_bytes(tx),
+                },
+            }
+        except Exception as e:
+            logger.error(f"Failed to collect metrics for {container.name}: {e}")
+            return None
+
     try:
-        client = docker.from_env()
-        containers = []
+        containers = client.containers.list()
+        metrics = []
 
-        for container in client.containers.list():
-            try:
-                stats = container.stats(stream=False)
+        with ThreadPoolExecutor(max_workers=min(10, len(containers))) as executor:
+            futures = [executor.submit(collect_metrics, container) for container in containers]
+            for future in as_completed(futures):
+                result = future.result()
+                if result:
+                    metrics.append(result)
 
-                # Calculate CPU percentage using the more robust method
-                cpu_percent = calculate_cpu_percent(stats)
+        return metrics
 
-                # Calculate memory usage with proper error handling
-                try:
-                    memory_usage = safe_int_convert(
-                        stats["memory_stats"].get("usage", 0)
-                    )
-                    memory_limit = safe_int_convert(
-                        stats["memory_stats"].get("limit", 1)
-                    )
-                    memory_percent = (
-                        (memory_usage / memory_limit) * 100.0 if memory_limit > 0 else 0
-                    )
-                except KeyError:
-                    memory_usage = 0
-                    memory_percent = 0
-
-                # Get network stats if available
-                network_stats = {"rx_bytes": 0, "tx_bytes": 0}
-
-                if "networks" in stats:
-                    for interface in stats["networks"].values():
-                        network_stats["rx_bytes"] += safe_int_convert(
-                            interface.get("rx_bytes", 0)
-                        )
-                        network_stats["tx_bytes"] += safe_int_convert(
-                            interface.get("tx_bytes", 0)
-                        )
-
-                containers.append(
-                    {
-                        "name": container.name,
-                        "id": container.id[:12],  # Short ID
-                        "status": container.status,
-                        "image": (
-                            container.image.tags[0] if container.image.tags else "none"
-                        ),
-                        "created": format_container_creation_time(
-                            container.attrs["Created"]
-                        ),
-                        "cpu_percent": cpu_percent,
-                        "memory": {
-                            "usage": format_bytes(memory_usage),
-                            "percent": round(memory_percent, 2),
-                        },
-                        "network": {
-                            "received": format_bytes(network_stats["rx_bytes"]),
-                            "transmitted": format_bytes(network_stats["tx_bytes"]),
-                        },
-                    }
-                )
-            except Exception as e:
-                logger.error(
-                    f"Error collecting metrics for container {container.name}: {e}"
-                )
-                continue
-
-        return containers
     except Exception as e:
-        logger.error(f"Error connecting to Docker: {e}")
+        logger.error(f"Error connecting to Docker or collecting container list: {e}")
         return []

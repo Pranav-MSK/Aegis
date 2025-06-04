@@ -680,7 +680,7 @@ install_from_git() {
     log "Setting up $APP_NAME from Git repository..."
 
     # Install the executable
-    install_executable
+    # install_executable
 
     log "$APP_NAME installed successfully from Git!"
 
@@ -764,7 +764,7 @@ install_from_release() {
     rm "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip"
 
     log "Extraction completed."
-    install_executable
+    # install_executable
     setup_cron_job
 
     change_ownership "$EXTRACT_DIR"
