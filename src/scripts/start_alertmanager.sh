@@ -17,7 +17,7 @@ CONFIG_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")/prometheus_config"
 
 # Configuration variables
 ALERTMANAGER_CONTAINER="alertmanager"
-ALERTMANAGER_IMAGE="prom/alertmanager:v0.27.0"
+ALERTMANAGER_IMAGE="prom/alertmanager:v0.28.1"
 ALERTMANAGER_PORT="9093"
 ALERTMANAGER_CONFIG="$CONFIG_DIR/alertmanager.yml"
 PROMETHEUS_CONFIG="$CONFIG_DIR/prometheus.yml"

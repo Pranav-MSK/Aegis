@@ -22,7 +22,7 @@ USER_NAME=$(get_user_name)
 # Configuration variables
 NETWORK_NAME="flask-prometheus-net"
 PROMETHEUS_CONTAINER="prometheus"
-PROMETHEUS_IMAGE="prom/prometheus:v2.55.0"
+PROMETHEUS_IMAGE="prom/prometheus:v3.4.1"
 PROMETHEUS_PORT="9090"
 
 # Paths and directories
