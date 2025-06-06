@@ -111,7 +111,8 @@ def check_monthly_alerts():
 @csrf.exempt
 def receive_alerts():
     """
-    Receives and processes incoming alerts from external sources.
+    Receives and processes incoming alerts from external sources. Alertmanager will 
+    send alerts in JSON format to this endpoint.
 
     Validates the request content type and alert data, logs the alert based on severity,
     and triggers notifications via Slack, email, and Discord.

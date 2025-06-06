@@ -269,23 +269,29 @@ def create_alert_ticket(alert_instance: Alert):
 
 def log_alert(alert_instance):
     """
-    Logs the alert message with the appropriate log level based on its severity.
+    Logs an alert using the appropriate log level based on the alert's severity.
 
     Args:
-        severity (str): Severity level of the alert (e.g., critical, warning, info).
-        alert_name (str): Name of the alert.
-        instance (str): Instance generating the alert.
-        description (str): Detailed alert description.
-        summary (str): Brief alert summary.
+        alert_instance (object): An object with attributes:
+            - severity (str): Severity level of the alert (e.g., critical, warning, info, debug).
+            - alert_name (str): Name of the alert.
+            - instance (str): Instance generating the alert.
+            - summary (str): Brief summary of the alert.
+            - description (str): Detailed description of the alert.
     """
-    message = f"Alert: {alert_instance.alert_name}"
+    message = (
+        f"[{alert_instance.severity.upper()}] "
+        f"{alert_instance.alert_name} on {alert_instance.instance}: "
+        f"{alert_instance.summary} - {alert_instance.description}"
+    )
 
     log_method = {
         "critical": logger.error,
         "warning": logger.warning,
         "info": logger.info,
         "debug": logger.debug,
-    }.get(alert_instance.severity, logger.info)
+    }.get(alert_instance.severity.lower(), logger.info)
+
     log_method(message)
 
 

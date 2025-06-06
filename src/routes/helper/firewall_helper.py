@@ -17,7 +17,10 @@ def list_open_ports(sudo_password):
     """
     try:
         # Use iptables to list all open ports
-        result = subprocess.run(['sudo', '-S', 'iptables', '-L', '-n'], input=f"{sudo_password}\n", stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(['sudo', '-S', 'iptables', '-L', '-n'], 
+                                input=f"{sudo_password}\n", 
+                                stdout=subprocess.PIPE, 
+                                stderr=subprocess.PIPE, text=True)
         output = result.stdout
         if "incorrect password" in result.stderr:
             return [], "Incorrect sudo password. Please try again."
@@ -47,7 +50,8 @@ def enable_port(port, protocol, sudo_password):
     """
     try:
         # Build the iptables command to enable a port
-        command = ['sudo', '-S', 'iptables', '-A', 'INPUT', '-p', protocol, '--dport', str(port), '-j', 'ACCEPT']
+        command = ['sudo', '-S', 'iptables', '-A', 'INPUT', '-p',
+                    protocol, '--dport', str(port), '-j', 'ACCEPT']
         result = subprocess.run(command, input=f'{sudo_password}\n', text=True)
         if result.returncode == 0:
             return f"Port {port} with protocol {protocol} enabled."
@@ -68,7 +72,8 @@ def disable_port(port, protocol, sudo_password):
     """
     try:
         # Build the iptables command to disable a port
-        command = ['sudo', '-S', 'iptables', '-D', 'INPUT', '-p', protocol, '--dport', str(port), '-j', 'ACCEPT']
+        command = ['sudo', '-S', 'iptables', '-D', 'INPUT', 
+                   '-p', protocol, '--dport', str(port), '-j', 'ACCEPT']
         result = subprocess.run(command, input=f'{sudo_password}\n', text=True)
         if result.returncode == 0:
             return f"Port {port} with protocol {protocol} disabled."
