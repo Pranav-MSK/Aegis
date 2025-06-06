@@ -6,7 +6,7 @@ from src.logger import get_logger
 logger = get_logger(__name__)
 
 
-def send_teams_alert(webhook_url, alert_name, instance, severity, description, summary):
+def send_teams_alert(webhook_url, alert_instance):
     """
     Sends a Prometheus alert to a Microsoft Teams channel using a webhook.
 
@@ -23,16 +23,16 @@ def send_teams_alert(webhook_url, alert_name, instance, severity, description, s
     message_payload = {
         "@type": "MessageCard",
         "@context": "https://schema.org/extensions",
-        "summary": summary,
-        "themeColor": "FF0000" if severity.lower() == "critical" else "FFD700",  # Red for critical, Yellow for others
+        "summary": alert_instance.summary,
+        "themeColor": "FF0000" if alert_instance.severity.lower() == "critical" else "FFD700",  # Red for critical, Yellow for others
         "sections": [{
-            "activityTitle": f"**Alert: {alert_name}**",
+            "activityTitle": f"**Alert: {alert_instance.alert_name}**",
             "facts": [
-                {"name": "Instance:", "value": instance},
-                {"name": "Severity:", "value": severity},
-                {"name": "Description:", "value": description}
+                {"name": "Instance:", "value": alert_instance.instance},
+                {"name": "Severity:", "value": alert_instance.severity},
+                {"name": "Description:", "value": alert_instance.description}
             ],
-            "text": description,
+            "text": alert_instance.description,
             "markdown": True
         }]
     }

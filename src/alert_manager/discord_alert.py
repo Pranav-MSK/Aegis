@@ -5,7 +5,7 @@ from src.logger import get_logger
 
 logger = get_logger(__name__)
 
-def send_discord_alert(webhook_url, alert_name, instance, severity, description, summary):
+def send_discord_alert(webhook_url, alert_instance):
     """
     Sends an alert to a Discord channel via a webhook.
 
@@ -30,13 +30,13 @@ def send_discord_alert(webhook_url, alert_name, instance, severity, description,
     message = {
         "embeds": [
             {
-                "title": f"🚨 **{alert_name}** 🚨",
-                "color": color_dict.get(severity, 0),
+                "title": f"🚨 **{alert_instance.alert_name}** 🚨",
+                "color": color_dict.get(alert_instance.severity, 0),
                 "fields": [
-                    {"name": "Instance", "value": instance, "inline": True},
-                    {"name": "Severity", "value": severity, "inline": True},
-                    {"name": "Description", "value": description, "inline": False},
-                    {"name": "Summary", "value": summary, "inline": False}
+                    {"name": "Instance", "value": alert_instance.instance, "inline": True},
+                    {"name": "Severity", "value": alert_instance.severity, "inline": True},
+                    {"name": "Description", "value": alert_instance.description, "inline": False},
+                    {"name": "Summary", "value": alert_instance.summary, "inline": False}
                 ],
                 "footer": {
                     "text": "System Guard Alert"
@@ -54,5 +54,5 @@ def send_discord_alert(webhook_url, alert_name, instance, severity, description,
         logger.error(f"Failed to send alert to Discord: {response.status_code}, {response.text}")
         return False
 
-    logger.info(f"Alert sent to Discord: {alert_name}")
+    logger.info(f"Alert sent to Discord: {alert_instance.alert_name}")
     return True

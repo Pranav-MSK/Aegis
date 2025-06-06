@@ -6,7 +6,7 @@ from src.logger import get_logger
 
 logger = get_logger(__name__)
 
-def send_slack_alert(webhook_url, alert_name, instance, severity, description, summary):
+def send_slack_alert(webhook_url, alert_instance):
     """
     Sends a formatted notification message to a Slack channel via webhook.
     
@@ -33,14 +33,14 @@ def send_slack_alert(webhook_url, alert_name, instance, severity, description, s
         "username": "SystemGuard Alert",
         "attachments": [
             {
-                "fallback": alert_name,
-                "color": color_dict.get(severity, "gray"),
-                "title": alert_name,
-                "text": summary,
+                "fallback": alert_instance.alert_name,
+                "color": color_dict.get(alert_instance.severity, "gray"),
+                "title": alert_instance.alert_name,
+                "text": alert_instance.summary,
                 "fields": [
-                    {"title": "Instance", "value": instance, "short": True},
-                    {"title": "Severity", "value": severity, "short": True},
-                    {"title": "Description", "value": description, "short": False},
+                    {"title": "Instance", "value": alert_instance.instance, "short": True},
+                    {"title": "Severity", "value": alert_instance.severity, "short": True},
+                    {"title": "Description", "value": alert_instance.description, "short": False},
                 ],
                 "footer": "System Metrics",
                 "ts": f"{datetime.now().timestamp()} UTC"
@@ -58,4 +58,4 @@ def send_slack_alert(webhook_url, alert_name, instance, severity, description, s
     if response.status_code != 200:
         raise Exception(f"Request to Slack failed with status code {response.status_code}, response: {response.text}")
     
-    logger.info(f"Alert sent to Slack: {alert_name}") 
+    logger.info(f"Alert sent to Slack: {alert_instance.alert_name}") 

@@ -37,6 +37,7 @@ PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
 # App configuration
 FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
 FLASK_APP_PORT="5050"
+ALERT_MANAGER_PORT="9093"
 SCRAPE_INTERVAL="1s"
 SYSTEM_LABEL="systemguard-metrics"
 ENVIRONMENT="production"
@@ -79,7 +80,7 @@ alerting:
   alertmanagers:
     - static_configs:
         - targets:
-            - $FLASK_APP_IP:$FLASK_APP_PORT
+            - $FLASK_APP_IP:$ALERT_MANAGER_PORT
       timeout: 5m
 
 rule_files:

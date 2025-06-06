@@ -5,7 +5,7 @@ from src.logger import get_logger
 
 logger = get_logger(__name__)
 
-def send_google_chat_alert(webhook_url, alert_name, instance, severity, description, summary):
+def send_google_chat_alert(webhook_url, alert_instance):
     """
     Sends an alert message to a Google Chat room using a webhook.
 
@@ -23,7 +23,7 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
             {
                 "header": {
                     "title": "SystemGuard Alert",
-                    "subtitle": f"Alert: {alert_name}",
+                    "subtitle": f"Alert: {alert_instance.alert_name}",
                     "imageUrl": "https://developers.google.com/chat/images/chat-product-icon.png",
                     "imageStyle": "IMAGE"
                 },
@@ -33,23 +33,23 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
                             {
                                 "keyValue": {
                                     "topLabel": "Instance",
-                                    "content": instance,
+                                    "content": alert_instance.instance,
                                 }
                             },
                             {
                                 "keyValue": {
                                     "topLabel": "Severity",
-                                    "content": severity,
+                                    "content": alert_instance.severity,
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Description:</b> {description}"
+                                    "text": f"<b>Description:</b> {alert_instance.description}"
                                 }
                             },
                             {
                                 "textParagraph": {
-                                    "text": f"<b>Summary:</b> {summary}"
+                                    "text": f"<b>Summary:</b> {alert_instance.summary}"
                                 }
                             }
                         ]
@@ -69,7 +69,7 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
 
     # Check if the request was successful
     if response.status_code == 200:
-        logger.info(f"Alert sent to Google Chat - {alert_name}")
+        logger.info(f"Alert sent to Google Chat - {alert_instance.alert_name}")
     else:
         logger.error(f"Failed to send message to Google Chat. Status code: {response.status_code}")
         logger.error(f"Response: {response.text}")

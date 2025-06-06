@@ -9,6 +9,8 @@ from datetime import datetime
 from flask_login import current_user
 import subprocess
 
+from dataclasses import dataclass
+
 from src.config import db
 from src.logger import get_logger
 logger = get_logger(__name__)
@@ -31,6 +33,19 @@ from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper.alert_helper import can_create_alert
 
+
+@dataclass
+class Alert:
+    alert_name: str
+    alert_status: str
+    instance: str
+    severity: str
+    description: str
+    summary: str
+    system_username: str
+    system_hostname: str
+    fingerprint: str
+    runbook_url: str
 
 def send_test_alert(alertmanager_url, alert_name, severity, instance):
     # Generate a unique alert name by appending the current timestamp
@@ -154,34 +169,26 @@ def process_alert(alert):
     }
     generate_system_notification(notification_data)
 
-    log_alert(severity, alert_name, instance, description, summary)
-    create_alert_ticket(
-        alert_name,
-        alert_status,
-        instance,
-        severity,
-        description,
-        summary,
-        system_username,
-        system_hostname,
-        fingerprint,
-        runbook_url,
+    # Create an Alert object to encapsulate the alert details
+    alert_instance = Alert(
+        alert_name=alert_name,
+        alert_status=alert_status,
+        instance=instance,
+        severity=severity,
+        description=description,
+        summary=summary,
+        system_username=system_username,
+        system_hostname=system_hostname,
+        fingerprint=fingerprint,
+        runbook_url=runbook_url,
     )
-    notify_alert(alert_name, instance, severity, description, summary)
+
+    log_alert(alert_instance)
+    create_alert_ticket(alert_instance)
+    notify_alert(alert_instance)
 
 
-def create_alert_ticket(
-    alert_name,
-    alert_status,
-    instance,
-    severity,
-    description,
-    summary,
-    system_username,
-    system_hostname,
-    fingerprint,
-    runbook_url=None,
-):
+def create_alert_ticket(alert_instance: Alert):
     """
     Saves the alert data to the database.
 
@@ -244,23 +251,23 @@ def create_alert_ticket(
 
     # Create and save the alert ticket
     alert_ticket = AlertTicket(
-        alert_name=alert_name,
-        alert_status=alert_status,
-        instance=instance,
-        severity=severity,
-        summary=summary,
-        description=description,
+        alert_name=alert_instance.alert_name,
+        alert_status=alert_instance.alert_status,
+        instance=alert_instance.instance,
+        severity=alert_instance.severity,
+        summary=alert_instance.summary,
+        description=alert_instance.description,
         assigned_supervisor_id=assigned_supervisor_id,
-        system_username=system_username,
-        system_hostname=system_hostname,
-        fingerprint=fingerprint,
-        runbook_url=runbook_url,
+        system_username=alert_instance.system_username,
+        system_hostname=alert_instance.system_hostname,
+        fingerprint=alert_instance.fingerprint,
+        runbook_url=alert_instance.runbook_url,
     )
     alert_ticket.save()
     logger.info(f"Saving alert ticket: {alert_ticket}")
 
 
-def log_alert(severity, alert_name, instance, description, summary):
+def log_alert(alert_instance):
     """
     Logs the alert message with the appropriate log level based on its severity.
 
@@ -271,14 +278,14 @@ def log_alert(severity, alert_name, instance, description, summary):
         description (str): Detailed alert description.
         summary (str): Brief alert summary.
     """
-    message = f"Alert: {alert_name}"
+    message = f"Alert: {alert_instance.alert_name}"
 
     log_method = {
         "critical": logger.error,
         "warning": logger.warning,
         "info": logger.info,
         "debug": logger.debug,
-    }.get(severity, logger.info)
+    }.get(alert_instance.severity, logger.info)
     log_method(message)
 
 
@@ -307,7 +314,7 @@ def is_enabled(notification_config, setting_key):
 
 
 def send_slack_alert_wrapper(
-    config, alert_name, instance, severity, description, summary
+    config, alert_instance
 ):
     """
     Sends a Slack alert using the provided configuration.
@@ -318,12 +325,10 @@ def send_slack_alert_wrapper(
     """
     slack_webhook = config.get("slack_webhook_url")
     if slack_webhook:
-        send_slack_alert(
-            slack_webhook, alert_name, instance, severity, description, summary
-        )
+        send_slack_alert(slack_webhook, alert_instance)
 
 
-def send_email_alert_wrapper(alert_name, instance, severity, description, summary):
+def send_email_alert_wrapper(alert_instance):
     """
     Sends email alerts to administrators.
 
@@ -333,11 +338,11 @@ def send_email_alert_wrapper(alert_name, instance, severity, description, summar
     admin_emails = get_email_addresses(user_level="admin", receive_email_alerts=True)
     logger.info(f"Sending email alert to {admin_emails}")
     context = {
-        "alert_name": alert_name,
-        "instance": instance,
-        "severity": severity,
-        "description": description,
-        "summary": summary,
+        "alert_name": alert_instance.alert_name,
+        "instance": alert_instance.instance,
+        "severity": alert_instance.severity,
+        "description": alert_instance.description,
+        "summary": alert_instance.summary,
     }
 
     login_alert_template = os.path.join(
@@ -347,27 +352,24 @@ def send_email_alert_wrapper(alert_name, instance, severity, description, summar
     if admin_emails:
         send_smtp_email(
             receiver_email=admin_emails,
-            subject=f"{alert_name} Alert",
+            subject=f"{alert_instance.alert_name} Alert",
             body=email_body,
             is_html=True,
         )
 
 
 def send_discord_alert_wrapper(
-    config, alert_name, instance, severity, description, summary
+    config, alert_instance
 ):
     """
     Sends a Discord alert using the provided configuration.
     """
     discord_webhook = config.get("discord_webhook_url")
     if discord_webhook:
-        send_discord_alert(
-            discord_webhook, alert_name, instance, severity, description, summary
-        )
-
+        send_discord_alert(discord_webhook, alert_instance)
 
 def send_teams_alert_wrapper(
-    config, alert_name, instance, severity, description, summary
+    config, alert_instance
 ):
     """
     Sends a Microsoft Teams alert using the provided configuration.
@@ -375,12 +377,12 @@ def send_teams_alert_wrapper(
     teams_webhook_url = config.get("teams_webhook_url")
     if teams_webhook_url:
         send_teams_alert(
-            teams_webhook_url, alert_name, instance, severity, description, summary
+            teams_webhook_url, alert_instance
         )
 
 
 def send_google_chat_alert_wrapper(
-    config, alert_name, instance, severity, description, summary
+    config, alert_instance
 ):
     """
     Sends a Google Chat alert using the provided configuration.
@@ -388,17 +390,10 @@ def send_google_chat_alert_wrapper(
 
     google_chat_webhook_url = config.get("google_chat_webhook_url")
     if google_chat_webhook_url:
-        send_google_chat_alert(
-            google_chat_webhook_url,
-            alert_name,
-            instance,
-            severity,
-            description,
-            summary,
-        )
+        send_google_chat_alert(google_chat_webhook_url, alert_instance)
 
 
-def notify_alert(alert_name, instance, severity, description, summary):
+def notify_alert(alert_instance):
     """
     Sends notifications for the alert via Slack, email, and Discord.
 
@@ -412,27 +407,19 @@ def notify_alert(alert_name, instance, severity, description, summary):
     notification_config = get_notification_settings()
 
     if is_enabled(notification_config, "is_email_alert_enabled"):
-        send_email_alert_wrapper(alert_name, instance, severity, description, summary)
+        send_email_alert_wrapper(alert_instance)
 
     if is_enabled(notification_config, "is_slack_alert_enabled"):
-        send_slack_alert_wrapper(
-            notification_config, alert_name, instance, severity, description, summary
-        )
+        send_slack_alert_wrapper(notification_config, alert_instance)
 
     if is_enabled(notification_config, "is_discord_alert_enabled"):
-        send_discord_alert_wrapper(
-            notification_config, alert_name, instance, severity, description, summary
-        )
+        send_discord_alert_wrapper(notification_config, alert_instance)
 
     if is_enabled(notification_config, "is_teams_alert_enabled"):
-        send_teams_alert_wrapper(
-            notification_config, alert_name, instance, severity, description, summary
-        )
+        send_teams_alert_wrapper(notification_config, alert_instance)
 
     if is_enabled(notification_config, "is_google_chat_alert_enabled"):
-        send_google_chat_alert_wrapper(
-            notification_config, alert_name, instance, severity, description, summary
-        )
+        send_google_chat_alert_wrapper(notification_config, alert_instance)
 
 
 class PDF(fpdf.FPDF):
