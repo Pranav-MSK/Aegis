@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 
 from src.config import app
 from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
-from routes.helper.alert_ticket_helper import generate_system_notification
+from routes.helper.alert_helper import generate_system_notification
 from src.routes.helper.access_decorators import systemguard_enterprise
 
 discussion_board_bp = Blueprint('user_post', __name__)
