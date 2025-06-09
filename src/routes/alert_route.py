@@ -17,7 +17,7 @@ from src.logger import get_logger
 logger = get_logger(__name__)
 
 from src.routes.helper.alert.alertmanager_adapter import send_test_alert
-from src.routes.helper.alert.processor import process_alert
+from src.routes.helper.alert.processor import AlertProcessor
 from src.utils import get_ip_address
 from src.models import (
     AlertTicket,
@@ -132,7 +132,8 @@ def receive_alerts():
 
         for alert in alert_data["alerts"]:
             logger.info(f"Processing alert: {alert}")
-            process_alert(alert)
+            # process_alert(alert)
+            AlertProcessor(alert=alert).process()
 
         return jsonify({"status": "success"}), 200
 

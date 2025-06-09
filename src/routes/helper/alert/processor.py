@@ -14,82 +14,63 @@ from src.models import (
 )
 from src.routes.helper.alert.ticket_assigner import create_alert_ticket
 
-def process_alert(alert):
-    """
-    Handles an individual alert by extracting necessary details and
-    triggering logging and notification mechanisms.
 
-    Args:
-        alert (dict): The alert payload containing labels and annotations.
-    """
-    alert_name = alert["labels"].get("alertname", "Unknown Alert")
-    alert_status = alert.get("status", "firing")
-    system_username = alert["labels"].get("username", "Unknown User")
-    system_hostname = alert["labels"].get("system_hostname", "Unknown System")
-    instance = alert["labels"].get("instance", "Unknown Instance")
-    severity = alert["labels"].get("severity", "info")
-    description = alert["annotations"].get("description", "No description provided")
-    summary = alert["annotations"].get("summary", "No summary provided")
-    fingerprint = alert.get("fingerprint", None)
-    runbook_url = alert["annotations"].get("runbook_url", None)
+class AlertProcessor:
+    def __init__(self, alert: dict):
+        self.alert = alert
+        self.alert_name = alert["labels"].get("alertname", "Unknown Alert")
+        self.alert_status = alert.get("status", "firing")
+        self.system_username = alert["labels"].get("username", "Unknown User")
+        self.system_hostname = alert["labels"].get("system_hostname", "Unknown System")
+        self.instance = alert["labels"].get("instance", "Unknown Instance")
+        self.severity = alert["labels"].get("severity", "info")
+        self.description = alert["annotations"].get("description", "No description provided")
+        self.summary = alert["annotations"].get("summary", "No summary provided")
+        self.fingerprint = alert.get("fingerprint", "Unknown Fingerprint")
+        self.runbook_url = alert["annotations"].get("runbook_url", None)
 
-    # check if fingerprint already exists
-    if fingerprint:
-        existing_alert = AlertTicket.query.filter_by(fingerprint=fingerprint).first()
-        # if alert_status of existing alert is "firing" and new alert_status is "resolved", update the existing alert
-        if (
-            existing_alert
-            and existing_alert.alert_status == "firing"
-            and alert_status == "resolved"
-        ):
-            existing_alert.alert_status = alert_status
-            existing_alert.updated_at = datetime.utcnow()
-            # also log
-            log_message = f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
-            alert_log = AlertLog(alert_ticket_id=existing_alert.id, 
-                                 log=log_message)
-            alert_log.save()
-            existing_alert.save()
-            logger.info(
-                f"SystemGuard Bot: Alert with fingerprint {fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
-            )
-            return
-        elif (
-            existing_alert
-            and existing_alert.alert_status == "resolved"
-            and alert_status == "firing"
-        ):
-            logger.info(
-                f"Alert with fingerprint {fingerprint} already exists and is resolved. Ignoring the alert."
-            )
-            return
+    def process(self):
+        # if self.fingerprint:
+        #     existing_alert = AlertTicket.query.filter_by(fingerprint=self.fingerprint).first()
+        #     if existing_alert and existing_alert.alert_status == "firing" and self.alert_status == "resolved":
+        #         self.resolve_existing_alert(existing_alert)
+        #         return
+        #     elif existing_alert and existing_alert.alert_status == "resolved" and self.alert_status == "firing":
+        #         logger.info(
+        #             f"Alert with fingerprint {self.fingerprint} already exists and is resolved. Ignoring the alert."
+        #         )
+        #         return
 
-    notification_data = {
-        "type": severity,
-        "icon": "info-circle",  # Font Awesome icon
-        "title": alert_name,
-        "message": description,
-        "is_global": True,
-    }
-    generate_system_notification(notification_data)
+        alert_instance = self.create_alert_instance()
+        self.log_and_notify(alert_instance)
 
-    # Create an Alert object to encapsulate the alert details
-    alert_instance = AlertMessage(
-        alert_name=alert_name,
-        alert_status=alert_status,
-        instance=instance,
-        severity=severity,
-        description=description,
-        summary=summary,
-        system_username=system_username,
-        system_hostname=system_hostname,
-        fingerprint=fingerprint,
-        runbook_url=runbook_url,
-    )
+    def resolve_existing_alert(self, existing_alert):
+        existing_alert.alert_status = self.alert_status
+        existing_alert.updated_at = datetime.utcnow()
+        log_message = f"SystemGuard Bot: Alert with fingerprint {self.fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
+        alert_log = AlertLog(alert_ticket_id=existing_alert.id, log=log_message)
+        alert_log.save()
+        existing_alert.save()
+        logger.info(log_message)
 
-    log_alert(alert_instance)
-    create_alert_ticket(alert_instance)
-    notify_alert(alert_instance)
+    def create_alert_instance(self):
+        return AlertMessage(
+            alert_name=self.alert_name,
+            alert_status=self.alert_status,
+            instance=self.instance,
+            severity=self.severity,
+            description=self.description,
+            summary=self.summary,
+            system_username=self.system_username,
+            system_hostname=self.system_hostname,
+            fingerprint=self.fingerprint,
+            runbook_url=self.runbook_url,
+        )
+
+    def log_and_notify(self, alert_instance):
+        log_alert(alert_instance)
+        create_alert_ticket(alert_instance)
+        notify_alert(alert_instance)
 
 def log_alert(alert_instance):
     """

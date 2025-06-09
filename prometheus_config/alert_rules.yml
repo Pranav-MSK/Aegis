@@ -24,7 +24,7 @@ groups:
       description: Memory usage is above 80% for more than 2 minutes
       runbook_url: https://example.com/runbook/high-memory-usage
       summary: Instance {{ $labels.instance }} high memory usage.
-    expr: avg by (instance) (memory_usage_percentage) > 90
+    expr: avg by (instance) (memory_usage_percentage) > 2
     for: 1m
     labels:
       severity: warning

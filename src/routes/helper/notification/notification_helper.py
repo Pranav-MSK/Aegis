@@ -15,6 +15,7 @@ from src.alert_manager import (
     send_google_chat_alert,
 )
 
+from src.routes.helper.notification.manager import generate_system_notification
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
 
@@ -39,14 +40,17 @@ class AlertObserver(ABC):
 
 
 class SlackAlertObserver(AlertObserver):
+
     def __init__(self, config):
         self.slack_webhook = config.get("slack_webhook_url")
+
     def notify(self, alert_instance):
         if self.slack_webhook:
             send_slack_alert(self.slack_webhook, alert_instance)
 
 
 class EmailAlertObserver(AlertObserver):
+
     def notify(self, alert_instance):
         admin_emails = get_email_addresses(user_level="admin", receive_email_alerts=True)
         if not admin_emails:
@@ -71,33 +75,54 @@ class EmailAlertObserver(AlertObserver):
 
 
 class DiscordAlertObserver(AlertObserver):
+
     def __init__(self, config):
         self.discord_webhook = config.get("discord_webhook_url")
+
     def notify(self, alert_instance):
         if self.discord_webhook:
             send_discord_alert(self.discord_webhook, alert_instance)
 
 
 class TeamsAlertObserver(AlertObserver):
+
     def __init__(self, config):
         self.teams_webhook_url = config.get("teams_webhook_url")
+
     def notify(self, alert_instance):
         if self.teams_webhook_url:
             send_teams_alert(self.teams_webhook_url, alert_instance)
 
 
 class GoogleChatAlertObserver(AlertObserver):
+
     def __init__(self, config):
         self.google_chat_webhook_url = config.get("google_chat_webhook_url")
+
     def notify(self, alert_instance):
         if self.google_chat_webhook_url:
             send_google_chat_alert(self.google_chat_webhook_url, alert_instance)
+
+class SystemNotificationObserver(AlertObserver):
+
+    def notify(self, alert_instance):
+        notification_data = {
+            "type": alert_instance.severity,
+            "icon": "info-circle",
+            "title": alert_instance.alert_name,
+            "message": alert_instance.description,
+            "is_global": True,
+        }
+        # Assuming generate_system_notification is a function that handles system notifications
+        
+        generate_system_notification(notification_data)
 
 # NOTE - Design Pattern: Factory Method
 # This factory creates instances of alert observers based on the notification configuration.
 # It encapsulates the logic for determining which observers to create,
 # allowing for easy extension and modification of alert notification mechanisms.
 class AlertObserverFactory:
+
     @staticmethod
     def create_observers(notification_config):
         observers = []
@@ -111,6 +136,9 @@ class AlertObserverFactory:
             observers.append(TeamsAlertObserver(notification_config))
         if notification_config.get("is_google_chat_alert_enabled"):
             observers.append(GoogleChatAlertObserver(notification_config))
+        # system notification observer is default on
+        observers.append(SystemNotificationObserver())
+
         return observers
 
 # NOTE: Design Pattern: Observer
@@ -118,6 +146,7 @@ class AlertObserverFactory:
 # It iterates through the list of observers and calls their `notify` method,
 # allowing each observer to handle the alert instance as needed.
 class AlertNotifier:
+
     def __init__(self, observers: list[AlertObserver]):
         self._observers = observers
 
@@ -130,10 +159,14 @@ class AlertNotifier:
 
     def get_observers(self):
         return self._observers
-    
+
+
 
 def notify_alert(alert_instance):
     notification_config = NotificationSettings().to_dict()
+    # get all observers based on the notification configuration
     observers = AlertObserverFactory.create_observers(notification_config)
+    # create an AlertNotifier instance with the observers
     notifier = AlertNotifier(observers)
+    # notify all observers with the alert instance
     notifier.notify_all(alert_instance)
