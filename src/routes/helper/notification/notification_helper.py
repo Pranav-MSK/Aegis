@@ -7,17 +7,16 @@ logger = get_logger(__name__)
 from src.models import (
     NotificationSettings)
 
-from src.alert_manager import (
-    send_slack_alert,
-    send_smtp_email,
-    send_discord_alert,
-    send_teams_alert,
-    send_google_chat_alert,
+from src.routes.helper.notification.observers import (
+    EmailAlertObserver,
+    SlackAlertObserver,
+    DiscordAlertObserver,
+    TeamsAlertObserver,
+    GoogleChatAlertObserver
 )
 
 from src.routes.helper.notification.manager import generate_system_notification
-from src.routes.helper.common_helper import get_email_addresses
-from src.utils import render_template_from_file, ROOT_DIR
+
 
 from abc import ABC, abstractmethod
 
@@ -39,71 +38,12 @@ class AlertObserver(ABC):
         pass
 
 
-class SlackAlertObserver(AlertObserver):
-
-    def __init__(self, config):
-        self.slack_webhook = config.get("slack_webhook_url")
-
-    def notify(self, alert_instance):
-        if self.slack_webhook:
-            send_slack_alert(self.slack_webhook, alert_instance)
-
-
-class EmailAlertObserver(AlertObserver):
-
-    def notify(self, alert_instance):
-        admin_emails = get_email_addresses(user_level="admin", receive_email_alerts=True)
-        if not admin_emails:
-            return
-        context = {
-            "alert_name": alert_instance.alert_name,
-            "instance": alert_instance.instance,
-            "severity": alert_instance.severity,
-            "description": alert_instance.description,
-            "summary": alert_instance.summary,
-        }
-        email_body = render_template_from_file(
-            os.path.join(ROOT_DIR, "src/templates/email_templates/alert_template.html"),
-            **context
-        )
-        send_smtp_email(
-            receiver_email=admin_emails,
-            subject=f"{alert_instance.alert_name} Alert",
-            body=email_body,
-            is_html=True,
-        )
-
-
-class DiscordAlertObserver(AlertObserver):
-
-    def __init__(self, config):
-        self.discord_webhook = config.get("discord_webhook_url")
-
-    def notify(self, alert_instance):
-        if self.discord_webhook:
-            send_discord_alert(self.discord_webhook, alert_instance)
-
-
-class TeamsAlertObserver(AlertObserver):
-
-    def __init__(self, config):
-        self.teams_webhook_url = config.get("teams_webhook_url")
-
-    def notify(self, alert_instance):
-        if self.teams_webhook_url:
-            send_teams_alert(self.teams_webhook_url, alert_instance)
-
-
-class GoogleChatAlertObserver(AlertObserver):
-
-    def __init__(self, config):
-        self.google_chat_webhook_url = config.get("google_chat_webhook_url")
-
-    def notify(self, alert_instance):
-        if self.google_chat_webhook_url:
-            send_google_chat_alert(self.google_chat_webhook_url, alert_instance)
-
 class SystemNotificationObserver(AlertObserver):
+    """ In App Notification Observer
+
+    this observer is responsible for generating system notifications
+    that show up in the application interface.
+    """
 
     def notify(self, alert_instance):
         notification_data = {
@@ -113,8 +53,6 @@ class SystemNotificationObserver(AlertObserver):
             "message": alert_instance.description,
             "is_global": True,
         }
-        # Assuming generate_system_notification is a function that handles system notifications
-        
         generate_system_notification(notification_data)
 
 # NOTE - Design Pattern: Factory Method
@@ -147,26 +85,20 @@ class AlertObserverFactory:
 # allowing each observer to handle the alert instance as needed.
 class AlertNotifier:
 
-    def __init__(self, observers: list[AlertObserver]):
-        self._observers = observers
+    def __init__(self):
+        self._observers = []
+
+    def fetch_observers(self):
+        """
+        Fetches observers based on the notification configuration.
+        """
+        notification_config = NotificationSettings().to_dict()
+        self._observers = AlertObserverFactory.create_observers(notification_config)
 
     def notify_all(self, alert_instance):
+        self.fetch_observers()
         for observer in self._observers:
             try:
                 observer.notify(alert_instance)
             except Exception as e:
                 logger.error(f"Error notifying {observer.__class__.__name__}: {e}")
-
-    def get_observers(self):
-        return self._observers
-
-
-
-def notify_alert(alert_instance):
-    notification_config = NotificationSettings().to_dict()
-    # get all observers based on the notification configuration
-    observers = AlertObserverFactory.create_observers(notification_config)
-    # create an AlertNotifier instance with the observers
-    notifier = AlertNotifier(observers)
-    # notify all observers with the alert instance
-    notifier.notify_all(alert_instance)

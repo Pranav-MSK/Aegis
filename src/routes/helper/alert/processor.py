@@ -3,19 +3,17 @@ from datetime import datetime
 from src.logger import get_logger
 logger = get_logger(__name__)
 
-from src.routes.helper.notification.notification_helper import notify_alert
+from src.routes.helper.notification.notification_helper import AlertNotifier
 from src.routes.helper.alert.models import AlertMessage
-from src.routes.helper.notification.manager import generate_system_notification
 
 from src.models import (
-    AlertTicket,
     AlertLog,
 
 )
 from src.routes.helper.alert.ticket_assigner import create_alert_ticket
 
 
-class AlertProcessor:
+class AlertProcessor(AlertNotifier):
     def __init__(self, alert: dict):
         self.alert = alert
         self.alert_name = alert["labels"].get("alertname", "Unknown Alert")
@@ -70,7 +68,8 @@ class AlertProcessor:
     def log_and_notify(self, alert_instance):
         log_alert(alert_instance)
         create_alert_ticket(alert_instance)
-        notify_alert(alert_instance)
+        # AlertNotifier.notify_all(alert_instance)
+        self.notify_all(alert_instance)
 
 def log_alert(alert_instance):
     """
