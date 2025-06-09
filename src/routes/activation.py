@@ -11,7 +11,7 @@ from src.activator import (
 from src.helper import load_secret_key
 from src.routes.helper.activation_helper import generate_license_pdf
 from src.activator import get_plan_details
-from src.routes.helper.notification_helper import generate_system_notification
+from routes.helper.alert_ticket_helper import generate_system_notification
 
 activation_bp = Blueprint('activation', __name__)
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')

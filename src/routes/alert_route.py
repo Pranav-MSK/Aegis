@@ -15,7 +15,7 @@ from flask_login import current_user, login_required
 from src.config import app, csrf, db, get_app_info
 from src.logger import get_logger
 logger = get_logger(__name__)
-from src.routes.helper.notification_helper import send_test_alert, process_alert
+from routes.helper.alert_ticket_helper import send_test_alert, process_alert
 from src.utils import get_ip_address
 from src.models import (
     AlertTicket,
@@ -31,9 +31,9 @@ from src.routes.helper.access_decorators import (
     community_edition,
 )
 from src.routes.helper.alert_helper import user_has_access_to_alert, user_id_to_username
-from src.routes.helper.notification_helper import generate_system_notification
+from routes.helper.alert_ticket_helper import generate_system_notification
 from src.routes.helper.common_helper import award_points
-from src.routes.helper.notification_helper import fetch_user_notifications
+from routes.helper.alert_ticket_helper import fetch_user_notifications
 
 alert_bp = Blueprint("alert", __name__)
 
