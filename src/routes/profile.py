@@ -8,7 +8,7 @@ from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import login_required, current_user
 from src.models import AlertTicket, UserProfile, UserActivity
 from werkzeug.security import generate_password_hash, check_password_hash
-from routes.helper.alert_helper import generate_system_notification
+from src.routes.helper.notification.manager import generate_system_notification
 from src.routes.helper.common_helper import log_activity
 
 from src.config import app

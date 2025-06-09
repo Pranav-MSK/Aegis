@@ -20,7 +20,10 @@ from src.utils import render_template_from_file, ROOT_DIR
 
 from abc import ABC, abstractmethod
 
-
+# NOTE: Abstract Base Class for Alert Observers
+# This class defines the interface for all alert observers.
+# Each concrete observer must implement the `notify` method,
+# Easily extensible for adding new notification methods in the future.
 class AlertObserver(ABC):
     """
     Abstract base class for alert observers.
@@ -90,7 +93,10 @@ class GoogleChatAlertObserver(AlertObserver):
         if self.google_chat_webhook_url:
             send_google_chat_alert(self.google_chat_webhook_url, alert_instance)
 
-
+# NOTE - Design Pattern: Factory Method
+# This factory creates instances of alert observers based on the notification configuration.
+# It encapsulates the logic for determining which observers to create,
+# allowing for easy extension and modification of alert notification mechanisms.
 class AlertObserverFactory:
     @staticmethod
     def create_observers(notification_config):
@@ -107,7 +113,10 @@ class AlertObserverFactory:
             observers.append(GoogleChatAlertObserver(notification_config))
         return observers
 
-
+# NOTE: Design Pattern: Observer
+# This class is responsible for notifying all registered observers about an alert instance.
+# It iterates through the list of observers and calls their `notify` method,
+# allowing each observer to handle the alert instance as needed.
 class AlertNotifier:
     def __init__(self, observers: list[AlertObserver]):
         self._observers = observers
@@ -119,6 +128,9 @@ class AlertNotifier:
             except Exception as e:
                 logger.error(f"Error notifying {observer.__class__.__name__}: {e}")
 
+    def get_observers(self):
+        return self._observers
+    
 
 def notify_alert(alert_instance):
     notification_config = NotificationSettings().to_dict()
