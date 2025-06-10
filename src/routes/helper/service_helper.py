@@ -108,7 +108,7 @@ class ServiceMonitor:
                     continue
 
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) # Handle unexpected errors # type: ignore
 
         # Round summary memory values
         for category in summary:

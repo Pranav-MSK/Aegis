@@ -111,12 +111,12 @@ def update_prometheus_config():
             if 'basic_auth' in job:
                 updated_job['basic_auth'] = job['basic_auth']
 
-        # Replace the old job with the updated one
-        for index, j in enumerate(config['scrape_configs']):
-            if j['job_name'] == 'localhost':
-                config['scrape_configs'][index] = updated_job
-            else:
-                config['scrape_configs'][index] = OrderedDict(j)
+            # Replace the old job with the updated one
+            for index, j in enumerate(config['scrape_configs']):
+                if j['job_name'] == 'localhost':
+                    config['scrape_configs'][index] = updated_job
+                else:
+                    config['scrape_configs'][index] = OrderedDict(j)
 
         # Save the updated config
         try:
