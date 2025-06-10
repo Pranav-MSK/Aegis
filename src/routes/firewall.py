@@ -3,10 +3,7 @@ from flask import Blueprint, render_template, request, session, flash
 from flask_login import login_required
 
 from src.config import app
-from src.routes.helper.firewall_helper import (
-    list_open_ports,
-    enable_port, 
-    disable_port)
+from src.routes.helper.firewall_helper import PortManager
 from src.routes.helper.common_helper import admin_required, handle_sudo_password
 from src.logger import get_logger
 logger = get_logger(__name__)
@@ -29,6 +26,7 @@ def firewall():
     message = ''
     open_ports = []
     sudo_password = session.get('sudo_password', '')
+    port_manager = PortManager()
 
     try:
         if request.method == 'POST':
@@ -42,15 +40,15 @@ def firewall():
                     message = f"Invalid port number: {port}."
                     flash(message, 'danger')
                     logger.error(message)
-                    open_ports, _ = list_open_ports(sudo_password)
+                    open_ports, _ = port_manager.list_open_ports(sudo_password)
                 else:
                     logger.info(f"Port: {port}, Protocol: {protocol}, Action: {action}")
 
                     # Handle port enabling/disabling based on the action
                     if action == 'enable':
-                        message = enable_port(port, protocol, sudo_password)
+                        message = port_manager.enable_port(port, protocol, sudo_password)
                     elif action == 'disable':
-                        message = disable_port(port, protocol, sudo_password)
+                        message = port_manager.disable_port(port, protocol, sudo_password)
                     else:
                         message = "Invalid action specified."
                         flash(message, 'danger')
@@ -60,7 +58,7 @@ def firewall():
                     flash(message, 'info')
                     logger.info(message)
 
-                    open_ports, error_message = list_open_ports(sudo_password)
+                    open_ports, error_message = port_manager.list_open_ports(sudo_password)
                     if error_message:
                         message = error_message
                         flash(message, 'danger')
@@ -69,7 +67,7 @@ def firewall():
                 message = "Missing required fields: port, protocol, action."
                 flash(message, 'danger')
                 logger.error(message)
-                open_ports, error_message = list_open_ports(sudo_password)
+                open_ports, error_message = port_manager.list_open_ports(sudo_password)
                 if error_message:
                     message = error_message
                     flash(message, 'danger')
@@ -77,7 +75,7 @@ def firewall():
         else:
             # Handle GET request
             if sudo_password:
-                open_ports, error_message = list_open_ports(sudo_password)
+                open_ports, error_message = port_manager.list_open_ports(sudo_password)
                 if error_message:
                     message = error_message
                     flash(message, 'danger')
@@ -100,7 +98,7 @@ def validate_port(port):
         return 1 <= port_number <= 65535
     except ValueError:
         return False
-    
+
 
 @app.route('/system/security', methods=['GET', 'POST'])
 @login_required
