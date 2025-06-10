@@ -2,176 +2,147 @@
 import os
 import re
 from datetime import datetime, timedelta
+from dataclasses import dataclass, asdict
 from cryptography.fernet import Fernet
-
 from src.helper import load_secret_key
 
-number_of_sum_check_digits = 2
-internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
+# --- Constants ---
+SUM_CHECK_DIGITS = 2
+LICENSE_PATH = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
 
-def calculate_checksum(unique_id, num_of_digits=2):
-    """Calculate a simple checksum for the given unique ID."""
-    checksum = sum((index + 1) * ord(char) for index, char in enumerate(unique_id))
-    return checksum % (10 ** num_of_digits)
 
+# --- Utility Functions ---
 def get_os_installation_uuid():
-    """Retrieve the OS installation UUID."""
-    try:
-        if os.path.exists('/etc/machine-id'):
-            with open('/etc/machine-id', 'r') as f:
-                return f.read().strip()
-        elif os.path.exists('/var/lib/dbus/machine-id'):
-            with open('/var/lib/dbus/machine-id', 'r') as f:
-                return f.read().strip()
-        else:
-            return "OS Installation UUID not found."
-    except Exception as e:
-        return f"Error reading OS Installation UUID: {str(e)}"
+    for path in ['/etc/machine-id', '/var/lib/dbus/machine-id']:
+        try:
+            if os.path.exists(path):
+                with open(path) as f:
+                    return f.read().strip()
+        except Exception:
+            pass
+    return "OS Installation UUID not found."
 
 
-def calculate_unique_system_id():
-    """
-    Calculate a unique system identifier using the OS installation UUID.
-    The ID is filtered to alphanumeric characters, downsampled, and includes a checksum.
-    """
-    os_uuid = get_os_installation_uuid()
-    clean_uuid = re.sub(r'\W+', '', os_uuid)
-    short_uuid = clean_uuid[::2]
-    checksum = calculate_checksum(short_uuid, number_of_sum_check_digits)    
-    return f"{short_uuid}{checksum}"
+def calculate_checksum(data: str, digits: int = 2) -> int:
+    return sum((i + 1) * ord(c) for i, c in enumerate(data)) % (10 ** digits)
 
 
-def verify_activation_code(activation_code, hardware_id, obfuscated_key):
-    try:
-        cipher = Fernet(obfuscated_key)
-        decrypted_data = cipher.decrypt(activation_code.encode()).decode()
-        license_key, received_hardware_id = decrypted_data.split(':')
+def generate_unique_id() -> str:
+    uuid = get_os_installation_uuid()
+    cleaned = re.sub(r'\W+', '', uuid)
+    short = cleaned[::2]
+    return f"{short}{calculate_checksum(short, SUM_CHECK_DIGITS)}"
+
+
+# --- Data Class ---
+@dataclass
+class LicenseInfo:
+    plan_type: str = "Free Edition"
+    is_trial: bool = False
+    remaining_plan_days: int = 0
+    is_plan_not_expired: bool = False
+    license_key: str = ""
+    activation_code: str = ""
+    systemguard_unique_id: str = generate_unique_id()
+    max_scrap_target: int = 1
+    max_alert_rules: int = 5
+    max_number_of_graphs: int = 5
+    monthly_alert_tickets_limit: int = 10
+    max_users_allowed: int = 5
+    message: str = ""
+
+    def to_dict(self):
+        return asdict(self)
+
+
+# --- Cipher Utility ---
+class LicenseCipher:
+    def __init__(self, key: bytes):
+        self.cipher = Fernet(key)
+
+    def decrypt(self, token: str) -> str:
+        return self.cipher.decrypt(token.encode()).decode()
+
+    def encrypt(self, data: str) -> str:
+        return self.cipher.encrypt(data.encode()).decode()
+
+
+# --- License Manager ---
+class LicenseManager:
+    def __init__(self, key_path: str = "obfuscation.so"):
+        self.secret_key = load_secret_key(key_path)
+        self.cipher = LicenseCipher(self.secret_key)
+
+    def verify_activation_code(self, activation_code: str, expected_id: str) -> bool:
+        try:
+            license_key, received_id = self.cipher.decrypt(activation_code).split(":")
+            return received_id == expected_id
+        except Exception:
+            return False
         
-        if received_hardware_id == hardware_id:
-            return True, license_key
-        return False, None
-    except Exception as e:
-        return False, f"Error verifying activation code: {str(e)}"
-    
-def check_license_expiration(license_key, obfuscated_key):
-    base_plan = "Free Edition"
-    is_trial = False
-    max_scrap_target = 1
-    max_alert_rules = 5
-    max_number_of_graphs = 5
-    monthly_alert_tickets_limit = 10
-    max_users_allowed = 5
-    cipher = Fernet(obfuscated_key)
-    decrypted_license_data = cipher.decrypt(license_key.encode()).decode()
-    
-    license_parts = decrypted_license_data.split('|')
-    if len(license_parts) < 3:
-        return False, "Invalid license format.", base_plan, is_trial, max_scrap_target, max_alert_rules, max_number_of_graphs, monthly_alert_tickets_limit, max_users_allowed
+    def get_license_key(self, activation_code: str) -> str:
+        try:
+            decrypted = self.cipher.decrypt(activation_code)
+            return decrypted.split(":")[0]
+        except Exception as e:
+            raise ValueError(f"Failed to decrypt activation code: {e}")
 
-    plan_type = license_parts[0]
-    expiration_date_str = license_parts[1]
-    is_trial = license_parts[2]
-    max_scrap_target = license_parts[3]
-    max_alert_rules = license_parts[4]
-    max_number_of_graphs = license_parts[5]
-    monthly_alert_tickets_limit = license_parts[6]
-    max_users_allowed = license_parts[7]
+    def parse_license_data(self, encrypted_license: str) -> list:
+        try:
+            decrypted = self.cipher.decrypt(encrypted_license)
+            parts = decrypted.split('|')
+            if len(parts) < 8:
+                raise ValueError("Incomplete license data.")
+            return parts
+        except Exception as e:
+            raise ValueError(f"Failed to parse license: {e}")
 
-    expiration_date = datetime.strptime(expiration_date_str, '%Y-%m-%d')
+    def apply_license_plan(self, info: LicenseInfo, parts: list):
+        exp_date = datetime.strptime(parts[1], '%Y-%m-%d')
+        today = datetime.now()
 
-    today = datetime.now() + timedelta(days=0)
-    expiration_date_str = expiration_date.strftime('%Y-%m-%d')
-    if today >= expiration_date:
-        return False, "License has expired {}. Please renew the license.".format(expiration_date_str), base_plan, is_trial, max_scrap_target, max_alert_rules, max_number_of_graphs, monthly_alert_tickets_limit, max_users_allowed
+        info.plan_type = parts[0]
+        info.is_trial = parts[2] == "True"
+        info.max_scrap_target = int(parts[3])
+        info.max_alert_rules = int(parts[4])
+        info.max_number_of_graphs = int(parts[5])
+        info.monthly_alert_tickets_limit = int(parts[6])
+        info.max_users_allowed = int(parts[7])
 
-    remaining_plan_days = (expiration_date - today).days
-    return True, remaining_plan_days, plan_type, is_trial, max_scrap_target, max_alert_rules, max_number_of_graphs, monthly_alert_tickets_limit, max_users_allowed
+        if today >= exp_date:
+            info.message = f"License expired on {exp_date.strftime('%Y-%m-%d')}"
+            info.is_plan_not_expired = False
+        else:
+            info.remaining_plan_days = (exp_date - today).days
+            info.is_plan_not_expired = True
 
+    def load_license_info(self, path: str = LICENSE_PATH) -> LicenseInfo:
+        info = LicenseInfo()
+        try:
+            with open(path) as f:
+                lines = f.read().splitlines()
+                if len(lines) < 4:
+                    raise ValueError("Incomplete license file.")
+
+                info.license_key = lines[1].split(':', 1)[1]
+                info.activation_code = lines[2].split(':', 1)[1]
+                info.systemguard_unique_id = lines[3].split(':', 1)[1]
+
+                if not self.verify_activation_code(info.activation_code, info.systemguard_unique_id):
+                    info.message = "Invalid activation code"
+                    return info
+
+                license_parts = self.parse_license_data(info.license_key)
+                self.apply_license_plan(info, license_parts)
+
+        except FileNotFoundError:
+            info.message = "License file not found."
+        except Exception as e:
+            info.message = str(e)
+
+        return info
+
+
+# --- Public API ---
 def get_plan_details():
-    obfuscated_key = load_secret_key("obfuscation.so")
-    is_plan_not_expired = False
-    remaining_plan_days = 0
-    plan_type = "Free Edition"
-    is_trial = False
-    license_key = ""
-    activation_code = ""
-    systemguard_unique_id = calculate_unique_system_id()
-    max_scrap_target = 1
-    max_alert_rules = 5
-    max_number_of_graphs = 5
-    monthly_alert_tickets_limit = 10
-    max_users_allowed = 5
-    try:
-        with open(internal_license_key_path, 'r') as f:
-            license_data = f.read()
-            license_key = license_data.split('\n')[1].split(':')[1]
-            activation_code = license_data.split('\n')[2].split(':')[1]
-            systemguard_unique_id = license_data.split('\n')[3].split(':')[1]
-
-            is_valid, _ = verify_activation_code(activation_code, systemguard_unique_id, obfuscated_key)
-            if not is_valid:
-                return {
-                    "is_plan_not_expired": is_plan_not_expired,
-                    "remaining_plan_days": remaining_plan_days,
-                    "plan_type": plan_type,
-                    "is_trial": is_trial,
-                    "license_key": license_key,
-                    "activation_code": activation_code,
-                    "systemguard_unique_id": systemguard_unique_id,
-                    "max_scrap_target": max_scrap_target,
-                    "max_alert_rules": max_alert_rules,
-                    "max_number_of_graphs": max_number_of_graphs,
-                    "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
-                    "max_users_allowed": max_users_allowed
-                }
-
-
-            is_plan_not_expired, remaining_plan_days, plan_type, is_trial, \
-                max_scrap_target, max_alert_rules, max_number_of_graphs, \
-                    monthly_alert_tickets_limit, max_users_allowed = check_license_expiration(license_key, obfuscated_key)
-            if not is_plan_not_expired:
-                return {
-                        "is_plan_not_expired": is_plan_not_expired,
-                        "remaining_plan_days": remaining_plan_days,
-                        "plan_type": plan_type,
-                        "is_trial": is_trial,
-                        "license_key": license_key,
-                        "activation_code": activation_code,
-                        "systemguard_unique_id": systemguard_unique_id,
-                        "max_scrap_target": max_scrap_target,
-                        "max_alert_rules": max_alert_rules,
-                        "max_number_of_graphs": max_number_of_graphs,
-                        "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
-                        "max_users_allowed": max_users_allowed
-
-                    }
-            else:
-                return {
-                        "is_plan_not_expired": is_plan_not_expired,
-                        "remaining_plan_days": remaining_plan_days,
-                        "plan_type": plan_type,
-                        "is_trial": is_trial,
-                        "license_key": license_key,
-                        "activation_code": activation_code,
-                        "systemguard_unique_id": systemguard_unique_id,
-                        "max_scrap_target": max_scrap_target,
-                        "max_alert_rules": max_alert_rules,
-                        "max_number_of_graphs": max_number_of_graphs,
-                        "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
-                        "max_users_allowed": max_users_allowed
-                    }
-    except FileNotFoundError:
-        return {
-            "is_plan_not_expired": is_plan_not_expired,
-            "remaining_plan_days": remaining_plan_days,
-            "plan_type": plan_type,
-            "is_trial": is_trial,
-            "license_key": license_key,
-            "activation_code": activation_code,
-            "systemguard_unique_id": systemguard_unique_id,
-            "max_scrap_target": max_scrap_target,
-            "max_alert_rules": max_alert_rules,
-            "max_number_of_graphs": max_number_of_graphs,
-            "monthly_alert_tickets_limit": monthly_alert_tickets_limit,
-            "max_users_allowed": max_users_allowed
-        }
+    return LicenseManager().load_license_info().to_dict()

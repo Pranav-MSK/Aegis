@@ -5,8 +5,8 @@ from flask_login import login_required
 
 from src.config import app
 from src.activator import (
-    calculate_unique_system_id, 
-    verify_activation_code, 
+    generate_unique_id, 
+    LicenseManager
 )
 from src.helper import load_secret_key
 from src.routes.helper.activation_helper import generate_license_pdf
@@ -42,15 +42,15 @@ def activation():
         max_users_allowed=plan_details.get('max_users_allowed')
     )
 
-    systemguard_unique_id = calculate_unique_system_id()
+    systemguard_unique_id = generate_unique_id()
 
     license_key = None
     activation_code = ""
 
     if request.method == 'POST':
-        activation_code = request.form.get('activation_code')
-        obfuscated_key = load_secret_key("obfuscation.so")
-        is_valid, new_license_key = verify_activation_code(activation_code, systemguard_unique_id, obfuscated_key)
+        activation_code = request.form.get('activation_code') or ""
+        is_valid = LicenseManager().verify_activation_code(activation_code, systemguard_unique_id)
+        new_license_key = LicenseManager().get_license_key(activation_code)
 
         if is_valid:
             try:
@@ -84,7 +84,7 @@ def activation():
 @login_required
 def download_license():
     try:
-        systemguard_unique_id = calculate_unique_system_id()
+        systemguard_unique_id = generate_unique_id()
         pdf_file_path = generate_license_pdf(internal_license_key_path)
         return send_file(pdf_file_path, as_attachment=True, download_name=f"license_{systemguard_unique_id}.pdf")
     except Exception as e:

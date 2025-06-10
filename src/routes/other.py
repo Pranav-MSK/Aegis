@@ -9,7 +9,7 @@ from src.alert_manager import send_smtp_email
 from src.utils import get_os_release_info, get_os_info
 from src.helper import check_installation_information
 from src.routes.helper.common_helper import admin_required
-from src.activator import calculate_unique_system_id
+from src.activator import generate_unique_id
 
 other_bp = blueprints.Blueprint('other', __name__)
 
@@ -67,7 +67,7 @@ def send_email_page():
 @app.route("/about")
 def about():
     installation_info = check_installation_information()
-    systemguard_unique_id = calculate_unique_system_id()
+    systemguard_unique_id = generate_unique_id()
     session['systemguard_unique_id'] = systemguard_unique_id
     
     return render_template("other/about.html", 
