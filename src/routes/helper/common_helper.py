@@ -122,15 +122,17 @@ def award_points(activity_type, reverse=False, user_id=None):
 
     points = activity_points_dict.get(activity_type, 1)  # Default to 1 if not found
     user = UserProfile.query.get(user_id)
+    if not user:
+        return  # User not found, do nothing
     user.user_points += points
     user.save()
 
 def log_activity(activity_type, text):
     """Helper function to log user activities."""
     activity = UserActivity(
-        user_id=current_user.id,
-        type=activity_type,
-        text=text
+        user_id=current_user.id, # type: ignore
+        type=activity_type, # type: ignore
+        text=text # type: ignore
     )
 
     # Award points based on the activity type
