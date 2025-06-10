@@ -71,6 +71,8 @@ class LicenseCipher:
 class LicenseManager:
     def __init__(self, key_path: str = "obfuscation.so"):
         self.secret_key = load_secret_key(key_path)
+        if self.secret_key is None:
+            raise ValueError("Secret key cannot be None.")
         self.cipher = LicenseCipher(self.secret_key)
 
     def verify_activation_code(self, activation_code: str, expected_id: str) -> bool:

@@ -26,16 +26,6 @@ network_metrics.start()
 
 app = Flask(__name__)
 
-# [app.meta]
-# NAME = SystemGuard
-# VERSION = 1.0.2
-# DESCRIPTION = A web application to monitor and manage system resources.
-# AUTHOR = SystemGuard Team
-# YEAR = 2023
-# CONTACT_EMAIL = ""
-# PRE_RELEASE = False
-
-
 # Application Metadata
 APP_NAME = configuration_settings["app.meta"].get('NAME', fallback='SystemGuard')
 DESCRIPTION = configuration_settings.get('app.meta', 'DESCRIPTION', fallback='A web application to monitor and manage system resources.')

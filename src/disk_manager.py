@@ -91,8 +91,7 @@ class DiskMetrics:
         finally:
             self.stop()
             
-    def _calculate_io_stats(self, initial: psutil._common.sdiskio, 
-                          final: psutil._common.sdiskio) -> IOStats:
+    def _calculate_io_stats(self, initial, final) -> IOStats:
         """Calculate I/O statistics between two measurements."""
         read_diff = final.read_bytes - initial.read_bytes
         write_diff = final.write_bytes - initial.write_bytes
@@ -149,39 +148,39 @@ class DiskMetrics:
     @property
     def disk_percent(self) -> float:
         """Disk usage percentage."""
-        return self._metrics.get('disk_percent', 0.0)
+        return float(self._metrics.get('disk_percent', 0.0))
         
     @property
     def disk_total_gb(self) -> float:
         """Total disk space in GB."""
-        return self._metrics.get('disk_total_gb', 0.0)
+        return float(self._metrics.get('disk_total_gb', 0.0))
         
     @property
     def disk_used_gb(self) -> float:
         """Used disk space in GB."""
-        return self._metrics.get('disk_used_gb', 0.0)
+        return float(self._metrics.get('disk_used_gb', 0.0))
         
     @property
     def disk_free_gb(self) -> float:
         """Free disk space in GB."""
-        return self._metrics.get('disk_free_gb', 0.0)
+        return float(self._metrics.get('disk_free_gb', 0.0))
         
     @property
     def disk_read_total(self) -> str:
         """Total bytes read, formatted."""
-        return self._metrics.get('disk_read_total', '0 B/s')
+        return str(self._metrics.get('disk_read_total', '0 B/s'))
         
     @property
     def disk_write_total(self) -> str:
         """Total bytes written, formatted."""
-        return self._metrics.get('disk_write_total', '0 B/s')
+        return str(self._metrics.get('disk_write_total', '0 B/s'))
         
     @property
     def disk_read_speed(self) -> str:
         """Current read speed, formatted."""
-        return self._metrics.get('disk_read_speed', '0 B/s')
+        return str(self._metrics.get('disk_read_speed', '0 B/s'))
         
     @property
     def disk_write_speed(self) -> str:
         """Current write speed, formatted."""
-        return self._metrics.get('disk_write_speed', '0 B/s')
+        return str(self._metrics.get('disk_write_speed', '0 B/s'))

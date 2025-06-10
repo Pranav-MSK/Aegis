@@ -6,7 +6,6 @@ import datetime
 import subprocess
 import psutil
 import requests
-import configparser
 import GPUtil
 import functools
 from jinja2 import Environment, FileSystemLoader
@@ -268,7 +267,7 @@ def get_top_processes(number=5, combined=False):
                 (
                     name,
                     info["cpu_percent"],
-                    round(info["memory_percent"], 2),
+                    round(info["memory_percent"], 2) if info["memory_percent"] is not None else 0,
                     info["pid"],
                 )
                 for name, info in combined_processes.items()
