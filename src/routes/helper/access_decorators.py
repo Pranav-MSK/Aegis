@@ -1,7 +1,9 @@
 # cython: language_level=3
 from functools import wraps
-from typing import Optional
 from flask import abort, current_app
+
+from src.activator import get_plan_details
+
 
 class PlanAuthorizationError(Exception):
     """Custom exception for plan authorization failures."""
@@ -25,9 +27,9 @@ class PlanAuthorization:
         Falls back to Free Edition if plan details cannot be retrieved.
         """
         try:
-            from src.activator import get_plan_details
+            
             plan_details = get_plan_details()
-            return plan_details.get("plan_type") if plan_details else "Free Edition"
+            return str(plan_details.get("plan_type")) if plan_details and plan_details.get("plan_type") else "Free Edition"
         except Exception as e:
             current_app.logger.error(f"Failed to get plan details: {str(e)}")
             return "Free Edition"
