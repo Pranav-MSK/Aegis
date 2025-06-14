@@ -1,5 +1,5 @@
 import os
-from src.routes.helper.notification.observers.base_observer import AlertObserver
+from src.services.notification.observers.base_observer import AlertObserver
 
 from src.alert_manager import (
     send_smtp_email

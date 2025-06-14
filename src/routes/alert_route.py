@@ -16,8 +16,8 @@ from src.config.app_config import app, csrf, db, get_app_info
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
 
-from src.routes.helper.alert.alertmanager_adapter import send_test_alert
-from src.routes.helper.alert.processor import AlertProcessor
+from src.services.alert.alertmanager_adapter import send_test_alert
+from src.services.alert.processor import AlertProcessor
 from src.helper.utils import get_ip_address
 from src.models import (
     AlertTicket,
@@ -33,10 +33,10 @@ from src.routes.helper.access_decorators import (
     community_edition,
 )
 from src.routes.helper.decorators import user_has_access_to_alert, user_id_to_username
-from src.routes.helper.notification.manager import generate_system_notification
+from src.services.notification.manager import generate_system_notification
 from src.schemas.discussion_board import UserNotification   
 from src.routes.helper.common_helper import award_points
-from src.routes.helper.notification.manager import fetch_user_notifications
+from src.services.notification.manager import fetch_user_notifications
 
 alert_bp = Blueprint("alert", __name__)
 

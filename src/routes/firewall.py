@@ -6,8 +6,8 @@ from src.config.app_config import app
 from src.routes.helper.access_decorators import systemguard_enterprise
 from src.routes.helper.common_helper import handle_sudo_password, admin_required
 from src.helper.logger import get_logger
-from src.routes.helper.firewall.firewall_service import FirewallService
-from src.routes.helper.firewall.security_scan_service import SecurityScanService
+from src.services.firewall.firewall_service import FirewallService
+from src.services.firewall.security_scan_service import SecurityScanService
 
 logger = get_logger(__name__)
 firewall_bp = Blueprint('firewall', __name__)

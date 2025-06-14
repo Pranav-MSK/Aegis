@@ -7,7 +7,7 @@ logger = get_logger(__name__)
 from src.models import (
     NotificationSettings)
 
-from src.routes.helper.notification.observers import (
+from src.services.notification.observers import (
     EmailAlertObserver,
     SlackAlertObserver,
     DiscordAlertObserver,
@@ -15,7 +15,7 @@ from src.routes.helper.notification.observers import (
     GoogleChatAlertObserver
 )
 
-from src.routes.helper.notification.manager import generate_system_notification
+from src.services.notification.manager import generate_system_notification
 from src.schemas.discussion_board import UserNotification   
 
 from abc import ABC, abstractmethod

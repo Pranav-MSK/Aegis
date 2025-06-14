@@ -3,14 +3,14 @@ from datetime import datetime
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
 
-from src.routes.helper.notification.notification_helper import AlertNotifier
+from src.services.notification.notification_helper import AlertNotifier
 from src.schemas.alerts import AlertMessage
 
 from src.models import (
     AlertLog,
 
 )
-from src.routes.helper.alert.ticket_assigner import create_alert_ticket
+from src.services.alert.ticket_assigner import create_alert_ticket
 
 
 class AlertProcessor(AlertNotifier):

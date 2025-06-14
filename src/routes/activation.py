@@ -12,7 +12,7 @@ from src.helper.helper import load_secret_key
 from src.routes.helper.activation_helper import generate_license_pdf
 from src.core.activator import get_plan_details
 
-from src.routes.helper.notification.manager import generate_system_notification
+from src.services.notification.manager import generate_system_notification
 from src.schemas.discussion_board import UserNotification   
 
 

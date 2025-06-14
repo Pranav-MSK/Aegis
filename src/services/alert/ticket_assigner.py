@@ -5,7 +5,7 @@ from src.models import (
     AlertTicket,
     UserProfile,
 )
-from src.routes.helper.alert.quota_guard import can_create_alert
+from src.services.alert.quota_guard import can_create_alert
 from src.schemas.alerts import AlertMessage
 
 

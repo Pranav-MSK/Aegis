@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 
 from src.config.app_config import app
 from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
-from src.routes.helper.notification.manager import generate_system_notification
+from src.services.notification.manager import generate_system_notification
 from src.schemas.discussion_board import UserNotification
 from src.routes.helper.access_decorators import systemguard_enterprise
 

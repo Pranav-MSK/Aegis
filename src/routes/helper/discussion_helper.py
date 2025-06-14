@@ -4,7 +4,7 @@ from sqlalchemy import desc
 
 from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
 from src.schemas.discussion_board import UserNotification
-from src.routes.helper.notification.manager import generate_system_notification
+from src.services.notification.manager import generate_system_notification
 
 class NotificationService:
     def notify_post_action(self, user, title, message, icon="info-circle", is_global=False, user_id=None):

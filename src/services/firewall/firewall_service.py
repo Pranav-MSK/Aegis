@@ -1,5 +1,5 @@
 from flask import request, session, flash
-from src.routes.helper.firewall.firewall_helper import PortManager
+from src.services.firewall.firewall_helper import PortManager
 from src.helper.logger import get_logger
 
 logger = get_logger(__name__)
