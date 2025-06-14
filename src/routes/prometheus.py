@@ -20,8 +20,8 @@ from flask_login import login_required
 
 from src.config.app_config import app, get_app_info
 from src.models import UserProfile
-from helper.utils import ROOT_DIR
-from helper.logger import get_logger
+from src.helper.os_info import ROOT_DIR
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
@@ -42,12 +42,6 @@ from src.config.config_loader import configuration_settings
 
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint("prometheus", __name__)
-
-# [monitoring.prometheus]
-# BASE_URL = http://localhost:9090
-# QUERY_API = http://localhost:9090/api/v1/query
-# TARGETS_API = http://localhost:9090/api/v1/targets
-
 
 PROMETHEUS_BASE_URL = configuration_settings.get(
     "monitoring.prometheus", "BASE_URL"
