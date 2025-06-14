@@ -2,7 +2,8 @@
 import configparser
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+print("ROOT_DIR:", ROOT_DIR)
 
 def load_config(file_path: Path) -> configparser.ConfigParser:
     """Load configuration from config.ini file."""
@@ -11,5 +12,5 @@ def load_config(file_path: Path) -> configparser.ConfigParser:
     
     return config
 
-config_file = ROOT_DIR / 'src' / 'config.ini'
+config_file = ROOT_DIR / 'src' / 'config' / 'config.ini'
 configuration_settings = load_config(config_file)

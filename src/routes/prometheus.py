@@ -18,10 +18,10 @@ from werkzeug.security import check_password_hash
 from functools import lru_cache
 from flask_login import login_required
 
-from src.config import app, get_app_info
+from src.config.app_config import app, get_app_info
 from src.models import UserProfile
-from src.utils import ROOT_DIR
-from src.logger import get_logger
+from src.helper.utils import ROOT_DIR
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
@@ -38,7 +38,7 @@ from src.routes.helper.prometheus_helper import (
     calculate_total_rules,
 )
 from src.routes.helper.access_decorators import systemguard_enterprise
-from src.config_loader import configuration_settings
+from src.config.config_loader import configuration_settings
 
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint("prometheus", __name__)

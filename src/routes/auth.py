@@ -6,15 +6,15 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash
 
 from src.alert_manager import send_smtp_email
-from src.config import app, db
+from src.config.app_config import app, db
 from src.models import (
     UserProfile,
     UserDashboardSettings,
 )
-from src.utils import render_template_from_file, ROOT_DIR
+from src.helper.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper.common_helper import get_email_addresses
-from src.config import get_app_info
-from src.logger import get_logger
+from src.config.app_config import get_app_info
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 
 auth_bp = blueprints.Blueprint("auth", __name__)

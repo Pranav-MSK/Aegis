@@ -10,7 +10,7 @@ import time
 from typing import Dict, Union
 from dataclasses import dataclass
 from contextlib import contextmanager
-from src.config_loader import configuration_settings
+from src.config.config_loader import configuration_settings
 
 # Constants
 BYTES_PER_GB = configuration_settings.getint('metrics.settings', 'BYTES_PER_GB')

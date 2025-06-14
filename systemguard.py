@@ -1,7 +1,7 @@
-from src.config import app
+from src.config.app_config import app
 from src import routes
 from src.background_task import start_background_tasks
-from src.config_loader import configuration_settings
+from src.config.config_loader import configuration_settings
 # Start the background tasks
 start_background_tasks()
 

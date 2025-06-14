@@ -12,13 +12,13 @@ from flask import (
 )
 from flask_login import current_user, login_required
 
-from src.config import app, csrf, db, get_app_info
-from src.logger import get_logger
+from src.config.app_config import app, csrf, db, get_app_info
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 
 from src.routes.helper.alert.alertmanager_adapter import send_test_alert
 from src.routes.helper.alert.processor import AlertProcessor
-from src.utils import get_ip_address
+from src.helper.utils import get_ip_address
 from src.models import (
     AlertTicket,
     UserProfile,

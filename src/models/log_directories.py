@@ -1,6 +1,6 @@
 # cython: language_level=3
 from src.models.base_model import BaseModel
-from src.config import db
+from src.config.app_config import db
 
 
 class LogDirectory(BaseModel):

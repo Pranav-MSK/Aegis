@@ -5,14 +5,14 @@ import aiohttp
 from datetime import datetime, timezone
 from flask import jsonify, blueprints, request, render_template
 from flask_login import login_required, current_user
-from src.config import app, db, csrf
+from src.config.app_config import app, db, csrf
 from src.models import (
     UserDashboardSettings,
     AlertTicket,
     ChartConfiguration,
     UserProfile,
 )
-from src.utils import (
+from src.helper.utils import (
     _collect_metrics,
     get_os_release_info,
     get_os_info,
@@ -25,10 +25,10 @@ from src.routes.helper.prometheus_helper import (
     load_alert_rules,
     save_alert_rules,
 )
-from src.config import disk_metrics, network_metrics
+from src.config.app_config import disk_metrics, network_metrics
 from src.routes.helper.health_helper import check_database
-from src.config_loader import configuration_settings
-from src.logger import get_logger
+from src.config.config_loader import configuration_settings
+from src.helper.logger import get_logger
 
 # Initialize logger
 logger = get_logger(__name__)

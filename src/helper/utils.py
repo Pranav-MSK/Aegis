@@ -13,10 +13,10 @@ from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from functools import lru_cache
 
-from src.logger import get_logger
+from src.helper.logger import get_logger
 from src.models import GeneralSettings
-from src.helper import get_basic_system_information, get_ip_address
-from src.config_loader import configuration_settings
+from src.helper.helper import get_basic_system_information, get_ip_address
+from src.config.config_loader import configuration_settings
 
 logger = get_logger(__name__)
 

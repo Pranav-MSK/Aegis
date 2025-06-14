@@ -2,7 +2,7 @@
 import json
 import requests
 from datetime import datetime
-from src.logger import get_logger
+from src.helper.logger import get_logger
 
 logger = get_logger(__name__)
 

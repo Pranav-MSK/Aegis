@@ -3,11 +3,11 @@ import os
 import datetime
 from flask import render_template, Blueprint
 from flask_login import current_user
-from src.config import app
+from src.config.app_config import app
 from src.models import UserDashboardSettings, NetworkSpeedTestResult
-from src.utils import run_speedtest, render_template_from_file, ROOT_DIR
+from src.helper.utils import run_speedtest, render_template_from_file, ROOT_DIR
 from src.alert_manager import send_smtp_email
-from src.config import get_app_info
+from src.config.app_config import get_app_info
 from src.routes.helper.common_helper import admin_required
 
 speedtest_bp = Blueprint("speedtest", __name__)

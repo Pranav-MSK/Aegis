@@ -6,7 +6,7 @@ from src.alert_manager import (
 )
 
 from src.routes.helper.common_helper import get_email_addresses
-from src.utils import render_template_from_file, ROOT_DIR
+from src.helper.utils import render_template_from_file, ROOT_DIR
 
 class EmailAlertObserver(AlertObserver):
 

@@ -5,13 +5,13 @@ from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import current_user
 from werkzeug.security import generate_password_hash
 
-from src.config import app, db, get_app_info, csrf
+from src.config.app_config import app, db, get_app_info, csrf
 from src.models import UserProfile, UserDashboardSettings, ActivityTable
-from src.utils import render_template_from_file, ROOT_DIR
+from src.helper.utils import render_template_from_file, ROOT_DIR
 from src.alert_manager import send_smtp_email
 from src.routes.helper.common_helper import get_email_addresses
-from src.config import get_app_info
-from src.logger import get_logger
+from src.config.app_config import get_app_info
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.routes.helper.common_helper import admin_required
 

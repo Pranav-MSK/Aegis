@@ -6,11 +6,10 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from flask import redirect, url_for, flash
-from src.config import app
-from src.logger import get_logger
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.models import GeneralSettings, SMTPSettings
-from src.config import get_app_info
+from src.config.app_config import get_app_info, app
 
 system_name = os.uname().sysname
 

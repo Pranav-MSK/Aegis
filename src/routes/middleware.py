@@ -9,10 +9,10 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from prometheus_client import Counter
 
-from src.config import app
-from src.logger import get_logger
+from src.config.app_config import app
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
-from src.activator import get_plan_details
+from src.core.activator import get_plan_details
 from src.background_task.prometheus_metrics import metrics
 
 middleware_bp = blueprints.Blueprint("middleware", __name__)

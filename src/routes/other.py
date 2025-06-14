@@ -3,13 +3,13 @@ from flask import render_template, request, flash, blueprints, redirect, url_for
 from flask_login import login_required
 
 from src.models import GeneralSettings
-from src.config import app
+from src.config.app_config import app
 from src.routes.helper.common_helper import get_email_addresses
 from src.alert_manager import send_smtp_email
-from src.utils import get_os_release_info, get_os_info
-from src.helper import check_installation_information
+from src.helper.utils import get_os_release_info, get_os_info
+from src.helper.helper import check_installation_information
 from src.routes.helper.common_helper import admin_required
-from src.activator import generate_unique_id
+from src.core.activator import generate_unique_id
 
 other_bp = blueprints.Blueprint('other', __name__)
 

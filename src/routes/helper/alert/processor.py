@@ -1,10 +1,10 @@
 # cython: language_level=3
 from datetime import datetime
-from src.logger import get_logger
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 
 from src.routes.helper.notification.notification_helper import AlertNotifier
-from schemas.alerts import AlertMessage
+from src.schemas.alerts import AlertMessage
 
 from src.models import (
     AlertLog,

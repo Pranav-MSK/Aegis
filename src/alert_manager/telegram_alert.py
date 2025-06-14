@@ -1,6 +1,6 @@
 # cython: language_level=3
 import requests
-from src.logger import get_logger
+from src.helper.logger import get_logger
 
 logger = get_logger(__name__)
 

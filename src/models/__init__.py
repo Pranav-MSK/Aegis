@@ -16,8 +16,8 @@ from src.models.instance_metadata import InstanceMetadata
 from src.models.user_post_model import UserArticle, UserPostComment, UserPostLike, UserSavedPost, UserPostReport
 from src.models.log_directories import LogDirectory
 
-from src.config import db, app
-from src.logger import get_logger
+from src.config.app_config import db, app
+from src.helper.logger import get_logger
 
 logger = get_logger(__name__)
 

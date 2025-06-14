@@ -4,10 +4,10 @@ from threading import Timer, Lock
 from sqlalchemy.exc import SQLAlchemyError
 from contextlib import contextmanager
 
-from src.logger import get_logger
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
-from src.config import app, db
-from src.utils import _collect_metrics
+from src.config.app_config import app, db
+from src.helper.utils import _collect_metrics
 from src.models import GeneralSettings
 from src.background_task.prometheus_metrics import metrics
 

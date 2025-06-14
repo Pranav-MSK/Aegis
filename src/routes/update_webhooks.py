@@ -1,6 +1,6 @@
 # cython: language_level=3
 from flask import render_template, request, redirect, url_for, flash, blueprints
-from src.config import app
+from src.config.app_config import app
 from src.models import NotificationSettings, GeneralSettings
 from src.routes.helper.common_helper import admin_required
 

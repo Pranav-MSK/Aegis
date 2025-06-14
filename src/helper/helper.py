@@ -3,10 +3,9 @@ import os
 import ctypes
 import subprocess
 from functools import lru_cache
+from pathlib import Path
 
-
-CURR_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(CURR_DIR)
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
 def load_library(filename):
     try:

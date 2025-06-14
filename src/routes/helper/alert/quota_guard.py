@@ -1,12 +1,12 @@
 # cython: language_level=3
 from datetime import datetime
 
-from src.logger import get_logger
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.models import (
     AlertTicket,
 )
-from src.config import get_app_info
+from src.config.app_config import get_app_info
 
 def can_create_alert():
     try:

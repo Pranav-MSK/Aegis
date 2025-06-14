@@ -4,7 +4,7 @@ import re
 from flask import render_template, request
 import subprocess
 
-from src.helper import get_ip_address
+from src.helper.helper import get_ip_address
 
 def scan_network(subnet):
     try:

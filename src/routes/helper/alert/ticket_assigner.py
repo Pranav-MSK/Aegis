@@ -1,12 +1,12 @@
 # cython: language_level=3
-from src.logger import get_logger
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.models import (
     AlertTicket,
     UserProfile,
 )
 from src.routes.helper.alert.quota_guard import can_create_alert
-from schemas.alerts import AlertMessage
+from src.schemas.alerts import AlertMessage
 
 
 def create_alert_ticket(alert_instance: AlertMessage):

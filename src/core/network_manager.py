@@ -10,7 +10,7 @@ import time
 from typing import Dict, Union, NamedTuple
 from dataclasses import dataclass
 from contextlib import contextmanager
-from src.config_loader import configuration_settings
+from src.config.config_loader import configuration_settings
 
 # Constants
 BYTES_PER_MB_BINARY = 1024 ** 2  # Binary megabyte (MiB)
@@ -105,8 +105,7 @@ class NetworkMetrics:
         finally:
             self.stop()
             
-    def _calculate_network_stats(self, initial: psutil._common.snetio, 
-                               final: psutil._common.snetio) -> NetworkStats:
+    def _calculate_network_stats(self, initial, final) -> NetworkStats:
         """Calculate network statistics between two measurements."""
         upload_speed = (final.bytes_sent - initial.bytes_sent) / self.update_interval
         download_speed = (final.bytes_recv - initial.bytes_recv) / self.update_interval

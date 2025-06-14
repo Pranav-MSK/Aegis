@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import render_template, request, redirect, url_for, Blueprint
 from flask_login import login_required, current_user
 
-from src.config import app
+from src.config.app_config import app
 from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
 from src.routes.helper.notification.manager import generate_system_notification
 from src.schemas.discussion_board import UserNotification

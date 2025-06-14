@@ -11,9 +11,9 @@ from flask import (
     jsonify
 )
 from flask_login import current_user, login_required
-from src.config import app, csrf
-from src.utils import get_top_processes
-from src.logger import get_logger
+from src.config.app_config import app, csrf
+from src.helper.utils import get_top_processes
+from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.routes.helper.common_helper import (
     admin_required,

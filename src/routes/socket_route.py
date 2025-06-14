@@ -4,7 +4,7 @@
 # from functools import wraps
 # from flask_socketio import SocketIO, emit
 
-# from src.config import socketio
+# from src.config.app_config import socketio
 # from src.utils import _collect_metrics
 
 # thread = None

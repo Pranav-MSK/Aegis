@@ -4,10 +4,10 @@ from flask import render_template, Blueprint, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func, case
 
-from src.config import app, csrf, get_app_info
+from src.config.app_config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration, InstanceMetadata
-from src.utils import fetch_system_metrics
-from src.activator import get_plan_details
+from src.helper.utils import fetch_system_metrics
+from src.core.activator import get_plan_details
 from src.routes.helper.prometheus_helper import (
     count_of_targets, 
     calculate_total_rules, 

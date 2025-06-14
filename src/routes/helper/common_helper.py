@@ -6,7 +6,7 @@ from flask_login import current_user
 from flask import flash, redirect, url_for, request, session
 
 from src.models import UserProfile, UserActivity, ActivityTable
-from src.config import app
+from src.config.app_config import app
 
 
 def get_email_addresses(user_level=None, receive_email_alerts=True, fetch_all_users=False):

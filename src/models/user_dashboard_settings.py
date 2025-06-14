@@ -1,6 +1,6 @@
 # cython: language_level=3
 
-from src.config import db
+from src.config.app_config import db
 from src.models.base_model import BaseModel
 
 

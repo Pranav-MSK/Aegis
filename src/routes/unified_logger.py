@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import jsonify, render_template, request, Blueprint
 from flask_login import login_required
 
-from src.config import app, csrf
+from src.config.app_config import app, csrf
 from src.models import LogDirectory
 from src.routes.helper.access_decorators import systemguard_enterprise
 

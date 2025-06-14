@@ -12,7 +12,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from src.routes.helper.notification.manager import generate_system_notification
 from src.schemas.discussion_board import UserNotification   
 from src.routes.helper.common_helper import log_activity
-from src.config import app
+from src.config.app_config import app
 
 profile_bp = blueprints.Blueprint('profile', __name__)
 
