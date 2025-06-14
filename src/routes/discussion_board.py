@@ -1,16 +1,13 @@
 # cython: language_level=3
-from datetime import datetime
 from flask import render_template, request, redirect, url_for, Blueprint
 from flask_login import login_required, current_user
 
 from src.config.app_config import app
 from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
-from src.services.notification.manager import generate_system_notification
-from src.schemas.discussion_board import UserNotification
 from src.services.access_decorators import systemguard_enterprise
 
-from src.routes.helper.discussion_helper import DiscussionService
-from src.routes.helper.discussion_helper import NotificationService
+from services.discussion_service import DiscussionService
+from services.discussion_service import NotificationService
 
 discussion_board_bp = Blueprint('user_post', __name__)
 discussion_service = DiscussionService()
