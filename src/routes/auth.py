@@ -5,7 +5,7 @@ from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import LoginManager, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash
 
-from src.alert_manager import send_smtp_email
+from services.messaging.email_service import send_smtp_email
 from src.config.app_config import app, db
 from src.models import (
     UserProfile,

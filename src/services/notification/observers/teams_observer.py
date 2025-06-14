@@ -1,8 +1,6 @@
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.alert_manager import (
-    send_teams_alert
-)
+from src.services.messaging.team_service import dispatch_teams_alert
 
 class TeamsAlertObserver(AlertObserver):
 
@@ -11,4 +9,4 @@ class TeamsAlertObserver(AlertObserver):
 
     def notify(self, alert_instance):
         if self.teams_webhook_url:
-            send_teams_alert(self.teams_webhook_url, alert_instance)
+            dispatch_teams_alert(self.teams_webhook_url, alert_instance)

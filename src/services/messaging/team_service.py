@@ -6,7 +6,7 @@ from src.helper.logger import get_logger
 logger = get_logger(__name__)
 
 
-def send_teams_alert(webhook_url, alert_instance):
+def dispatch_teams_alert(webhook_url, alert_instance):
     """
     Sends a Prometheus alert to a Microsoft Teams channel using a webhook.
 

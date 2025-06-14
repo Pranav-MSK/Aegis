@@ -1,8 +1,6 @@
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.alert_manager import (
-    send_google_chat_alert
-)
+from src.services.messaging.google_chat_service import dispatch_google_chat_notification
 
 class GoogleChatAlertObserver(AlertObserver):
 
@@ -11,4 +9,4 @@ class GoogleChatAlertObserver(AlertObserver):
 
     def notify(self, alert_instance):
         if self.google_chat_webhook_url:
-            send_google_chat_alert(self.google_chat_webhook_url, alert_instance)
+            dispatch_google_chat_notification(self.google_chat_webhook_url, alert_instance)

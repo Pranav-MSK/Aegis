@@ -1,6 +1,7 @@
+from services import notification
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.alert_manager import send_discord_alert
+from src.services.messaging.discord_service import dispatch_alert_to_discord
 
 class DiscordAlertObserver(AlertObserver):
 
@@ -9,4 +10,4 @@ class DiscordAlertObserver(AlertObserver):
 
     def notify(self, alert_instance):
         if self.discord_webhook:
-            send_discord_alert(self.discord_webhook, alert_instance)
+            dispatch_alert_to_discord(self.discord_webhook, alert_instance)

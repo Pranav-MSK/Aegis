@@ -5,7 +5,7 @@ from src.helper.logger import get_logger
 
 logger = get_logger(__name__)
 
-def send_discord_alert(webhook_url, alert_instance):
+def dispatch_alert_to_discord(webhook_url, alert_instance):
     """
     Sends an alert to a Discord channel via a webhook.
 

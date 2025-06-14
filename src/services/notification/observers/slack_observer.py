@@ -1,6 +1,6 @@
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.alert_manager import send_slack_alert
+from src.services.messaging.slack_service import dispatch_slack_alert
 
 class SlackAlertObserver(AlertObserver):
 
@@ -9,5 +9,5 @@ class SlackAlertObserver(AlertObserver):
 
     def notify(self, alert_instance):
         if self.slack_webhook:
-            send_slack_alert(self.slack_webhook, alert_instance)
+            dispatch_slack_alert(self.slack_webhook, alert_instance)
 

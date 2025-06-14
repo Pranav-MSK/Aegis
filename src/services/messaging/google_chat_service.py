@@ -5,7 +5,7 @@ from src.helper.logger import get_logger
 
 logger = get_logger(__name__)
 
-def send_google_chat_alert(webhook_url, alert_instance):
+def dispatch_google_chat_notification(webhook_url, alert_instance):
     """
     Sends an alert message to a Google Chat room using a webhook.
 

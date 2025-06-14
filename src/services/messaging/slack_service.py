@@ -6,7 +6,7 @@ from src.helper.logger import get_logger
 
 logger = get_logger(__name__)
 
-def send_slack_alert(webhook_url, alert_instance):
+def dispatch_slack_alert(webhook_url, alert_instance):
     """
     Sends a formatted notification message to a Slack channel via webhook.
     
