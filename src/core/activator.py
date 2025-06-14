@@ -1,6 +1,7 @@
 # cython: language_level=3
 import os
 import re
+import requests
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
 from cryptography.fernet import Fernet
@@ -99,9 +100,19 @@ class LicenseManager:
         except Exception as e:
             raise ValueError(f"Failed to parse license: {e}")
 
+    @staticmethod
+    def get_google_server_time():
+        try:
+            response = requests.head("https://www.google.com", timeout=5)
+            date_str = response.headers['Date']  # e.g., 'Fri, 14 Jun 2025 16:43:12 GMT'
+            return datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S GMT')
+        except Exception as e:
+            print(f"Error fetching Google server time: {e}")
+            return None
+        
     def apply_license_plan(self, info: LicenseInfo, parts: list):
         exp_date = datetime.strptime(parts[1], '%Y-%m-%d')
-        today = datetime.now()
+        today = self.get_google_server_time() or datetime.utcnow()
 
         info.plan_type = parts[0]
         info.is_trial = parts[2] == "True"

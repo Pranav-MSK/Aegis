@@ -8,7 +8,7 @@ from src.config.app_config import app, csrf
 from src.models import UserDashboardSettings, GeneralSettings
 from flask_login import login_required, current_user
 from src.helper.template_utils import render_template_from_file, ROOT_DIR
-from services.messaging.email_service import send_smtp_email
+from src.services.messaging.email_service import send_smtp_email
 from src.routes.helper.common_helper import (
     get_email_addresses, 
     admin_required, 

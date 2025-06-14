@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash
 
 from src.models import UserProfile, UserDashboardSettings, ActivityTable
 from src.helper.template_utils import render_template_from_file, ROOT_DIR
-from services.messaging.email_service import send_smtp_email
+from src.services.messaging.email_service import send_smtp_email
 from src.config.app_config import get_app_info, db
 from src.routes.helper.common_helper import get_email_addresses
 from src.helper.logger import get_logger
