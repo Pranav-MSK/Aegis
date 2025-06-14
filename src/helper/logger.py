@@ -3,9 +3,7 @@ import logging
 import os
 from pathlib import Path
 
-# /hom/<user>/logs/
 HOME_LOGS_DIR = Path.home() / "logs"
-# Ensure the logs directory exists
 HOME_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
 def get_logger(name: str = __name__):

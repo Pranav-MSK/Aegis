@@ -15,7 +15,7 @@ from functools import lru_cache
 
 from src.helper.logger import get_logger
 from src.models import GeneralSettings
-from src.helper.helper import get_basic_system_information, get_ip_address
+from src.helper.basic_info import get_basic_system_information, get_ip_address
 from src.config.config_loader import configuration_settings
 
 logger = get_logger(__name__)

@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 from src.services.alert.alertmanager_adapter import send_test_alert
 from src.services.alert.processor import AlertProcessor
-from src.helper.helper import get_ip_address
+from src.helper.basic_info import get_ip_address
 from src.models import (
     AlertTicket,
     UserProfile,

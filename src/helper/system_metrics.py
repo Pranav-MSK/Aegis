@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 
 from src.helper.logger import get_logger
-from src.helper.helper import get_basic_system_information, get_ip_address
+from src.helper.basic_info import get_basic_system_information, get_ip_address
 from src.config.config_loader import configuration_settings
 from src.helper.cache_utils import get_cached_value
 from src.helper.os_info import get_os_info, get_os_release_info, get_linux_processor_name

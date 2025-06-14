@@ -8,7 +8,6 @@ from src.core.activator import (
     generate_unique_id, 
     LicenseManager
 )
-from src.helper.helper import load_secret_key
 from src.routes.helper.activation_helper import generate_license_pdf
 from src.core.activator import get_plan_details
 

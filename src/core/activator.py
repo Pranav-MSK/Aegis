@@ -4,7 +4,7 @@ import re
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
 from cryptography.fernet import Fernet
-from src.helper.helper import load_secret_key
+from src.helper.secrets import load_secret_key
 
 # --- Constants ---
 SUM_CHECK_DIGITS = 2
