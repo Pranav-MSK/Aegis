@@ -16,15 +16,24 @@ from src.models import (
     Notification,
     SystemNotification,
 )
+from src.schemas.discussion_board import UserNotification   
 
-def generate_system_notification(notification_data, user_id=None):
+def generate_system_notification(user_notification_info: UserNotification, user_id=None):
+    # new_notification = Notification(
+    #     type=notification_data.get("type", "info"),
+    #     icon=notification_data.get("icon", "info-circle"),
+    #     title=notification_data["title"],
+    #     message=notification_data["message"],
+    #     is_global=notification_data.get("is_global", False),
+    # )
     new_notification = Notification(
-        type=notification_data.get("type", "info"),
-        icon=notification_data.get("icon", "info-circle"),
-        title=notification_data["title"],
-        message=notification_data["message"],
-        is_global=notification_data.get("is_global", False),
+        type=user_notification_info.type,
+        icon=user_notification_info.icon,
+        title=user_notification_info.title,
+        message=user_notification_info.message,
+        is_global=user_notification_info.is_global,
     )
+
     new_notification.save()
 
     if new_notification.is_global:

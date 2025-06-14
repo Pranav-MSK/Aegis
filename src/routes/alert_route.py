@@ -34,6 +34,7 @@ from src.routes.helper.access_decorators import (
 )
 from src.routes.helper.decorators import user_has_access_to_alert, user_id_to_username
 from src.routes.helper.notification.manager import generate_system_notification
+from src.schemas.discussion_board import UserNotification   
 from src.routes.helper.common_helper import award_points
 from src.routes.helper.notification.manager import fetch_user_notifications
 
@@ -324,13 +325,20 @@ def alert_ticket(alert_id):
                     log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
                     flash("User assigned successfully!", "success")
 
-                    notification_data = {
-                        "type": "info",
-                        "icon": "info-circle",  # Font Awesome icon
-                        "title": "Alert Ticket Assignment",
-                        "message": f"Alert ticket assigned to you by {current_user.first_name} {current_user.last_name}",
-                        "is_global": False,
-                    }
+                    # notification_data = {
+                    #     "type": "info",
+                    #     "icon": "info-circle",  # Font Awesome icon
+                    #     "title": "Alert Ticket Assignment",
+                    #     "message": f"Alert ticket assigned to you by {current_user.first_name} {current_user.last_name}",
+                    #     "is_global": False,
+                    # }
+                    notification_data = UserNotification(
+                        type="info",
+                        icon="info-circle",
+                        title="Alert Ticket Assignment",
+                        message=f"Alert ticket assigned to you by {current_user.first_name} {current_user.last_name}",
+                        is_global=False,
+                    )
                     generate_system_notification(notification_data, assigned_user_id)
                     award_points("ticket", user_id=assigned_user_id)
                 else:

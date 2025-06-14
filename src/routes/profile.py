@@ -8,9 +8,10 @@ from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import login_required, current_user
 from src.models import AlertTicket, UserProfile, UserActivity
 from werkzeug.security import generate_password_hash, check_password_hash
-from src.routes.helper.notification.manager import generate_system_notification
-from src.routes.helper.common_helper import log_activity
 
+from src.routes.helper.notification.manager import generate_system_notification
+from src.schemas.discussion_board import UserNotification   
+from src.routes.helper.common_helper import log_activity
 from src.config import app
 
 profile_bp = blueprints.Blueprint('profile', __name__)
@@ -88,13 +89,20 @@ def change_password():
         current_user.password_last_changed = datetime.utcnow()
         current_user.save()
 
-        notification_data = {
-            "type": "info",
-            "icon": "info-circle",
-            "title": "Password Changed",
-            "message": f"Your password was changed successfully.",
-            "is_global": False
-        }
+        # notification_data = {
+        #     "type": "info",
+        #     "icon": "info-circle",
+        #     "title": "Password Changed",
+        #     "message": f"Your password was changed successfully.",
+        #     "is_global": False
+        # }
+        notification_data = UserNotification(
+            type="info",
+            icon="info-circle",
+            title="Password Changed",
+            message="Your password was changed successfully.",
+            is_global=False
+        )
         generate_system_notification(notification_data)
 
         log_activity('edit', 'Password changed')
@@ -134,13 +142,20 @@ def edit_profile():
 
         user.save()
 
-        notification_data = {
-            "type": "info",
-            "icon": "info-circle",
-            "title": "Profile Updated",
-            "message": f"Your profile was updated successfully.",
-            "is_global": False
-        }
+        # notification_data = {
+        #     "type": "info",
+        #     "icon": "info-circle",
+        #     "title": "Profile Updated",
+        #     "message": f"Your profile was updated successfully.",
+        #     "is_global": False
+        # }
+        notification_data = UserNotification(
+            type="info",
+            icon="info-circle",
+            title="Profile Updated",
+            message="Your profile was updated successfully.",
+            is_global=False
+        )
         generate_system_notification(notification_data)
         log_activity('edit', 'Profile updated')
 

@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from src.config import app
 from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
 from src.routes.helper.notification.manager import generate_system_notification
+from src.schemas.discussion_board import UserNotification   
 from src.routes.helper.access_decorators import systemguard_enterprise
 
 discussion_board_bp = Blueprint('user_post', __name__)
@@ -25,13 +26,21 @@ def discussion_board():
             new_post = UserArticle(user_id=current_user.id, content=content, tags=new_post_tags) # type: ignore
             new_post.save()                
 
-            notification_data = {
-                "type": "info",
-                "icon": "info-circle",
-                "title": "New Post",
-                "message": f"New post by {current_user.first_name}: {content[:15]}...",
-                "is_global": True
-            }
+            # notification_data = {
+            #     "type": "info",
+            #     "icon": "info-circle",
+            #     "title": "New Post",
+            #     "message": f"New post by {current_user.first_name}: {content[:15]}...",
+            #     "is_global": True
+            # }
+            notification_data = UserNotification(
+                type="info",
+                icon="info-circle",
+                title="New Post",
+                message=f"New post by {current_user.first_name}: {content[:15]}...",
+                is_global=True
+            )
+
             generate_system_notification(notification_data)
             return redirect(url_for('discussion_board'))
 
@@ -106,14 +115,22 @@ def like_post(post_id):
 
         #post owner id
         post_owner_id = UserArticle.query.get(post_id).user_id # type: ignore
-        notification_data = {
-            "type": "info",
-            "icon": "info-circle",
-            "title": "Post Like",
-            "message": f"Your post was liked by {current_user.first_name}",
-            "is_global": False,
-            "user_id": post_owner_id
-        }
+        # notification_data = {
+        #     "type": "info",
+        #     "icon": "info-circle",
+        #     "title": "Post Like",
+        #     "message": f"Your post was liked by {current_user.first_name}",
+        #     "is_global": False,
+        #     "user_id": post_owner_id
+        # }
+        notification_data = UserNotification(
+            type="info",
+            icon="info-circle",
+            title="Post Like",
+            message=f"Your post was liked by {current_user.first_name}",
+            is_global=False,
+            user_id=post_owner_id
+        )
         generate_system_notification(notification_data, user_id=post_owner_id)
     
     return redirect(url_for('discussion_board'))
@@ -128,14 +145,23 @@ def comment(post_id):
 
         #post owner id
         post_owner_id = UserArticle.query.get(post_id).user_id # type: ignore
-        notification_data = {
-            "type": "info",
-            "icon": "info-circle",
-            "title": "Post Comment",
-            "message": f"Your post was commented by {current_user.first_name}",
-            "is_global": False,
-            "user_id": post_owner_id
-        }
+        # notification_data = {
+        #     "type": "info",
+        #     "icon": "info-circle",
+        #     "title": "Post Comment",
+        #     "message": f"Your post was commented by {current_user.first_name}",
+        #     "is_global": False,
+        #     "user_id": post_owner_id
+        # }
+        notification_data = UserNotification(
+            type="info",
+            icon="info-circle",
+            title="Post Comment",
+            message=f"Your post was commented by {current_user.first_name}",
+            is_global=False,
+            user_id=post_owner_id
+        )
+         # Generate system notification for the post owner
         generate_system_notification(notification_data, user_id=post_owner_id)
     return redirect(url_for('discussion_board'))
 
@@ -162,13 +188,20 @@ def delete_post(post_id):
     post = UserArticle.query.get_or_404(post_id)
     if post.user_id == current_user.id:
 
-        notification_data = {
-            "type": "info",
-            "icon": "info-circle",
-            "title": "Post Deleted",
-            "message": f"You have deleted your post {post.content[:15]}...",
-            "is_global": False,
-        }
+        # notification_data = {
+        #     "type": "info",
+        #     "icon": "info-circle",
+        #     "title": "Post Deleted",
+        #     "message": f"You have deleted your post {post.content[:15]}...",
+        #     "is_global": False,
+        # }
+        notification_data = UserNotification(
+            type="info",
+            icon="info-circle",
+            title="Post Deleted",
+            message=f"You have deleted your post {post.content[:15]}...",
+            is_global=False,
+        )
         generate_system_notification(notification_data)
 
         post.is_deleted = True

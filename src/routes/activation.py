@@ -13,6 +13,8 @@ from src.routes.helper.activation_helper import generate_license_pdf
 from src.activator import get_plan_details
 
 from src.routes.helper.notification.manager import generate_system_notification
+from src.schemas.discussion_board import UserNotification   
+
 
 activation_bp = Blueprint('activation', __name__)
 internal_license_key_path = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
@@ -59,13 +61,22 @@ def activation():
                 flash('Activation successful', 'success')
                 
                 # send system notification
-                notification_data = {
-                    "type": "info",
-                    "icon": "info-circle",  # Font Awesome icon
-                    "title": "Product Activation",
-                    "message": "Product activation successful.",
-                    "is_global": True
-                }
+                # notification_data = {
+                #     "type": "info",
+                #     "icon": "info-circle",  # Font Awesome icon
+                #     "title": "Product Activation",
+                #     "message": "Product activation successful.",
+                #     "is_global": True
+                # }
+                notification_data = UserNotification(
+                    type="info",
+                    icon="info-circle",
+                    title="Product Activation",
+                    message="Product activation successful.",
+                    is_global=True
+                )
+
+
                 generate_system_notification(notification_data)
                     
                 return redirect(url_for('activation'))
