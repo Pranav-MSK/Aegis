@@ -6,7 +6,7 @@ from flask_login import login_required
 
 from src.config.app_config import app, csrf
 from src.models import LogDirectory
-from src.routes.helper.access_decorators import systemguard_enterprise
+from src.services.access_decorators import systemguard_enterprise
 
 unified_logger_bp = Blueprint("unified_logger", __name__)
 CHUNK_SIZE = 100  # Number of lines to fetch per request

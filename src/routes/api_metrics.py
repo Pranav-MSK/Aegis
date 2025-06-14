@@ -7,7 +7,7 @@ from flask_login import login_required
 
 from src.config.app_config import app
 from src.routes.helper.service_helper import get_running_docker_containers
-from src.routes.helper.access_decorators import systemguard_enterprise, community_edition
+from src.services.access_decorators import systemguard_enterprise, community_edition
 
 metrics_bp = blueprints.Blueprint('metrics', __name__)
 

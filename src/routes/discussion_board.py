@@ -7,7 +7,7 @@ from src.config.app_config import app
 from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
 from src.services.notification.manager import generate_system_notification
 from src.schemas.discussion_board import UserNotification
-from src.routes.helper.access_decorators import systemguard_enterprise
+from src.services.access_decorators import systemguard_enterprise
 
 from src.routes.helper.discussion_helper import DiscussionService
 from src.routes.helper.discussion_helper import NotificationService
