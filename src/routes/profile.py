@@ -89,13 +89,6 @@ def change_password():
         current_user.password_last_changed = datetime.utcnow()
         current_user.save()
 
-        # notification_data = {
-        #     "type": "info",
-        #     "icon": "info-circle",
-        #     "title": "Password Changed",
-        #     "message": f"Your password was changed successfully.",
-        #     "is_global": False
-        # }
         notification_data = UserNotification(
             type="info",
             icon="info-circle",
@@ -142,13 +135,6 @@ def edit_profile():
 
         user.save()
 
-        # notification_data = {
-        #     "type": "info",
-        #     "icon": "info-circle",
-        #     "title": "Profile Updated",
-        #     "message": f"Your profile was updated successfully.",
-        #     "is_global": False
-        # }
         notification_data = UserNotification(
             type="info",
             icon="info-circle",

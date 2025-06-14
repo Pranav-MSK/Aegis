@@ -46,13 +46,7 @@ class SystemNotificationObserver(AlertObserver):
     """
 
     def notify(self, alert_instance):
-        # notification_data = {
-        #     "type": alert_instance.severity,
-        #     "icon": "info-circle",
-        #     "title": alert_instance.alert_name,
-        #     "message": alert_instance.description,
-        #     "is_global": True,
-        # }
+       
         notification_data = UserNotification(
             type=alert_instance.severity,
             icon="info-circle",

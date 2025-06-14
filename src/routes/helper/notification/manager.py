@@ -19,19 +19,13 @@ from src.models import (
 from src.schemas.discussion_board import UserNotification   
 
 def generate_system_notification(user_notification_info: UserNotification, user_id=None):
-    # new_notification = Notification(
-    #     type=notification_data.get("type", "info"),
-    #     icon=notification_data.get("icon", "info-circle"),
-    #     title=notification_data["title"],
-    #     message=notification_data["message"],
-    #     is_global=notification_data.get("is_global", False),
-    # )
+ 
     new_notification = Notification(
-        type=user_notification_info.type,
-        icon=user_notification_info.icon,
-        title=user_notification_info.title,
-        message=user_notification_info.message,
-        is_global=user_notification_info.is_global,
+        type=user_notification_info.type, # type: ignore
+        icon=user_notification_info.icon, # type: ignore
+        title=user_notification_info.title, # type: ignore
+        message=user_notification_info.message, # type: ignore
+        is_global=user_notification_info.is_global, # type: ignore
     )
 
     new_notification.save()
@@ -39,23 +33,22 @@ def generate_system_notification(user_notification_info: UserNotification, user_
     if new_notification.is_global:
         for user in UserProfile.query.all():
             user_notification = SystemNotification(
-                user_id=user.id, 
-                notification_id=new_notification.id
+                user_id=user.id, # type: ignore
+                notification_id=new_notification.id # type: ignore
             )
             user_notification.save()
     else:
         if not user_id:
             user_id = current_user.id
         user_notification = SystemNotification(
-            user_id=user_id, 
-            notification_id=new_notification.id
+            user_id=user_id, # type: ignore
+            notification_id=new_notification.id # type: ignore
         )
         user_notification.save()
 
 
-def fetch_user_notifications(
-    user_id: int, unread_only: bool = True, limit: int = 50, offset: int = 0
-) -> List[Dict[str, Any]]:
+def fetch_user_notifications(user_id: int, unread_only: bool = True, 
+                             limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
     """
     Get notifications for a specific user with optional filtering and pagination.
 

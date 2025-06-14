@@ -325,13 +325,6 @@ def alert_ticket(alert_id):
                     log_message = f"User {user_id_to_username(assigned_user_id)} assigned to alert ticket by {current_user.username}"
                     flash("User assigned successfully!", "success")
 
-                    # notification_data = {
-                    #     "type": "info",
-                    #     "icon": "info-circle",  # Font Awesome icon
-                    #     "title": "Alert Ticket Assignment",
-                    #     "message": f"Alert ticket assigned to you by {current_user.first_name} {current_user.last_name}",
-                    #     "is_global": False,
-                    # }
                     notification_data = UserNotification(
                         type="info",
                         icon="info-circle",

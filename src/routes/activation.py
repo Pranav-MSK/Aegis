@@ -60,14 +60,6 @@ def activation():
                     f.write(f"Don't modify this file. It contains the SystemGuard license information.\nlicense_key:{new_license_key}\nactivation_code:{activation_code}\nsystemguard_unique_id:{systemguard_unique_id}")
                 flash('Activation successful', 'success')
                 
-                # send system notification
-                # notification_data = {
-                #     "type": "info",
-                #     "icon": "info-circle",  # Font Awesome icon
-                #     "title": "Product Activation",
-                #     "message": "Product activation successful.",
-                #     "is_global": True
-                # }
                 notification_data = UserNotification(
                     type="info",
                     icon="info-circle",
