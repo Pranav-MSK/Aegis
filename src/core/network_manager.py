@@ -153,37 +153,37 @@ class NetworkMetrics:
             return self._metrics.copy()
     
     @property
-    def network_sent_mb(self) -> float:
+    def network_sent_mb(self):
         """Total megabytes sent."""
         with self._lock:
             return self._metrics.get('network_sent_mb', 0.0)
     
     @property
-    def network_received_mb(self) -> float:
+    def network_received_mb(self):
         """Total megabytes received."""
         with self._lock:
             return self._metrics.get('network_received_mb', 0.0)
     
     @property
-    def upload_speed(self) -> str:
+    def upload_speed(self):
         """Current upload speed (formatted)."""
         with self._lock:
             return self._metrics.get('upload_speed', '0 Bytes/s')
     
     @property
-    def download_speed(self) -> str:
+    def download_speed(self):
         """Current download speed (formatted)."""
         with self._lock:
             return self._metrics.get('download_speed', '0 Bytes/s')
     
     @property
-    def upload_speed_raw(self) -> float:
+    def upload_speed_raw(self):
         """Current upload speed in bytes per second."""
         with self._lock:
             return self._metrics.get('upload_speed_raw', 0.0)
     
     @property
-    def download_speed_raw(self) -> float:
+    def download_speed_raw(self):
         """Current download speed in bytes per second."""
         with self._lock:
             return self._metrics.get('download_speed_raw', 0.0)
