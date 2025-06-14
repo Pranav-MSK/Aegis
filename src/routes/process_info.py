@@ -12,7 +12,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from src.config.app_config import app, csrf
-from src.helper.utils import get_top_processes
+from src.helper.system_metrics import get_top_processes
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.routes.helper.common_helper import (

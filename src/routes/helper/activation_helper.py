@@ -2,7 +2,7 @@
 import os
 from datetime import datetime
 from fpdf import FPDF
-from src.helper.utils import ROOT_DIR
+from src.helper.system_metrics import ROOT_DIR
 
 def generate_license_pdf(license_file_path):
     with open(license_file_path, 'r') as f:

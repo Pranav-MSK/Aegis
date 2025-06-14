@@ -7,7 +7,7 @@ from flask import render_template, request, flash, blueprints, redirect, url_for
 from src.config.app_config import app, csrf
 from src.models import UserDashboardSettings, GeneralSettings
 from flask_login import login_required, current_user
-from src.helper.utils import render_template_from_file, ROOT_DIR
+from src.helper.template_utils import render_template_from_file, ROOT_DIR
 from src.alert_manager import send_smtp_email
 from src.routes.helper.common_helper import (
     get_email_addresses, 

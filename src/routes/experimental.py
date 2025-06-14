@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify
 from src.config.app_config import app
 from src.models import InstanceMetadata
 from src.routes.helper.common_helper import admin_required
-from src.helper.utils import get_instance_metadata
+from src.helper.ec2_metadata import get_instance_metadata
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
 

@@ -12,12 +12,13 @@ from src.models import (
     ChartConfiguration,
     UserProfile,
 )
-from src.helper.utils import (
-    _collect_metrics,
+from src.helper.system_metrics import _collect_metrics
+from src.helper.os_info import (
     get_os_release_info,
     get_os_info,
-    get_cached_value,
 )
+from src.helper.cache_utils import get_cached_value
+
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
     load_prometheus_config,
