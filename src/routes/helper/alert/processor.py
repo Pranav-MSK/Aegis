@@ -4,7 +4,7 @@ from src.logger import get_logger
 logger = get_logger(__name__)
 
 from src.routes.helper.notification.notification_helper import AlertNotifier
-from src.routes.helper.alert.models import AlertMessage
+from schemas.alerts import AlertMessage
 
 from src.models import (
     AlertLog,
@@ -46,7 +46,7 @@ class AlertProcessor(AlertNotifier):
         existing_alert.alert_status = self.alert_status
         existing_alert.updated_at = datetime.utcnow()
         log_message = f"SystemGuard Bot: Alert with fingerprint {self.fingerprint} updated to resolved status by systemgaurd(Auto-Resolve)."
-        alert_log = AlertLog(alert_ticket_id=existing_alert.id, log=log_message)
+        alert_log = AlertLog(alert_ticket_id=existing_alert.id, log=log_message) # type: ignore
         alert_log.save()
         existing_alert.save()
         logger.info(log_message)

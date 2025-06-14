@@ -6,7 +6,7 @@ from src.models import (
     UserProfile,
 )
 from src.routes.helper.alert.quota_guard import can_create_alert
-from src.routes.helper.alert.models import AlertMessage
+from schemas.alerts import AlertMessage
 
 
 def create_alert_ticket(alert_instance: AlertMessage):
@@ -72,17 +72,17 @@ def create_alert_ticket(alert_instance: AlertMessage):
 
     # Create and save the alert ticket
     alert_ticket = AlertTicket(
-        alert_name=alert_instance.alert_name,
-        alert_status=alert_instance.alert_status,
-        instance=alert_instance.instance,
-        severity=alert_instance.severity,
-        summary=alert_instance.summary,
-        description=alert_instance.description,
-        assigned_supervisor_id=assigned_supervisor_id,
-        system_username=alert_instance.system_username,
-        system_hostname=alert_instance.system_hostname,
-        fingerprint=alert_instance.fingerprint,
-        runbook_url=alert_instance.runbook_url,
+        alert_name=alert_instance.alert_name, # type: ignore    
+        alert_status=alert_instance.alert_status, # type: ignore    
+        instance=alert_instance.instance, # type: ignore    
+        severity=alert_instance.severity, # type: ignore    
+        summary=alert_instance.summary, # type: ignore    
+        description=alert_instance.description, # type: ignore    
+        assigned_supervisor_id=assigned_supervisor_id, # type: ignore    
+        system_username=alert_instance.system_username, # type: ignore    
+        system_hostname=alert_instance.system_hostname, # type: ignore    
+        fingerprint=alert_instance.fingerprint, # type: ignore    
+        runbook_url=alert_instance.runbook_url, # type: ignore    
     )
     alert_ticket.save()
     logger.info(f"Saving alert ticket: {alert_ticket}")

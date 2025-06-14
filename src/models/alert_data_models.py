@@ -95,10 +95,10 @@ class AlertTicket(BaseModel):
             'updated_at': self.updated_at,
             'assigned_user_id': self.assigned_user_id,
             'assigned_supervisor_id': self.assigned_supervisor_id,
-            'investigation_notes': [note.to_dict() for note in self.investigation_notes],
-            'reports': [report.to_dict() for report in self.reports],
-            'alertlogs': [log.to_dict() for log in self.alertlogs],
-            'customfields': [field.to_dict() for field in self.customfields]
+            'investigation_notes': [note.to_dict() for note in self.investigation_notes], # type: ignore    
+            'reports': [report.to_dict() for report in self.reports], # type: ignore    
+            'alertlogs': [log.to_dict() for log in self.alertlogs], # type: ignore    
+            'customfields': [field.to_dict() for field in self.customfields] # type: ignore    
         }
 
     def serialize(self):
@@ -119,10 +119,10 @@ class AlertTicket(BaseModel):
             'updated_at': self.updated_at,
             'assigned_user_id': self.assigned_user_id,
             'assigned_supervisor_id': self.assigned_supervisor_id,
-            'investigation_notes': [note.to_dict() for note in self.investigation_notes],
-            'reports': [report.to_dict() for report in self.reports],
-            'alertlogs': [log.to_dict() for log in self.alertlogs],
-            'customfields': [field.to_dict() for field in self.customfields]
+            'investigation_notes': [note.to_dict() for note in self.investigation_notes], # type: ignore    
+            'reports': [report.to_dict() for report in self.reports], # type: ignore    
+            'alertlogs': [log.to_dict() for log in self.alertlogs], # type: ignore    
+            'customfields': [field.to_dict() for field in self.customfields] # type: ignore    
         }
 
 class AlertLog(BaseModel):
