@@ -3,13 +3,13 @@ from flask_login import current_user
 from src.models import UserProfile
 from src.routes.helper.common_helper import admin_required
 from src.services.user_management_service import UserManagementService, ActivityService
-from src.config.app_config import csrf
+from src.config.app_config import csrf, app
 
 user_management_bp = Blueprint('user_management', __name__)
 user_service = UserManagementService()
 activity_service = ActivityService()
 
-@user_management_bp.route('/system/create_user', methods=['GET', 'POST'])
+@app.route('/system/create_user', methods=['GET', 'POST'])
 @admin_required
 def create_user():
     if request.method == 'POST':
@@ -21,14 +21,14 @@ def create_user():
     return render_template('users/create_user.html', total_users=total_users)
 
 
-@user_management_bp.route('/system/user_management', methods=['GET'])
+@app.route('/system/user_management', methods=['GET'])
 @admin_required
 def view_users():
     users = UserProfile.query.all()
     return render_template('users/view_users.html', users=users)
 
 
-@user_management_bp.route('/system/user/<username>', methods=['GET', 'POST'])
+@app.route('/system/user/<username>', methods=['GET', 'POST'])
 @admin_required
 def update_user_profile(username):
     user = UserProfile.query.filter_by(username=username).first_or_404()
@@ -39,7 +39,7 @@ def update_user_profile(username):
     return render_template('users/update_user.html', user=user)
 
 
-@user_management_bp.route('/delete_user/<username>', methods=['POST'])
+@app.route('/delete_user/<username>', methods=['POST'])
 @admin_required
 def delete_user(username):
     user = UserProfile.query.filter_by(username=username).first_or_404()
@@ -48,8 +48,8 @@ def delete_user(username):
     return redirect(url_for('user_management.view_users'))
 
 
-@user_management_bp.route("/system/activity_list", methods=["GET", "POST"])
-@user_management_bp.route("/system/activity_list/<int:activity_id>", methods=["GET", "PUT", "DELETE"])
+@app.route("/system/activity_list", methods=["GET", "POST"])
+@app.route("/system/activity_list/<int:activity_id>", methods=["GET", "PUT", "DELETE"])
 @csrf.exempt
 @admin_required
 def manage_activities(activity_id=None):

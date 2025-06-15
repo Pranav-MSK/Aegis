@@ -6,7 +6,7 @@ from src.models import (
     UserProfile,
 )
 from src.services.alert.quota_guard import can_create_alert
-from src.schemas.alerts import AlertMessage
+from src.schemas import AlertMessage
 
 
 def create_alert_ticket(alert_instance: AlertMessage):

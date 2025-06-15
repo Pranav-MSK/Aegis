@@ -5,7 +5,7 @@ from flask_login import login_required
 
 from src.config.app_config import app
 from src.services.service_helper import ServiceMonitor
-from src.services.access_decorators import systemguard_enterprise
+from src.services.decorators.access_decorators import systemguard_enterprise
 
 services_bp = blueprints.Blueprint('services', __name__)
 

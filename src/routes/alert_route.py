@@ -28,7 +28,7 @@ from src.models import (
     SystemNotification,
 )
 
-from src.services.access_decorators import (
+from src.services.decorators.access_decorators import (
     systemguard_enterprise,
     community_edition,
 )

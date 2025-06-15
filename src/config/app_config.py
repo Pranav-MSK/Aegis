@@ -13,19 +13,21 @@ from humanize import naturaltime
 
 from src.core.disk_manager import DiskMetrics
 from src.core.network_manager import NetworkMetrics
-from src.helper.basic_info import get_system_node_name, get_ip_address
+from src.helper.basic_info import get_system_node_name, get_ip_address, ROOT_DIR
 from src.helper.secrets import load_secret_key
 from src.core.activator import get_plan_details
 from src.parser.markdown_parser import process_markdown_with_tailwind
 from src.config.config_loader import configuration_settings
-
 # disk and metrics background process
 disk_metrics = DiskMetrics()
 disk_metrics.start()
 network_metrics = NetworkMetrics()
 network_metrics.start()
 
-app = Flask(__name__)
+template_folder = os.path.join(ROOT_DIR, "src/templates")
+static_folder = os.path.join(ROOT_DIR, "src/static")
+print(f"Template folder set to: {template_folder}")
+app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
 
 # Application Metadata
 APP_NAME = configuration_settings["app.meta"].get('NAME', fallback='SystemGuard')

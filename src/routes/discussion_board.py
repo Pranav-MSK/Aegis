@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, url_for, Blueprint
 from flask_login import login_required, current_user
 
 from src.config.app_config import app
-from src.services.access_decorators import systemguard_enterprise
+from src.services.decorators.access_decorators import systemguard_enterprise
 
 from src.services.discussion_service import DiscussionService
 from src.services.discussion_service import NotificationService

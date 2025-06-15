@@ -37,7 +37,7 @@ from src.routes.helper.prometheus_helper import (
     count_of_targets,
     calculate_total_rules,
 )
-from src.services.access_decorators import systemguard_enterprise
+from src.services.decorators.access_decorators import systemguard_enterprise
 from src.config.config_loader import configuration_settings
 
 # Define the Prometheus Blueprint

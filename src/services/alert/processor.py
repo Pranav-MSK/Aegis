@@ -4,7 +4,7 @@ from src.helper.logger import get_logger
 logger = get_logger(__name__)
 
 from src.services.notification.notification_helper import AlertNotifier
-from src.schemas.alerts import AlertMessage
+from src.schemas import AlertMessage
 
 from src.models import (
     AlertLog,

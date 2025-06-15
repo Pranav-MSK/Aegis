@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, session, flash
 from flask_login import login_required
 
 from src.config.app_config import app
-from src.services.access_decorators import systemguard_enterprise
+from src.services.decorators.access_decorators import systemguard_enterprise
 from src.routes.helper.common_helper import handle_sudo_password, admin_required
 from src.helper.logger import get_logger
 from src.services.firewall.firewall_service import FirewallService
@@ -30,4 +30,5 @@ def perform_security_analysis():
             return scan_service.handle_network_scan()
         elif 'scan_ports' in request.form:
             return scan_service.handle_port_scan()
+    
     return render_template('security/scan.html')
