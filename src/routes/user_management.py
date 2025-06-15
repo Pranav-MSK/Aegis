@@ -15,7 +15,7 @@ def create_user():
     if request.method == 'POST':
         success, message = user_service.create_user(request.form)
         flash(message, 'success' if success else 'danger')
-        return redirect(url_for('user_management.view_users'))
+        return redirect("/system/user_management")
 
     total_users = UserProfile.fetch_total_count()
     return render_template('users/create_user.html', total_users=total_users)
@@ -35,7 +35,7 @@ def update_user_profile(username):
     if request.method == 'POST':
         user_service.update_user_profile(user, request.form)
         flash('User settings updated successfully!', 'success')
-        return redirect(url_for('user_management.view_users'))
+        return redirect("/system/user_management")
     return render_template('users/update_user.html', user=user)
 
 
@@ -45,7 +45,7 @@ def delete_user(username):
     user = UserProfile.query.filter_by(username=username).first_or_404()
     user_service.delete_user(user)
     flash(f'User {username} has been deleted successfully!', 'success')
-    return redirect(url_for('user_management.view_users'))
+    return redirect("/system/user_management")
 
 
 @app.route("/system/activity_list", methods=["GET", "POST"])

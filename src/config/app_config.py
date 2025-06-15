@@ -2,15 +2,13 @@
 import os
 import hashlib
 
-from pathlib import Path
 from datetime import datetime
-from flask import Flask, config
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from datetime import datetime
 from humanize import naturaltime
-from flask_cors import CORS
 
 from src.core.disk_manager import DiskMetrics
 from src.core.network_manager import NetworkMetrics
@@ -19,6 +17,7 @@ from src.helper.secrets import load_secret_key
 from src.core.activator import get_plan_details
 from src.parser.markdown_parser import process_markdown_with_tailwind
 from src.config.config_loader import configuration_settings
+
 # disk and metrics background process
 disk_metrics = DiskMetrics()
 disk_metrics.start()
@@ -142,12 +141,15 @@ def natural_time(value):
         return naturaltime(value)
     return value
 
-@app.template_filter()
-def get_profile_picture_url(email, size=200):
-    # Create an MD5 hash of the email address
+
+def generate_gravatar_url(email, size=200):
+    """Generate a Gravatar URL for a given email."""
     email_hash = hashlib.md5(email.strip().lower().encode('utf-8'), usedforsecurity=False).hexdigest()
     return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
 
+@app.template_filter()
+def get_profile_picture_url(email, size=200):
+    return generate_gravatar_url(email, size)
 
 # Define a custom filter to convert Markdown to HTML
 @app.template_filter('markdown')
