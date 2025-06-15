@@ -11,7 +11,7 @@ from src.routes.historical_system_metrics import graphs_bp
 from src.routes.firewall import firewall_bp
 from src.routes.health import health_bp
 from src.routes.api import api_bp
-from src.routes.experimental import experimental_bp
+from src.routes.ec2_metadata import ec2_metadata_bp
 from src.routes.error_handlers import error_handlers_bp
 from src.routes.profile import profile_bp
 from src.routes.prometheus import prometheus_bp
