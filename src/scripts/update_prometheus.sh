@@ -24,7 +24,7 @@ PROMETHEUS_CONFIG_DIR="$ROOT_DIR/prometheus_config"
 CONTAINER_NAME="prometheus"
 PROMETHEUS_CONFIG="$PROMETHEUS_CONFIG_DIR/prometheus.yml"
 PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
-PROMETHEUS_IMAGE="prom/prometheus"  # Add your image name if needed
+PROMETHEUS_IMAGE="prom/prometheus:v3.4.1"
 NETWORK_NAME="flask-prometheus-net"  # Specify your network name
 PROMETHEUS_PORT="9090"  # Specify your port
 

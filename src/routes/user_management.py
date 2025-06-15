@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from flask_login import current_user
+from flask import Blueprint, render_template, request, redirect, flash, jsonify
 from src.models import UserProfile
 from src.routes.helper.common_helper import admin_required
 from src.services.user_management_service import UserManagementService, ActivityService

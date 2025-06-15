@@ -22,7 +22,6 @@ from src.config.app_config import app, get_app_info
 from src.models import UserProfile
 from src.helper.basic_info import ROOT_DIR
 from src.helper.logger import get_logger
-logger = get_logger(__name__)
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
     load_yaml,
@@ -40,6 +39,7 @@ from src.routes.helper.prometheus_helper import (
 from src.services.decorators.access_decorators import systemguard_enterprise
 from src.config.config_loader import configuration_settings
 
+logger = get_logger(__name__)
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint("prometheus", __name__)
 
@@ -92,7 +92,7 @@ def metrics():
     )
     return Response(output, mimetype="text/plain")
 
-
+# #NOTE - Need to remove this route in production
 @app.route("/metrics_")
 def metrics_():
     output = generate_latest()
@@ -297,19 +297,7 @@ def api_active_alerts():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# alerts
-# @app.route("/system/alerts")
-# @login_required
-# def show_alerts():
-#     try:
-#         response = requests.get(f"{ALERTMANAGER_BASE_URL}/api/v2/alerts")
-#         response.raise_for_status()  # Raise an error for bad responses
-#         alerts = response.json()  # Parse JSON response
 
-#         return render_template("alerts/show_alerts.html", alerts=alerts)
-#     except requests.exceptions.RequestException as e:
-#         return f"Error fetching alerts: {str(e)}", 500
-    
 # prometheus active alerts
 @app.route("/system/alerts/active")
 @login_required

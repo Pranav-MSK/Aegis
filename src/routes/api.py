@@ -373,36 +373,6 @@ def manage_alert_rules():
     rules = load_alert_rules()
     return jsonify(rules)
 
-
-# Reload Prometheus configuration
-def reload_prometheus():
-    url = f"{PROMETHEUS_BASE_URL}/-/reload"
-    response = requests.post(url, timeout=10)
-    if response.status_code == 200:
-        return (
-            jsonify(
-                {"status": "success", "message": "Prometheus configuration reloaded"}
-            ),
-            200,
-        )
-    else:
-        return (
-            jsonify(
-                {
-                    "status": "error",
-                    "message": "Failed to reload Prometheus config",
-                    "details": response.text,
-                }
-            ),
-            response.status_code,
-        )
-
-
-@app.route("/api/v1/prometheus/reload", methods=["POST"])
-def reload_prometheus_config():
-    return reload_prometheus()
-
-
 @app.route("/api/v1/prometheus/ready")
 def ready_prometheus():
     url = f"{PROMETHEUS_BASE_URL}/-/ready"
@@ -421,7 +391,6 @@ def ready_prometheus():
             ),
             response.status_code,
         )
-
 
 # Route to get the current retention time
 @app.route("/api/v1/get-retention", methods=["GET"])
