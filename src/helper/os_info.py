@@ -9,8 +9,6 @@ from src.config.config_loader import configuration_settings
 
 logger = get_logger(__name__)
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 @functools.lru_cache(maxsize=1)
 def get_os_info():
     return {"operating_system": platform.system(), "kernel_version": platform.release()}

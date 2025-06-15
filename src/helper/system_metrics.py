@@ -14,8 +14,6 @@ from src.helper.os_info import get_os_info, get_os_release_info, get_linux_proce
 
 logger = get_logger(__name__)
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 cache = {}
 
 CACHE_EXPIRATION = configuration_settings.getint("metrics.settings", "CACHE_EXPIRATION")

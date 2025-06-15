@@ -20,8 +20,6 @@ from src.config.config_loader import configuration_settings
 
 logger = get_logger(__name__)
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 cache = {}
 
 CACHE_EXPIRATION = configuration_settings.getint("metrics.settings", "CACHE_EXPIRATION")

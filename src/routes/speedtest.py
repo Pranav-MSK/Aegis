@@ -5,7 +5,8 @@ from flask import render_template, Blueprint
 from flask_login import current_user
 from src.config.app_config import app
 from src.models import UserDashboardSettings, NetworkSpeedTestResult
-from src.helper.template_utils import render_template_from_file, ROOT_DIR
+from src.helper.template_utils import render_template_from_file
+from src.helper.basic_info import ROOT_DIR
 from src.helper.speedtest_utils import run_speedtest
 from src.services.messaging.email_service import send_smtp_email
 from src.config.app_config import get_app_info

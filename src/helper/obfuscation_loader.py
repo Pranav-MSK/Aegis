@@ -1,8 +1,7 @@
 import os
 import ctypes
 from pathlib import Path
-
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+from src.helper.basic_info import ROOT_DIR
 
 def load_library(filename):
     try:

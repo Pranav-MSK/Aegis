@@ -20,7 +20,7 @@ from flask_login import login_required
 
 from src.config.app_config import app, get_app_info
 from src.models import UserProfile
-from src.helper.os_info import ROOT_DIR
+from src.helper.basic_info import ROOT_DIR
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.routes.helper.common_helper import admin_required

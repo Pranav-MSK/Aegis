@@ -5,7 +5,7 @@ import subprocess
 from collections import OrderedDict
 import requests
 
-from src.helper.system_metrics import ROOT_DIR
+from src.helper.basic_info import ROOT_DIR
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
 

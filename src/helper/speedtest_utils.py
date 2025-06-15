@@ -4,11 +4,8 @@ import os
 import subprocess
 
 from src.helper.logger import get_logger
-from src.config.config_loader import configuration_settings
 
 logger = get_logger(__name__)
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def run_speedtest():
     """Run a speed test using speedtest-cli."""
