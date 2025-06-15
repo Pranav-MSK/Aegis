@@ -3,7 +3,7 @@ from flask import request
 from sqlalchemy import desc
 
 from src.models import UserArticle, UserPostComment, UserPostLike, UserSavedPost
-from src.schemas.discussion_board import UserNotification
+from src.schemas import UserNotification   
 from src.services.notification.manager import generate_system_notification
 
 class NotificationService:

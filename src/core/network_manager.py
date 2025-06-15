@@ -11,6 +11,7 @@ from typing import Dict, Union, NamedTuple
 from dataclasses import dataclass
 from contextlib import contextmanager
 from src.config.config_loader import configuration_settings
+from src.schemas import NetworkStats
 
 # Constants
 BYTES_PER_MB_BINARY = 1024 ** 2  # Binary megabyte (MiB)
@@ -30,13 +31,6 @@ SPEED_UNITS = [
     SpeedUnits(0, 1, "Bytes/s")
 ]
 
-@dataclass
-class NetworkStats:
-    """Container for network statistics."""
-    bytes_sent: int
-    bytes_recv: int
-    upload_speed: float
-    download_speed: float
 
 class NetworkMetricsError(Exception):
     """Base exception for NetworkMetrics-related errors."""

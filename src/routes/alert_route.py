@@ -34,7 +34,7 @@ from src.services.access_decorators import (
 )
 from src.routes.helper.decorators import user_has_access_to_alert, user_id_to_username
 from src.services.notification.manager import generate_system_notification
-from src.schemas.discussion_board import UserNotification   
+from src.schemas import UserNotification   
 from src.routes.helper.common_helper import award_points
 from src.services.notification.manager import fetch_user_notifications
 

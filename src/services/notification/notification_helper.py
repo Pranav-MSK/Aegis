@@ -16,7 +16,7 @@ from src.services.notification.observers import (
 )
 
 from src.services.notification.manager import generate_system_notification
-from src.schemas.discussion_board import UserNotification   
+from src.schemas import UserNotification   
 
 from abc import ABC, abstractmethod
 

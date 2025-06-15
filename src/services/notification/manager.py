@@ -16,7 +16,7 @@ from src.models import (
     Notification,
     SystemNotification,
 )
-from src.schemas.discussion_board import UserNotification   
+from src.schemas import UserNotification   
 
 def generate_system_notification(user_notification_info: UserNotification, user_id=None):
  

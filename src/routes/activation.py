@@ -12,7 +12,7 @@ from src.routes.helper.activation_helper import generate_license_pdf
 from src.core.activator import get_plan_details
 
 from src.services.notification.manager import generate_system_notification
-from src.schemas.discussion_board import UserNotification   
+from src.schemas import UserNotification   
 
 
 activation_bp = Blueprint('activation', __name__)

@@ -6,54 +6,11 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
 from cryptography.fernet import Fernet
 from src.helper.secrets import load_secret_key
-
+from src.helper.basic_info import generate_unique_id
+from src.schemas import LicenseInfo
 # --- Constants ---
-SUM_CHECK_DIGITS = 2
+
 LICENSE_PATH = os.path.join(os.path.expanduser('~'), '.database', 'internal_license_key.txt')
-
-
-# --- Utility Functions ---
-def get_os_installation_uuid():
-    for path in ['/etc/machine-id', '/var/lib/dbus/machine-id']:
-        try:
-            if os.path.exists(path):
-                with open(path) as f:
-                    return f.read().strip()
-        except Exception:
-            pass
-    return "OS Installation UUID not found."
-
-
-def calculate_checksum(data: str, digits: int = 2) -> int:
-    return sum((i + 1) * ord(c) for i, c in enumerate(data)) % (10 ** digits)
-
-
-def generate_unique_id() -> str:
-    uuid = get_os_installation_uuid()
-    cleaned = re.sub(r'\W+', '', uuid)
-    short = cleaned[::2]
-    return f"{short}{calculate_checksum(short, SUM_CHECK_DIGITS)}"
-
-
-# --- Data Class ---
-@dataclass
-class LicenseInfo:
-    plan_type: str = "Free Edition"
-    is_trial: bool = False
-    remaining_plan_days: int = 0
-    is_plan_not_expired: bool = False
-    license_key: str = ""
-    activation_code: str = ""
-    systemguard_unique_id: str = generate_unique_id()
-    max_scrap_target: int = 1
-    max_alert_rules: int = 5
-    max_number_of_graphs: int = 5
-    monthly_alert_tickets_limit: int = 10
-    max_users_allowed: int = 5
-    message: str = ""
-
-    def to_dict(self):
-        return asdict(self)
 
 
 # --- Cipher Utility ---

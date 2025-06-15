@@ -11,6 +11,8 @@ from typing import Dict, Union
 from dataclasses import dataclass
 from contextlib import contextmanager
 from src.config.config_loader import configuration_settings
+from src.schemas import IOStats
+
 
 # Constants
 BYTES_PER_GB = configuration_settings.getint('metrics.settings', 'BYTES_PER_GB')
@@ -18,13 +20,6 @@ BYTES_PER_MB = configuration_settings.getint('metrics.settings', 'BYTES_PER_MB')
 BYTES_PER_KB = configuration_settings.getint('metrics.settings', 'BYTES_PER_KB')
 UPDATE_INTERVAL = configuration_settings.getfloat('metrics.settings', 'UPDATE_INTERVAL')
 
-@dataclass
-class IOStats:
-    """Container for I/O statistics."""
-    read_bytes: int
-    write_bytes: int
-    read_speed: float
-    write_speed: float
 
 def format_speed(bytes_per_sec: float) -> str:
     """
