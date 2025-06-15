@@ -10,6 +10,7 @@ from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from datetime import datetime
 from humanize import naturaltime
+from flask_cors import CORS
 
 from src.core.disk_manager import DiskMetrics
 from src.core.network_manager import NetworkMetrics
@@ -26,6 +27,7 @@ network_metrics.start()
 
 template_folder = os.path.join(ROOT_DIR, "src/templates")
 static_folder = os.path.join(ROOT_DIR, "src/static")
+print(f"Template folder: {template_folder}")
 app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
 
 # Application Metadata
@@ -65,6 +67,11 @@ app.config['under_maintenance'] = configuration_settings.getboolean('app.setting
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 csrf = CSRFProtect(app)
+# CORS(app,
+#     origins=["http://localhost:5001", "http://localhost:5050"],
+#     supports_credentials=True,
+#     allow_headers=["Content-Type", "Authorization", "X-CSRFToken"],
+# )
 
 # systemgaurd plan details
 plan_details = get_plan_details()

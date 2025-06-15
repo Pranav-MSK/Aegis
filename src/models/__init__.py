@@ -131,7 +131,3 @@ with app.app_context():
             db.session.add(GeneralSettings())
             db.session.commit()
             logger.info("General settings initialized.")
-
-        
-    else:
-        logger.info("Tables already exist. Skipping creation.")

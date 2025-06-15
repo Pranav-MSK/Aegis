@@ -22,6 +22,8 @@ flask-migrate==4.1.0        # Handles database migrations for Flask apps
 Flask-WTF==1.2.2            # Flask integration with WTForms
 Flask-Caching==2.3.1        # Caching extension for Flask
 Flask-Compress==1.17        # Compresses Flask HTTP responses (e.g., gzip)
+flask-cors==6.0.1           # Cross-Origin Resource Sharing (CORS) support for Flask
+
 # Flask-Limiter==3.8.0        # Rate limiting extension for Flask
 
 # File system monitoring

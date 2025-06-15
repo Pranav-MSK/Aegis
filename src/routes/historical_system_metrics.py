@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from src.config.app_config import app, csrf, get_app_info
+from src.config.app_config import app, csrf
 from src.routes.helper.common_helper import admin_required
 from src.services.chart_config_service import ChartConfigService
 
@@ -15,8 +15,10 @@ def historical_system_metrics():
 @login_required
 def chart_configurations():
     if request.method == "POST":
-        return ChartConfigService.create_or_update_chart(current_user, request)
-    return ChartConfigService.render_chart_config_page(current_user)
+        response = ChartConfigService.create_or_update_chart(current_user, request)
+        return response if response else jsonify({"message": "No response from service"}), 400
+    response = ChartConfigService.render_chart_config_page(current_user)
+    return response if response else jsonify({"message": "No response from service"}), 400
 
 @app.route("/chart_configurations/<int:id>", methods=["DELETE"])
 @admin_required
