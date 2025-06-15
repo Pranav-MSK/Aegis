@@ -26,7 +26,6 @@ network_metrics.start()
 
 template_folder = os.path.join(ROOT_DIR, "src/templates")
 static_folder = os.path.join(ROOT_DIR, "src/static")
-print(f"Template folder set to: {template_folder}")
 app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
 
 # Application Metadata

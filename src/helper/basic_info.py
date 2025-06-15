@@ -5,7 +5,7 @@ import subprocess
 from functools import lru_cache
 SUM_CHECK_DIGITS = 2
 
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+ROOT_DIR = Path(__file__).resolve().parents[2]
 
 @lru_cache(maxsize=128)
 def get_basic_system_information():
