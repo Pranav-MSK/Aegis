@@ -46,7 +46,7 @@ class UserProfile(BaseModel, UserMixin):
     last_login = db.Column(db.DateTime, nullable=True)
     date_joined = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     last_updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=False) # type: ignore
     user_points = db.Column(db.Integer, default=0)
     assign_tickets = db.Column(db.Boolean, default=False)
 
