@@ -124,7 +124,12 @@ run_output=$(docker run -d \
     -v "$PROMETHEUS_CONFIG_FILE:/etc/prometheus/prometheus.yml" \
     -v "$ALERT_RULES_FILE:/etc/prometheus/alert_rules.yml" \
     -v "$PROMETHEUS_DATA_DIR:/prometheus" \
-    "$PROMETHEUS_IMAGE" 2>&1)
+    "$PROMETHEUS_IMAGE" \
+    --config.file=/etc/prometheus/prometheus.yml \
+  --storage.tsdb.path=/prometheus \
+  --web.enable-admin-api \
+  --web.enable-lifecycle
+2>&1)
 
 # Verify if Prometheus container started successfully
 if [ $? -eq 0 ]; then
