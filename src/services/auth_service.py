@@ -1,8 +1,8 @@
 import os
 import datetime
+import stat
 from werkzeug.security import generate_password_hash
 from flask_login import login_user, logout_user, current_user
-from services import alert
 from src.config.app_config import db
 from src.models import UserProfile, UserDashboardSettings
 from src.services.messaging.email_service import send_smtp_email
@@ -22,7 +22,7 @@ class AuthService:
         user = UserProfile.query.filter(
             (UserProfile.username == username) | (UserProfile.email == username)
         ).first()
-        
+
         if user and user.check_password(password):
             if not user.is_active:
                 return None, "Account is not active, Contact Admin"
@@ -63,8 +63,8 @@ class AuthService:
                     email_body,
                     is_html=True,
                 )
-
-    def logout(self):
+    @staticmethod
+    def logout():
         logger.info(f"user {current_user.username} logged out")
         logout_user()
 
@@ -100,14 +100,14 @@ class AuthService:
 
         hashed_password = generate_password_hash(password)
         new_user = UserProfile(
-            first_name=first_name,
-            last_name=last_name,
-            username=username,
-            email=email,
-            password=hashed_password,
-            user_level=user_level,
-            receive_email_alerts=receive_email_alerts,
-            profession=profession,
+            first_name=first_name, # type: ignore
+            last_name=last_name, # type: ignore
+            username=username, # type: ignore
+            email=email, # type: ignore
+            password=hashed_password, # type: ignore
+            user_level=user_level, # type: ignore
+            receive_email_alerts=receive_email_alerts, # type: ignore
+            profession=profession, # type: ignore
         )
 
         db.session.add(new_user)
@@ -116,12 +116,13 @@ class AuthService:
         self.send_new_user_alert(new_user)
         self.send_welcome_email(new_user)
 
-        db.session.add(UserDashboardSettings(user_id=new_user.id))
+        db.session.add(UserDashboardSettings(user_id=new_user.id)) # type: ignore
         db.session.commit()
         logger.info(f"New user {new_user.username} created")
         return new_user, None
 
-    def send_new_user_alert(self, user):
+    @staticmethod
+    def send_new_user_alert(user):
         admin_emails_with_alerts = get_email_addresses(
             user_level="admin", receive_email_alerts=True
         )
