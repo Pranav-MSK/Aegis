@@ -28,7 +28,6 @@ from src.routes.helper.prometheus_helper import (
     save_yaml,
     show_targets,
     prometheus_yml_path,
-    update_prometheus_container,
     update_prometheus_config,
     save_updated_alert_manager_config,
     retrieve_active_alerts,
@@ -56,7 +55,26 @@ PROMETHEUS_RELOAD_URL = configuration_settings.get(
 
 RULES_FILE_PATH = os.path.join(ROOT_DIR, "prometheus_config/alert_rules.yml")
 
+def reload_prometheus(prometheus_url="http://localhost:9090/-/reload"):
+    """
+    Triggers a reload of Prometheus configuration and alert rules.
 
+    Args:
+        prometheus_url (str): The URL for the Prometheus reload endpoint.
+
+    Returns:
+        bool: True if reload was successful (HTTP 200), False otherwise.
+        str: The response text from Prometheus.
+    """
+    try:
+        response = requests.post(prometheus_url, timeout=5)
+        if response.status_code == 200:
+            return True, "Prometheus reloaded successfully."
+        else:
+            return False, f"Reload failed with status {response.status_code}: {response.text}"
+    except requests.RequestException as e:
+        return False, f"Request error: {e}"
+    
 # Cache user queries with LRU cache (memory-based, not ideal for distributed apps)
 @lru_cache(maxsize=128)
 def get_user_by_username(username):
@@ -187,6 +205,7 @@ def configure_targets():
         # Save the updated config
         save_yaml(config, prometheus_yml_path)
         flash("Target added successfully!", "success")
+        reload_prometheus()
 
         return redirect(url_for("configure_targets"))
 
@@ -223,7 +242,7 @@ def configure_targets():
             flash(f"Job {job_name} not found.", "warning")
 
         save_yaml(config, prometheus_yml_path)
-        update_prometheus_container()
+        reload_prometheus()
         return redirect(url_for("configure_targets"))
 
     if request.form.get("_method") == "PUT":
@@ -269,7 +288,6 @@ def configure_targets():
                 config["scrape_configs"][index] = OrderedDict(j)
 
             save_yaml(config, prometheus_yml_path)
-            # update_prometheus_container()
             return redirect(url_for("configure_targets"))
 
     return render_template(
@@ -282,7 +300,7 @@ def configure_targets():
 @app.route("/system/targets/restart_prometheus")
 @admin_required
 def restart_prometheus():
-    update_prometheus_container()
+    reload_prometheus()
     flash("Prometheus service updated successfully!", "success")
     return redirect(url_for("configure_targets"))
 
@@ -369,7 +387,7 @@ def manage_rules():
                 yaml.dump(rules, file)
 
             # Reload Prometheus configuration
-            requests.post(PROMETHEUS_RELOAD_URL)
+            reload_prometheus()
 
             flash("Rule added successfully!", "success")
             return redirect(url_for("manage_rules"))
@@ -408,7 +426,8 @@ def manage_rules():
                 yaml.dump(rules, file)
 
             # Reload Prometheus configuration
-            requests.post(PROMETHEUS_RELOAD_URL)
+            # requests.post(PROMETHEUS_RELOAD_URL)
+            reload_prometheus()
 
             flash("Rule updated successfully!", "success")
             return redirect(url_for("manage_rules"))
@@ -433,7 +452,8 @@ def manage_rules():
                 yaml.dump(rules, file)
 
             # Reload Prometheus configuration
-            requests.post(PROMETHEUS_RELOAD_URL)
+            # requests.post(PROMETHEUS_RELOAD_URL)
+            reload_prometheus()
 
             flash("Rule deleted successfully!", "success")
             return redirect(url_for("manage_rules"))

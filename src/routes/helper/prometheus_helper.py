@@ -15,8 +15,6 @@ update_prometheus_path = os.path.join(ROOT_DIR, 'src/scripts/update_prometheus.s
 alert_rules_path = os.path.join(ROOT_DIR, 'prometheus_config/alert_rules.yml')
 
 PROMETHEUS_BASE_URL = "http://localhost:9090"
-ALERTMANAGER_BASE_URL = "http://localhost:9093"
-PROMETHEUS_RELOAD_URL = "http://localhost:9090/api/v1/admin/tsdb/reload"  # Adjust as necessary
 
 
 def is_valid_file(file_path: str) -> bool:
@@ -184,13 +182,6 @@ def show_targets():
             'scrape_interval': scrape_interval
         })
     return targets_info
-
-def update_prometheus_container():
-    """Update the Prometheus container."""
-    try:
-        subprocess.run(['bash', update_prometheus_path], check=True, text=True, capture_output=True)        
-    except subprocess.CalledProcessError as e:
-        logger.error(f"An error occurred while updating Prometheus container: {e}")
 
 def calculate_total_rules():
     """Return the total number of rules."""
