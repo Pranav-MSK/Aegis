@@ -11,11 +11,13 @@ from prometheus_client import Counter
 
 from src.config.app_config import app
 from src.helper.logger import get_logger
-logger = get_logger(__name__)
+
 from src.core.activator import get_plan_details
 from src.background_task.prometheus_metrics import metrics
 
 middleware_bp = blueprints.Blueprint("middleware", __name__)
+logger = get_logger(__name__)
+
 
 class SecurityMiddleware:
     """Handle security-related middleware functions"""
@@ -40,6 +42,7 @@ class SecurityMiddleware:
         if not any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in password):
             return False, "Password must contain at least one special character"
         return True, "Password meets requirements"
+
 
 class MetricsMiddleware:
     """Handle metrics collection and monitoring"""
@@ -69,6 +72,7 @@ class MetricsMiddleware:
         except Exception as e:
             logger.error(f"Error recording metrics: {e}")
             metrics['ERROR_METRIC_COUNTER'].inc()
+
 
 class PlanMiddleware:
     """Handle plan and license-related functionality"""
@@ -100,6 +104,7 @@ class PlanMiddleware:
             flash("Your plan has expired. Please renew to continue.", "danger")
             return redirect(url_for('activation'))
         return None
+
 
 # Initialize middleware instances
 security = SecurityMiddleware()

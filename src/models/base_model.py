@@ -28,6 +28,9 @@ class BaseModel(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def flush(self):
+        db.session.flush()
+
     @classmethod
     def get_all(cls):
         return cls.query.all()

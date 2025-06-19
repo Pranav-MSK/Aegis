@@ -1,6 +1,6 @@
 from dataclasses import dataclass, asdict
 
-# schemas and models are different concepts, schemas are used for data validation and serialization
+# schemas and models are different concepts(in this project), schemas are used for data validation and serialization
 # while models are used for database interactions.
 
 @dataclass

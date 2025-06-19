@@ -7,9 +7,9 @@ from src.schemas import UserNotification
 from src.services.notification.manager import generate_system_notification
 
 class NotificationService:
-    def notify_post_action(self, user, title, message, icon="info-circle", is_global=False, user_id=None):
+    def notify_post_action(self, title, message, type="info", icon="info-circle", is_global=False, user_id=None):
         notification_data = UserNotification(
-            type="info",
+            type=type,
             icon=icon,
             title=title,
             message=message,
@@ -32,7 +32,6 @@ class DiscussionService:
             new_post = UserArticle(user_id=current_user.id, content=content, tags=tags) # type: ignore
             new_post.save()
             self.notification_service.notify_post_action(
-                current_user,
                 title="New Post",
                 message=f"New post by {current_user.first_name}: {content[:15]}...",
                 is_global=True
@@ -45,7 +44,8 @@ class DiscussionService:
                 post.content = content
                 post.save()
 
-    def get_discussion_context(self, current_user, page):
+    @staticmethod
+    def get_discussion_context(current_user, page):
         per_page = 10
         pagination = UserArticle.query.filter_by(is_deleted=False).order_by(desc(UserArticle.created_at)).paginate(page=page, per_page=per_page, error_out=False)
         saved_post_ids = [p.post_id for p in UserSavedPost.query.filter_by(user_id=current_user.id).all()]
@@ -76,7 +76,7 @@ class DiscussionService:
             "user_analytics": user_analytics
         }
 
-    def get_comments(self, post_id, page, per_page=4):
+    def get_comments(post_id, page, per_page=4):
         return UserPostComment.query.filter_by(post_id=post_id).paginate(page, per_page, error_out=False) # type: ignore
 
     def toggle_like(self, post_id, current_user):
@@ -88,7 +88,6 @@ class DiscussionService:
         else:
             UserPostLike(post_id=post_id, user_id=current_user.id).save() # type: ignore
             self.notification_service.notify_post_action(
-                current_user,
                 title="Post Like",
                 message=f"Your post was liked by {current_user.first_name}",
                 user_id=post_owner_id
@@ -99,19 +98,20 @@ class DiscussionService:
             UserPostComment(post_id=post_id, user_id=current_user.id, content=content).save() # type: ignore
             post_owner_id = UserArticle.query.get(post_id).user_id # type: ignore
             self.notification_service.notify_post_action(
-                current_user,
                 title="Post Comment",
                 message=f"Your post was commented by {current_user.first_name}",
                 user_id=post_owner_id
-            )
-
-    def edit_post(self, post_id, current_user, content):
+                )
+    
+    @staticmethod
+    def edit_post(post_id, current_user, content):
         post = UserArticle.query.get_or_404(post_id)
         if post.user_id == current_user.id and content:
             post.content = content
             post.save()
 
-    def get_user_post(self, post_id, current_user):
+    @staticmethod
+    def get_user_post(post_id, current_user):
         post = UserArticle.query.get_or_404(post_id)
         return post if post.user_id == current_user.id else None
 
@@ -121,39 +121,44 @@ class DiscussionService:
             post.is_deleted = True
             post.save()
             self.notification_service.notify_post_action(
-                current_user,
                 title="Post Deleted",
                 message=f"You have deleted your post {post.content[:15]}..."
             )
 
-    def save_post(self, post_id, current_user):
+    @staticmethod
+    def save_post(post_id, current_user):
         if not UserSavedPost.query.filter_by(post_id=post_id, user_id=current_user.id).first():
             UserSavedPost(post_id=post_id, user_id=current_user.id).save() # type: ignore
 
-    def unsave_post(self, post_id, current_user):
+    @staticmethod
+    def unsave_post(post_id, current_user):
         save = UserSavedPost.query.filter_by(post_id=post_id, user_id=current_user.id).first()
         if save:
             save.delete()
 
-    def restore_post(self, post_id, current_user):
+    @staticmethod
+    def restore_post(post_id, current_user):
         post = UserArticle.query.get_or_404(post_id)
         if post.user_id == current_user.id:
             post.is_deleted = False
             post.save()
 
-    def delete_post_permanently(self, post_id, current_user):
+    @staticmethod
+    def delete_post_permanently(post_id, current_user):
         post = UserArticle.query.get_or_404(post_id)
         if post.user_id == current_user.id:
             post.delete()
 
-    def edit_comment(self, comment_id, current_user, content):
+    @staticmethod
+    def edit_comment(comment_id, current_user, content):
         comment = UserPostComment.query.get_or_404(comment_id)
         if comment.user_id == current_user.id and content:
             comment.content = content
             comment.updated_at = datetime.utcnow()
             comment.save()
 
-    def delete_comment(self, comment_id, current_user):
+    @staticmethod
+    def delete_comment(comment_id, current_user):
         comment = UserPostComment.query.get_or_404(comment_id)
         if comment.user_id == current_user.id:
             comment.delete()
