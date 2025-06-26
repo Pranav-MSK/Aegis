@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash, jsonify, Blueprint
 from flask_login import login_required, current_user
-from src.services.profile_service import ProfileService
+
+from src.services.user.profile_service import ProfileService
 from src.core.config.app_config import app
 
 profile_bp = Blueprint('profile', __name__)
@@ -39,10 +40,12 @@ def edit_profile():
         return redirect(url_for('view_profile'))
     return render_template('users/edit_profile.html', user=user)
 
-@app.route('/delete_user', methods=['GET'])
+@app.route('/system/delete_user', methods=['GET'])
 @login_required
 def delete_user_self():
-    ProfileService.delete_user(current_user)
+    ProfileService.delete_user(current_user) # soft delete
+    # If you want to hard delete, use ProfileService.hard_delete_user(current_user)
+
     flash('Your account has been deleted.', 'success')
     return redirect(url_for('login'))
 

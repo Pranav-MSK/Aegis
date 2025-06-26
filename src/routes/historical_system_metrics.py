@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
+
 from src.core.config.app_config import app, csrf
 from src.services.common_helper import admin_required
 from src.services.chart_config_service import ChartConfigService

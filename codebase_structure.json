@@ -1,0 +1,201 @@
+{
+  "metadata": {
+    "generated_at": "2025-06-26 11:21:06 UTC",
+    "analyzed_by": "codeperfectplus"
+  },
+  "modules": {
+    "root": {
+      "settings.py": [
+        "settings",
+        "user_settings",
+        "general_settings",
+        "utility_control_api",
+        "utility_control",
+        "superadmin"
+      ],
+      "unified_logger.py": [
+        "unified_logger",
+        "list_directories",
+        "list_log_files",
+        "get_log_file"
+      ],
+      "ec2_metadata.py": [
+        "ec2_metadata"
+      ],
+      "discussion_board.py": [
+        "discussion_board",
+        "get_comments",
+        "like_post",
+        "comment",
+        "edit_post",
+        "delete_post",
+        "save_post",
+        "unsave_post",
+        "restore_post",
+        "delete_post_permanently",
+        "edit_comment",
+        "delete_comment"
+      ],
+      "auth.py": [
+        "load_user",
+        "login",
+        "logout",
+        "signup"
+      ],
+      "error_handlers.py": [
+        "forbidden",
+        "page_not_found",
+        "method_not_allowed",
+        "ratelimit_handler",
+        "internal_server_error",
+        "bad_gateway",
+        "service_unavailable",
+        "gateway_timeout"
+      ],
+      "api_metrics.py": [
+        "query_prometheus",
+        "get_histogram_metrics",
+        "get_endpoints_histogram",
+        "get_metrics",
+        "get_available_summary_metrics",
+        "get_metrics_list",
+        "get_metrics_summary",
+        "get_bucket_metrics",
+        "get_summary_metrics",
+        "fetch_running_docker_containers"
+      ],
+      "user_management.py": [
+        "create_user",
+        "view_users",
+        "update_user_profile",
+        "delete_user",
+        "manage_activities"
+      ],
+      "activation.py": [
+        "activation",
+        "download_license"
+      ],
+      "speedtest.py": [
+        "speedtest"
+      ],
+      "other.py": [
+        "send_email_page",
+        "about",
+        "show_os_info",
+        "terms",
+        "privacy",
+        "help",
+        "support",
+        "under_maintenance"
+      ],
+      "dashboard.py": [
+        "fetch_statistics",
+        "dashboard",
+        "api_dashboard_stats"
+      ],
+      "update_webhooks.py": [
+        "update_webhooks"
+      ],
+      "api.py": [
+        "system_api",
+        "get_cached_data",
+        "set_cached_data",
+        "graph_data_api",
+        "get_prometheus_targets",
+        "manage_refresh_interval",
+        "get_os_info_api",
+        "manage_prometheus_config",
+        "manage_alert_rules",
+        "ready_prometheus",
+        "get_retention",
+        "alert_history_api",
+        "get_chart_configurations",
+        "retrieve_labels",
+        "get_disk_usage",
+        "get_network_metrics",
+        "check_prometheus_health",
+        "check_alert_manager_health",
+        "get_status"
+      ],
+      "historical_system_metrics.py": [
+        "historical_system_metrics",
+        "chart_configurations",
+        "delete_chart_configuration",
+        "activate_chart_configuration"
+      ],
+      "process_info.py": [
+        "process",
+        "kill_process"
+      ],
+      "prometheus.py": [
+        "reload_prometheus",
+        "get_user_by_username",
+        "verify_user",
+        "metrics",
+        "metrics_",
+        "configure_targets",
+        "restart_prometheus",
+        "api_active_alerts",
+        "active_alerts",
+        "prometheus_rules_api",
+        "manage_rules",
+        "alertmanager_status",
+        "api_alertmanagers"
+      ],
+      "health.py": [
+        "health"
+      ],
+      "profile.py": [
+        "view_profile",
+        "change_password",
+        "edit_profile",
+        "delete_user_self",
+        "get_activities"
+      ],
+      "__init__.py": [],
+      "firewall.py": [
+        "firewall",
+        "perform_security_analysis"
+      ]
+    },
+    "config": {
+      "smtp_email_config.py": [
+        "smtp_config"
+      ]
+    },
+    "services": {
+      "services.py": [
+        "fetch_all_running_services",
+        "get_services_by_category",
+        "list_service_categories",
+        "show_system_services"
+      ]
+    },
+    "routes": {
+      "cmd_route.py": [
+        "hello",
+        "create_user",
+        "delete_user",
+        "update_user",
+        "list_users"
+      ],
+      "alert_route.py": [
+        "paginate_alerts",
+        "user_has_access_to_alert",
+        "user_id_to_username",
+        "check_monthly_alerts",
+        "receive_alerts",
+        "test_alert",
+        "alert_history",
+        "alert_ticket",
+        "mark_notification",
+        "mark_all_notifications",
+        "show_all_notifications",
+        "get_notification",
+        "decorated_function",
+        "paginate_alerts",
+        "log_and_save"
+      ]
+    }
+  }
+}

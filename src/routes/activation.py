@@ -8,7 +8,7 @@ from src.core.license.activator import (
     generate_unique_id, 
     LicenseManager
 )
-from src.services.activation_helper import generate_license_pdf
+from src.services.license.activation_helper import generate_license_pdf
 from src.core.license.activator import get_plan_details
 
 from src.services.notification.manager import generate_system_notification

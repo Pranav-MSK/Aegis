@@ -23,7 +23,7 @@ from src.models import UserProfile
 from src.helper.basic_info import ROOT_DIR
 from src.helper.logger import get_logger
 from src.services.common_helper import admin_required
-from src.services.prometheus_helper import (
+from src.services.monitoring.prometheus_helper import (
     load_yaml,
     save_yaml,
     show_targets,

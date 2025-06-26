@@ -1,5 +1,4 @@
 # cython: language_level=3
-# Import necessary libraries
 from flask import render_template, Blueprint, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func, case
@@ -7,11 +6,12 @@ from sqlalchemy import func, case
 from src.core.config.app_config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration, InstanceMetadata
 from src.helper.system_metrics import fetch_system_metrics
-from src.services.prometheus_helper import (
+from src.services.monitoring.prometheus_helper import (
     count_of_targets, 
     calculate_total_rules, 
     retrieve_active_alertmanagers
 )
+
 dashboard_bp = Blueprint("dashboard", __name__)
 
 def fetch_statistics(user_id):

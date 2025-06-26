@@ -1,6 +1,8 @@
 # cython: language_level=3
 import time
+
 from flask import jsonify, blueprints
+
 from src.core.config.app_config import app, get_app_info
 
 health_bp = blueprints.Blueprint("health", __name__)

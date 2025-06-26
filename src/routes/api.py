@@ -5,6 +5,7 @@ import aiohttp
 from datetime import datetime, timezone
 from flask import jsonify, blueprints, request, render_template
 from flask_login import login_required, current_user
+
 from src.core.config.app_config import app, db, csrf
 from src.models import (
     UserDashboardSettings,
@@ -20,7 +21,7 @@ from src.helper.os_info import (
 from src.helper.cache_utils import get_cached_value
 
 from src.services.common_helper import admin_required
-from src.services.prometheus_helper import (
+from src.services.monitoring.prometheus_helper import (
     load_prometheus_config,
     save_prometheus_config,
     load_alert_rules,

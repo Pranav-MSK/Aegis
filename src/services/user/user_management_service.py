@@ -90,6 +90,14 @@ class UserManagementService:
 
     def delete_user(self, user):
         self.send_user_deletion_email(user)
+        user.is_active = False
+        user.last_updated = datetime.utcnow()
+        user.save()
+        return True
+    
+    def hard_delete_user(self, user):
+        # hard delete user from the database
+        # remove entry from UserProfile
         user.delete()
         return True
 

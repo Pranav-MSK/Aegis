@@ -1,5 +1,6 @@
 # cython: language_level=3
 from flask import render_template, request, redirect, url_for, flash, Blueprint
+
 from src.core.config.app_config import app
 from src.services.common_helper import admin_required
 from src.services.webhook_service import get_settings_data, update_webhook_settings

@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, flash, jsonify
+
 from src.models import UserProfile
 from src.services.common_helper import admin_required
-from src.services.user_management_service import UserManagementService, ActivityService
+from src.services.user.user_management_service import UserManagementService, ActivityService
 from src.core.config.app_config import csrf, app
 
 user_management_bp = Blueprint('user_management', __name__)
@@ -42,7 +43,9 @@ def update_user_profile(username):
 @admin_required
 def delete_user(username):
     user = UserProfile.query.filter_by(username=username).first_or_404()
-    user_service.delete_user(user)
+    user_service.hard_delete_user(user) # soft delete
+    # If you want to hard delete, use user.hard_delete_user() instead
+    # user.delete()
     flash(f'User {username} has been deleted successfully!', 'success')
     return redirect("/system/user_management")
 

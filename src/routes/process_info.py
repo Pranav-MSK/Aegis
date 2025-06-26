@@ -9,12 +9,13 @@ from flask import (
     jsonify,
 )
 from flask_login import current_user, login_required
+
 from src.core.config.app_config import app, csrf
 from src.services.common_helper import (
     admin_required,
     handle_sudo_password,
 )
-from src.services.process_service import ProcessService
+from src.services.process.process_service import ProcessService
 
 process_bp = Blueprint("process", __name__)
 

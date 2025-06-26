@@ -3,6 +3,7 @@ import os
 import datetime
 from flask import render_template, Blueprint
 from flask_login import current_user
+
 from src.core.config.app_config import app
 from src.models import UserDashboardSettings, NetworkSpeedTestResult
 from src.helper.template_utils import render_template_from_file

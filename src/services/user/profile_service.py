@@ -2,6 +2,7 @@ import random
 import string
 import hashlib
 from datetime import datetime
+from turtle import st
 from sqlalchemy import desc
 from src.models import AlertTicket, UserProfile, UserActivity
 from src.schemas import UserNotification
@@ -93,8 +94,19 @@ class ProfileService:
 
     @staticmethod
     def delete_user(user):
-        user.delete()
+        # delete user from the database
+        user.is_active = False
+        user.last_updated = datetime.utcnow()
+        user.save()
+
         log_activity('delete', 'User deleted their account')
+
+    @staticmethod
+    def hard_delete_user(user):
+        # hard delete user from the database
+        # remove entry from UserProfile
+        user.delete()
+        return True
 
     @staticmethod
     def get_recent_activities(user_id, page=1, per_page=10):
