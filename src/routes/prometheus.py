@@ -37,20 +37,12 @@ from src.routes.helper.prometheus_helper import (
 )
 from src.services.decorators.access_decorators import systemguard_enterprise
 from src.config.config_loader import configuration_settings
-from src.clients.api_client import APIClient
-from src.clients.api_client import APIClient
+from clients.http_client.client import HttpClient
 
-prometheus_api_client = APIClient("prometheus")
+prometheus_api_client = HttpClient("prometheus")
 logger = get_logger(__name__)
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint("prometheus", __name__)
-
-PROMETHEUS_BASE_URL = configuration_settings.get(
-    "monitoring.prometheus", "BASE_URL"
-)
-ALERTMANAGER_BASE_URL = configuration_settings.get(
-    "monitoring.alertmanager", "BASE_URL"
-)
 
 PROMETHEUS_RELOAD_URL = configuration_settings.get(
     "monitoring.prometheus", "RELOAD_URL"

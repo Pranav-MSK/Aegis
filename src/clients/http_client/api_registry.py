@@ -1,5 +1,5 @@
 from typing import Dict, Optional
-from src.clients.base_client import BaseAPIClient
+from src.clients.http_client.base_client import BaseAPIClient
 
 
 class APIClientRegistry:

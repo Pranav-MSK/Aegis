@@ -1,5 +1,5 @@
 from src.config.app_config import app
-from src.clients.initialize_clients import register_all_clients
+from src.clients.http_client.initialize_clients import register_all_clients
 
 register_all_clients()
 

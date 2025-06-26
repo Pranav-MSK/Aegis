@@ -1,12 +1,12 @@
 import requests
 from typing import Dict, Any, Optional, Union
 
-from src.clients.api_registry import APIClientRegistry
-from src.clients.request_strategies import GetRequest, PostRequest, PutRequest, DeleteRequest
-from src.clients.base_client import RequestError, ResponseError
+from src.clients.http_client.api_registry import APIClientRegistry
+from src.clients.http_client.request_strategies import GetRequest, PostRequest, PutRequest, DeleteRequest
+from src.clients.http_client.base_client import RequestError, ResponseError
 
 
-class APIClient:
+class HttpClient:
     """High-level API client for making requests using strategy pattern"""
     
     def __init__(self, api_name: str):
