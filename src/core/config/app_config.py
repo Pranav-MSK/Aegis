@@ -14,7 +14,7 @@ from src.core.monitoring.disk_manager import DiskMetrics
 from src.core.monitoring.network_manager import NetworkMetrics
 from src.helper.basic_info import get_system_node_name, get_ip_address, ROOT_DIR
 from src.helper.secrets import load_secret_key
-from core.license.activator import get_plan_details
+from src.core.license.activator import get_plan_details
 from src.parser.markdown_parser import process_markdown_with_tailwind
 from src.core.config.config_loader import configuration_settings
 

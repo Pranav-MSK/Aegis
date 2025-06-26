@@ -9,7 +9,7 @@ from src.infrastructure.messaging.email_service import send_smtp_email
 from src.helper.os_info import get_os_release_info, get_os_info
 from src.helper.git_info import check_installation_information
 from src.services.common_helper import admin_required
-from core.license.activator import generate_unique_id
+from src.core.license.activator import generate_unique_id
 
 other_bp = blueprints.Blueprint('other', __name__)
 

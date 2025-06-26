@@ -1,5 +1,5 @@
 # cython: language_level=3
-from src.config.app_config import db
+from src.core.config.app_config import db
 
 
 class BaseModel(db.Model):

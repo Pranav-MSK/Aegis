@@ -4,7 +4,7 @@ import datetime
 import subprocess
 from flask import render_template, request, flash, blueprints, redirect, url_for, session
 
-from src.config.app_config import app, csrf
+from src.core.config.app_config import app, csrf
 from src.models import UserDashboardSettings, GeneralSettings
 from flask_login import login_required, current_user
 from src.helper.template_utils import render_template_from_file
@@ -15,7 +15,7 @@ from src.services.common_helper import (
     admin_required, 
     handle_sudo_password)
 
-from src.config.app_config import get_app_info
+from src.core.config.app_config import get_app_info
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 

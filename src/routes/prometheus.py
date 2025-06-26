@@ -18,7 +18,7 @@ from werkzeug.security import check_password_hash
 from functools import lru_cache
 from flask_login import login_required
 
-from src.config.app_config import app, get_app_info
+from src.core.config.app_config import app, get_app_info
 from src.models import UserProfile
 from src.helper.basic_info import ROOT_DIR
 from src.helper.logger import get_logger
@@ -36,7 +36,7 @@ from src.services.prometheus_helper import (
     calculate_total_rules,
 )
 from src.services.decorators.access_decorators import systemguard_enterprise
-from src.config.config_loader import configuration_settings
+from src.core.config.config_loader import configuration_settings
 from src.infrastructure.http.client import HttpClient
 
 prometheus_api_client = HttpClient("prometheus")

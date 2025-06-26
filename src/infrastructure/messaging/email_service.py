@@ -9,7 +9,7 @@ from flask import redirect, url_for, flash
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.models import GeneralSettings, SMTPSettings
-from src.config.app_config import get_app_info, app
+from src.core.config.app_config import get_app_info, app
 
 system_name = os.uname().sysname
 

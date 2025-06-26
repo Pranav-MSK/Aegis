@@ -5,7 +5,7 @@ import requests
 from flask import render_template, blueprints, jsonify, request
 from flask_login import login_required
 
-from src.config.app_config import app
+from src.core.config.app_config import app
 from src.services.service_helper import get_running_docker_containers
 from src.services.decorators.access_decorators import systemguard_enterprise, community_edition
 from src.infrastructure.http.client import HttpClient

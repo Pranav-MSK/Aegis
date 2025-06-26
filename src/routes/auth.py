@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import LoginManager
-from src.config.app_config import app
+from src.core.config.app_config import app
 from src.services.auth_service import AuthService
 from src.models import UserProfile
 

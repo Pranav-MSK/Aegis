@@ -2,7 +2,7 @@
 from flask import render_template, request, Blueprint
 from flask_login import login_required
 
-from src.config.app_config import app, csrf
+from src.core.config.app_config import app, csrf
 from src.services.unified_logger_service import UnifiedLoggerService
 from src.services.decorators.access_decorators import systemguard_enterprise
 

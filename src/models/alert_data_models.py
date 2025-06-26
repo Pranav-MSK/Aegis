@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import CheckConstraint
 
 from src.models.base_model import BaseModel
-from src.config.app_config import db
+from src.core.config.app_config import db
 
 
 # Alert Ticket model to save the alert ticket data

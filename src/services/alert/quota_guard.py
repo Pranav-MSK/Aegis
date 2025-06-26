@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 from src.models import (
     AlertTicket,
 )
-from src.config.app_config import get_app_info
+from src.core.config.app_config import get_app_info
 
 def can_create_alert():
     try:

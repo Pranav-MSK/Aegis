@@ -3,7 +3,7 @@ from flask import render_template, blueprints, jsonify
 from http.client import HTTPException
 from flask_login import login_required
 
-from src.config.app_config import app
+from src.core.config.app_config import app
 from src.services.service_helper import ServiceMonitor
 from src.services.decorators.access_decorators import systemguard_enterprise
 

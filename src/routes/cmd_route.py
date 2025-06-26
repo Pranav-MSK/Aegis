@@ -1,6 +1,6 @@
 # cython: language_level=3
 from flask import blueprints
-from src.config.app_config import app
+from src.core.config.app_config import app
 
 cmd_bp = blueprints.Blueprint("cmd", __name__)
 

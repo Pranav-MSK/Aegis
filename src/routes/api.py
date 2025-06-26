@@ -5,7 +5,7 @@ import aiohttp
 from datetime import datetime, timezone
 from flask import jsonify, blueprints, request, render_template
 from flask_login import login_required, current_user
-from src.config.app_config import app, db, csrf
+from src.core.config.app_config import app, db, csrf
 from src.models import (
     UserDashboardSettings,
     AlertTicket,
@@ -26,9 +26,9 @@ from src.services.prometheus_helper import (
     load_alert_rules,
     save_alert_rules,
 )
-from src.config.app_config import disk_metrics, network_metrics
+from src.core.config.app_config import disk_metrics, network_metrics
 from src.services.health_helper import check_database
-from src.config.config_loader import configuration_settings
+from src.core.config.config_loader import configuration_settings
 from src.helper.logger import get_logger
 from src.infrastructure.http.client import HttpClient
 

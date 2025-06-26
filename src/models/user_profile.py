@@ -5,7 +5,7 @@ from flask_login import UserMixin
 from werkzeug.security import check_password_hash
 from humanize import naturaltime
 
-from src.config.app_config import db
+from src.core.config.app_config import db
 from src.models.base_model import BaseModel
 
 

@@ -15,7 +15,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 
-from src.config.app_config import app, csrf, db, get_app_info
+from src.core.config.app_config import app, csrf, db, get_app_info
 from src.helper.basic_info import get_ip_address
 from src.helper.logger import get_logger
 from src.models import (

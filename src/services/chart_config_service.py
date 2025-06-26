@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, jsonify, flash
 from src.models import ChartConfiguration
 from src.helper.request_utils import get_form_value
-from src.config.app_config import get_app_info
+from src.core.config.app_config import get_app_info
 from src.helper.logger import get_logger
 
 logger = get_logger(__name__)

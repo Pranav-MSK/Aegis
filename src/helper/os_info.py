@@ -5,7 +5,7 @@ import platform
 import functools
 
 from src.helper.logger import get_logger
-from src.config.config_loader import configuration_settings
+from src.core.config.config_loader import configuration_settings
 
 logger = get_logger(__name__)
 

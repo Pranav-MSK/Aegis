@@ -11,5 +11,5 @@ def load_config(file_path: Path) -> configparser.ConfigParser:
     
     return config
 
-config_file = ROOT_DIR / 'src' / 'config' / 'config.ini'
+config_file = ROOT_DIR / 'src' / 'core' / 'config' / 'config.ini'
 configuration_settings = load_config(config_file)

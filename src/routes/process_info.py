@@ -9,7 +9,7 @@ from flask import (
     jsonify,
 )
 from flask_login import current_user, login_required
-from src.config.app_config import app, csrf
+from src.core.config.app_config import app, csrf
 from src.services.common_helper import (
     admin_required,
     handle_sudo_password,

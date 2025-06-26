@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask_login import login_required
 
-from src.config.app_config import app
+from src.core.config.app_config import app
 from src.services.decorators.access_decorators import systemguard_enterprise
 from src.services.common_helper import handle_sudo_password, admin_required
 from src.helper.logger import get_logger

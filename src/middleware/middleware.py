@@ -12,7 +12,7 @@ from prometheus_client import Counter
 from src.core.config.app_config import app
 from src.helper.logger import get_logger
 
-from core.license.activator import get_plan_details
+from src.core.license.activator import get_plan_details
 from src.tasks.prometheus_metrics import metrics
 
 middleware_bp = blueprints.Blueprint("middleware", __name__)

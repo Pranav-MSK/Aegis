@@ -1,7 +1,7 @@
 # cython: language_level=3
 from typing import List, Dict, Any
 
-from src.config.app_config import db
+from src.core.config.app_config import db
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
 from src.models import (

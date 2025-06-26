@@ -2,7 +2,7 @@
 from functools import wraps
 from flask import abort, current_app
 
-from core.license.activator import get_plan_details
+from src.core.license.activator import get_plan_details
 
 
 class PlanAuthorizationError(Exception):

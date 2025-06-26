@@ -3,13 +3,13 @@ import datetime
 import stat
 from werkzeug.security import generate_password_hash
 from flask_login import login_user, logout_user, current_user
-from src.config.app_config import db
+from src.core.config.app_config import db
 from src.models import UserProfile, UserDashboardSettings
 from src.infrastructure.messaging.email_service import send_smtp_email
 from src.helper.template_utils import render_template_from_file
 from src.helper.basic_info import ROOT_DIR
 from src.services.common_helper import get_email_addresses
-from src.config.app_config import get_app_info
+from src.core.config.app_config import get_app_info
 from src.helper.logger import get_logger
 
 logger = get_logger(__name__)

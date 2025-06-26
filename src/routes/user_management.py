@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, flash, jsonify
 from src.models import UserProfile
 from src.services.common_helper import admin_required
 from src.services.user_management_service import UserManagementService, ActivityService
-from src.config.app_config import csrf, app
+from src.core.config.app_config import csrf, app
 
 user_management_bp = Blueprint('user_management', __name__)
 user_service = UserManagementService()

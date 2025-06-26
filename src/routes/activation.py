@@ -4,12 +4,12 @@ from flask import render_template, request, Blueprint, flash, redirect, url_for,
 from flask_login import login_required
 
 from src.core.config.app_config import app
-from core.license.activator import (
+from src.core.license.activator import (
     generate_unique_id, 
     LicenseManager
 )
 from src.services.activation_helper import generate_license_pdf
-from core.license.activator import get_plan_details
+from src.core.license.activator import get_plan_details
 
 from src.services.notification.manager import generate_system_notification
 from src.schemas import UserNotification   
