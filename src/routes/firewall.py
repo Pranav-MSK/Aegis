@@ -4,7 +4,7 @@ from flask_login import login_required
 
 from src.config.app_config import app
 from src.services.decorators.access_decorators import systemguard_enterprise
-from src.routes.helper.common_helper import handle_sudo_password, admin_required
+from src.services.common_helper import handle_sudo_password, admin_required
 from src.helper.logger import get_logger
 from src.services.firewall.firewall_service import FirewallService
 from src.services.firewall.security_scan_service import SecurityScanService

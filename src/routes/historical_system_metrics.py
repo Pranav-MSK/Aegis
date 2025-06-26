@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
 from src.config.app_config import app, csrf
-from src.routes.helper.common_helper import admin_required
+from src.services.common_helper import admin_required
 from src.services.chart_config_service import ChartConfigService
 
 graphs_bp = Blueprint("charts", __name__)

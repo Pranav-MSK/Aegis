@@ -3,7 +3,7 @@ from flask import render_template, request, flash, redirect, url_for, blueprints
 
 from src.config.app_config import app, db
 from src.models import SMTPSettings
-from src.routes.helper.common_helper import admin_required
+from src.services.common_helper import admin_required
 
 smtp_email_config_bp = blueprints.Blueprint('smtp_email_config', __name__)
 

@@ -10,7 +10,7 @@ from src.helper.basic_info import ROOT_DIR
 from src.helper.speedtest_utils import run_speedtest
 from src.services.messaging.email_service import send_smtp_email
 from src.config.app_config import get_app_info
-from src.routes.helper.common_helper import admin_required
+from src.services.common_helper import admin_required
 
 speedtest_bp = Blueprint("speedtest", __name__)
 

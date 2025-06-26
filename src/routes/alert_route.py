@@ -1,44 +1,82 @@
 # cython: language_level=3
-from http import HTTPStatus
 from datetime import datetime
+from functools import wraps
+from http import HTTPStatus
+
 from flask import (
-    request,
-    jsonify,
     Blueprint,
-    render_template,
-    redirect,
-    url_for,
+    abort,
     flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
 from flask_login import current_user, login_required
 
 from src.config.app_config import app, csrf, db, get_app_info
+from src.helper.basic_info import get_ip_address
 from src.helper.logger import get_logger
-logger = get_logger(__name__)
-
+from src.models import (
+    AlertLog,
+    AlertTicket,
+    CustomFields,
+    InvestigationNote,
+    SystemNotification,
+    UserProfile,
+)
+from src.schemas import UserNotification
 from src.services.alert.alertmanager_adapter import send_test_alert
 from src.services.alert.processor import AlertProcessor
-from src.helper.basic_info import get_ip_address
-from src.models import (
-    AlertTicket,
-    UserProfile,
-    InvestigationNote,
-    AlertLog,
-    CustomFields,
-    SystemNotification,
-)
-
+from src.services.common_helper import award_points
 from src.services.decorators.access_decorators import (
-    systemguard_enterprise,
     community_edition,
+    systemguard_enterprise,
 )
-from src.routes.helper.decorators import user_has_access_to_alert, user_id_to_username
-from src.services.notification.manager import generate_system_notification
-from src.schemas import UserNotification   
-from src.routes.helper.common_helper import award_points
-from src.services.notification.manager import fetch_user_notifications
+from src.services.notification.manager import (
+    fetch_user_notifications,
+    generate_system_notification,
+)
 
+# Initialize logger
+logger = get_logger(__name__)
+
+# Initialize blueprint
 alert_bp = Blueprint("alert", __name__)
+
+
+
+def paginate_alerts(ticket_status, page, per_page=10):
+    return AlertTicket.query.filter_by(ticket_status=ticket_status).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+
+
+def user_has_access_to_alert(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        alert_id = kwargs.get("alert_id")
+        alert = AlertTicket.query.get(alert_id)
+
+        if not alert:
+            flash("Alert not found!", "error")
+            return redirect(url_for("alert_history"))
+
+        if current_user.user_level != "admin" and current_user.id not in {
+            alert.assigned_user_id,
+            alert.assigned_supervisor_id,
+        }:
+            abort(403, description="You do not have access to this alert ticket.")
+
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def user_id_to_username(user_id):
+    user = UserProfile.query.get(user_id)
+    return user.username if user else "Unknown"
 
 @app.route("/api/v1/check_monthly_alerts")
 @login_required

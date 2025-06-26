@@ -10,7 +10,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from src.config.app_config import app, csrf
-from src.routes.helper.common_helper import (
+from src.services.common_helper import (
     admin_required,
     handle_sudo_password,
 )

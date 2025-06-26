@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from src.config.app_config import app
-from src.routes.helper.common_helper import admin_required
+from src.services.common_helper import admin_required
 from src.services.ec2_metadata_service import Ec2MetadataService
 
 ec2_metadata_bp = Blueprint("experimental", __name__)

@@ -8,7 +8,7 @@ from src.config.app_config import app, csrf, get_app_info
 from src.models import UserProfile, AlertTicket, ChartConfiguration, InstanceMetadata
 from src.helper.system_metrics import fetch_system_metrics
 from src.core.activator import get_plan_details
-from src.routes.helper.prometheus_helper import (
+from src.services.prometheus_helper import (
     count_of_targets, 
     calculate_total_rules, 
     retrieve_active_alertmanagers

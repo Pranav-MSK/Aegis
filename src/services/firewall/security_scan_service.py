@@ -1,4 +1,4 @@
-from src.routes.helper.network_helper import handle_network_scan, handle_port_scan
+from src.services.network_helper import handle_network_scan, handle_port_scan
 
 class SecurityScanService:
     def handle_network_scan(self):

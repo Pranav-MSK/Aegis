@@ -19,15 +19,15 @@ from src.helper.os_info import (
 )
 from src.helper.cache_utils import get_cached_value
 
-from src.routes.helper.common_helper import admin_required
-from src.routes.helper.prometheus_helper import (
+from src.services.common_helper import admin_required
+from src.services.prometheus_helper import (
     load_prometheus_config,
     save_prometheus_config,
     load_alert_rules,
     save_alert_rules,
 )
 from src.config.app_config import disk_metrics, network_metrics
-from src.routes.helper.health_helper import check_database
+from src.services.health_helper import check_database
 from src.config.config_loader import configuration_settings
 from src.helper.logger import get_logger
 from src.clients.http_client.client import HttpClient

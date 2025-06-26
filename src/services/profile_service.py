@@ -6,7 +6,7 @@ from sqlalchemy import desc
 from src.models import AlertTicket, UserProfile, UserActivity
 from src.schemas import UserNotification
 from src.services.notification.manager import generate_system_notification
-from src.routes.helper.common_helper import log_activity
+from src.services.common_helper import log_activity
 from flask_login import current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 

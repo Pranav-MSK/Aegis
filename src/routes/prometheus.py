@@ -22,8 +22,8 @@ from src.config.app_config import app, get_app_info
 from src.models import UserProfile
 from src.helper.basic_info import ROOT_DIR
 from src.helper.logger import get_logger
-from src.routes.helper.common_helper import admin_required
-from src.routes.helper.prometheus_helper import (
+from src.services.common_helper import admin_required
+from src.services.prometheus_helper import (
     load_yaml,
     save_yaml,
     show_targets,
