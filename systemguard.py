@@ -1,4 +1,4 @@
-from src.config.app_config import app
+from src.core.config.app_config import app
 from src.infrastructure.http.initialize_clients import register_all_clients
 
 register_all_clients()
@@ -6,7 +6,7 @@ register_all_clients()
 from src import routes
 from src import middleware
 from src.tasks import start_background_tasks
-from src.config.config_loader import configuration_settings
+from src.core.config.config_loader import configuration_settings
 
 # Start the background tasks
 start_background_tasks()

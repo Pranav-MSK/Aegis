@@ -10,13 +10,13 @@ from flask_wtf.csrf import CSRFProtect
 from datetime import datetime
 from humanize import naturaltime
 
-from src.core.disk_manager import DiskMetrics
-from src.core.network_manager import NetworkMetrics
+from src.core.monitoring.disk_manager import DiskMetrics
+from src.core.monitoring.network_manager import NetworkMetrics
 from src.helper.basic_info import get_system_node_name, get_ip_address, ROOT_DIR
 from src.helper.secrets import load_secret_key
-from src.core.activator import get_plan_details
+from core.license.activator import get_plan_details
 from src.parser.markdown_parser import process_markdown_with_tailwind
-from src.config.config_loader import configuration_settings
+from src.core.config.config_loader import configuration_settings
 
 # disk and metrics background process
 disk_metrics = DiskMetrics()

@@ -3,13 +3,13 @@ import os
 from flask import render_template, request, Blueprint, flash, redirect, url_for, send_file
 from flask_login import login_required
 
-from src.config.app_config import app
-from src.core.activator import (
+from src.core.config.app_config import app
+from core.license.activator import (
     generate_unique_id, 
     LicenseManager
 )
 from src.services.activation_helper import generate_license_pdf
-from src.core.activator import get_plan_details
+from core.license.activator import get_plan_details
 
 from src.services.notification.manager import generate_system_notification
 from src.schemas import UserNotification   

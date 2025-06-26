@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 from src.helper.logger import get_logger
 logger = get_logger(__name__)
-from src.config.app_config import app, db
+from src.core.config.app_config import app, db
 from src.helper.system_metrics import _collect_metrics
 from src.models import GeneralSettings
 from src.tasks.prometheus_metrics import metrics
