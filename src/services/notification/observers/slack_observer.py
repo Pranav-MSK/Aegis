@@ -1,6 +1,6 @@
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.services.messaging.slack_service import dispatch_slack_alert
+from src.infrastructure.messaging.slack_service import dispatch_slack_alert
 
 class SlackAlertObserver(AlertObserver):
 

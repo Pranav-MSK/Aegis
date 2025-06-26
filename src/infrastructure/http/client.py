@@ -1,9 +1,9 @@
 import requests
 from typing import Dict, Any, Optional, Union
 
-from src.clients.http_client.api_registry import APIClientRegistry
-from src.clients.http_client.request_strategies import GetRequest, PostRequest, PutRequest, DeleteRequest
-from src.clients.http_client.base_client import RequestError, ResponseError
+from src.infrastructure.http.api_registry import APIClientRegistry
+from src.infrastructure.http.request_strategies import GetRequest, PostRequest, PutRequest, DeleteRequest
+from src.infrastructure.http.base_client import RequestError, ResponseError
 
 
 class HttpClient:

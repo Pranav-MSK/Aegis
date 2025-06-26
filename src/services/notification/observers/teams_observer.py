@@ -1,6 +1,6 @@
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.services.messaging.team_service import dispatch_teams_alert
+from src.infrastructure.messaging.team_service import dispatch_teams_alert
 
 class TeamsAlertObserver(AlertObserver):
 

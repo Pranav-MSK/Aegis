@@ -2,7 +2,7 @@
 from flask import render_template, blueprints
 
 from src.config.app_config import app
-from src.background_task.prometheus_metrics import metrics
+from src.tasks.prometheus_metrics import metrics
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
 

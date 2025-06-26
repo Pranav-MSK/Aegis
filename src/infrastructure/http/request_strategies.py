@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.clients.http_client.base_client import BaseAPIClient
+from src.infrastructure.http.base_client import BaseAPIClient
 
 
 class RequestStrategy(ABC):

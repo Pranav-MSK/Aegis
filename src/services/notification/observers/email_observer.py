@@ -1,7 +1,7 @@
 import os
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.services.messaging.email_service import send_smtp_email
+from src.infrastructure.messaging.email_service import send_smtp_email
 from src.services.common_helper import get_email_addresses
 from src.helper.template_utils import render_template_from_file
 from src.helper.basic_info import ROOT_DIR

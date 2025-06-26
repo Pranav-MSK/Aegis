@@ -2,7 +2,7 @@
 Centralized API client registration module.
 This module registers all API clients used by the application.
 """
-from src.clients.http_client.api_registry import APIClientRegistry
+from src.infrastructure.http.api_registry import APIClientRegistry
 from src.config.config_loader import configuration_settings
 
 METADATA_URL = configuration_settings.get("aws.metadata", "METADATA_URL")

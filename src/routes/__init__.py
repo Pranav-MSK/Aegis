@@ -20,7 +20,6 @@ from src.routes.update_webhooks import webhooks_bp
 from src.routes.activation import activation_bp
 from src.routes.services import services_bp
 from src.routes.api_metrics import metrics_bp
-from src.routes.middleware import middleware_bp
 from src.routes.cmd_route import cmd_bp
 from src.routes.discussion_board import discussion_board_bp
 from src.routes.unified_logger import unified_logger_bp

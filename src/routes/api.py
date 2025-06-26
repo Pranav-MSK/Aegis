@@ -30,7 +30,7 @@ from src.config.app_config import disk_metrics, network_metrics
 from src.services.health_helper import check_database
 from src.config.config_loader import configuration_settings
 from src.helper.logger import get_logger
-from src.clients.http_client.client import HttpClient
+from src.infrastructure.http.client import HttpClient
 
 # Initialize logger
 logger = get_logger(__name__)

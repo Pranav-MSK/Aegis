@@ -1,40 +1,44 @@
-# db_connector/sqlite_connector.py
+# db_connector/postgresql_connector.py
 
-import os
-import sqlite3
 from typing import List, Tuple, Optional, Union, Dict
 import logging
 
-from src.clients.db_client.base import DBConnection, DatabaseError
+from src.infrastructure.database.base import DBConnection, DatabaseError
 
-EXPAND_USER = os.path.expanduser('~')
-DEFAULT_SQLITE_PATH = os.path.join(EXPAND_USER, ".database/systemguard.db")
 
-class SQLiteConnection(DBConnection):
-    """SQLite implementation of the database connection."""
+class PostgreSQLConnection(DBConnection):
+    """PostgreSQL implementation of the database connection."""
     
-    def __init__(self, db_path: str = DEFAULT_SQLITE_PATH):
-        self.db_path = db_path
-        self._ensure_directory_exists()
-        self.conn: Optional[sqlite3.Connection] = None
-    
-    def _ensure_directory_exists(self) -> None:
-        """Ensure the directory for the database file exists."""
-        directory = os.path.dirname(self.db_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory, exist_ok=True)
+    def __init__(self, host: str, database: str, user: str, password: str, port: int = 5432):
+        self.host = host
+        self.database = database
+        self.user = user
+        self.password = password
+        self.port = port
+        self.conn = None
+        
+        # Import psycopg2 here to avoid making it a hard dependency
+        try:
+            import psycopg2
+            self.psycopg2 = psycopg2
+        except ImportError:
+            raise ImportError("psycopg2 is required for PostgreSQL support. Install it with 'pip install psycopg2'.")
     
     def connect(self) -> bool:
-        """Establish a connection to the SQLite database."""
+        """Establish a connection to the PostgreSQL database."""
         if self.conn is not None:
             return True
             
         try:
-            self.conn = sqlite3.connect(self.db_path)
-            # Enable foreign keys
-            self.conn.execute("PRAGMA foreign_keys = ON")
+            self.conn = self.psycopg2.connect(
+                host=self.host,
+                database=self.database,
+                user=self.user,
+                password=self.password,
+                port=self.port
+            )
             return True
-        except sqlite3.Error as e:
+        except self.psycopg2.Error as e:
             return False
     
     def close(self) -> None:
@@ -52,7 +56,7 @@ class SQLiteConnection(DBConnection):
             cursor = self.conn.cursor() # type: ignore
             cursor.execute(query, params)
             return True
-        except sqlite3.Error as e:
+        except self.psycopg2.Error as e:
             return False
     
     def fetch_one(self, query: str, params: Union[Tuple, List, Dict] = ()) -> Optional[Tuple]:
@@ -64,7 +68,7 @@ class SQLiteConnection(DBConnection):
             cursor = self.conn.cursor() # type: ignore
             cursor.execute(query, params)
             return cursor.fetchone()
-        except sqlite3.Error as e:
+        except self.psycopg2.Error as e:
             return None
     
     def fetch_all(self, query: str, params: Union[Tuple, List, Dict] = ()) -> List[Tuple]:
@@ -76,7 +80,7 @@ class SQLiteConnection(DBConnection):
             cursor = self.conn.cursor() # type: ignore
             cursor.execute(query, params)
             return cursor.fetchall()
-        except sqlite3.Error as e:
+        except self.psycopg2.Error as e:
             return []
     
     def begin_transaction(self) -> None:
@@ -85,8 +89,10 @@ class SQLiteConnection(DBConnection):
             raise DatabaseError("Could not establish database connection")
         
         try:
-            self.conn.execute("BEGIN TRANSACTION") # type: ignore
-        except sqlite3.Error as e:
+            # PostgreSQL automatically starts a transaction when you execute a command
+            # but we can explicitly do it for clarity
+            self.conn.autocommit = False # type: ignore
+        except self.psycopg2.Error as e:
             raise DatabaseError(f"Failed to begin transaction: {e}")
     
     def commit(self) -> None:
@@ -96,7 +102,7 @@ class SQLiteConnection(DBConnection):
             
         try:
             self.conn.commit()
-        except sqlite3.Error as e:
+        except self.psycopg2.Error as e:
             raise DatabaseError(f"Failed to commit transaction: {e}")
     
     def rollback(self) -> None:
@@ -106,7 +112,7 @@ class SQLiteConnection(DBConnection):
             
         try:
             self.conn.rollback()
-        except sqlite3.Error as e:
+        except self.psycopg2.Error as e:
             raise DatabaseError(f"Failed to rollback transaction: {e}")
     
     def __enter__(self):

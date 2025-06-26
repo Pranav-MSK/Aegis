@@ -1,9 +1,9 @@
 # db_connector/factory.py
 
 import os
-from src.clients.db_client.base import DBConnection
-from src.clients.db_client.sqlite_connector import SQLiteConnection, DEFAULT_SQLITE_PATH
-from src.clients.db_client.postgresql_connector import PostgreSQLConnection
+from src.infrastructure.database.base import DBConnection
+from src.infrastructure.database.sqlite_connector import SQLiteConnection, DEFAULT_SQLITE_PATH
+from src.infrastructure.database.postgresql_connector import PostgreSQLConnection
 
 class DatabaseFactory:
     """Factory class for creating database connections."""

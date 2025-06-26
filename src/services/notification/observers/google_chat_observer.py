@@ -1,6 +1,6 @@
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.services.messaging.google_chat_service import dispatch_google_chat_notification
+from src.infrastructure.messaging.google_chat_service import dispatch_google_chat_notification
 
 class GoogleChatAlertObserver(AlertObserver):
 

@@ -3,7 +3,7 @@ import json
 import requests
 from typing import Dict, Any
 
-from src.clients.http_client.client import HttpClient
+from src.infrastructure.http.client import HttpClient
 
 alertmanager_api_client = HttpClient("alertmanager")
 

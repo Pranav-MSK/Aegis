@@ -1,0 +1,1 @@
+from src.middleware.middleware import middleware_bp

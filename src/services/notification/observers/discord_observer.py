@@ -1,7 +1,7 @@
 from src.services import notification
 from src.services.notification.observers.base_observer import AlertObserver
 
-from src.services.messaging.discord_service import dispatch_alert_to_discord
+from src.infrastructure.messaging.discord_service import dispatch_alert_to_discord
 
 class DiscordAlertObserver(AlertObserver):
 

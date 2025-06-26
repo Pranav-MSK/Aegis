@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 from src.config.app_config import app, db
 from src.helper.system_metrics import _collect_metrics
 from src.models import GeneralSettings
-from src.background_task.prometheus_metrics import metrics
+from src.tasks.prometheus_metrics import metrics
 
 # Constants
 LOGGING_INTERVAL = 1  # Log every second

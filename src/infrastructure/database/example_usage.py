@@ -1,7 +1,7 @@
 # example_usage.py
 
 # from db_connector import DatabaseFactory
-from src.clients.db_client.factory import DatabaseFactory
+from src.infrastructure.database.factory import DatabaseFactory
 
 def sqlite_example():
     """Example of using SQLite connection"""

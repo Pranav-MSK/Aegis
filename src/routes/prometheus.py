@@ -37,7 +37,7 @@ from src.services.prometheus_helper import (
 )
 from src.services.decorators.access_decorators import systemguard_enterprise
 from src.config.config_loader import configuration_settings
-from src.clients.http_client.client import HttpClient
+from src.infrastructure.http.client import HttpClient
 
 prometheus_api_client = HttpClient("prometheus")
 

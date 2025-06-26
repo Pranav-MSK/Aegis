@@ -7,7 +7,9 @@ import requests
 
 from src.helper.basic_info import ROOT_DIR
 from src.helper.logger import get_logger
-from src.clients.http_client.client import HttpClient
+from src.infrastructure.http.client import HttpClient
+
+
 logger = get_logger(__name__)
 
 prometheus_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/prometheus.yml')

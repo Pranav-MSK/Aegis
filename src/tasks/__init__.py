@@ -1,6 +1,6 @@
 # cython: language_level=3
 import os
-from src.background_task.log_system_info import initialize_logging
+from src.tasks.log_system_info import initialize_logging
 
 
 
