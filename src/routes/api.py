@@ -30,10 +30,13 @@ from src.config.app_config import disk_metrics, network_metrics
 from src.routes.helper.health_helper import check_database
 from src.config.config_loader import configuration_settings
 from src.helper.logger import get_logger
+from src.clients.http_client.client import HttpClient
 
 # Initialize logger
 logger = get_logger(__name__)
 
+prometheus_api_client = HttpClient("prometheus")
+alertmanager_api_client = HttpClient("alertmanager")
 api_bp = blueprints.Blueprint("api", __name__)
 
 cache = {}
@@ -220,7 +223,7 @@ def graph_data_api():
 def get_prometheus_targets():
     try:
         # Query Prometheus API to get the targets
-        response = requests.get(TARGETS_API_URL)
+        response = prometheus_api_client.get("/api/v1/targets")
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -375,8 +378,7 @@ def manage_alert_rules():
 
 @app.route("/api/v1/prometheus/ready")
 def ready_prometheus():
-    url = f"{PROMETHEUS_BASE_URL}/-/ready"
-    response = requests.get(url)
+    response = prometheus_api_client.get("/-/ready", timeout=5)
 
     if response.status_code == 200:
         return jsonify({"status": "success", "message": response.text}), 200
@@ -397,7 +399,7 @@ def ready_prometheus():
 def get_retention():
     try:
         # Fetch current flags from Prometheus
-        response = requests.get(f"{PROMETHEUS_BASE_URL}/api/v1/status/flags")
+        response = prometheus_api_client.get("/api/v1/status/flags")
         flags = response.json().get("data", {})
 
         # Get the current value of "storage.tsdb.retention.time"
@@ -454,7 +456,7 @@ def get_chart_configurations():
 @app.route("/api/v1/labels", methods=["GET"])
 @login_required
 def retrieve_labels():
-    response = requests.get("http://localhost:9090/api/v1/label/__name__/values")
+    response = prometheus_api_client.get("/api/v1/label/__name__/values")
     data = response.json().get("data", [])
     return render_template("graphs/labels.html", labels=data)
 
@@ -474,9 +476,8 @@ def get_network_metrics():
 
 
 def check_prometheus_health():
-    prometheus_url = 'http://localhost:9090/api/v1/targets'  # Adjust the URL as necessary
     try:
-        response = requests.get(prometheus_url, timeout=2)
+        response = prometheus_api_client.get("/api/v1/targets")
         if response.status_code == 200:
             return "healthy"
         else:
@@ -485,9 +486,9 @@ def check_prometheus_health():
         return "unhealthy"
 
 def check_alert_manager_health():
-    alert_manager_url = 'http://localhost:9093/api/v2/status'
+    # alert_manager_url = 'http://localhost:9093/api/v2/status'
     try:
-        response = requests.get(alert_manager_url, timeout=2)
+        response = alertmanager_api_client.get("/api/v2/status")
         if response.status_code == 200:
             return "healthy"
         else:

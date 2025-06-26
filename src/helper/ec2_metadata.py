@@ -5,6 +5,8 @@ from functools import lru_cache
 
 from src.helper.logger import get_logger
 from src.config.config_loader import configuration_settings
+from src.clients.http_client.client import HttpClient
+
 logger = get_logger(__name__)
 
 CACHE_EXPIRATION = configuration_settings.getint("metrics.settings", "CACHE_EXPIRATION")
@@ -15,6 +17,8 @@ TOKEN_URL = configuration_settings.get("aws.metadata", "TOKEN_URL")
 
 CONVERSION_FACTOR_MB = 1024**2 if DIVIDE_BY_1024 else 1000**2
 CONVERSION_FACTOR_GB = 1024**3 if DIVIDE_BY_1024 else 1000**3
+
+aws_client =  HttpClient("aws_metadata")
 
 @lru_cache(maxsize=1)
 def get_instance_metadata():

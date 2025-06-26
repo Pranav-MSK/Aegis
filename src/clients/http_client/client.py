@@ -17,28 +17,26 @@ class HttpClient:
         self._put_strategy = PutRequest()
         self._delete_strategy = DeleteRequest()
     
-    def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> requests.Response:
-        
+    def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None, timeout: int = 30, **kwargs) -> requests.Response:
         try:
-            return self._get_strategy.execute(self.client, endpoint, params=params)
+            return self._get_strategy.execute(self.client, endpoint, params=params, timeout=timeout, **kwargs)
         except (RequestError, ResponseError) as e:
             raise
     
-    def post(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> requests.Response:
-        
+    def post(self, endpoint: str, data: Optional[list[dict[str, Any]]] = None, timeout: int = 30, **kwargs) -> requests.Response:
         try:
-            return self._post_strategy.execute(self.client, endpoint, data=data)
+            return self._post_strategy.execute(self.client, endpoint, data=data, timeout=timeout, **kwargs)
         except (RequestError, ResponseError) as e:
             raise
     
-    def put(self, endpoint: str, data: Optional[Dict[str, Any]] = None) -> requests.Response:
+    def put(self, endpoint: str, data: Optional[Dict[str, Any]] = None, timeout: int = 30, **kwargs) -> requests.Response:
         try:
-            return self._put_strategy.execute(self.client, endpoint, data=data)
+            return self._put_strategy.execute(self.client, endpoint, data=data, timeout=timeout, **kwargs)
         except (RequestError, ResponseError) as e:
             raise
     
-    def delete(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> requests.Response:
+    def delete(self, endpoint: str, params: Optional[Dict[str, Any]] = None, timeout: int = 30, **kwargs) -> requests.Response:
         try:
-            return self._delete_strategy.execute(self.client, endpoint, params=params)
+            return self._delete_strategy.execute(self.client, endpoint, params=params, timeout=timeout, **kwargs)
         except (RequestError, ResponseError) as e:
             raise

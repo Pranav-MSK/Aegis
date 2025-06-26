@@ -3,16 +3,17 @@ import json
 import requests
 from typing import Dict, Any
 
-def send_test_alert(alertmanager_url, alert_name, severity, instance):
+from src.clients.http_client.client import HttpClient
+
+alertmanager_api_client = HttpClient("alertmanager")
+
+def send_test_alert(alert_name, severity, instance):
     # Generate a unique alert name by appending the current timestamp
     unique_alert_name = f"{alert_name}_{int(time.time())}"
 
     # Create a detailed description for the alert
-    description = (
-        f"This is a test alert generated at {time.strftime('%Y-%m-%d %H:%M:%S')}.\n"
-        "This alert is intended for testing purposes only and does not indicate any real issues.\n"
-        "If this alert appears in your monitoring system, please disregard it."
-    )
+    description = """If you see this alert, it means that the Alertmanager is functioning correctly. """
+    
     # Define the alert data with the unique alert name and improved annotations
     alert_data = [
         {
@@ -31,13 +32,11 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
 
     # Send the POST request to Alertmanager
     try:
-        response = requests.post(
-            f"{alertmanager_url}/api/v2/alerts",
-            headers={"Content-Type": "application/json"},
-            data=json.dumps(alert_data),
+        response = alertmanager_api_client.post(
+            endpoint="/api/v2/alerts",
+            data=alert_data,
             timeout=10,
         )
-
         # Check the response
         if response.status_code in (200, 202):
             return {

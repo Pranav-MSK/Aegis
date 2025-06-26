@@ -8,20 +8,18 @@ from flask_login import login_required
 from src.config.app_config import app
 from src.services.service_helper import get_running_docker_containers
 from src.services.decorators.access_decorators import systemguard_enterprise, community_edition
+from src.clients.http_client.client import HttpClient
+
 
 metrics_bp = blueprints.Blueprint('metrics', __name__)
 
+prometheus_api_client = HttpClient("prometheus")
 PROMETHEUS_URL = 'http://localhost:9090'
 
 def query_prometheus(query):
     """Execute a query against Prometheus."""
     try:
-        response = requests.get(
-            f'{PROMETHEUS_URL}/api/v1/query',
-            params={'query': query},
-            timeout=5
-        )
-        response.raise_for_status()
+        response = prometheus_api_client.get('/api/v1/query', params={'query': query}, timeout=10)
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"Prometheus query failed: {str(e)}")

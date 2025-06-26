@@ -31,10 +31,12 @@ class BaseAPIClient:
     def _build_url(self, endpoint: str) -> str:
         return f"{self.base_url}/{endpoint.lstrip('/')}"
 
-    def request(self, method: str, endpoint: str, **kwargs) -> requests.Response:
+    def request(self, method: str, endpoint: str, timeout: int, **kwargs) -> requests.Response:
         url = self._build_url(endpoint)
         request_headers = {**self.headers, **kwargs.pop('headers', {})}
-        timeout = kwargs.pop('timeout', self.timeout)
+        # if timeout is not None override the default timeout
+        if timeout is None:
+            timeout = self.timeout
 
         try:
             response = requests.request(

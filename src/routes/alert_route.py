@@ -150,13 +150,7 @@ def receive_alerts():
 @login_required
 @community_edition()
 def test_alert():
-    alertmanager_ip = get_ip_address()
-    alertmanager_port = "9093"
-    alertmanager_url = f"http://{alertmanager_ip}:{alertmanager_port}"
-
-    response = send_test_alert(
-        alertmanager_url, "Test Alert", "warning", "Test Instance"
-    )
+    response = send_test_alert("Test Alert", "warning", "Test Instance")
     return jsonify(response), response.get("status", 500)
 
 

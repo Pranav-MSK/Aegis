@@ -37,10 +37,10 @@ from src.routes.helper.prometheus_helper import (
 )
 from src.services.decorators.access_decorators import systemguard_enterprise
 from src.config.config_loader import configuration_settings
-from clients.http_client.client import HttpClient
+from src.clients.http_client.client import HttpClient
 
 prometheus_api_client = HttpClient("prometheus")
-logger = get_logger(__name__)
+
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint("prometheus", __name__)
 
@@ -48,6 +48,7 @@ PROMETHEUS_RELOAD_URL = configuration_settings.get(
     "monitoring.prometheus", "RELOAD_URL"
 )
 
+logger = get_logger(__name__)
 RULES_FILE_PATH = os.path.join(ROOT_DIR, "prometheus_config/alert_rules.yml")
 
 def reload_prometheus(prometheus_url="http://localhost:9090/-/reload"):

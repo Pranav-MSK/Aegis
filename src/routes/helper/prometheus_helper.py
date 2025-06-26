@@ -7,6 +7,7 @@ import requests
 
 from src.helper.basic_info import ROOT_DIR
 from src.helper.logger import get_logger
+from src.clients.http_client.client import HttpClient
 logger = get_logger(__name__)
 
 prometheus_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/prometheus.yml')
@@ -14,7 +15,7 @@ alert_manager_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/alertmanager.
 update_prometheus_path = os.path.join(ROOT_DIR, 'src/scripts/update_prometheus.sh')
 alert_rules_path = os.path.join(ROOT_DIR, 'prometheus_config/alert_rules.yml')
 
-PROMETHEUS_BASE_URL = "http://localhost:9090"
+prometheus_api_client = HttpClient("prometheus")
 
 
 def is_valid_file(file_path: str) -> bool:
@@ -203,8 +204,7 @@ def count_of_targets():
 
 def retrieve_active_alertmanagers():
     try:
-        url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"
-        response = requests.get(url)
+        response = prometheus_api_client.get("/api/v1/alertmanagers")
 
         if response.status_code == 200:
             alertmanager_data = response.json()
@@ -216,7 +216,7 @@ def retrieve_active_alertmanagers():
         ]
 
 def retrieve_active_alerts():
-    response = requests.get(f"{PROMETHEUS_BASE_URL}/api/v1/alerts")
+    response = prometheus_api_client.get("/api/v1/alerts")
     alerts_data = response.json()
     alerts = alerts_data["data"]["alerts"]  # Extract the alerts
     return alerts
