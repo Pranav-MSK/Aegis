@@ -37,7 +37,10 @@ from src.routes.helper.prometheus_helper import (
 )
 from src.services.decorators.access_decorators import systemguard_enterprise
 from src.config.config_loader import configuration_settings
+from src.clients.api_client import APIClient
+from src.clients.api_client import APIClient
 
+prometheus_api_client = APIClient("prometheus")
 logger = get_logger(__name__)
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint("prometheus", __name__)
@@ -479,8 +482,7 @@ def alertmanager_status():
 @login_required
 def api_alertmanagers():
     try:
-        url = f"{PROMETHEUS_BASE_URL}/api/v1/alertmanagers"
-        response = requests.get(url)
+        response = prometheus_api_client.get("/api/v1/alertmanagers")
         return jsonify(response.json())
-    except Exception as e:
+    except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500
