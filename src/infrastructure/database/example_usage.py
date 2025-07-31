@@ -1,3 +1,4 @@
+# cython: language_level=3
 # example_usage.py
 
 # from db_connector import DatabaseFactory

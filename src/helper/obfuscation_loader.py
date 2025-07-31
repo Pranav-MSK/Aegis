@@ -1,3 +1,4 @@
+# cython: language_level=3
 import os
 import ctypes
 from pathlib import Path

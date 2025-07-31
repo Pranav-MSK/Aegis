@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import render_template, redirect, url_for, request, flash, jsonify, Blueprint
 from flask_login import login_required, current_user
 

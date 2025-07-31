@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import request, session, flash
 from src.services.firewall.firewall_helper import PortManager
 from src.helper.logger import get_logger

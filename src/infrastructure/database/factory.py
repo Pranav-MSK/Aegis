@@ -1,3 +1,4 @@
+# cython: language_level=3
 # db_connector/factory.py
 
 import os

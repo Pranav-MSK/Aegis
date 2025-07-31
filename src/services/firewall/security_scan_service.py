@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.services.security.network_helper import handle_network_scan, handle_port_scan
 
 class SecurityScanService:

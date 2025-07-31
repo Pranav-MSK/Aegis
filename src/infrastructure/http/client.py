@@ -1,3 +1,4 @@
+# cython: language_level=3
 import requests
 from typing import Dict, Any, Optional, Union
 

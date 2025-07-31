@@ -56,7 +56,7 @@ compile_c_to_so_parallel() {
 copy_files() {
     log "Copying project files..."
     safe_copy requirements.txt "$COMPILED_CODE_DIRECTORY"
-    safe_copy src/config.ini "$COMPILED_CODE_SOURCE_DIRECTORY"
+    safe_copy src/core/config/config.ini "$COMPILED_CODE_SOURCE_DIRECTORY"
     safe_copy systemguard.py "$COMPILED_CODE_DIRECTORY"
     safe_copy setup.sh "$COMPILED_CODE_DIRECTORY"
     safe_copy docs "$COMPILED_CODE_DIRECTORY"

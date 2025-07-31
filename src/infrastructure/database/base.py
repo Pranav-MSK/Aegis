@@ -1,3 +1,4 @@
+# cython: language_level=3
 # db_connector/base.py
 
 from abc import ABC, abstractmethod

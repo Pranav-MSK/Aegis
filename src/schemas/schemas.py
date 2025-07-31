@@ -1,3 +1,4 @@
+# cython: language_level=3
 from dataclasses import dataclass, asdict
 
 # schemas and models are different concepts(in this project), schemas are used for data validation and serialization

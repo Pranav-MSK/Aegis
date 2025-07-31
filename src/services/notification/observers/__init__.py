@@ -1,3 +1,4 @@
+# cython: language_level=3
 
 from src.services.notification.observers.email_observer import EmailAlertObserver
 from src.services.notification.observers.slack_observer import SlackAlertObserver

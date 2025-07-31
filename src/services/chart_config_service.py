@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import render_template, redirect, url_for, jsonify, flash
 from src.models import ChartConfiguration
 from src.helper.request_utils import get_form_value

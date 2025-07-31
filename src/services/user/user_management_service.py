@@ -1,3 +1,4 @@
+# cython: language_level=3
 from datetime import datetime
 import os
 from flask_login import current_user

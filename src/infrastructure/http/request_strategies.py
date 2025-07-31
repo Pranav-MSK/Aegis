@@ -1,3 +1,4 @@
+# cython: language_level=3
 from abc import ABC, abstractmethod
 
 from src.infrastructure.http.base_client import BaseAPIClient

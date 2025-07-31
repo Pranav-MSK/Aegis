@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.models import InstanceMetadata
 from src.helper.ec2_metadata import get_instance_metadata
 from src.helper.logger import get_logger

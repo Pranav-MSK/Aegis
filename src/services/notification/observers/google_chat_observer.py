@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.services.notification.observers.base_observer import AlertObserver
 
 from src.infrastructure.messaging.google_chat_service import dispatch_google_chat_notification

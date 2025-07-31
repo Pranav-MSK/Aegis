@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import Blueprint, jsonify
 
 from src.core.config.app_config import app

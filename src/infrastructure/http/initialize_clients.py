@@ -1,3 +1,4 @@
+# cython: language_level=3
 """
 Centralized API client registration module.
 This module registers all API clients used by the application.

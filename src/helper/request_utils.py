@@ -1,3 +1,4 @@
+# cython: language_level=3
 from flask import request
 
 def get_form_value(key, default):

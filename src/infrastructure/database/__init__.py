@@ -1,3 +1,4 @@
+# cython: language_level=3
 # db_connector/__init__.py
 
 from src.infrastructure.database.factory import DatabaseFactory

@@ -1,3 +1,4 @@
+# cython: language_level=3
 # db_connector/sqlite_connector.py
 
 import os

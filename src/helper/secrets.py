@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.helper.obfuscation_loader import retrieve_obfuscated_key
 
 def load_secret_key(key_name):

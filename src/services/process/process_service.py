@@ -1,3 +1,4 @@
+# cython: language_level=3
 import subprocess
 from src.helper.system_metrics import get_top_processes
 from src.helper.logger import get_logger

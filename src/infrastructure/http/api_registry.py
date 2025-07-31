@@ -1,3 +1,4 @@
+# cython: language_level=3
 from typing import Dict, Optional
 from src.infrastructure.http.base_client import BaseAPIClient
 

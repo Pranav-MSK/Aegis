@@ -1,3 +1,4 @@
+# cython: language_level=3
 # db_connector/postgresql_connector.py
 
 from typing import List, Tuple, Optional, Union, Dict

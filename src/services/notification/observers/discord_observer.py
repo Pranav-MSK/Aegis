@@ -1,3 +1,4 @@
+# cython: language_level=3
 from src.services import notification
 from src.services.notification.observers.base_observer import AlertObserver
 
