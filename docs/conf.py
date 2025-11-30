@@ -24,7 +24,7 @@ pdf_documents = [
 ]
 
 # GitHub Releases Integration
-releases_github_path = "codeperfectplus/systemguard"
+releases_github_path = "SystemGuard-official/systemguard"
 releases_unstable_prehistory = True
 
 # Paths and file formats
@@ -46,13 +46,13 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/codeperfectplus/systemguard",
+            "url": "https://github.com/SystemGuard-official/systemguard",
             "icon": "fab fa-github",
             "type": "fontawesome"
         },
         {
             "name": "Releases",
-            "url": "https://github.com/codeperfectplus/systemguard/releases",
+            "url": "https://github.com/SystemGuard-official/systemguard/releases",
             "icon": "fas fa-tag",
             "type": "fontawesome"
         }
@@ -61,7 +61,7 @@ html_theme_options = {
 }
 
 html_context = {
-    "github_user": "codeperfectplus",
+    "github_user": "SystemGuard-official",
     "github_repo": "systemguard",
     "github_version": "production",
     "doc_path": "docs",

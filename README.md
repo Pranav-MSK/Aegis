@@ -9,47 +9,47 @@
         </a>
       </td>
       <td align="center">
-        <a href="https://github.com/codeperfectplus/SystemGuard/blob/main/LICENSE">
-          <img src="https://img.shields.io/github/license/codeperfectplus/SystemGuard" alt="GitHub license"/>
+        <a href="https://github.com/SystemGuard-official/SystemGuard/blob/main/LICENSE">
+          <img src="https://img.shields.io/github/license/SystemGuard-official/SystemGuard" alt="GitHub license"/>
         </a>
       </td>
       <td align="center">
-        <a href="https://github.com/codeperfectplus/SystemGuard/releases">
-          <img src="https://img.shields.io/github/v/release/codeperfectplus/SystemGuard" alt="GitHub release"/>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td align="center">
-        <a href="https://github.com/codeperfectplus/SystemGuard/issues">
-          <img src="https://img.shields.io/github/issues/codeperfectplus/SystemGuard" alt="GitHub issues"/>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://github.com/codeperfectplus/SystemGuard/pulls">
-          <img src="https://img.shields.io/github/issues-pr/codeperfectplus/SystemGuard" alt="GitHub pull requests"/>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://github.com/codeperfectplus/SystemGuard/commits/dev">
-          <img src="https://img.shields.io/github/commit-activity/m/codeperfectplus/SystemGuard" alt="GitHub commit activity"/>
+        <a href="https://github.com/SystemGuard-official/SystemGuard/releases">
+          <img src="https://img.shields.io/github/v/release/SystemGuard-official/SystemGuard" alt="GitHub release"/>
         </a>
       </td>
     </tr>
     <tr>
       <td align="center">
-        <a href="https://github.com/codeperfectplus/SystemGuard/network/members">
-          <img src="https://img.shields.io/github/forks/codeperfectplus/SystemGuard" alt="GitHub forks"/>
+        <a href="https://github.com/SystemGuard-official/SystemGuard/issues">
+          <img src="https://img.shields.io/github/issues/SystemGuard-official/SystemGuard" alt="GitHub issues"/>
         </a>
       </td>
       <td align="center">
-        <a href="https://github.com/codeperfectplus/SystemGuard/stargazers">
-          <img src="https://img.shields.io/github/stars/codeperfectplus/SystemGuard" alt="GitHub stars"/>
+        <a href="https://github.com/SystemGuard-official/SystemGuard/pulls">
+          <img src="https://img.shields.io/github/issues-pr/SystemGuard-official/SystemGuard" alt="GitHub pull requests"/>
         </a>
       </td>
       <td align="center">
-        <a href="https://github.com/codeperfectplus/SystemGuard/watchers">
-          <img src="https://img.shields.io/github/watchers/codeperfectplus/SystemGuard" alt="GitHub watchers"/>
+        <a href="https://github.com/SystemGuard-official/SystemGuard/commits/dev">
+          <img src="https://img.shields.io/github/commit-activity/m/SystemGuard-official/SystemGuard" alt="GitHub commit activity"/>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/SystemGuard-official/SystemGuard/network/members">
+          <img src="https://img.shields.io/github/forks/SystemGuard-official/SystemGuard" alt="GitHub forks"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/SystemGuard-official/SystemGuard/stargazers">
+          <img src="https://img.shields.io/github/stars/SystemGuard-official/SystemGuard" alt="GitHub stars"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/SystemGuard-official/SystemGuard/watchers">
+          <img src="https://img.shields.io/github/watchers/SystemGuard-official/SystemGuard" alt="GitHub watchers"/>
         </a>
       </td>
     </tr>

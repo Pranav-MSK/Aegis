@@ -23,6 +23,12 @@ For **Debian/Ubuntu** systems:
 
 For **Fedora** systems:
 
+For **Arch Linux** systems:
+
+   .. code:: bash
+
+      sudo pacman -Syu unzip iptables nmap
+
    .. code:: bash
 
       sudo dnf update -y
@@ -78,7 +84,7 @@ Installation Steps
 
    .. code:: bash
 
-      wget https://raw.githubusercontent.com/codeperfectplus/SystemGuard/production/setup.sh
+      wget https://raw.githubusercontent.com/SystemGuard-official/SystemGuard/production/setup.sh
       chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/systemguard-installer
 
 2. **Install the SystemGuard App:**

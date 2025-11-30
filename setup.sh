@@ -231,8 +231,8 @@ install_dependencies() {
 
 # Function to check for required dependencies
 check_dependencies() {
-    # List of required dependencies
-    local dependencies=(git curl wget unzip iptables)
+    # List of required dependencies (add nmap for parity with docs)
+    local dependencies=(git curl wget unzip iptables nmap)
 
     # Detect the package manager
     local manager
@@ -254,6 +254,10 @@ check_dependencies() {
         echo "Do you want to install them now? (y/n)"
         read -r choice
         if [ "$choice" == "y" ]; then
+            # For Arch Linux, ensure system is updated before installing
+            if [ "$manager" = "pacman" ]; then
+                sudo pacman -Syu --noconfirm
+            fi
             install_dependencies "$manager" "${missing_dependencies[@]}"
         else
             log "ERROR" "Please install the required dependencies and run the script again."

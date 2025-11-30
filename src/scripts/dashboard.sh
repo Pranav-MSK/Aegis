@@ -66,7 +66,7 @@ APP_NAME="systemguard"
 LOG_FILE="/home/$(whoami)/logs/flask.log"
 USERNAME="$(whoami)"
 CONDA_ENV_NAME=$APP_NAME
-GIT_REMOTE_URL="https://github.com/codeperfectplus/SystemDashboard" # Set this if you want to add a remote
+GIT_REMOTE_URL="https://github.com/SystemGuard-official/SystemDashboard" # Set this if you want to add a remote
 ENV_FILE="/home/$(whoami)/.bashrc"
 PYTHON_VERSION="3.13"
 # Export Flask environment variables
