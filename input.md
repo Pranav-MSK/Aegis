@@ -5,9 +5,6 @@ I’m currently working on a similar project called systemguard. It’s focused 
 I believe there’s a lot we could learn from each other’s journeys, and possibly even explore ways to collaborate or cross-pollinate ideas. Would you be open to a quick call for a demo and to introduce the product? I think it could be mutually beneficial, and I’d love to hear your thoughts on it. Let me know if you’re available, and we can set up a time that works for both of us. Looking forward to hearing from you!
 
 
-
-
-
 I’m currently working on a project called SystemGuard, designed to provide a comprehensive solution for system and API/service monitoring, advanced threat detection, and robust alert management. SystemGuard enables organizations to monitor the health and performance of their infrastructure and APIs in real time, while proactively identifying security threats and anomalies.
 
 Key features include:
