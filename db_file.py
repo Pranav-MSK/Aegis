@@ -33,6 +33,8 @@ rows = c.fetchall()
 # Print the data in a tabular format
 print(tabulate(rows, headers=column_names, tablefmt="grid"))
 
+
+
 # Ask if the user wants to export the data as CSV
 export_choice = input("\nDo you want to download this data as a CSV file? (yes/no): ").strip().lower()
 
