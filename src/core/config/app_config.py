@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from datetime import datetime
 from humanize import naturaltime
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from src.core.monitoring.disk_manager import DiskMetrics
 from src.core.monitoring.network_manager import NetworkMetrics
@@ -28,6 +29,7 @@ template_folder = os.path.join(ROOT_DIR, "src/templates")
 static_folder = os.path.join(ROOT_DIR, "src/static")
 print(f"Template folder: {template_folder}")
 app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # Application Metadata
 APP_NAME = configuration_settings["app.meta"].get('NAME', fallback='SystemGuard')
