@@ -84,28 +84,28 @@ Installation Steps
 
    .. code:: bash
 
-      wget https://raw.githubusercontent.com/SystemGuard-official/SystemGuard/production/setup.sh
-      chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/systemguard-installer
+      wget https://raw.githubusercontent.com/py-contributors/Aegis/production/setup.sh
+      chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/aegis-installer
 
-2. **Install the SystemGuard App:**
+2. **Install the Aegis App:**
 
-   Run the installer to set up the SystemGuard app:
-
-   .. code:: bash
-
-      sudo systemguard-installer --install
-
-   Optionally, you can install the Alert Manager along with the SystemGuard. Recommended for centralized server monitoring and alerting capabilities:
+   Run the installer to set up the Aegis app:
 
    .. code:: bash
 
-      sudo systemguard-installer --install-alert-manager
+      sudo aegis-installer --install
+
+   Optionally, you can install the Alert Manager along with the Aegis. Recommended for centralized server monitoring and alerting capabilities:
+
+   .. code:: bash
+
+      sudo aegis-installer --install-alert-manager
 
 
-3. **Access SystemGuard:**
+3. **Access Aegis:**
 
    Once the installation is complete, open your browser and visit the
-   following URL to access the SystemGuard dashboard:
+   following URL to access the Aegis dashboard:
 
    .. code:: bash
 
@@ -125,11 +125,11 @@ Installation Steps
 4. **Start Monitoring:**
 
    After logging in, you can begin monitoring your server’s performance
-   and system metrics through the SystemGuard interface.
+   and system metrics through the Aegis interface.
 
 --------------
 
-By following these steps, SystemGuard will be installed and ready for
+By following these steps, Aegis will be installed and ready for
 use on your server.
 
 
@@ -138,4 +138,4 @@ use on your server.
 
 .. code:: bash
 
-   sudo /usr/local/bin/systemguard-installer --install
+   sudo /usr/local/bin/aegis-installer --install

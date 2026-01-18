@@ -44,7 +44,7 @@ USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
 DOWNLOAD_DIR="/tmp"
-APP_NAME="SystemGuard"
+APP_NAME="Aegis"
 INSATLLER_VERSION="v1.0.0"
 APP_NAME_LOWER=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]')
 EXTRACT_DIR="$USER_HOME/.$APP_NAME_LOWER"
@@ -64,7 +64,7 @@ FLASK_LOG_FILE="$LOG_DIR/flask.log"
 CRON_PATTERN=".$APP_NAME_LOWER/${APP_NAME}-.*/src/scripts/dashboard.sh"
 
 # GitHub repository details
-GITHUB_USER="systemGuard-official"
+GITHUB_USER="py-contributors"
 GITHUB_REPO="$APP_NAME"
 GITHUB_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO"
 ISSUE_TRACKER_URL="$GITHUB_URL/issues"
@@ -82,7 +82,7 @@ ADMIN_LOGIN="admin"
 ADMIN_PASSWORD="admin"
 
 # installation script link
-install_script_link="https://raw.githubusercontent.com/systemGuard-official/SystemGuard/main/setup.sh"
+install_script_link="https://raw.githubusercontent.com/py-contributors/Aegis/main/setup.sh"
 
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
