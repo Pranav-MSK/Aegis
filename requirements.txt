@@ -50,7 +50,7 @@ aiohttp==3.13.3             # Async HTTP client for non-blocking requests
 fpdf==1.7.2                 # PDF generation library
 humanize==4.12.3            # Humanizes data (e.g., file sizes, timestamps)
 
-markdown==3.8
+markdown==3.8.1
 
 pybind11==2.13.6            # C++11 bindings for Python
 
