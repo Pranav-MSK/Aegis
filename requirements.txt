@@ -30,7 +30,7 @@ flask-cors==6.0.1           # Cross-Origin Resource Sharing (CORS) support for F
 watchdog==6.0.0             # Monitors filesystem events and changes
 
 # HTTP requests library
-requests==2.32.4            # Simplified HTTP requests for Python
+requests==2.33.0            # Simplified HTTP requests for Python
 
 # Internet speed testing
 speedtest-cli==2.1.3        # CLI for testing internet speed
