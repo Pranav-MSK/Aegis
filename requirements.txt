@@ -7,7 +7,7 @@ psutil==7.0.0               # Retrieves system metrics (CPU, memory, etc.)
 GPUtil==1.4.0               # Retrieves GPU metrics (if available)
 
 # Environment variable management
-python-dotenv==1.1.0        # Loads environment variables from .env file
+python-dotenv==1.2.2        # Loads environment variables from .env file
 cryptography==46.0.7
 
 # WSGI HTTP server for production
