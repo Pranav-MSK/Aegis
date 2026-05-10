@@ -67,10 +67,10 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 - Centralized control panel for monitor/manage/analyze the fleet of servers.
 - Role-Based Access Control (RBAC) for managing user permissions.
 - Includes built-in security features such as authentication for login, logout, and signup.
-- Analuze the network speed with the built-in speed test feature.
-- Anaylze the suspicious processes and terminate them with a single click.
-- Anaylze the network statistics with the built-in network statistics feature.
-- Anaylze the subnet for security vulnerabilities with the built-in security analysis feature.
+- Analyze the network speed with the built-in speed test feature.
+- Analyze the suspicious processes and terminate them with a single click.
+- Analyze the network statistics with the built-in network statistics feature.
+- Analyze the subnet for security vulnerabilities with the built-in security analysis feature.
 - Option to download historical data in CSV format for detailed analysis (upcoming feature).
 - Role-based dashboards tailored for Developer, Admin, IT Manager, and Manager roles (upcoming feature).
 - Update security updates with a single click or automatically update to the latest version to simplify maintenance.
@@ -92,7 +92,7 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 ## Release Notes 📝
 
 - Check the [Release Notes](/src/docs/Release.md) file for the latest updates.
-- Check the [Release Instructions](/src/docs/release_instrunctions.md) file for the release process.
+- Check the [Release Instructions](/src/docs/release_instructions.md) file for the release process.
 
 ## Supported Systems 🖥️
 
@@ -100,7 +100,9 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 
 ## How does installation work? 🤔
 
-The installation process is straightforward and can be completed in a few steps. The user needs to run a bash script that installs the required dependencies, sets up the database, create a conda environment, and add flask server to the cron job. The user can then access the SystemGuard web interface by visiting the server's IP address or domain name.
+The installation process is straightforward and can be completed in a few steps. The user needs to run a bash script that installs the required dependencies, sets up the database, create a conda environment, and add flask server to the cron job. The user can then access the SystemGuard web interface by visiting the server's IP address or domain name. 
+
+For more details, checkout the official website:- [SystemGuard](https://systemguard.readthedocs.io/en/latest/)
 
 ## Product Screenshots 📸
 
@@ -116,4 +118,7 @@ Contributions are always welcome! Please read the [contribution guidelines](/CON
 
 ## License 📝
 
-This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
+This project is licensed under the GPL-3.0 License - see the [LICENSE](/LICENSE) file for details.
+
+### Note
+Aegis is the repository to maintain and work on the SystemGuard tool. 
